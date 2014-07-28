@@ -1,0 +1,4 @@
+name: colt
+description: A pub package
+dependencies:
+  intl: any
