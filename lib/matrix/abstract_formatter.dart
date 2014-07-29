@@ -150,9 +150,9 @@ abstract class AbstractFormatter {//extends cern.colt.PersistentObject {
             // int maxTrail = Integer.MIN_VALUE;
             for (int row = 0; row < rows; row++) {
                 String s = strings[row][column];
-                maxWidth = math.max(maxWidth, s.length);
+                maxWidth = Math.max(maxWidth, s.length);
                 if (isDecimal)
-                    maxLead = math.max(maxLead, _lead(s));
+                    maxLead = Math.max(maxLead, _lead(s));
                 // maxTrail = Math.max(maxTrail, trail(s));
             }
             maxColWidth[column] = maxWidth;

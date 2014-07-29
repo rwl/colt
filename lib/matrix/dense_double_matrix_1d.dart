@@ -69,9 +69,10 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
      * @param values
      *            The values to be filled into the new matrix.
      */
-    DenseDoubleMatrix1D(List<double> values) {
-        this(values.length);
-        assign(values);
+    factory DenseDoubleMatrix1D.from(List<double> values) {
+        final m = new DenseDoubleMatrix1D(values.length);
+        m.assign(values);
+        return m;
     }
 
     /**
@@ -83,10 +84,10 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
      * @throws IllegalArgumentException
      *             if <tt>size<0</tt>.
      */
-    DenseDoubleMatrix1D(int size) {
-        _setUp(size);
-        this._elements = new List<double>(size);
-    }
+//    DenseDoubleMatrix1D(int size) {
+//        _setUp(size);
+//        this._elements = new List<double>(size);
+//    }
 
     /**
      * Constructs a matrix with the given parameters.
@@ -105,7 +106,10 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
      * @throws IllegalArgumentException
      *             if <tt>size<0</tt>.
      */
-    DenseDoubleMatrix1D(int size, List<double> elements, int zero, int stride, bool isView) {
+    DenseDoubleMatrix1D(int size, [List<double> elements=null, int zero=0, int stride=1, bool isView=false]) {
+        if (elements == null) {
+          elements = new List<double>(size);
+        }
         _setUp(size, zero, stride);
         this._elements = elements;
         this._isNoView = !isView;
@@ -144,9 +148,9 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
         return a;
     }
 
-    double aggregate(final DoubleDoubleFunction aggr,
+    double aggregateIndex(final DoubleDoubleFunction aggr,
             final DoubleFunction f, final IntArrayList indexList) {
-        if (size() == 0)
+        if (this.size() == 0)
             return Double.NaN;
         final int size = indexList.size();
         final List<int> indexElements = indexList.elements();
@@ -185,7 +189,7 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
         return a;
     }
 
-    double aggregate(final DoubleMatrix1D other, final DoubleDoubleFunction aggr,
+    double aggregateMatrix(final DoubleMatrix1D other, final DoubleDoubleFunction aggr,
             final DoubleDoubleFunction f) {
         if (!(other is DenseDoubleMatrix1D)) {
             return super.aggregate(other, aggr, f);
@@ -231,7 +235,7 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
         return a;
     }
 
-    DoubleMatrix1D assign(final DoubleFunction function) {
+    DoubleMatrix1D assignFunc(final DoubleFunction function) {
         final double multiplicator;
         if (function is DoubleMult) {
             // x[i] = mult*x[i]
@@ -287,7 +291,7 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
         return this;
     }
 
-    DoubleMatrix1D assign(final DoubleProcedure cond,
+    DoubleMatrix1D assignProc(final DoubleProcedure cond,
             final DoubleFunction function) {
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
         if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
@@ -320,7 +324,7 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
         return this;
     }
 
-    DoubleMatrix1D assign(final DoubleProcedure cond, final double value) {
+    DoubleMatrix1D assignProcValue(final DoubleProcedure cond, final double value) {
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
         if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
             nthreads = Math.min(nthreads, _size);
@@ -381,7 +385,7 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
         return this;
     }
 
-    DoubleMatrix1D assign(final List<double> values) {
+    DoubleMatrix1D assignValues(final List<double> values) {
         if (values.length != _size)
             throw new IllegalArgumentException("Must have same number of cells: length=" + values.length + "size()="
                     + size());
@@ -416,7 +420,7 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
         return this;
     }
 
-    DoubleMatrix1D assign(DoubleMatrix1D source) {
+    DoubleMatrix1D assignMatrix(DoubleMatrix1D source) {
         // overriden for performance only
         if (!(source is DenseDoubleMatrix1D)) {
             super.assign(source);
@@ -477,7 +481,7 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
         return this;
     }
 
-    DoubleMatrix1D assign(final DoubleMatrix1D y, final DoubleDoubleFunction function) {
+    DoubleMatrix1D assignMatrixFunc(final DoubleMatrix1D y, final DoubleDoubleFunction function) {
         // overriden for performance only
         if (!(y is DenseDoubleMatrix1D)) {
             super.assign(y, function);
@@ -1252,7 +1256,7 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
         return M;
     }
 
-    DoubleMatrix3D reshape(final int slices, final int rows, final int columns) {
+    DoubleMatrix3D reshape3D(final int slices, final int rows, final int columns) {
         if (slices * rows * columns != _size) {
             throw new IllegalArgumentException("slices*rows*columns != size");
         }

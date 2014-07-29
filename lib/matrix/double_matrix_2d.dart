@@ -135,7 +135,7 @@ abstract class DoubleMatrix2D extends AbstractMatrix2D {
      * @return the aggregated measure.
      * @see cern.jet.math.tdouble.DoubleFunctions
      */
-    double aggregate(final DoubleDoubleFunction aggr,
+    double aggregateProc(final DoubleDoubleFunction aggr,
             final DoubleFunction f, final DoubleProcedure cond) {
         if (size() == 0)
             return Double.NaN;
@@ -206,9 +206,9 @@ abstract class DoubleMatrix2D extends AbstractMatrix2D {
      * @return the aggregated measure.
      * @see cern.jet.math.tdouble.DoubleFunctions
      */
-    double aggregate(final DoubleDoubleFunction aggr,
+    double aggregateIndex(final DoubleDoubleFunction aggr,
             final DoubleFunction f, final IntArrayList rowList, final IntArrayList columnList) {
-        if (size() == 0)
+        if (this.size() == 0)
             return Double.NaN;
         final int size = rowList.size();
         final List<int> rowElements = rowList.elements();
@@ -289,7 +289,7 @@ abstract class DoubleMatrix2D extends AbstractMatrix2D {
      *             <tt>columns() != other.columns() || rows() != other.rows()</tt>
      * @see cern.jet.math.tdouble.DoubleFunctions
      */
-    double aggregate(final DoubleMatrix2D other, final DoubleDoubleFunction aggr,
+    double aggregateFunc(final DoubleMatrix2D other, final DoubleDoubleFunction aggr,
             final DoubleDoubleFunction f) {
         checkShape(other);
         if (size() == 0)
@@ -396,7 +396,7 @@ abstract class DoubleMatrix2D extends AbstractMatrix2D {
      * @return <tt>this</tt> (for convenience only).
      * @see cern.jet.math.tdouble.DoubleFunctions
      */
-    DoubleMatrix2D assign(final DoubleProcedure cond,
+    DoubleMatrix2D assignProcFunc(final DoubleProcedure cond,
             final DoubleFunction f) {
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
         if ((nthreads > 1) && (_rows * _columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -444,7 +444,7 @@ abstract class DoubleMatrix2D extends AbstractMatrix2D {
      * @return <tt>this</tt> (for convenience only).
      *
      */
-    DoubleMatrix2D assign(final DoubleProcedure cond, final double value) {
+    DoubleMatrix2D assignProc(final DoubleProcedure cond, final double value) {
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
         if ((nthreads > 1) && (_rows * _columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             nthreads = Math.min(nthreads, _rows);
@@ -487,7 +487,7 @@ abstract class DoubleMatrix2D extends AbstractMatrix2D {
      *            the value to be filled into the cells.
      * @return <tt>this</tt> (for convenience only).
      */
-    DoubleMatrix2D assign(final double value) {
+    DoubleMatrix2D assignValue(final double value) {
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
         if ((nthreads > 1) && (_rows * _columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
             nthreads = Math.min(nthreads, _rows);
@@ -529,7 +529,7 @@ abstract class DoubleMatrix2D extends AbstractMatrix2D {
      * @throws IllegalArgumentException
      *             if <tt>values.length != rows()*columns()</tt>.
      */
-    DoubleMatrix2D assign(List<double> values) {
+    DoubleMatrix2D assignValues(List<double> values) {
         if (values.length != _rows * _columns)
             throw new IllegalArgumentException("Must have same length: length=" + values.length + "rows()*columns()="
                     + rows() * columns());
@@ -580,7 +580,7 @@ abstract class DoubleMatrix2D extends AbstractMatrix2D {
      *             <tt>values.length != rows() || for any 0 &lt;= row &lt; rows(): values[row].length != columns()</tt>
      *             .
      */
-    DoubleMatrix2D assign(final List<List<double>> values) {
+    DoubleMatrix2D assignValues2D(final List<List<double>> values) {
         if (values.length != _rows)
             throw new IllegalArgumentException("Must have same number of rows: rows=" + values.length + "rows()="
                     + rows());
@@ -636,7 +636,7 @@ abstract class DoubleMatrix2D extends AbstractMatrix2D {
      *             if
      *             <tt>columns() != other.columns() || rows() != other.rows()</tt>
      */
-    DoubleMatrix2D assign(DoubleMatrix2D other) {
+    DoubleMatrix2D assignMatrix(DoubleMatrix2D other) {
         if (other == this)
             return this;
         checkShape(other);
@@ -712,7 +712,7 @@ abstract class DoubleMatrix2D extends AbstractMatrix2D {
      *             <tt>columns() != other.columns() || rows() != other.rows()</tt>
      * @see cern.jet.math.tdouble.DoubleFunctions
      */
-    DoubleMatrix2D assign(final DoubleMatrix2D y, final DoubleDoubleFunction function) {
+    DoubleMatrix2D assignFunc(final DoubleMatrix2D y, final DoubleDoubleFunction function) {
         checkShape(y);
         int nthreads = ConcurrencyUtils.getNumberOfThreads();
         if ((nthreads > 1) && (_rows * _columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -761,7 +761,7 @@ abstract class DoubleMatrix2D extends AbstractMatrix2D {
      *             <tt>columns() != other.columns() || rows() != other.rows()</tt>
      * @see cern.jet.math.tdouble.DoubleFunctions
      */
-    DoubleMatrix2D assign(final DoubleMatrix2D y,
+    DoubleMatrix2D assignFuncIndex(final DoubleMatrix2D y,
             final DoubleDoubleFunction function, IntArrayList rowList,
             IntArrayList columnList) {
         checkShape(y);
@@ -807,7 +807,7 @@ abstract class DoubleMatrix2D extends AbstractMatrix2D {
      * @throws IllegalArgumentException
      *             if <tt>values.length != rows()*columns()</tt>.
      */
-    DoubleMatrix2D assign(List<float> values) {
+    DoubleMatrix2D assignList(List<float> values) {
         if (values.length != _rows * _columns)
             throw new IllegalArgumentException("Must have same length: length=" + values.length + "rows()*columns()="
                     + rows() * columns());
@@ -919,7 +919,7 @@ abstract class DoubleMatrix2D extends AbstractMatrix2D {
      * @return <tt>true</tt> if all cells are equal to the given value,
      *         <tt>false</tt> otherwise.
      */
-    bool equals(double value) {
+    bool equalsValue(double value) {
         return cern.colt.matrix.tdouble.algo.DoubleProperty.DEFAULT.equals(this, value);
     }
 
@@ -1331,7 +1331,7 @@ abstract class DoubleMatrix2D extends AbstractMatrix2D {
      *            the number of columns the matrix shall have.
      * @return a new empty matrix of the same dynamic type.
      */
-    DoubleMatrix2D like(int rows, int columns);
+    DoubleMatrix2D like2D(int rows, int columns);
 
     /**
      * Construct and returns a new 1-d matrix <i>of the corresponding dynamic
@@ -1711,7 +1711,7 @@ abstract class DoubleMatrix2D extends AbstractMatrix2D {
      *            The condition to be matched.
      * @return the new view.
      */
-    DoubleMatrix2D viewSelection(DoubleMatrix1DProcedure condition) {
+    DoubleMatrix2D viewSelectionProc(DoubleMatrix1DProcedure condition) {
         IntArrayList matches = new IntArrayList();
         for (int i = 0; i < _rows; i++) {
             if (condition.apply(viewRow(i)))
@@ -1794,7 +1794,7 @@ abstract class DoubleMatrix2D extends AbstractMatrix2D {
         return _viewSelectionLike(rowOffsets, columnOffsets);
     }
 
-    DoubleMatrix2D viewSelection(Set<List<int>> indexes) {
+    DoubleMatrix2D viewSelectionSet(Set<List<int>> indexes) {
         int n = indexes.size();
         List<int> rowIndexes = new List<int>(n);
         List<int> columnIndexes = new List<int>(n);
@@ -1961,9 +1961,9 @@ abstract class DoubleMatrix2D extends AbstractMatrix2D {
      * Linear algebraic matrix-vector multiplication; <tt>z = A * y</tt>;
      * Equivalent to <tt>return A.zMult(y,z,1,0);</tt>
      */
-    DoubleMatrix1D zMult(DoubleMatrix1D y, DoubleMatrix1D z) {
-        return zMult(y, z, 1, 0, false);
-    }
+//    DoubleMatrix1D zMult(DoubleMatrix1D y, DoubleMatrix1D z) {
+//        return zMult(y, z, 1, 0, false);
+//    }
 
     /**
      * Linear algebraic matrix-vector multiplication;
@@ -1984,8 +1984,8 @@ abstract class DoubleMatrix2D extends AbstractMatrix2D {
      * @throws IllegalArgumentException
      *             if <tt>A.columns() != y.size() || A.rows() > z.size())</tt>.
      */
-    DoubleMatrix1D zMult(final DoubleMatrix1D y, DoubleMatrix1D z, final double alpha, final double beta,
-            final bool transposeA) {
+    DoubleMatrix1D zMult(final DoubleMatrix1D y, DoubleMatrix1D z, [double alpha=1, double beta=0,
+            bool transposeA=false]) {
         if (transposeA)
             return viewDice().zMult(y, z, alpha, beta, false);
         final DoubleMatrix1D zz;
@@ -2033,9 +2033,9 @@ abstract class DoubleMatrix2D extends AbstractMatrix2D {
      * Linear algebraic matrix-matrix multiplication; <tt>C = A x B</tt>;
      * Equivalent to <tt>A.zMult(B,C,1,0,false,false)</tt>.
      */
-    DoubleMatrix2D zMult(DoubleMatrix2D B, DoubleMatrix2D C) {
-        return zMult(B, C, 1, 0, false, false);
-    }
+//    DoubleMatrix2D zMult(DoubleMatrix2D B, DoubleMatrix2D C) {
+//        return zMult(B, C, 1, 0, false, false);
+//    }
 
     /**
      * Linear algebraic matrix-matrix multiplication;
@@ -2061,8 +2061,8 @@ abstract class DoubleMatrix2D extends AbstractMatrix2D {
      * @throws IllegalArgumentException
      *             if <tt>A == C || B == C</tt>.
      */
-    DoubleMatrix2D zMult(final DoubleMatrix2D B, DoubleMatrix2D C, final double alpha, final double beta,
-            final bool transposeA, final bool transposeB) {
+    DoubleMatrix2D zMult2D(final DoubleMatrix2D B, DoubleMatrix2D C, [double alpha=1, double beta=0,
+            bool transposeA=false, bool transposeB=false]) {
         if (transposeA)
             return viewDice().zMult(B, C, alpha, beta, false, transposeB);
         if (transposeB)
