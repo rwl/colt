@@ -181,7 +181,7 @@ abstract class DoubleMatrix1D extends AbstractMatrix1D {
    *             if <tt>size() != other.size()</tt>.
    * @see cern.jet.math.tdouble.DoubleFunctions
    */
-  double aggregateFunc(final DoubleMatrix1D other, DoubleDoubleFunction aggr, DoubleDoubleFunction f) {
+  double aggregateMatrix(final DoubleMatrix1D other, DoubleDoubleFunction aggr, DoubleDoubleFunction f) {
     checkSize(other);
     if (_size == 0) return double.NAN;
     double a = f(getQuick(0), other.getQuick(0));
