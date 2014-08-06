@@ -19,70 +19,70 @@ part of cern.colt.matrix;
  * @see cern.colt.Sorting
  */
 abstract class Former {
-    /**
-     * Formats a double into a string (like sprintf in C).
-     *
-     * @param value
-     *            the number to format
-     * @return the formatted string
-     * @exception IllegalArgumentException
-     *                if bad argument
-     */
-    String formDouble(double value);
+  /**
+   * Formats a double into a string (like sprintf in C).
+   *
+   * @param value
+   *            the number to format
+   * @return the formatted string
+   * @exception IllegalArgumentException
+   *                if bad argument
+   */
+  String formDouble(double value);
 
-    /**
-     * Formats a float into a string (like sprintf in C).
-     *
-     * @param value
-     *            the number to format
-     * @return the formatted string
-     * @exception IllegalArgumentException
-     *                if bad argument
-     */
-    //String form(float value);
+  /**
+   * Formats a float into a string (like sprintf in C).
+   *
+   * @param value
+   *            the number to format
+   * @return the formatted string
+   * @exception IllegalArgumentException
+   *                if bad argument
+   */
+  //String form(float value);
 
-    /**
-     * Formats an int into a string (like sprintf in C).
-     *
-     * @param value
-     *            the number to format
-     * @return the formatted string
-     * @exception IllegalArgumentException
-     *                if bad argument
-     */
-    String formInt(int value);
+  /**
+   * Formats an int into a string (like sprintf in C).
+   *
+   * @param value
+   *            the number to format
+   * @return the formatted string
+   * @exception IllegalArgumentException
+   *                if bad argument
+   */
+  String formInt(int value);
 
-    /**
-     * Formats an long into a string (like sprintf in C).
-     *
-     * @param value
-     *            the number to format
-     * @return the formatted string
-     * @exception IllegalArgumentException
-     *                if bad argument
-     */
-    //String form(long value);
+  /**
+   * Formats an long into a string (like sprintf in C).
+   *
+   * @param value
+   *            the number to format
+   * @return the formatted string
+   * @exception IllegalArgumentException
+   *                if bad argument
+   */
+  //String form(long value);
 
-    /**
-     * Formats a complex (double[]) into a string (like sprintf in C).
-     *
-     * @param value
-     *            the number to format
-     * @return the formatted string
-     * @exception IllegalArgumentException
-     *                if bad argument
-     */
-    String formComplex(List<double> value);
+  /**
+   * Formats a complex (double[]) into a string (like sprintf in C).
+   *
+   * @param value
+   *            the number to format
+   * @return the formatted string
+   * @exception IllegalArgumentException
+   *                if bad argument
+   */
+  String formComplex(List<double> value);
 
-    /**
-     * Formats a complex (float[]) into a string (like sprintf in C).
-     *
-     * @param value
-     *            the number to format
-     * @return the formatted string
-     * @exception IllegalArgumentException
-     *                if bad argument
-     */
-    //String form(List<float> value);
+  /**
+   * Formats a complex (float[]) into a string (like sprintf in C).
+   *
+   * @param value
+   *            the number to format
+   * @return the formatted string
+   * @exception IllegalArgumentException
+   *                if bad argument
+   */
+  //String form(List<float> value);
 
 }

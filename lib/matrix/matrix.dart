@@ -9,7 +9,6 @@ import '../function.dart' show DoubleFunction, DoubleDoubleFunction, DoubleDoubl
 import '../function.dart' as func;
 import '../math.dart';
 import '../util.dart';
-//import '../list/list.dart';
 
 part 'abstract_formatter.dart';
 part 'abstract_matrix_1d.dart';

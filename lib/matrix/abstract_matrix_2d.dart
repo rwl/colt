@@ -21,338 +21,332 @@ part of cern.colt.matrix;
  */
 abstract class AbstractMatrix2D extends AbstractMatrix {
 
-    /** the number of colums and rows this matrix (view) has */
-    int _columns, _rows;
+  /** the number of colums and rows this matrix (view) has */
+  int _columns, _rows;
 
-    /**
-     * the number of elements between two rows, i.e.
-     * <tt>index(i+1,j,k) - index(i,j,k)</tt>.
-     */
-    int _rowStride;
+  /**
+   * the number of elements between two rows, i.e.
+   * <tt>index(i+1,j,k) - index(i,j,k)</tt>.
+   */
+  int _rowStride;
 
-    /**
-     * the number of elements between two columns, i.e.
-     * <tt>index(i,j+1,k) - index(i,j,k)</tt>.
-     */
-    int _columnStride;
+  /**
+   * the number of elements between two columns, i.e.
+   * <tt>index(i,j+1,k) - index(i,j,k)</tt>.
+   */
+  int _columnStride;
 
-    /** the index of the first element */
-    int _rowZero, _columnZero;
+  /** the index of the first element */
+  int _rowZero, _columnZero;
 
-    AbstractMatrix2D() {
+  AbstractMatrix2D() {
+  }
+
+  /**
+   * Returns the position of the given absolute rank within the (virtual or
+   * non-virtual) internal 1-dimensional array. Default implementation.
+   * Override, if necessary.
+   *
+   * @param rank
+   *            the absolute rank of the element.
+   * @return the position.
+   */
+  int _columnOffset(int absRank) {
+    return absRank;
+  }
+
+  /**
+   * Returns the absolute rank of the given relative rank.
+   *
+   * @param rank
+   *            the relative rank of the element.
+   * @return the absolute rank of the element.
+   */
+  int _columnRank(int rank) {
+    return _columnZero + rank * _columnStride;
+  }
+
+  /**
+   * Returns the position of the given absolute rank within the (virtual or
+   * non-virtual) internal 1-dimensional array. Default implementation.
+   * Override, if necessary.
+   *
+   * @param rank
+   *            the absolute rank of the element.
+   * @return the position.
+   */
+  int _rowOffset(int absRank) {
+    return absRank;
+  }
+
+  /**
+   * Returns the absolute rank of the given relative rank.
+   *
+   * @param rank
+   *            the relative rank of the element.
+   * @return the absolute rank of the element.
+   */
+  int _rowRank(int rank) {
+    return _rowZero + rank * _rowStride;
+  }
+
+  /**
+   * Checks whether the receiver contains the given box and throws an
+   * exception, if necessary.
+   *
+   * @throws IndexOutOfBoundsException
+   *             if
+   *             <tt>column<0 || width<0 || column+width>columns() || row<0 || height<0 || row+height>rows()</tt>
+   */
+  void _checkBox(int row, int column, int height, int width) {
+    if (column < 0 || width < 0 || column + width > _columns || row < 0 || height < 0 || row + height > _rows) throw new RangeError(toStringShort() + ", column:$column, row:$row ,width:$width, height:$height");
+  }
+
+  /**
+   * Sanity check for operations requiring a column index to be within bounds.
+   *
+   * @throws IndexOutOfBoundsException
+   *             if <tt>column < 0 || column >= columns()</tt>.
+   */
+  void _checkColumn(int column) {
+    if (column < 0 || column >= _columns) throw new RangeError("Attempted to access " + toStringShort() + " at column=$column");
+  }
+
+  /**
+   * Checks whether indexes are legal and throws an exception, if necessary.
+   *
+   * @throws IndexOutOfBoundsException
+   *             if <tt>! (0 <= indexes[i] < columns())</tt> for any
+   *             i=0..indexes.length()-1.
+   */
+  void _checkColumnIndexes(List<int> indexes) {
+    for (int i = indexes.length; --i >= 0; ) {
+      int index = indexes[i];
+      if (index < 0 || index >= _columns) _checkColumn(index);
     }
+  }
 
-    /**
-     * Returns the position of the given absolute rank within the (virtual or
-     * non-virtual) internal 1-dimensional array. Default implementation.
-     * Override, if necessary.
-     *
-     * @param rank
-     *            the absolute rank of the element.
-     * @return the position.
-     */
-    int _columnOffset(int absRank) {
-        return absRank;
+  /**
+   * Sanity check for operations requiring a row index to be within bounds.
+   *
+   * @throws IndexOutOfBoundsException
+   *             if <tt>row < 0 || row >= rows()</tt>.
+   */
+  void _checkRow(int row) {
+    if (row < 0 || row >= _rows) {
+      throw new RangeError("Attempted to access " + toStringShort() + " at row=$row");
     }
+  }
 
-    /**
-     * Returns the absolute rank of the given relative rank.
-     *
-     * @param rank
-     *            the relative rank of the element.
-     * @return the absolute rank of the element.
-     */
-    int _columnRank(int rank) {
-        return _columnZero + rank * _columnStride;
+  /**
+   * Checks whether indexes are legal and throws an exception, if necessary.
+   *
+   * @throws IndexOutOfBoundsException
+   *             if <tt>! (0 <= indexes[i] < rows())</tt> for any
+   *             i=0..indexes.length()-1.
+   */
+  void _checkRowIndexes(List<int> indexes) {
+    for (int i = indexes.length; --i >= 0; ) {
+      int index = indexes[i];
+      if (index < 0 || index >= _rows) _checkRow(index);
     }
+  }
 
-    /**
-     * Returns the position of the given absolute rank within the (virtual or
-     * non-virtual) internal 1-dimensional array. Default implementation.
-     * Override, if necessary.
-     *
-     * @param rank
-     *            the absolute rank of the element.
-     * @return the position.
-     */
-    int _rowOffset(int absRank) {
-        return absRank;
-    }
-
-    /**
-     * Returns the absolute rank of the given relative rank.
-     *
-     * @param rank
-     *            the relative rank of the element.
-     * @return the absolute rank of the element.
-     */
-    int _rowRank(int rank) {
-        return _rowZero + rank * _rowStride;
-    }
-
-    /**
-     * Checks whether the receiver contains the given box and throws an
-     * exception, if necessary.
-     *
-     * @throws IndexOutOfBoundsException
-     *             if
-     *             <tt>column<0 || width<0 || column+width>columns() || row<0 || height<0 || row+height>rows()</tt>
-     */
-    void _checkBox(int row, int column, int height, int width) {
-        if (column < 0 || width < 0 || column + width > _columns || row < 0 || height < 0 || row + height > _rows)
-            throw new RangeError(toStringShort() + ", column:$column, row:$row ,width:$width, height:$height");
-    }
-
-    /**
-     * Sanity check for operations requiring a column index to be within bounds.
-     *
-     * @throws IndexOutOfBoundsException
-     *             if <tt>column < 0 || column >= columns()</tt>.
-     */
-    void _checkColumn(int column) {
-        if (column < 0 || column >= _columns)
-            throw new RangeError("Attempted to access " + toStringShort() + " at column=$column");
-    }
-
-    /**
-     * Checks whether indexes are legal and throws an exception, if necessary.
-     *
-     * @throws IndexOutOfBoundsException
-     *             if <tt>! (0 <= indexes[i] < columns())</tt> for any
-     *             i=0..indexes.length()-1.
-     */
-    void _checkColumnIndexes(List<int> indexes) {
-        for (int i = indexes.length; --i >= 0;) {
-            int index = indexes[i];
-            if (index < 0 || index >= _columns)
-                _checkColumn(index);
-        }
-    }
-
-    /**
-     * Sanity check for operations requiring a row index to be within bounds.
-     *
-     * @throws IndexOutOfBoundsException
-     *             if <tt>row < 0 || row >= rows()</tt>.
-     */
-    void _checkRow(int row) {
-        if (row < 0 || row >= _rows)
-            throw new RangeError("Attempted to access " + toStringShort() + " at row=$row");
-    }
-
-    /**
-     * Checks whether indexes are legal and throws an exception, if necessary.
-     *
-     * @throws IndexOutOfBoundsException
-     *             if <tt>! (0 <= indexes[i] < rows())</tt> for any
-     *             i=0..indexes.length()-1.
-     */
-    void _checkRowIndexes(List<int> indexes) {
-        for (int i = indexes.length; --i >= 0;) {
-            int index = indexes[i];
-            if (index < 0 || index >= _rows)
-                _checkRow(index);
-        }
-    }
-
-    /**
-     * Sanity check for operations requiring matrices with the same number of
-     * columns and rows.
-     *
-     * @throws IllegalArgumentException
-     *             if
-     *             <tt>columns() != B.columns() || rows() != B.rows() || columns() != C.columns() || rows() != C.rows()</tt>
-     *             .
-     */
-    void checkShape(AbstractMatrix2D B, [AbstractMatrix2D C=null]) {
-      if (C == null) {
-        if (_columns != B._columns || _rows != B._rows)
-            throw new ArgumentError("Incompatible dimensions: " + toStringShort() + " and "
-                    + B.toStringShort());
-      } else {
-        if (_columns != B._columns || _rows != B._rows || _columns != C._columns || _rows != C._rows)
-            throw new ArgumentError("Incompatible dimensions: " + toStringShort() + ", " + B.toStringShort()
-                    + ", " + C.toStringShort());
+  /**
+   * Sanity check for operations requiring matrices with the same number of
+   * columns and rows.
+   *
+   * @throws IllegalArgumentException
+   *             if
+   *             <tt>columns() != B.columns() || rows() != B.rows() || columns() != C.columns() || rows() != C.rows()</tt>
+   *             .
+   */
+  void checkShape(AbstractMatrix2D B, [AbstractMatrix2D C = null]) {
+    if (C == null) {
+      if (_columns != B._columns || _rows != B._rows) {
+        throw new ArgumentError("Incompatible dimensions: " + toStringShort() + " and " + B.toStringShort());
+      }
+    } else {
+      if (_columns != B._columns || _rows != B._rows || _columns != C._columns || _rows != C._rows) {
+        throw new ArgumentError("Incompatible dimensions: " + toStringShort() + ", " + B.toStringShort() + ", " + C.toStringShort());
       }
     }
+  }
 
-    /**
-     * Returns the number of columns.
-     */
-    int columns() {
-        return _columns;
+  /**
+   * Returns the number of columns.
+   */
+  int columns() {
+    return _columns;
+  }
+
+  /**
+   * Returns the column stride.
+   */
+  int columnStride() {
+    return _columnStride;
+  }
+
+  /**
+   * Returns the position of the given coordinate within the (virtual or
+   * non-virtual) internal 1-dimensional array.
+   *
+   * @param row
+   *            the index of the row-coordinate.
+   * @param column
+   *            the index of the column-coordinate.
+   */
+  int index(int row, int column) {
+    return _rowOffset(_rowRank(row)) + _columnOffset(_columnRank(column));
+  }
+
+  /**
+   * Returns the number of rows.
+   */
+  int rows() {
+    return _rows;
+  }
+
+  /**
+   * Returns the row stride.
+   */
+  int rowStride() {
+    return _rowStride;
+  }
+
+  /**
+   * Sets up a matrix with a given number of rows and columns and the given
+   * strides.
+   *
+   * @param rows
+   *            the number of rows the matrix shall have.
+   * @param columns
+   *            the number of columns the matrix shall have.
+   * @param rowZero
+   *            the position of the first element.
+   * @param columnZero
+   *            the position of the first element.
+   * @param rowStride
+   *            the number of elements between two rows, i.e.
+   *            <tt>index(i+1,j)-index(i,j)</tt>.
+   * @param columnStride
+   *            the number of elements between two columns, i.e.
+   *            <tt>index(i,j+1)-index(i,j)</tt>.
+   * @throws IllegalArgumentException
+   *             if
+   *             <tt>rows<0 || columns<0 || (double)columns*rows > Integer.MAX_VALUE</tt>
+   *             or flip's are illegal.
+   */
+  void _setUp(int rows, int columns, [int rowZero = 0, int columnZero = 0, int rowStride = null, int columnStride = 1]) {
+    if (rowStride == null) rowStride = columns;
+    if (rows < 0 || columns < 0) {
+      throw new ArgumentError("negative size");
     }
+    this._rows = rows;
+    this._columns = columns;
 
-    /**
-     * Returns the column stride.
-     */
-    int columnStride() {
-        return _columnStride;
+    this._rowZero = rowZero;
+    this._columnZero = columnZero;
+
+    this._rowStride = rowStride;
+    this._columnStride = columnStride;
+
+    this._isNoView = true;
+    if (columns * rows > _MAX) {
+      throw new ArgumentError("matrix too large");
     }
+  }
 
-    /**
-     * Returns the position of the given coordinate within the (virtual or
-     * non-virtual) internal 1-dimensional array.
-     *
-     * @param row
-     *            the index of the row-coordinate.
-     * @param column
-     *            the index of the column-coordinate.
-     */
-    int index(int row, int column) {
-        return _rowOffset(_rowRank(row)) + _columnOffset(_columnRank(column));
+  /**
+   * Returns the number of cells which is <tt>rows()*columns()</tt>.
+   */
+  int size() {
+    return _rows * _columns;
+  }
+
+  /**
+   * Returns a string representation of the receiver's shape.
+   */
+  String toStringShort() {
+    return AbstractFormatter.shape2D(this);
+  }
+
+  /**
+   * Self modifying version of viewColumnFlip().
+   */
+  AbstractMatrix2D _vColumnFlip() {
+    if (_columns > 0) {
+      _columnZero += (_columns - 1) * _columnStride;
+      _columnStride = -_columnStride;
+      this._isNoView = false;
     }
+    return this;
+  }
 
-    /**
-     * Returns the number of rows.
-     */
-    int rows() {
-        return _rows;
+  /**
+   * Self modifying version of viewDice().
+   */
+  AbstractMatrix2D _vDice() {
+    int tmp;
+    // swap;
+    tmp = _rows;
+    _rows = _columns;
+    _columns = tmp;
+    tmp = _rowStride;
+    _rowStride = _columnStride;
+    _columnStride = tmp;
+    tmp = _rowZero;
+    _rowZero = _columnZero;
+    _columnZero = tmp;
+
+    // flips stay unaffected
+
+    this._isNoView = false;
+    return this;
+  }
+
+  /**
+   * Self modifying version of viewPart().
+   *
+   * @throws IndexOutOfBoundsException
+   *             if
+   *             <tt>column<0 || width<0 || column+width>columns() || row<0 || height<0 || row+height>rows()</tt>
+   */
+  AbstractMatrix2D _vPart(int row, int column, int height, int width) {
+    _checkBox(row, column, height, width);
+    this._rowZero += this._rowStride * row;
+    this._columnZero += this._columnStride * column;
+    this._rows = height;
+    this._columns = width;
+    this._isNoView = false;
+    return this;
+  }
+
+  /**
+   * Self modifying version of viewRowFlip().
+   */
+  AbstractMatrix2D _vRowFlip() {
+    if (_rows > 0) {
+      _rowZero += (_rows - 1) * _rowStride;
+      _rowStride = -_rowStride;
+      this._isNoView = false;
     }
+    return this;
+  }
 
-    /**
-     * Returns the row stride.
-     */
-    int rowStride() {
-        return _rowStride;
-    }
-
-    /**
-     * Sets up a matrix with a given number of rows and columns and the given
-     * strides.
-     *
-     * @param rows
-     *            the number of rows the matrix shall have.
-     * @param columns
-     *            the number of columns the matrix shall have.
-     * @param rowZero
-     *            the position of the first element.
-     * @param columnZero
-     *            the position of the first element.
-     * @param rowStride
-     *            the number of elements between two rows, i.e.
-     *            <tt>index(i+1,j)-index(i,j)</tt>.
-     * @param columnStride
-     *            the number of elements between two columns, i.e.
-     *            <tt>index(i,j+1)-index(i,j)</tt>.
-     * @throws IllegalArgumentException
-     *             if
-     *             <tt>rows<0 || columns<0 || (double)columns*rows > Integer.MAX_VALUE</tt>
-     *             or flip's are illegal.
-     */
-    void _setUp(int rows, int columns, [int rowZero=0, int columnZero=0, int rowStride=null, int columnStride=1]) {
-        if (rowStride == null)
-            rowStride = columns;
-        if (rows < 0 || columns < 0)
-            throw new ArgumentError("negative size");
-        this._rows = rows;
-        this._columns = columns;
-
-        this._rowZero = rowZero;
-        this._columnZero = columnZero;
-
-        this._rowStride = rowStride;
-        this._columnStride = columnStride;
-
-        this._isNoView = true;
-        if (columns * rows > _MAX)
-            throw new ArgumentError("matrix too large");
-    }
-
-    /**
-     * Returns the number of cells which is <tt>rows()*columns()</tt>.
-     */
-
-    int size() {
-        return _rows * _columns;
-    }
-
-    /**
-     * Returns a string representation of the receiver's shape.
-     */
-    String toStringShort() {
-        return AbstractFormatter.shape2D(this);
-    }
-
-    /**
-     * Self modifying version of viewColumnFlip().
-     */
-    AbstractMatrix2D _vColumnFlip() {
-        if (_columns > 0) {
-            _columnZero += (_columns - 1) * _columnStride;
-            _columnStride = -_columnStride;
-            this._isNoView = false;
-        }
-        return this;
-    }
-
-    /**
-     * Self modifying version of viewDice().
-     */
-    AbstractMatrix2D _vDice() {
-        int tmp;
-        // swap;
-        tmp = _rows;
-        _rows = _columns;
-        _columns = tmp;
-        tmp = _rowStride;
-        _rowStride = _columnStride;
-        _columnStride = tmp;
-        tmp = _rowZero;
-        _rowZero = _columnZero;
-        _columnZero = tmp;
-
-        // flips stay unaffected
-
-        this._isNoView = false;
-        return this;
-    }
-
-    /**
-     * Self modifying version of viewPart().
-     *
-     * @throws IndexOutOfBoundsException
-     *             if
-     *             <tt>column<0 || width<0 || column+width>columns() || row<0 || height<0 || row+height>rows()</tt>
-     */
-    AbstractMatrix2D _vPart(int row, int column, int height, int width) {
-        _checkBox(row, column, height, width);
-        this._rowZero += this._rowStride * row;
-        this._columnZero += this._columnStride * column;
-        this._rows = height;
-        this._columns = width;
-        this._isNoView = false;
-        return this;
-    }
-
-    /**
-     * Self modifying version of viewRowFlip().
-     */
-    AbstractMatrix2D _vRowFlip() {
-        if (_rows > 0) {
-            _rowZero += (_rows - 1) * _rowStride;
-            _rowStride = -_rowStride;
-            this._isNoView = false;
-        }
-        return this;
-    }
-
-    /**
-     * Self modifying version of viewStrides().
-     *
-     * @throws IndexOutOfBoundsException
-     *             if <tt>rowStride<=0 || columnStride<=0</tt>.
-     */
-    AbstractMatrix2D _vStrides(int rowStride, int columnStride) {
-        if (rowStride <= 0 || columnStride <= 0)
-            throw new RangeError("illegal strides: $rowStride, $columnStride");
-        this._rowStride *= rowStride;
-        this._columnStride *= columnStride;
-        if (this._rows != 0)
-            this._rows = (this._rows - 1) ~/ rowStride + 1;
-        if (this._columns != 0)
-            this._columns = (this._columns - 1) ~/ columnStride + 1;
-        this._isNoView = false;
-        return this;
-    }
+  /**
+   * Self modifying version of viewStrides().
+   *
+   * @throws IndexOutOfBoundsException
+   *             if <tt>rowStride<=0 || columnStride<=0</tt>.
+   */
+  AbstractMatrix2D _vStrides(int rowStride, int columnStride) {
+    if (rowStride <= 0 || columnStride <= 0) throw new RangeError("illegal strides: $rowStride, $columnStride");
+    this._rowStride *= rowStride;
+    this._columnStride *= columnStride;
+    if (this._rows != 0) this._rows = (this._rows - 1) ~/ rowStride + 1;
+    if (this._columns != 0) this._columns = (this._columns - 1) ~/ columnStride + 1;
+    this._isNoView = false;
+    return this;
+  }
 }

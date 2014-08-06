@@ -19,55 +19,54 @@ part of cern.colt.matrix;
  * @author wolfgang.hoschek@cern.ch
  * @version 1.0, 09/24/99
  */
-abstract class AbstractMatrix {//extends cern.colt.PersistentObject {
-    //static final int serialVersionUID = 1L;
+abstract class AbstractMatrix {
 
-    final _MAX = 576460752303423487;
+  final _MAX = 576460752303423487;
 
-    bool _isNoView = true;
+  bool _isNoView = true;
 
-    // static bool debug = true;
-    /**
-     * Makes this class non instantiable, but still let's others inherit from
-     * it.
-     */
-    AbstractMatrix() {
-    }
+  //static bool debug = true;
 
-    /**
-     * Ensures that the receiver can hold at least the specified number of
-     * non-zero (non-null) cells without needing to allocate new internal
-     * memory. If necessary, allocates new internal memory and increases the
-     * capacity of the receiver.
-     * <p>
-     * This default implementation does nothing. Override this method if
-     * necessary.
-     *
-     * @param minNonZeros
-     *            the desired minimum number of non-zero (non-null) cells.
-     */
-    void ensureCapacity(int minNonZeros) {
-    }
+  /**
+   * Makes this class non instantiable, but still let's others inherit from
+   * it.
+   */
+  AbstractMatrix();
 
-    /**
-     * Returns whether the receiver is a view or not.
-     */
-    bool isView() {
-        return !this._isNoView;
-    }
+  /**
+   * Ensures that the receiver can hold at least the specified number of
+   * non-zero (non-null) cells without needing to allocate new internal
+   * memory. If necessary, allocates new internal memory and increases the
+   * capacity of the receiver.
+   * <p>
+   * This default implementation does nothing. Override this method if
+   * necessary.
+   *
+   * @param minNonZeros
+   *            the desired minimum number of non-zero (non-null) cells.
+   */
+  //void ensureCapacity(int minNonZeros) {
+  //}
 
-    /**
-     * Returns the number of cells.
-     */
-    int size();
+  /**
+   * Returns whether the receiver is a view or not.
+   */
+  bool isView() {
+    return !this._isNoView;
+  }
 
-    /**
-     * Releases any superfluous internal memory. An application can use this
-     * operation to minimize the storage of the receiver.
-     * <p>
-     * This default implementation does nothing. Override this method if
-     * necessary.
-     */
-    void trimToSize() {
-    }
+  /**
+   * Returns the number of cells.
+   */
+  int size();
+
+  /**
+   * Releases any superfluous internal memory. An application can use this
+   * operation to minimize the storage of the receiver.
+   * <p>
+   * This default implementation does nothing. Override this method if
+   * necessary.
+   */
+  //void trimToSize() {
+  //}
 }

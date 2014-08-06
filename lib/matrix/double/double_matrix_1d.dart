@@ -32,8 +32,7 @@ abstract class DoubleMatrix1D extends AbstractMatrix1D {
    * Makes this class non instantiable, but still let's others inherit from
    * it.
    */
-  DoubleMatrix1D() {
-  }
+  DoubleMatrix1D();
 
   /**
    * Applies a function to each cell and aggregates the results. Returns a
@@ -1127,14 +1126,14 @@ abstract class DoubleMatrix1D extends AbstractMatrix1D {
   void normalize() {
     double min = getMinLocation()[0];
     if (min < 0) {
-      assign(DoubleFunctions.minus(min));
+      assign(func.subtract(min));
     }
     if (getMaxLocation()[0] == 0) {
       assignValue(1.0 / size());
     } else {
       double sumScaleFactor = zSum();
       sumScaleFactor = 1.0 / sumScaleFactor;
-      assign(DoubleFunctions.mult(sumScaleFactor));
+      assign(func.multiply(sumScaleFactor));
     }
   }
 
@@ -1160,7 +1159,7 @@ abstract class DoubleMatrix1D extends AbstractMatrix1D {
    *            number of columns
    * @return new 2D matrix with columns being the elements of this matrix.
    */
-  DoubleMatrix3D reshape3D(int slices, int rows, int columns);
+  //DoubleMatrix3D reshape3D(int slices, int rows, int columns);
 
   /**
    * Sets the matrix cell at coordinate <tt>index</tt> to the specified value.
@@ -1295,7 +1294,7 @@ abstract class DoubleMatrix1D extends AbstractMatrix1D {
    * @return a new flip view.
    */
   DoubleMatrix1D viewFlip() {
-    return (DoubleMatrix1D)(_view()._vFlip());
+    return _view()._vFlip() as DoubleMatrix1D;
   }
 
   /**
@@ -1327,7 +1326,7 @@ abstract class DoubleMatrix1D extends AbstractMatrix1D {
    *
    */
   DoubleMatrix1D viewPart(int index, int width) {
-    return (DoubleMatrix1D)(_view()._vPart(index, width));
+    return _view()._vPart(index, width) as DoubleMatrix1D;
   }
 
   /**
@@ -1365,8 +1364,8 @@ abstract class DoubleMatrix1D extends AbstractMatrix1D {
     for (int i = 0; i < _size; i++) {
       if (condition(getQuick(i))) matches.add(i);
     }
-    matches.trimToSize();
-    return viewSelection(matches.elements());
+    //matches.trimToSize();
+    return viewSelectionIndex(matches/*.elements()*/);
   }
 
   /**
@@ -1410,7 +1409,7 @@ abstract class DoubleMatrix1D extends AbstractMatrix1D {
     _checkIndexes(indexes);
     List<int> offsets = new List<int>(indexes.length);
     for (int i = 0; i < indexes.length; i++) {
-      offsets[i] = index(indexes[i]) as int;
+      offsets[i] = index(indexes[i]);
     }
     return _viewSelectionLike(offsets);
   }
@@ -1425,9 +1424,9 @@ abstract class DoubleMatrix1D extends AbstractMatrix1D {
    *
    * @return a new sorted vector (matrix) view.
    */
-  DoubleMatrix1D viewSorted() {
+  /*DoubleMatrix1D viewSorted() {
     return DoubleSorting.mergeSort.sort(this);
-  }
+  }*/
 
   /**
    * Constructs and returns a new <i>stride view</i> which is a sub matrix
@@ -1443,7 +1442,7 @@ abstract class DoubleMatrix1D extends AbstractMatrix1D {
    *
    */
   DoubleMatrix1D viewStrides(int stride) {
-    return (DoubleMatrix1D)(_view()._vStrides(stride));
+    return _view()._vStrides(stride) as DoubleMatrix1D;
   }
 
   /**
@@ -1534,24 +1533,24 @@ abstract class DoubleMatrix1D extends AbstractMatrix1D {
    */
   double zDotProductIndex(DoubleMatrix1D y, int from, int length,  /*IntArrayList*/List<int> nonZeroIndexes) {
     // determine minimum length
-    if (from < 0 || length <= 0) return 0;
+    if (from < 0 || length <= 0) return 0.0;
 
     int tail = from + length;
     if (_size < tail) tail = _size;
     if (y._size < tail) tail = y._size;
     length = tail - from;
-    if (length <= 0) return 0;
-    /*IntArrayList*/List<int> indexesCopy = nonZeroIndexes.copy();
-    indexesCopy.trimToSize();
-    indexesCopy.quickSort();
-    List<int> nonZeroIndexElements = indexesCopy.elements();
+    if (length <= 0) return 0.0;
+    /*IntArrayList*/List<int> indexesCopy = new List<int>.from(nonZeroIndexes);
+    //indexesCopy.trimToSize();
+    //indexesCopy.quickSort();
+    List<int> nonZeroIndexElements = indexesCopy;//.elements();
     int index = 0;
-    int s = indexesCopy.size();
+    int s = indexesCopy.length;
     // skip to start
     while ((index < s) && nonZeroIndexElements[index] < from) index++;
     // now the sparse dot product
     int i;
-    double sum = 0;
+    double sum = 0.0;
     while ((--length >= 0) && (index < s) && ((i = nonZeroIndexElements[index]) < tail)) {
       sum += getQuick(i) * y.getQuick(i);
       index++;
@@ -1565,8 +1564,8 @@ abstract class DoubleMatrix1D extends AbstractMatrix1D {
    * @return the sum.
    */
   double zSum() {
-    if (size() == 0) return 0;
-    return aggregate(cern.jet.math.tdouble.DoubleFunctions.plus, cern.jet.math.tdouble.DoubleFunctions.identity);
+    if (size() == 0) return 0.0;
+    return aggregate(func.plus, func.identity);
   }
 
   /**
@@ -1645,4 +1644,6 @@ abstract class DoubleMatrix1D extends AbstractMatrix1D {
   double _zDotProduct(DoubleMatrix1D y,  /*IntArrayList*/List<int> nonZeroIndexes) {
     return zDotProductIndex(y, 0, _size, nonZeroIndexes);
   }
+
+  Object clone();
 }
