@@ -20,5 +20,6 @@ part 'double/dense_double_matrix_1d.dart';
 part 'double/dense_double_matrix_2d.dart';
 part 'double/double_matrix_1d.dart';
 part 'double/double_matrix_2d.dart';
+part 'double/factory.dart';
 //part 'former.dart';
 //part 'former_factory.dart';

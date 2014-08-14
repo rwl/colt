@@ -666,8 +666,8 @@ DoubleFunction minimum(double b) {
  * Constructs a function that returns <tt>a - b</tt>. <tt>a</tt> is a
  * variable, <tt>b</tt> is fixed.
  */
-DoubleFunction subtract(double b) {
-    return add(-b);
+DoubleFunction subtract(num b) {
+    return add(-b.toDouble());
 }
 
 /**

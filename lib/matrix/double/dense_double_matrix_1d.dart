@@ -53,7 +53,7 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
    * @param values
    *            The values to be filled into the new matrix.
    */
-  factory DenseDoubleMatrix1D.from(List<double> values) {
+  factory DenseDoubleMatrix1D.from(Float64List values) {
     final m = new DenseDoubleMatrix1D(values.length);
     m.assignValues(values);
     return m;
@@ -90,7 +90,7 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
    * @throws ArgumentError
    *             if <tt>size<0</tt>.
    */
-  DenseDoubleMatrix1D(int size, [List<double> elements = null, int zero = 0, int stride = 1, bool isView = false]) {
+  DenseDoubleMatrix1D(int size, [Float64List elements = null, int zero = 0, int stride = 1, bool isView = false]) {
     if (elements == null) {
       elements = new List<double>(size);
     }
@@ -362,7 +362,7 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
     return this;
   }
 
-  DoubleMatrix1D assignValues(final List<double> values) {
+  DoubleMatrix1D assignValues(final Float64List values) {
     if (values.length != _size) {
       throw new ArgumentError("Must have same number of cells: length=${values.length} size()=${size()}");
     }

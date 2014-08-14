@@ -483,7 +483,7 @@ abstract class DoubleMatrix2D extends AbstractMatrix2D {
    *            the value to be filled into the cells.
    * @return <tt>this</tt> (for convenience only).
    */
-  DoubleMatrix2D assignValue(final double value) {
+  DoubleMatrix2D assignValue(final num value) {
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_rows * _columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
@@ -495,7 +495,7 @@ abstract class DoubleMatrix2D extends AbstractMatrix2D {
         futures[j] = ConcurrencyUtils.submit(() {
           for (int r = firstRow; r < lastRow; r++) {
             for (int c = 0; c < _columns; c++) {
-              setQuick(r, c, value);
+              setQuick(r, c, value.toDouble());
             }
           }
         });
@@ -504,7 +504,7 @@ abstract class DoubleMatrix2D extends AbstractMatrix2D {
     } else {*/
       for (int r = 0; r < _rows; r++) {
         for (int c = 0; c < _columns; c++) {
-          setQuick(r, c, value);
+          setQuick(r, c, value.toDouble());
         }
       }
     //}
