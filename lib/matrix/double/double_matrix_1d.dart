@@ -694,7 +694,7 @@ abstract class DoubleMatrix1D extends AbstractMatrix1D {
     if (obj == null) return false;
     if (!(obj is DoubleMatrix1D)) return false;
 
-    return DoubleProperty.DEFAULT.equals(this, obj as DoubleMatrix1D);
+    return DoubleProperty.DEFAULT.equalsMatrix1D(this, obj as DoubleMatrix1D);
   }
 
   /**
@@ -1281,7 +1281,7 @@ abstract class DoubleMatrix1D extends AbstractMatrix1D {
    * @see cern.colt.matrix.tdouble.algo.DoubleFormatter
    */
   String toString() {
-    return new DoubleFormatter().toString(this);
+    return new DoubleFormatter().toStringDouble1D(this);
   }
 
   /**

@@ -43,7 +43,7 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
   /**
    * The elements of this matrix.
    */
-  List<double> _elements;
+  Float64List _elements;
 
   /**
    * Constructs a matrix with a copy of the given values. The values are
@@ -55,7 +55,7 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
    */
   factory DenseDoubleMatrix1D.from(List<double> values) {
     final m = new DenseDoubleMatrix1D(values.length);
-    m.assign(values);
+    m.assignValues(values);
     return m;
   }
 
@@ -217,7 +217,7 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
     double multiplicator;
     if (function is DoubleMult) {
       // x[i] = mult*x[i]
-      multiplicator = function.multiplicator;
+      multiplicator = (function as DoubleMult).multiplicator;
       if (multiplicator == 1) {
         return this;
       }
@@ -409,7 +409,8 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
     checkSize(other);
     if (_isNoView && other._isNoView) {
       // quickest
-      System.arraycopy(other._elements, 0, this._elements, 0, this._elements.length);
+      this._elements.setAll(0, other._elements);
+      //System.arraycopy(other._elements, 0, this._elements, 0, this._elements.length);
       return this;
     }
     if (_haveSharedCells(other)) {
@@ -585,7 +586,7 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
           idxOther += strideOther;
         }
       } else if (function is DoublePlusMultSecond) {
-        double multiplicator = function.multiplicator;
+        double multiplicator = (function as DoublePlusMultSecond).multiplicator;
         if (multiplicator == 0) {
           // x[i] = x[i] + 0*y[i]
           return this;
@@ -666,6 +667,10 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
     //}
     return cardinality;
   }
+
+    Float64List elements() {
+        return _elements;
+    }
 
   void getNonZeros(final /*IntArrayList*/List<int> indexList, final /*DoubleArrayList*/List<double> valueList) {
     bool fillIndexList = indexList != null;
@@ -908,7 +913,7 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
         idx += _stride;
         if (minValue > _elements[idx]) {
           minValue = _elements[idx];
-          location = (idx - _zero) / _stride;
+          location = (idx - _zero) ~/ _stride;
         }
       }
     //}
@@ -1079,7 +1084,8 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
   void toArrayValues(List<double> values) {
     if (values.length < _size) throw new ArgumentError("values too small");
     if (this._isNoView) {
-      System.arraycopy(this._elements, 0, values, 0, this._elements.length);
+      values.setAll(0, this._elements);
+      //System.arraycopy(this._elements, 0, values, 0, this._elements.length);
     } else {
       super.toArrayValues(values);
     }
@@ -1216,11 +1222,10 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
 
   bool _haveSharedCellsRaw(DoubleMatrix1D other) {
     if (other is SelectedDenseDoubleMatrix1D) {
-      SelectedDenseDoubleMatrix1D otherMatrix = other as SelectedDenseDoubleMatrix1D;
-      return this._elements == otherMatrix._elements;
+      //SelectedDenseDoubleMatrix1D otherMatrix = other as SelectedDenseDoubleMatrix1D;
+      return this._elements == other._elements;
     } else if (other is DenseDoubleMatrix1D) {
-      DenseDoubleMatrix1D otherMatrix = other as DenseDoubleMatrix1D;
-      return this._elements == otherMatrix._elements;
+      return this._elements == other._elements;
     }
     return false;
   }
@@ -1231,5 +1236,9 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
 
   DoubleMatrix1D _viewSelectionLike(List<int> offsets) {
     return new SelectedDenseDoubleMatrix1D(this._elements, offsets);
+  }
+
+  Object clone() {
+    return new DenseDoubleMatrix1D(_size, _elements, _zero, _stride, !_isNoView);
   }
 }

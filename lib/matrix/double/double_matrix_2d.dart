@@ -9,6 +9,23 @@ It is provided "as is" without expressed or implied warranty.
 part of cern.colt.matrix;
 
 /**
+ * Applies a procedure to an argument. Optionally can return a boolean flag
+ * to inform the object calling the procedure.
+ *
+ * <p>
+ * Example: forEach() methods often use procedure objects. To signal to a
+ * forEach() method whether iteration should continue normally or terminate
+ * (because for example a matching element has been found), a procedure can
+ * return <tt>false</tt> to indicate termination and <tt>true</tt> to
+ * indicate continuation.
+ *
+ * @param element
+ *            element passed to the procedure.
+ * @return a flag to inform the object calling the procedure.
+ */
+typedef bool DoubleMatrix1DProcedure(DoubleMatrix1D element);
+
+/**
  * Abstract base class for 2-d matrices holding <tt>double</tt> elements. First
  * see the <a href="package-summary.html">package summary</a> and javadoc <a
  * href="package-tree.html">tree view</a> to get the broad picture.
@@ -888,7 +905,7 @@ abstract class DoubleMatrix2D extends AbstractMatrix2D {
    *         <tt>false</tt> otherwise.
    */
   bool equalsValue(double value) {
-    return DoubleProperty.DEFAULT.equals(this, value);
+    return DoubleProperty.DEFAULT.equalsMatrix2DValue(this, value);
   }
 
   /**
@@ -908,7 +925,7 @@ abstract class DoubleMatrix2D extends AbstractMatrix2D {
     if (obj == null) return false;
     if (!(obj is DoubleMatrix2D)) return false;
 
-    return DoubleProperty.DEFAULT.equals(this, obj as DoubleMatrix2D);
+    return DoubleProperty.DEFAULT.equalsMatrix2D(this, obj as DoubleMatrix2D);
   }
 
   /**
@@ -1416,7 +1433,7 @@ abstract class DoubleMatrix2D extends AbstractMatrix2D {
    * @see cern.colt.matrix.tdouble.algo.DoubleFormatter
    */
   String toString() {
-    return new DoubleFormatter().toString(this);
+    return new DoubleFormatter().toStringDouble2D(this);
   }
 
   /**
@@ -1789,9 +1806,9 @@ abstract class DoubleMatrix2D extends AbstractMatrix2D {
    * @throws RangeError
    *             if <tt>column < 0 || column >= columns()</tt>.
    */
-  DoubleMatrix2D viewSorted(int column) {
+  /*DoubleMatrix2D viewSorted(int column) {
     return DoubleSorting.mergeSort.sort(this, column);
-  }
+  }*/
 
   /**
    * Constructs and returns a new <i>stride view</i> which is a sub matrix
@@ -2052,7 +2069,7 @@ abstract class DoubleMatrix2D extends AbstractMatrix2D {
     } else {*/
       for (int a = 0; a < p; a++) {
         for (int b = 0; b < m; b++) {
-          double s = 0;
+          double s = 0.0;
           for (int c = 0; c < n; c++) {
             s += getQuick(b, c) * B.getQuick(c, a);
           }

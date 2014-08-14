@@ -53,7 +53,7 @@ part of cern.colt.matrix;
  */
 class DenseDoubleMatrix2D extends DoubleMatrix2D {
 
-  List<double> _elements;
+  Float64List _elements;
 
   /**
    * Constructs a matrix with a copy of the given values. <tt>values</tt> is
@@ -72,7 +72,7 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
    */
   factory DenseDoubleMatrix2D.from(List<List<double>> values) {
     final m = new DenseDoubleMatrix2D(values.length, values.length == 0 ? 0 : values[0].length);
-    assign(values);
+    assignValues2D(values);
     return m;
   }
 
@@ -136,7 +136,7 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
    *            matrix reader
    * @throws IOException
    */
-  factory DenseDoubleMatrix2D.read(MatrixVectorReader reader) {//throws IOException {
+  /*factory DenseDoubleMatrix2D.read(MatrixVectorReader reader) {//throws IOException {
     MatrixInfo info;
     if (reader.hasInfo()) {
       info = reader.readMatrixInfo();
@@ -173,7 +173,7 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
       }
     }
     return m;
-  }
+  }*/
 
   double aggregate(DoubleDoubleFunction aggr, DoubleFunction f) {
     if (size() == 0) return double.NAN;
@@ -217,7 +217,7 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
 
   double aggregateProc(DoubleDoubleFunction aggr, DoubleFunction f, DoubleProcedure cond) {
     if (size() == 0) return double.NAN;
-    final int zero = index(0, 0) as int;
+    final int zero = index(0, 0);
     double a = 0.0;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -268,7 +268,7 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
 
   double aggregateIndex(DoubleDoubleFunction aggr, DoubleFunction f, final /*IntArrayList*/List<int> rowList, final /*IntArrayList*/List<int> columnList) {
     if (this.size() == 0) return double.NAN;
-    final int zero = index(0, 0) as int;
+    final int zero = index(0, 0);
     final int size = rowList.length;
     final List<int> rowElements = rowList;//.elements();
     final List<int> columnElements = columnList;//.elements();
@@ -309,8 +309,8 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
     }
     checkShape(other);
     if (size() == 0) return double.NAN;
-    final int zero = index(0, 0) as int;
-    final int zeroOther = other.index(0, 0) as int;
+    final int zero = index(0, 0);
+    final int zeroOther = other.index(0, 0);
     final int rowStrideOther = other.rowStride();
     final int colStrideOther = other.columnStride();
     final List<double> elementsOther = other.elements() as List<double>;
@@ -401,7 +401,7 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
       // specialization for speed
       if (function is DoubleMult) { // x[i] =
         // mult*x[i]
-        double multiplicator = function.multiplicator;
+        double multiplicator = (function as DoubleMult).multiplicator;
         if (multiplicator == 1) return this;
         if (multiplicator == 0) return assignValue(0.0);
         for (int r = _rows; --r >= 0; ) { // the general case
@@ -560,7 +560,8 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
     }
     int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if (this._isNoView) {
-      System.arraycopy(values, 0, this._elements, 0, values.length);
+      this._elements.setAll(0, values);
+      //System.arraycopy(values, 0, this._elements, 0, values.length);
     } else {
       final int zero = index(0, 0);
       /*if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -600,14 +601,14 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
     return this;
   }
 
-  DoubleMatrix2D assignValuesList(final List<List<double>> values) {
+  DoubleMatrix2D assignValues2D(final List<List<double>> values) {
     if (values.length != _rows) {
       throw new ArgumentError("Must have same number of rows: rows=${values.length} rows()=${rows()}");
     }
     int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if (this._isNoView) {
-      if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-        /*nthreads = Math.min(nthreads, _rows);
+      /*if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+        nthreads = Math.min(nthreads, _rows);
         List<Future> futures = new List<Future>(nthreads);
         int k = _rows ~/ nthreads;
         for (int j = 0; j < nthreads; j++) {
@@ -631,7 +632,8 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
           if (currentRow.length != _columns) {
             throw new ArgumentError("Must have same number of columns in every row: columns=${currentRow.length} columns()=${columns()}");
           }
-          System.arraycopy(currentRow, 0, this._elements, i, _columns);
+          this._elements.setAll(i, currentRow);
+          //System.arraycopy(currentRow, 0, this._elements, i, _columns);
           i += _columns;
         }
       //}
@@ -690,7 +692,8 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
     checkShape(other);
     int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if (this._isNoView && other._isNoView) { // quickest
-      System.arraycopy(other._elements, 0, this._elements, 0, this._elements.length);
+      this._elements.setAll(0, other._elements);
+      //System.arraycopy(other._elements, 0, this._elements, 0, this._elements.length);
       return this;
     }
     if (_haveSharedCells(other)) {
@@ -915,7 +918,7 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
           idxOther += rowStrideOther;
         }
       } else if (function is DoublePlusMultSecond) {
-        double multiplicator = function.multiplicator;
+        double multiplicator = (function as DoublePlusMultSecond).multiplicator;
         if (multiplicator == 0) { // x[i] = x[i] + 0*y[i]
           return this;
         } else if (multiplicator == 1) { // x[i] = x[i] + y[i]
@@ -1393,7 +1396,7 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
     return _rowZero + row * _rowStride + _columnZero + column * _columnStride;
   }
 
-  DoubleMatrix2D like(int rows, int columns) {
+  DoubleMatrix2D like2D(int rows, int columns) {
     return new DenseDoubleMatrix2D(rows, columns);
   }
 
@@ -1564,7 +1567,7 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
 
   }
 
-  DoubleMatrix1D zMult(final DoubleMatrix1D y, DoubleMatrix1D z, final double alpha, final double beta, final bool transposeA) {
+  DoubleMatrix1D zMult(final DoubleMatrix1D y, DoubleMatrix1D z, [final double alpha = 1.0, final double beta = 0.0, final bool transposeA = false]) {
     if (transposeA) return viewDice().zMult(y, z, alpha, beta, false);
     if (z == null) {
       z = new DenseDoubleMatrix1D(_rows);
@@ -1614,7 +1617,7 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
       int idxZero = zero;
       int idxZeroZ = zeroZ;
       for (int r = 0; r < _rows; r++) {
-        double sum = 0;
+        double sum = 0.0;
         int idx = idxZero;
         int idxY = zeroY;
         for (int c = 0; c < _columns; c++) {
@@ -1630,7 +1633,7 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
     return z;
   }
 
-  DoubleMatrix2D zMult2D(final DoubleMatrix2D B, DoubleMatrix2D C, final double alpha, final double beta, final bool transposeA, final bool transposeB) {
+  DoubleMatrix2D zMult2D(final DoubleMatrix2D B, DoubleMatrix2D C, [final double alpha = 1.0, final double beta = 0.0, final bool transposeA = false, bool transposeB = false]) {
     final int rowsA = _rows;
     final int columnsA = _columns;
     final int rowsB = B.rows();
@@ -1880,8 +1883,7 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
 
   bool _haveSharedCellsRaw(DoubleMatrix2D other) {
     if (other is SelectedDenseDoubleMatrix2D) {
-      SelectedDenseDoubleMatrix2D otherMatrix = other as SelectedDenseDoubleMatrix2D;
-      return this._elements == otherMatrix._elements;
+      return this._elements == other._elements;
     } else if (other is DenseDoubleMatrix2D) {
       return this._elements == other._elements;
     }
@@ -1894,5 +1896,9 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
 
   DoubleMatrix2D _viewSelectionLike(List<int> rowOffsets, List<int> columnOffsets) {
     return new SelectedDenseDoubleMatrix2D(this._elements, rowOffsets, columnOffsets, 0);
+  }
+
+  Object clone() {
+    return new DenseDoubleMatrix2D(_rows, _columns, _elements, _rowZero, _columnZero, _rowStride, _columnStride, !_isNoView);
   }
 }

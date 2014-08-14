@@ -6,7 +6,15 @@ that both that copyright notice and this permission notice appear in supporting 
 CERN makes no representations about the suitability of this software for any purpose.
 It is provided "as is" without expressed or implied warranty.
  */
-part of cern.colt.matrix;
+library cern.colt.matrix.format;
+
+import 'dart:math' as Math;
+import 'package:intl/intl.dart';
+import 'matrix.dart';
+
+part 'former_factory.dart';
+part 'abstract_formatter.dart';
+part 'double/algo/formatter.dart';
 
 /**
  * Formats a double or complex (double[]) into a string (like sprintf in C).

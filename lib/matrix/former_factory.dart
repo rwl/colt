@@ -1,4 +1,4 @@
-part of cern.colt.matrix;
+part of cern.colt.matrix.format;
 
 /**
  * Factory producing implementations of {@link cern.colt.matrix.Former} via

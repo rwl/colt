@@ -6,7 +6,7 @@ that both that copyright notice and this permission notice appear in supporting 
 CERN makes no representations about the suitability of this software for any purpose.
 It is provided "as is" without expressed or implied warranty.
  */
-part of cern.colt.matrix;
+part of cern.colt.matrix.format;
 
 /**
  * Abstract base class for flexible, well human readable matrix print
@@ -422,7 +422,7 @@ abstract class AbstractFormatter {//extends cern.colt.PersistentObject {
    * @param matrix
    *            the matrix to convert.
    */
-  String _toString2D(AbstractMatrix2D matrix) {
+  String toString2D(AbstractMatrix2D matrix) {
     List<List<String>> strings = this._format2D(matrix);
     _align(strings);
     String total = _toString(strings);
