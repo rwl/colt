@@ -54,8 +54,8 @@ class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
    *             .
    */
   factory DiagonalDoubleMatrix2D.fromList(List<Float64List> values, int dindex) {
-    return DiagonalDoubleMatrix2D(values.length, values.length == 0 ? 0 : values[0].length, dindex)
-      ..assign(values);
+    return new DiagonalDoubleMatrix2D(values.length, values.length == 0 ? 0 : values[0].length, dindex)
+      ..assignValues2D(values);
   }
 
   /**
@@ -119,10 +119,10 @@ class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
         return this;
       }
       if (alpha == 0) {
-        return assign(0.0);
+        return assignValue(0.0);
       }
       if (alpha != alpha) {
-        return assign(alpha); // the funny definition of isNaN(). This should better not happen.
+        return assignValue(alpha); // the funny definition of isNaN(). This should better not happen.
       }
       for (int j = _dlength; --j >= 0; ) {
         _elements[j] *= alpha;
@@ -141,12 +141,14 @@ class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
   }
 
   DoubleMatrix2D assignValues(final Float64List values) {
-    if (values.length != _dlength) throw new ArgumentError("Must have same length: length=" + values.length + " dlength=" + _dlength);
-    int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    if (values.length != _dlength) {
+      throw new ArgumentError("Must have same length: length=${values.length} dlength=$_dlength");
+    }
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_dlength >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _dlength);
       List<Future> futures = new List<Future>(nthreads);
-      int k = _dlength / nthreads;
+      int k = _dlength ~/ nthreads;
       for (int j = 0; j < nthreads; j++) {
         final int firstRow = j * k;
         final int lastRow = (j == nthreads - 1) ? _dlength : firstRow + k;
@@ -157,16 +159,18 @@ class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
         });
       }
       ConcurrencyUtils.waitForCompletion(futures);
-    } else {
+    } else {*/
       for (int r = _dlength; --r >= 0; ) {
         _elements[r] = values[r];
       }
-    }
+    //}
     return this;
   }
 
   DoubleMatrix2D assignValues2D(final List<Float64List> values) {
-    if (values.length != _rows) throw new ArgumentError("Must have same number of rows: rows=" + values.length + "rows()=" + rows());
+    if (values.length != _rows) {
+      throw new ArgumentError("Must have same number of rows: rows=${values.length} rows()=${rows()}");
+    }
     int r, c;
     if (_dindex >= 0) {
       r = 0;
@@ -177,7 +181,7 @@ class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
     }
     for (int i = 0; i < _dlength; i++) {
       if (values[i].length != _columns) {
-        throw new ArgumentError("Must have same number of columns in every row: columns=" + values[r].length + "columns()=" + columns());
+        throw new ArgumentError("Must have same number of columns in every row: columns=${values[r].length} columns()=${columns()}");
       }
       _elements[i] = values[r++][c++];
     }
@@ -190,22 +194,23 @@ class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
     checkShape(source);
 
     if (source is DiagonalDoubleMatrix2D) {
-      DiagonalDoubleMatrix2D other = source as DiagonalDoubleMatrix2D;
+      DiagonalDoubleMatrix2D other = source;
       if ((_dindex != other._dindex) || (_dlength != other._dlength)) {
         throw new ArgumentError("source is DiagonalDoubleMatrix2D with different diagonal stored.");
       }
       // quickest
-      System.arraycopy(other._elements, 0, this._elements, 0, this._elements.length);
+      this._elements.setAll(0, other._elements);
+      //System.arraycopy(other._elements, 0, this._elements, 0, this._elements.length);
       return this;
     } else {
-      return super.assign(source);
+      return super.assignMatrix(source);
     }
   }
 
   DoubleMatrix2D assignFunc(final DoubleMatrix2D y, final func.DoubleDoubleFunction function) {
     checkShape(y);
     if (y is DiagonalDoubleMatrix2D) {
-      DiagonalDoubleMatrix2D other = y as DiagonalDoubleMatrix2D;
+      DiagonalDoubleMatrix2D other = y;
       if ((_dindex != other._dindex) || (_dlength != other._dlength)) {
         throw new ArgumentError("y is DiagonalDoubleMatrix2D with different diagonal stored.");
       }
@@ -216,11 +221,11 @@ class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
         }
       }
       final Float64List otherElements = other._elements;
-      int nthreads = ConcurrencyUtils.getNumberOfThreads();
+      /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
       if ((nthreads > 1) && (_dlength >= ConcurrencyUtils.getThreadsBeginN_2D())) {
         nthreads = Math.min(nthreads, _dlength);
         List<Future> futures = new List<Future>(nthreads);
-        int k = _dlength / nthreads;
+        int k = _dlength ~/ nthreads;
         for (int j = 0; j < nthreads; j++) {
           final int firstRow = j * k;
           final int lastRow = (j == nthreads - 1) ? _dlength : firstRow + k;
@@ -236,23 +241,23 @@ class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
                   _elements[j] = _elements[j] + alpha * otherElements[j];
                 }
               }
-            } else if (function == cern.jet.math.tdouble.DoubleFunctions.mult) { // x[i] = x[i] * y[i]
+            } else if (function == func.mult) { // x[i] = x[i] * y[i]
               for (int j = firstRow; j < lastRow; j++) {
                 _elements[j] = _elements[j] * otherElements[j];
               }
-            } else if (function == cern.jet.math.tdouble.DoubleFunctions.div) { // x[i] = x[i] /  y[i]
+            } else if (function == func.div) { // x[i] = x[i] /  y[i]
               for (int j = firstRow; j < lastRow; j++) {
                 _elements[j] = _elements[j] / otherElements[j];
               }
             } else {
               for (int j = firstRow; j < lastRow; j++) {
-                _elements[j] = function.apply(_elements[j], otherElements[j]);
+                _elements[j] = function(_elements[j], otherElements[j]);
               }
             }
           });
         }
         ConcurrencyUtils.waitForCompletion(futures);
-      } else {
+      } else {*/
         if (function is DoublePlusMultSecond) { // x[i] = x[i] + alpha*y[i]
           final double alpha = (function as DoublePlusMultSecond).multiplicator;
           if (alpha == 1) {
@@ -264,29 +269,29 @@ class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
               _elements[j] = _elements[j] + alpha * otherElements[j];
             }
           }
-        } else if (function == cern.jet.math.tdouble.DoubleFunctions.mult) { // x[i] = x[i] * y[i]
+        } else if (function == func.mult) { // x[i] = x[i] * y[i]
           for (int j = _dlength; --j >= 0; ) {
             _elements[j] = _elements[j] * otherElements[j];
           }
-        } else if (function == cern.jet.math.tdouble.DoubleFunctions.div) { // x[i] = x[i] /  y[i]
+        } else if (function == func.div) { // x[i] = x[i] /  y[i]
           for (int j = _dlength; --j >= 0; ) {
             _elements[j] = _elements[j] / otherElements[j];
           }
         } else {
           for (int j = _dlength; --j >= 0; ) {
-            _elements[j] = function.apply(_elements[j], otherElements[j]);
+            _elements[j] = function(_elements[j], otherElements[j]);
           }
         }
-      }
+      //}
       return this;
     } else {
-      return super.assign(y, function);
+      return super.assignFunc(y, function);
     }
   }
 
   int cardinality() {
     int cardinality = 0;
-    int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_dlength >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _dlength);
       List<Future> futures = new List<Future>(nthreads);
@@ -316,11 +321,11 @@ class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
       } on InterruptedException catch (e) {
         e.printStackTrace();
       }
-    } else {
+    } else {*/
       for (int r = 0; r < _dlength; r++) {
         if (_elements[r] != 0) cardinality++;
       }
-    }
+    //}
     return cardinality;
   }
 
@@ -329,11 +334,13 @@ class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
   }
 
   bool equalsValues(double value) {
-    double epsilon = cern.colt.matrix.tdouble.algo.DoubleProperty.DEFAULT.tolerance();
+    double epsilon = DoubleProperty.DEFAULT.tolerance();
     for (int r = 0; r < _dlength; r++) {
       double x = _elements[r];
-      double diff = Math.abs(value - x);
-      if ((diff != diff) && ((value != value && x != x) || value == x)) diff = 0;
+      double diff = (value - x).abs();
+      if ((diff != diff) && ((value != value && x != x) || value == x)) {
+        diff = 0.0;
+      }
       if (!(diff <= epsilon)) {
         return false;
       }
@@ -343,7 +350,7 @@ class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
 
   bool equals(Object obj) {
     if (obj is DiagonalDoubleMatrix2D) {
-      DiagonalDoubleMatrix2D other = obj as DiagonalDoubleMatrix2D;
+      DiagonalDoubleMatrix2D other = obj;
       double epsilon = DoubleProperty.DEFAULT.tolerance();
       if (this == obj) return true;
       if (!(this != null && obj != null)) return false;
@@ -357,8 +364,10 @@ class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
       for (int r = 0; r < _dlength; r++) {
         double x = _elements[r];
         double value = otherElements[r];
-        double diff = Math.abs(value - x);
-        if ((diff != diff) && ((value != value && x != x) || value == x)) diff = 0;
+        double diff = (value - x).abs();
+        if ((diff != diff) && ((value != value && x != x) || value == x)) {
+          diff = 0.0;
+        }
         if (!(diff <= epsilon)) {
           return false;
         }
@@ -373,7 +382,7 @@ class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
     for (int j = _dlength; --j >= 0; ) {
       double value = _elements[j];
       if (value != 0) {
-        _elements[j] = function.apply(j, j, value);
+        _elements[j] = function(j, j, value);
       }
     }
     return this;
@@ -399,13 +408,13 @@ class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
 
   Float64List getMaxLocation() {
     int location = 0;
-    double maxValue = 0;
-    int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    double maxValue = 0.0;
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_dlength >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _dlength);
       List<Future> futures = new List<Future>(nthreads);
       List<Float64List> results = new List<double>(nthreads);//[2];
-      int k = _dlength / nthreads;
+      int k = _dlength ~/ nthreads;
       for (int j = 0; j < nthreads; j++) {
         final int firstRow = j * k;
         final int lastRow = (j == nthreads - 1) ? _dlength : firstRow + k;
@@ -440,7 +449,7 @@ class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
       } on InterruptedException catch (e) {
         e.printStackTrace();
       }
-    } else {
+    } else {*/
       maxValue = _elements[0];
       double elem;
       for (int r = 1; r < _dlength; r++) {
@@ -450,7 +459,7 @@ class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
           location = r;
         }
       }
-    }
+    //}
     int rowLocation;
     int columnLocation;
     if (_dindex > 0) {
@@ -468,13 +477,13 @@ class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
 
   Float64List getMinLocation() {
     int location = 0;
-    double minValue = 0;
-    int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    double minValue = 0.0;
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_dlength >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _dlength);
       List<Future> futures = new List<Future>(nthreads);
       List<Float64List> results = new List<double>(nthreads);//[2];
-      int k = _dlength / nthreads;
+      int k = _dlength ~/ nthreads;
       for (int j = 0; j < nthreads; j++) {
         final int firstRow = j * k;
         final int lastRow = (j == nthreads - 1) ? _dlength : firstRow + k;
@@ -509,7 +518,7 @@ class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
       } on InterruptedException catch (e) {
         e.printStackTrace();
       }
-    } else {
+    } else {*/
       minValue = _elements[0];
       double elem;
       for (int r = 1; r < _dlength; r++) {
@@ -519,7 +528,7 @@ class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
           location = r;
         }
       }
-    }
+    //}
     int rowLocation;
     int columnLocation;
     if (_dindex > 0) {
@@ -538,28 +547,28 @@ class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
   double getQuick(int row, int column) {
     if (_dindex >= 0) {
       if (column < _dindex) {
-        return 0;
+        return 0.0;
       } else {
         if ((row < _dlength) && (row + _dindex == column)) {
           return _elements[row];
         } else {
-          return 0;
+          return 0.0;
         }
       }
     } else {
       if (row < -_dindex) {
-        return 0;
+        return 0.0;
       } else {
         if ((column < _dlength) && (row + _dindex == column)) {
           return _elements[column];
         } else {
-          return 0;
+          return 0.0;
         }
       }
     }
   }
 
-  DoubleMatrix2D like(int rows, int columns) {
+  DoubleMatrix2D like2D(int rows, int columns) {
     return new SparseDoubleMatrix2D(rows, columns);
   }
 
@@ -591,7 +600,7 @@ class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
     }
   }
 
-  DoubleMatrix1D zMult(DoubleMatrix1D y, DoubleMatrix1D z, double alpha, double beta, final bool transposeA) {
+  DoubleMatrix1D zMult(DoubleMatrix1D y, DoubleMatrix1D z, [double alpha=1.0, double beta=0.0, final bool transposeA=false]) {
     int rowsA = _rows;
     int columnsA = _columns;
     if (transposeA) {
@@ -617,14 +626,16 @@ class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
     DenseDoubleMatrix1D zz = z as DenseDoubleMatrix1D;
     final Float64List elementsZ = zz._elements;
     final int strideZ = zz.stride();
-    final int zeroZ = z.index(0) as int;
+    final int zeroZ = z.index(0);
 
     DenseDoubleMatrix1D yy = y as DenseDoubleMatrix1D;
     final Float64List elementsY = yy._elements;
     final int strideY = yy.stride();
-    final int zeroY = y.index(0) as int;
+    final int zeroY = y.index(0);
 
-    if (elementsY == null || elementsZ == null) throw new InternalError();
+    if (elementsY == null || elementsZ == null) {
+      throw new Error();
+    }
     if (!transposeA) {
       if (_dindex >= 0) {
         for (int i = _dlength; --i >= 0; ) {

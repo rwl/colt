@@ -552,7 +552,7 @@ class SparseDoubleMatrix2D extends DoubleMatrix2D {
       rowIndexes[k] = key ~/ _columns;
       columnIndexes[k] = key % _columns;
     }
-    return new SparseRCDoubleMatrix2D(_rows, _columns, rowIndexes, columnIndexes, values, false, false, sortColumnIndexes);
+    return new SparseRCDoubleMatrix2D.values(_rows, _columns, rowIndexes, columnIndexes, values, false, false, sortColumnIndexes);
   }
 
   /**

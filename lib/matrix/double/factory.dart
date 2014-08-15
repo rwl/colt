@@ -101,7 +101,7 @@ class DoubleFactory1D {
    */
   DoubleMatrix1D makeValues(Float64List values) {
     if (this == sparse) {
-      return new SparseDoubleMatrix1D(values);
+      return new SparseDoubleMatrix1D.from(values);
     } else {
       return new DenseDoubleMatrix1D.from(values);
     }
@@ -1057,7 +1057,7 @@ class DoubleFactory2D {
    */
   DoubleMatrix2D makeValues(List<Float64List> values) {
     if (this == sparse) {
-      return new SparseDoubleMatrix2D(values);
+      return new SparseDoubleMatrix2D.fromList(values);
     } else {
       return new DenseDoubleMatrix2D.from(values);
     }

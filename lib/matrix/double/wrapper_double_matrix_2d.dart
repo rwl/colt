@@ -114,7 +114,7 @@ class WrapperDoubleMatrix2D extends DoubleMatrix2D {
       if (this == obj) return true;
       if (!(this != null && obj != null)) return false;
       DiagonalDoubleMatrix2D A = _content as DiagonalDoubleMatrix2D;
-      DiagonalDoubleMatrix2D B = obj as DiagonalDoubleMatrix2D;
+      DiagonalDoubleMatrix2D B = obj;
       if (A.columns() != B.columns() || A.rows() != B.rows() || A.diagonalIndex() != B.diagonalIndex() || A.diagonalLength() != B.diagonalLength()) return false;
       Float64List AElements = A.elements();
       Float64List BElements = B.elements();
@@ -273,6 +273,10 @@ class WrapperDoubleMatrix2D extends DoubleMatrix2D {
   DoubleMatrix2D _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets) {
     throw new Error(); // should never be called
   }
+
+  Object clone() {
+    return new WrapperDoubleMatrix2D(_content);
+  }
 }
 
 class ViewColumnFlipWrapperDoubleMatrix2D extends WrapperDoubleMatrix2D {
@@ -294,6 +298,10 @@ class ViewColumnFlipWrapperDoubleMatrix2D extends WrapperDoubleMatrix2D {
   void set(int row, int column, double value) {
       _content.set(row, _columns - 1 - column, value);
   }
+
+  Object clone() {
+    return new ViewColumnFlipWrapperDoubleMatrix2D(_content);
+  }
 }
 
 class ViewDiceWrapperDoubleMatrix2D extends WrapperDoubleMatrix2D {
@@ -314,6 +322,10 @@ class ViewDiceWrapperDoubleMatrix2D extends WrapperDoubleMatrix2D {
 
   void set(int row, int column, double value) {
       _content.set(column, row, value);
+  }
+
+  Object clone() {
+    return new ViewDiceWrapperDoubleMatrix2D(_content);
   }
 }
 
@@ -339,6 +351,10 @@ class ViewPartWrapperDoubleMatrix2D extends WrapperDoubleMatrix2D {
   void set(int i, int j, double value) {
       _content.set(_row + i, _column + j, value);
   }
+
+  Object clone() {
+    return new ViewPartWrapperDoubleMatrix2D(_content, _row, _column);
+  }
 }
 
 class ViewRowFlipWrapperDoubleMatrix2D extends WrapperDoubleMatrix2D {
@@ -359,6 +375,10 @@ class ViewRowFlipWrapperDoubleMatrix2D extends WrapperDoubleMatrix2D {
 
   void set(int row, int column, double value) {
       _content.set(_rows - 1 - row, column, value);
+  }
+
+  Object clone() {
+    return new ViewRowFlipWrapperDoubleMatrix2D(_content);
   }
 }
 
@@ -384,6 +404,10 @@ class ViewSelectionWrapperDoubleMatrix2D extends WrapperDoubleMatrix2D {
   void set(int i, int j, double value) {
       _content.set(_rix[i], _cix[j], value);
   }
+
+  Object clone() {
+    return new ViewSelectionWrapperDoubleMatrix2D(_content, _cix, _rix);
+  }
 }
 
 class ViewStridesWrapperDoubleMatrix2D extends WrapperDoubleMatrix2D {
@@ -407,5 +431,9 @@ class ViewStridesWrapperDoubleMatrix2D extends WrapperDoubleMatrix2D {
 
   void set(int row, int column, double value) {
       _content.set(_rowStride * row, _columnStride * column, value);
+  }
+
+  Object clone() {
+    return new ViewStridesWrapperDoubleMatrix2D(_content, _rowStride, _columnStride);
   }
 }
