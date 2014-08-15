@@ -18,6 +18,8 @@ part 'abstract_matrix_2d.dart';
 part 'abstract_matrix.dart';
 part 'double/dense_double_matrix_1d.dart';
 part 'double/dense_double_matrix_2d.dart';
+part 'double/sparse_double_matrix_1d.dart';
+part 'double/sparse_double_matrix_2d.dart';
 part 'double/double_matrix_1d.dart';
 part 'double/double_matrix_2d.dart';
 part 'double/factory.dart';

@@ -575,7 +575,7 @@ abstract class DoubleMatrix2D extends AbstractMatrix2D {
    *             <tt>values.length != rows() || for any 0 &lt;= row &lt; rows(): values[row].length != columns()</tt>
    *             .
    */
-  DoubleMatrix2D assignValues2D(final List<List<double>> values) {
+  DoubleMatrix2D assignValues2D(final List<Float64List> values) {
     if (values.length != _rows) {
       throw new ArgumentError("Must have same number of rows: rows=${values.length}rows()=${rows()}");
     }
