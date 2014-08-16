@@ -121,11 +121,11 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
       }
       a = ConcurrencyUtils.waitForCompletion(futures, aggr);
     } else {*/
-      int idx = _zero + (_size - 1) * _stride;
-      a = f(_elements[idx]);
-      for (int i = _size - 1; --i >= 0; ) {
-        a = aggr(a, f(_elements[idx -= _stride]));
-      }
+    int idx = _zero + (_size - 1) * _stride;
+    a = f(_elements[idx]);
+    for (int i = _size - 1; --i >= 0; ) {
+      a = aggr(a, f(_elements[idx -= _stride]));
+    }
     //}
     return a;
   }
@@ -157,14 +157,14 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
       }
       a = ConcurrencyUtils.waitForCompletion(futures, aggr);
     } else {*/
-      double elem;
-      int idx = _zero + indexElements[0] * _stride;
-      a = f(_elements[idx]);
-      for (int i = 1; i < size; i++) {
-        idx = _zero + indexElements[i] * _stride;
-        elem = _elements[idx];
-        a = aggr(a, f(elem));
-      }
+    double elem;
+    int idx = _zero + indexElements[0] * _stride;
+    a = f(_elements[idx]);
+    for (int i = 1; i < size; i++) {
+      idx = _zero + indexElements[i] * _stride;
+      elem = _elements[idx];
+      a = aggr(a, f(elem));
+    }
     //}
     return a;
   }
@@ -201,19 +201,19 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
       }
       a = ConcurrencyUtils.waitForCompletion(futures, aggr);
     } else {*/
-      a = f(_elements[_zero], elementsOther[zeroOther]);
-      int idx = _zero;
-      int idxOther = zeroOther;
-      for (int i = 1; i < _size; i++) {
-        idx += _stride;
-        idxOther += strideOther;
-        a = aggr(a, f(_elements[idx], elementsOther[idxOther]));
-      }
+    a = f(_elements[_zero], elementsOther[zeroOther]);
+    int idx = _zero;
+    int idxOther = zeroOther;
+    for (int i = 1; i < _size; i++) {
+      idx += _stride;
+      idxOther += strideOther;
+      a = aggr(a, f(_elements[idx], elementsOther[idxOther]));
+    }
     //}
     return a;
   }
 
-  DoubleMatrix1D assignFunc(final DoubleFunction function) {
+  DoubleMatrix1D assign(final DoubleFunction function) {
     double multiplicator;
     if (function is DoubleMult) {
       // x[i] = mult*x[i]
@@ -252,19 +252,19 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-      int idx = _zero - _stride;
-      // specialization for speed
-      if (function is DoubleMult) {
-        // x[i] = mult*x[i]
-        for (int k = _size; --k >= 0; ) {
-          _elements[idx += _stride] *= multiplicator;
-        }
-      } else {
-        // the general case x[i] = f(x[i])
-        for (int k = _size; --k >= 0; ) {
-          _elements[idx += _stride] = function(_elements[idx]);
-        }
+    int idx = _zero - _stride;
+    // specialization for speed
+    if (function is DoubleMult) {
+      // x[i] = mult*x[i]
+      for (int k = _size; --k >= 0; ) {
+        _elements[idx += _stride] *= multiplicator;
       }
+    } else {
+      // the general case x[i] = f(x[i])
+      for (int k = _size; --k >= 0; ) {
+        _elements[idx += _stride] = function(_elements[idx]);
+      }
+    }
     //}
     return this;
   }
@@ -290,13 +290,13 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-      int idx = _zero;
-      for (int i = 0; i < _size; i++) {
-        if (cond(_elements[idx]) == true) {
-          _elements[idx] = function(_elements[idx]);
-        }
-        idx += _stride;
+    int idx = _zero;
+    for (int i = 0; i < _size; i++) {
+      if (cond(_elements[idx]) == true) {
+        _elements[idx] = function(_elements[idx]);
       }
+      idx += _stride;
+    }
     //}
     return this;
   }
@@ -322,13 +322,13 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-      int idx = _zero;
-      for (int i = 0; i < _size; i++) {
-        if (cond(_elements[idx]) == true) {
-          _elements[idx] = value;
-        }
-        idx += _stride;
+    int idx = _zero;
+    for (int i = 0; i < _size; i++) {
+      if (cond(_elements[idx]) == true) {
+        _elements[idx] = value;
       }
+      idx += _stride;
+    }
     //}
     return this;
   }
@@ -388,11 +388,11 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
         }
         ConcurrencyUtils.waitForCompletion(futures);
       } else {*/
-        int idx = _zero;
-        for (int i = 0; i < _size; i++) {
-          _elements[idx] = values[i];
-          idx += _stride;
-        }
+      int idx = _zero;
+      for (int i = 0; i < _size; i++) {
+        _elements[idx] = values[i];
+        idx += _stride;
+      }
       //}
     }
     return this;
@@ -449,21 +449,21 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-      int idx = _zero;
-      int idxOther = zeroOther;
-      for (int k = 0; k < _size; k++) {
-        _elements[idx] = elementsOther[idxOther];
-        idx += _stride;
-        idxOther += strideOther;
-      }
+    int idx = _zero;
+    int idxOther = zeroOther;
+    for (int k = 0; k < _size; k++) {
+      _elements[idx] = elementsOther[idxOther];
+      idx += _stride;
+      idxOther += strideOther;
+    }
     //}
     return this;
   }
 
-  DoubleMatrix1D assignMatrixFunc(final DoubleMatrix1D y, final DoubleDoubleFunction function) {
+  DoubleMatrix1D assignFunc(final DoubleMatrix1D y, final DoubleDoubleFunction function) {
     // overriden for performance only
     if (!(y is DenseDoubleMatrix1D)) {
-      super.assignMatrixFunc(y, function);
+      super.assignFunc(y, function);
       return this;
     }
     checkSize(y);
@@ -568,58 +568,58 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-      // specialized for speed
-      int idx = _zero;
-      int idxOther = zeroOther;
-      if (function == func.mult) {
-        // x[i] = x[i] * y[i]
+    // specialized for speed
+    int idx = _zero;
+    int idxOther = zeroOther;
+    if (function == func.mult) {
+      // x[i] = x[i] * y[i]
+      for (int k = 0; k < _size; k++) {
+        _elements[idx] *= elementsOther[idxOther];
+        idx += _stride;
+        idxOther += strideOther;
+      }
+    } else if (function == func.div) {
+      // x[i] = x[i] / y[i]
+      for (int k = 0; k < _size; k++) {
+        _elements[idx] /= elementsOther[idxOther];
+        idx += _stride;
+        idxOther += strideOther;
+      }
+    } else if (function is DoublePlusMultSecond) {
+      double multiplicator = (function as DoublePlusMultSecond).multiplicator;
+      if (multiplicator == 0) {
+        // x[i] = x[i] + 0*y[i]
+        return this;
+      } else if (multiplicator == 1) {
+        // x[i] = x[i] + y[i]
         for (int k = 0; k < _size; k++) {
-          _elements[idx] *= elementsOther[idxOther];
+          _elements[idx] += elementsOther[idxOther];
           idx += _stride;
           idxOther += strideOther;
         }
-      } else if (function == func.div) {
-        // x[i] = x[i] / y[i]
+      } else if (multiplicator == -1) {
+        // x[i] = x[i] - y[i]
         for (int k = 0; k < _size; k++) {
-          _elements[idx] /= elementsOther[idxOther];
+          _elements[idx] -= elementsOther[idxOther];
           idx += _stride;
           idxOther += strideOther;
-        }
-      } else if (function is DoublePlusMultSecond) {
-        double multiplicator = (function as DoublePlusMultSecond).multiplicator;
-        if (multiplicator == 0) {
-          // x[i] = x[i] + 0*y[i]
-          return this;
-        } else if (multiplicator == 1) {
-          // x[i] = x[i] + y[i]
-          for (int k = 0; k < _size; k++) {
-            _elements[idx] += elementsOther[idxOther];
-            idx += _stride;
-            idxOther += strideOther;
-          }
-        } else if (multiplicator == -1) {
-          // x[i] = x[i] - y[i]
-          for (int k = 0; k < _size; k++) {
-            _elements[idx] -= elementsOther[idxOther];
-            idx += _stride;
-            idxOther += strideOther;
-          }
-        } else {
-          // the general case x[i] = x[i] + mult*y[i]
-          for (int k = 0; k < _size; k++) {
-            _elements[idx] += multiplicator * elementsOther[idxOther];
-            idx += _stride;
-            idxOther += strideOther;
-          }
         }
       } else {
-        // the general case x[i] = f(x[i],y[i])
+        // the general case x[i] = x[i] + mult*y[i]
         for (int k = 0; k < _size; k++) {
-          _elements[idx] = function(_elements[idx], elementsOther[idxOther]);
+          _elements[idx] += multiplicator * elementsOther[idxOther];
           idx += _stride;
           idxOther += strideOther;
         }
       }
+    } else {
+      // the general case x[i] = f(x[i],y[i])
+      for (int k = 0; k < _size; k++) {
+        _elements[idx] = function(_elements[idx], elementsOther[idxOther]);
+        idx += _stride;
+        idxOther += strideOther;
+      }
+    }
     //}
     return this;
   }
@@ -659,18 +659,18 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
         e.printStackTrace();
       }
     } else {*/
-      int idx = _zero;
-      for (int i = 0; i < _size; i++) {
-        if (_elements[idx] != 0) cardinality++;
-        idx += _stride;
-      }
+    int idx = _zero;
+    for (int i = 0; i < _size; i++) {
+      if (_elements[idx] != 0) cardinality++;
+      idx += _stride;
+    }
     //}
     return cardinality;
   }
 
-    Float64List elements() {
-        return _elements;
-    }
+  Float64List elements() {
+    return _elements;
+  }
 
   void getNonZeros(final /*IntArrayList*/List<int> indexList, final /*DoubleArrayList*/List<double> valueList) {
     bool fillIndexList = indexList != null;
@@ -848,16 +848,16 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
         e.printStackTrace();
       }
     } else {*/
-      maxValue = _elements[_zero];
-      location = 0;
-      int idx = _zero;
-      for (int i = 1; i < _size; i++) {
-        idx += _stride;
-        if (maxValue < _elements[idx]) {
-          maxValue = _elements[idx];
-          location = (idx - _zero) ~/ _stride;
-        }
+    maxValue = _elements[_zero];
+    location = 0;
+    int idx = _zero;
+    for (int i = 1; i < _size; i++) {
+      idx += _stride;
+      if (maxValue < _elements[idx]) {
+        maxValue = _elements[idx];
+        location = (idx - _zero) ~/ _stride;
       }
+    }
     //}
     return [maxValue, location];
   }
@@ -906,16 +906,16 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
         e.printStackTrace();
       }
     } else {*/
-      minValue = _elements[_zero];
-      location = 0;
-      int idx = _zero;
-      for (int i = 1; i < _size; i++) {
-        idx += _stride;
-        if (minValue > _elements[idx]) {
-          minValue = _elements[idx];
-          location = (idx - _zero) ~/ _stride;
-        }
+    minValue = _elements[_zero];
+    location = 0;
+    int idx = _zero;
+    for (int i = 1; i < _size; i++) {
+      idx += _stride;
+      if (minValue > _elements[idx]) {
+        minValue = _elements[idx];
+        location = (idx - _zero) ~/ _stride;
       }
+    }
     //}
     return [minValue, location];
   }
@@ -924,7 +924,7 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
     return _elements[_zero + index * _stride];
   }
 
-  DoubleMatrix1D likeSize(int size) {
+  DoubleMatrix1D like1D(int size) {
     return new DenseDoubleMatrix1D(size);
   }
 
@@ -1069,15 +1069,15 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-      int idx = _zero;
-      int idxOther = zeroOther;
-      for (int k = 0; k < _size; k++) {
-        double tmp = _elements[idx];
-        _elements[idx] = elementsOther[idxOther];
-        elementsOther[idxOther] = tmp;
-        idx += _stride;
-        idxOther += strideOther;
-      }
+    int idx = _zero;
+    int idxOther = zeroOther;
+    for (int k = 0; k < _size; k++) {
+      double tmp = _elements[idx];
+      _elements[idx] = elementsOther[idxOther];
+      elementsOther[idxOther] = tmp;
+      idx += _stride;
+      idxOther += strideOther;
+    }
     //}
   }
 
@@ -1149,15 +1149,15 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
         e.printStackTrace();
       }
     } else {*/
-      zeroThis -= _stride;
-      zeroOther -= strideOther;
-      int min = tail - from;
-      for (int k = min ~/ 4; --k >= 0; ) {
-        sum += _elements[zeroThis += _stride] * elementsOther[zeroOther += strideOther] + _elements[zeroThis += _stride] * elementsOther[zeroOther += strideOther] + _elements[zeroThis += _stride] * elementsOther[zeroOther += strideOther] + _elements[zeroThis += _stride] * elementsOther[zeroOther += strideOther];
-      }
-      for (int k = min % 4; --k >= 0; ) {
-        sum += _elements[zeroThis += _stride] * elementsOther[zeroOther += strideOther];
-      }
+    zeroThis -= _stride;
+    zeroOther -= strideOther;
+    int min = tail - from;
+    for (int k = min ~/ 4; --k >= 0; ) {
+      sum += _elements[zeroThis += _stride] * elementsOther[zeroOther += strideOther] + _elements[zeroThis += _stride] * elementsOther[zeroOther += strideOther] + _elements[zeroThis += _stride] * elementsOther[zeroOther += strideOther] + _elements[zeroThis += _stride] * elementsOther[zeroOther += strideOther];
+    }
+    for (int k = min % 4; --k >= 0; ) {
+      sum += _elements[zeroThis += _stride] * elementsOther[zeroOther += strideOther];
+    }
     //}
     return sum;
   }
@@ -1199,11 +1199,11 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
         e.printStackTrace();
       }
     } else {*/
-      int idx = _zero;
-      for (int k = 0; k < _size; k++) {
-        sum += elems[idx];
-        idx += _stride;
-      }
+    int idx = _zero;
+    for (int k = 0; k < _size; k++) {
+      sum += elems[idx];
+      idx += _stride;
+    }
     //}
     return sum;
   }
@@ -1235,10 +1235,296 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
   }
 
   DoubleMatrix1D _viewSelectionLike(List<int> offsets) {
-    return new SelectedDenseDoubleMatrix1D(this._elements, offsets);
+    return new SelectedDenseDoubleMatrix1D.offset(this._elements, offsets);
   }
 
   Object clone() {
     return new DenseDoubleMatrix1D(_size, _elements, _zero, _stride, !_isNoView);
+  }
+}
+
+/**
+ * Selection view on dense 1-d matrices holding <tt>double</tt> elements. First
+ * see the <a href="package-summary.html">package summary</a> and javadoc <a
+ * href="package-tree.html">tree view</a> to get the broad picture.
+ * <p>
+ * <b>Implementation:</b>
+ * <p>
+ * Objects of this class are typically constructed via <tt>viewIndexes</tt>
+ * methods on some source matrix. The interface introduced in abstract super
+ * classes defines everything a user can do. From a user point of view there is
+ * nothing special about this class; it presents the same functionality with the
+ * same signatures and semantics as its abstract superclass(es) while
+ * introducing no additional functionality. Thus, this class need not be visible
+ * to users. By the way, the same principle applies to concrete DenseXXX,
+ * SparseXXX classes: they presents the same functionality with the same
+ * signatures and semantics as abstract superclass(es) while introducing no
+ * additional functionality. Thus, they need not be visible to users, either.
+ * Factory methods could hide all these concrete types.
+ * <p>
+ * This class uses no delegation. Its instances point directly to the data. Cell
+ * addressing overhead is 1 additional array index access per get/set.
+ * <p>
+ * Note that this implementation is not synchronized.
+ * <p>
+ * <b>Memory requirements:</b>
+ * <p>
+ * <tt>memory [bytes] = 4*indexes.length</tt>. Thus, an index view with 1000
+ * indexes additionally uses 4 KB.
+ * <p>
+ * <b>Time complexity:</b>
+ * <p>
+ * Depends on the parent view holding cells.
+ * <p>
+ *
+ * @author wolfgang.hoschek@cern.ch
+ * @version 1.0, 09/24/99
+ *
+ * @author Piotr Wendykier (piotr.wendykier@gmail.com)
+ * @version 1.1, 08/22/2007
+ */
+class SelectedDenseDoubleMatrix1D extends DoubleMatrix1D {
+
+  /**
+   * The elements of this matrix.
+   */
+  Float64List _elements;
+
+  /**
+   * The offsets of visible indexes of this matrix.
+   */
+  Int32List _offsets;
+
+  /**
+   * The offset.
+   */
+  int __offset;
+
+  /**
+   * Constructs a matrix view with the given parameters.
+   *
+   * @param elements
+   *            the cells.
+   * @param indexes
+   *            The indexes of the cells that shall be visible.
+   */
+  factory SelectedDenseDoubleMatrix1D.offset(Float64List elements, Int32List offsets) {
+    return new SelectedDenseDoubleMatrix1D(offsets.length, elements, 0, 1, offsets, 0);
+  }
+
+  /**
+   * Constructs a matrix view with the given parameters.
+   *
+   * @param size
+   *            the number of cells the matrix shall have.
+   * @param elements
+   *            the cells.
+   * @param zero
+   *            the index of the first element.
+   * @param stride
+   *            the number of indexes between any two elements, i.e.
+   *            <tt>index(i+1)-index(i)</tt>.
+   * @param offsets
+   *            the offsets of the cells that shall be visible.
+   * @param offset
+   */
+  SelectedDenseDoubleMatrix1D(int size, Float64List elements, int zero, int stride, Int32List offsets, int offset) {
+    _setUp(size, zero, stride);
+
+    this._elements = elements;
+    this._offsets = offsets;
+    this.__offset = offset;
+    this._isNoView = false;
+  }
+
+  Float64List elements() {
+    return _elements;
+  }
+
+  /**
+   * Returns the matrix cell value at coordinate <tt>index</tt>.
+   *
+   * <p>
+   * Provided with invalid parameters this method may return invalid objects
+   * without throwing any exception. <b>You should only use this method when
+   * you are absolutely sure that the coordinate is within bounds.</b>
+   * Precondition (unchecked): <tt>index&lt;0 || index&gt;=size()</tt>.
+   *
+   * @param index
+   *            the index of the cell.
+   * @return the value of the specified cell.
+   */
+  double getQuick(int index) {
+    // if (debug) if (index<0 || index>=size) checkIndex(index);
+    // return elements[index(index)];
+    // manually inlined:
+    return _elements[__offset + _offsets[_zero + index * _stride]];
+  }
+
+  /**
+   * Returns the position of the element with the given relative rank within
+   * the (virtual or non-virtual) internal 1-dimensional array. You may want
+   * to override this method for performance.
+   *
+   * @param rank
+   *            the rank of the element.
+   */
+  int index(int rank) {
+    // return this.offset + super.index(rank);
+    // manually inlined:
+    return __offset + _offsets[_zero + rank * _stride];
+  }
+
+  /**
+   * Construct and returns a new empty matrix <i>of the same dynamic type</i>
+   * as the receiver, having the specified size. For example, if the receiver
+   * is an instance of type <tt>DenseDoubleMatrix1D</tt> the new matrix must
+   * also be of type <tt>DenseDoubleMatrix1D</tt>, if the receiver is an
+   * instance of type <tt>SparseDoubleMatrix1D</tt> the new matrix must also
+   * be of type <tt>SparseDoubleMatrix1D</tt>, etc. In general, the new matrix
+   * should have internal parametrization as similar as possible.
+   *
+   * @param size
+   *            the number of cell the matrix shall have.
+   * @return a new empty matrix of the same dynamic type.
+   */
+  DoubleMatrix1D like1D(int size) {
+    return new DenseDoubleMatrix1D(size);
+  }
+
+  /**
+   * Construct and returns a new 2-d matrix <i>of the corresponding dynamic
+   * type</i>, entirelly independent of the receiver. For example, if the
+   * receiver is an instance of type <tt>DenseDoubleMatrix1D</tt> the new
+   * matrix must be of type <tt>DenseDoubleMatrix2D</tt>, if the receiver is
+   * an instance of type <tt>SparseDoubleMatrix1D</tt> the new matrix must be
+   * of type <tt>SparseDoubleMatrix2D</tt>, etc.
+   *
+   * @param rows
+   *            the number of rows the matrix shall have.
+   * @param columns
+   *            the number of columns the matrix shall have.
+   * @return a new matrix of the corresponding dynamic type.
+   */
+  DoubleMatrix2D like2D(int rows, int columns) {
+    return new DenseDoubleMatrix2D(rows, columns);
+  }
+
+  DoubleMatrix2D reshape(int rows, int columns) {
+    if (rows * columns != _size) {
+      throw new ArgumentError("rows*columns != size");
+    }
+    DoubleMatrix2D M = new DenseDoubleMatrix2D(rows, columns);
+    final Float64List elementsOther = M.elements() as Float64List;
+    final int zeroOther = M.index(0, 0);
+    final int rowStrideOther = M.rowStride();
+    final int colStrideOther = M.columnStride();
+    int idxOther;
+    int idx = 0;
+    for (int c = 0; c < columns; c++) {
+      idxOther = zeroOther + c * colStrideOther;
+      for (int r = 0; r < rows; r++) {
+        elementsOther[idxOther] = getQuick(idx++);
+        idxOther += rowStrideOther;
+      }
+    }
+    return M;
+  }
+
+  /*DoubleMatrix3D reshape3D(int slices, int rows, int columns) {
+    if (slices * rows * columns != _size) {
+      throw new ArgumentError("slices*rows*columns != size");
+    }
+    DoubleMatrix3D M = new DenseDoubleMatrix3D(slices, rows, columns);
+    final Float64List elementsOther = M.elements() as Float64List;
+    final int zeroOther = M.index(0, 0, 0);
+    final int sliceStrideOther = M.sliceStride();
+    final int rowStrideOther = M.rowStride();
+    final int colStrideOther = M.columnStride();
+    int idxOther;
+    int idx = 0;
+    for (int s = 0; s < slices; s++) {
+      for (int c = 0; c < columns; c++) {
+        idxOther = zeroOther + s * sliceStrideOther + c * colStrideOther;
+        for (int r = 0; r < rows; r++) {
+          elementsOther[idxOther] = getQuick(idx++);
+          idxOther += rowStrideOther;
+        }
+      }
+    }
+    return M;
+  }*/
+
+  /**
+   * Sets the matrix cell at coordinate <tt>index</tt> to the specified value.
+   *
+   * <p>
+   * Provided with invalid parameters this method may access illegal indexes
+   * without throwing any exception. <b>You should only use this method when
+   * you are absolutely sure that the coordinate is within bounds.</b>
+   * Precondition (unchecked): <tt>index&lt;0 || index&gt;=size()</tt>.
+   *
+   * @param index
+   *            the index of the cell.
+   * @param value
+   *            the value to be filled into the specified cell.
+   */
+  void setQuick(int index, double value) {
+    // if (debug) if (index<0 || index>=size) checkIndex(index);
+    // elements[index(index)] = value;
+    // manually inlined:
+    _elements[__offset + _offsets[_zero + index * _stride]] = value;
+  }
+
+  /**
+   * Returns the position of the given absolute rank within the (virtual or
+   * non-virtual) internal 1-dimensional array. Default implementation.
+   * Override, if necessary.
+   *
+   * @param rank
+   *            the absolute rank of the element.
+   * @return the position.
+   */
+  int _offset(int absRank) {
+    return _offsets[absRank];
+  }
+
+  /**
+   * Returns <tt>true</tt> if both matrices share at least one identical cell.
+   */
+  bool _haveSharedCellsRaw(DoubleMatrix1D other) {
+    if (other is SelectedDenseDoubleMatrix1D) {
+      return this._elements == other._elements;
+    } else if (other is DenseDoubleMatrix1D) {
+      return this._elements == other._elements;
+    }
+    return false;
+  }
+
+  /**
+   * Sets up a matrix with a given number of cells.
+   *
+   * @param size
+   *            the number of cells the matrix shall have.
+   */
+  void _setUp1D(int size) {
+    super._setUp(size);
+    this._stride = 1;
+    this.__offset = 0;
+  }
+
+  /**
+   * Construct and returns a new selection view.
+   *
+   * @param offsets
+   *            the offsets of the visible elements.
+   * @return a new view.
+   */
+  DoubleMatrix1D _viewSelectionLike(Int32List offsets) {
+    return new SelectedDenseDoubleMatrix1D.offset(this._elements, offsets);
+  }
+
+  Object clone() {
+    return new SelectedDenseDoubleMatrix1D(_size, _elements, _zero, _stride, _offsets, __offset);
   }
 }

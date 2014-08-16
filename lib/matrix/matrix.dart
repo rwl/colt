@@ -4,6 +4,8 @@ import 'dart:math' as Math;
 import 'dart:async' show Future;
 import 'dart:typed_data';
 
+import 'package:csparse/csparse.dart';
+
 import '../function.dart' show DoubleFunction, DoubleDoubleFunction, DoubleDoubleProcedure,
   DoubleIntProcedure, DoubleProcedure;
 import '../function.dart' as func;
@@ -21,6 +23,7 @@ part 'double/dense_double_matrix_2d.dart';
 part 'double/sparse_double_matrix_1d.dart';
 part 'double/sparse_double_matrix_2d.dart';
 part 'double/sparse_rc_double_matrix.dart';
+part 'double/sparse_cc_double_matrix.dart';
 part 'double/diagonal_double_matrix_2d.dart';
 part 'double/wrapper_double_matrix_2d.dart';
 part 'double/delegate_double_matrix.dart';

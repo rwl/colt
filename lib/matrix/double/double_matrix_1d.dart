@@ -491,7 +491,7 @@ abstract class DoubleMatrix1D extends AbstractMatrix1D {
    *             if <tt>size() != y.size()</tt>.
    * @see cern.jet.math.tdouble.DoubleFunctions
    */
-  DoubleMatrix1D assignMatrixFunc(DoubleMatrix1D y, DoubleDoubleFunction function) {
+  DoubleMatrix1D assignFunc(DoubleMatrix1D y, DoubleDoubleFunction function) {
     checkSize(y);
     int nthreads = ConcurrencyUtils.getNumberOfThreads();
     /*if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
@@ -556,7 +556,7 @@ abstract class DoubleMatrix1D extends AbstractMatrix1D {
    *             if <tt>size() != y.size()</tt>.
    * @see cern.jet.math.tdouble.DoubleFunctions
    */
-  DoubleMatrix1D assignMatrixFuncIndex(DoubleMatrix1D y, DoubleDoubleFunction function, /*IntArrayList*/List<int> nonZeroIndexes) {
+  DoubleMatrix1D assignFuncIndex(DoubleMatrix1D y, DoubleDoubleFunction function, /*IntArrayList*/List<int> nonZeroIndexes) {
     checkSize(y);
     List<int> nonZeroElements = nonZeroIndexes;//.elements();
 
@@ -590,7 +590,7 @@ abstract class DoubleMatrix1D extends AbstractMatrix1D {
         }
       }
     } else { // the general case x[i] = f(x[i],y[i])
-      return assignMatrixFunc(y, function);
+      return assignFunc(y, function);
     }
     return this;
   }
@@ -1084,7 +1084,7 @@ abstract class DoubleMatrix1D extends AbstractMatrix1D {
    * @return a new empty matrix of the same dynamic type.
    */
   DoubleMatrix1D like() {
-    return likeSize(_size);
+    return like1D(_size);
   }
 
   /**
@@ -1100,7 +1100,7 @@ abstract class DoubleMatrix1D extends AbstractMatrix1D {
    *            the number of cell the matrix shall have.
    * @return a new empty matrix of the same dynamic type.
    */
-  DoubleMatrix1D likeSize(int size);
+  DoubleMatrix1D like1D(int size);
 
   /**
    * Construct and returns a new 2-d matrix <i>of the corresponding dynamic

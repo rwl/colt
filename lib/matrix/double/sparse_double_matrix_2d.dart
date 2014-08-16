@@ -506,7 +506,7 @@ class SparseDoubleMatrix2D extends DoubleMatrix2D {
       rowIndexes[k] = key ~/ _columns;
       columnIndexes[k] = key % _columns;
     }
-    return new SparseCCDoubleMatrix2D(_rows, _columns, rowIndexes, columnIndexes, values, false, false, sortRowIndexes);
+    return new SparseCCDoubleMatrix2D.values(_rows, _columns, rowIndexes, columnIndexes, values, false, false, sortRowIndexes);
   }
 
   /**
@@ -762,9 +762,9 @@ class SparseDoubleMatrix2D extends DoubleMatrix2D {
       int j = key % _columns;
       fun.multiplicator = value * alpha;
       if (!transposeA) {
-        Crows[i].assignMatrixFunc(Brows[j], fun);
+        Crows[i].assignFunc(Brows[j], fun);
       } else {
-        Crows[j].assignMatrixFunc(Brows[i], fun);
+        Crows[j].assignFunc(Brows[i], fun);
       }
       return true;
     });
@@ -838,6 +838,11 @@ class SparseDoubleMatrix2D extends DoubleMatrix2D {
 
   DoubleMatrix2D _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets) {
     return new SelectedSparseDoubleMatrix2D.from(this._elements, rowOffsets, columnOffsets, 0);
+  }
+
+  Object clone() {
+    return new SparseDoubleMatrix2D(_rows, _columns, _elements, _rowZero, _columnZero,
+        _rowStride, _columnStride, !_isNoView);
   }
 
 }

@@ -226,11 +226,11 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
     }
   }
 
-  void checkDense2D(DoubleMatrix2D A) {
+  /*void checkDense2D(DoubleMatrix2D A) {
     if (!(A is DenseDoubleMatrix2D) && !(A is DenseColumnDoubleMatrix2D)) {
       throw new ArgumentError("Matrix must be dense");
     }
-  }
+  }*/
 
   void checkDense(DoubleMatrix1D A) {
     if (!(A is DenseDoubleMatrix1D)) {

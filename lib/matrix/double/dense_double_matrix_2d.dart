@@ -202,15 +202,15 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
       }
       a = ConcurrencyUtils.waitForCompletion(futures, aggr);
     } else {*/
-      a = f(_elements[zero + (_rows - 1) * _rowStride + (_columns - 1) * _columnStride]);
-      int d = 1;
-      for (int r = _rows; --r >= 0; ) {
-        int ridx = zero + r * _rowStride;
-        for (int c = _columns - d; --c >= 0; ) {
-          a = aggr(a, f(_elements[ridx + c * _columnStride]));
-        }
-        d = 0;
+    a = f(_elements[zero + (_rows - 1) * _rowStride + (_columns - 1) * _columnStride]);
+    int d = 1;
+    for (int r = _rows; --r >= 0; ) {
+      int ridx = zero + r * _rowStride;
+      for (int c = _columns - d; --c >= 0; ) {
+        a = aggr(a, f(_elements[ridx + c * _columnStride]));
       }
+      d = 0;
+    }
     //}
     return a;
   }
@@ -248,20 +248,20 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
       }
       a = ConcurrencyUtils.waitForCompletion(futures, aggr);
     } else {*/
-      double elem = _elements[zero];
-      if (cond(elem) == true) {
-        a = f(_elements[zero]);
-      }
-      int d = 1; // first cell already done
-      for (int r = 0; r < _rows; r++) {
-        for (int c = d; c < _columns; c++) {
-          elem = _elements[zero + r * _rowStride + c * _columnStride];
-          if (cond(elem) == true) {
-            a = aggr(a, f(elem));
-          }
+    double elem = _elements[zero];
+    if (cond(elem) == true) {
+      a = f(_elements[zero]);
+    }
+    int d = 1; // first cell already done
+    for (int r = 0; r < _rows; r++) {
+      for (int c = d; c < _columns; c++) {
+        elem = _elements[zero + r * _rowStride + c * _columnStride];
+        if (cond(elem) == true) {
+          a = aggr(a, f(elem));
         }
-        d = 0;
       }
+      d = 0;
+    }
     //}
     return a;
   }
@@ -293,12 +293,12 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
       }
       a = ConcurrencyUtils.waitForCompletion(futures, aggr);
     } else {*/
-      double elem;
-      a = f(_elements[zero + rowElements[0] * _rowStride + columnElements[0] * _columnStride]);
-      for (int i = 1; i < size; i++) {
-        elem = _elements[zero + rowElements[i] * _rowStride + columnElements[i] * _columnStride];
-        a = aggr(a, f(elem));
-      }
+    double elem;
+    a = f(_elements[zero + rowElements[0] * _rowStride + columnElements[0] * _columnStride]);
+    for (int i = 1; i < size; i++) {
+      elem = _elements[zero + rowElements[i] * _rowStride + columnElements[i] * _columnStride];
+      a = aggr(a, f(elem));
+    }
     //}
     return a;
   }
@@ -337,14 +337,14 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
       }
       a = ConcurrencyUtils.waitForCompletion(futures, aggr);
     } else {*/
-      int d = 1; // first cell already done
-      a = f(_elements[zero], elementsOther[zeroOther]);
-      for (int r = 0; r < _rows; r++) {
-        for (int c = d; c < _columns; c++) {
-          a = aggr(a, f(_elements[zero + r * _rowStride + c * _columnStride], elementsOther[zeroOther + r * rowStrideOther + c * colStrideOther]));
-        }
-        d = 0;
+    int d = 1; // first cell already done
+    a = f(_elements[zero], elementsOther[zeroOther]);
+    for (int r = 0; r < _rows; r++) {
+      for (int c = d; c < _columns; c++) {
+        a = aggr(a, f(_elements[zero + r * _rowStride + c * _columnStride], elementsOther[zeroOther + r * rowStrideOther + c * colStrideOther]));
       }
+      d = 0;
+    }
     //}
     return a;
   }
@@ -397,31 +397,31 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-      int idx = zero + (_rows - 1) * _rowStride + (_columns - 1) * _columnStride;
-      // specialization for speed
-      if (function is DoubleMult) { // x[i] =
-        // mult*x[i]
-        double multiplicator = (function as DoubleMult).multiplicator;
-        if (multiplicator == 1) return this;
-        if (multiplicator == 0) return assignValue(0.0);
-        for (int r = _rows; --r >= 0; ) { // the general case
-          for (int i = idx,
-              c = _columns; --c >= 0; ) {
-            elems[i] *= multiplicator;
-            i -= _columnStride;
-          }
-          idx -= _rowStride;
+    int idx = zero + (_rows - 1) * _rowStride + (_columns - 1) * _columnStride;
+    // specialization for speed
+    if (function is DoubleMult) { // x[i] =
+      // mult*x[i]
+      double multiplicator = (function as DoubleMult).multiplicator;
+      if (multiplicator == 1) return this;
+      if (multiplicator == 0) return assignValue(0.0);
+      for (int r = _rows; --r >= 0; ) { // the general case
+        for (int i = idx,
+            c = _columns; --c >= 0; ) {
+          elems[i] *= multiplicator;
+          i -= _columnStride;
         }
-      } else { // the general case x[i] = f(x[i])
-        for (int r = _rows; --r >= 0; ) {
-          for (int i = idx,
-              c = _columns; --c >= 0; ) {
-            elems[i] = function(elems[i]);
-            i -= _columnStride;
-          }
-          idx -= _rowStride;
-        }
+        idx -= _rowStride;
       }
+    } else { // the general case x[i] = f(x[i])
+      for (int r = _rows; --r >= 0; ) {
+        for (int i = idx,
+            c = _columns; --c >= 0; ) {
+          elems[i] = function(elems[i]);
+          i -= _columnStride;
+        }
+        idx -= _rowStride;
+      }
+    }
     //}
     return this;
   }
@@ -454,19 +454,19 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-      double elem;
-      int idx = zero;
-      for (int r = 0; r < _rows; r++) {
-        for (int i = idx,
-            c = 0; c < _columns; c++) {
-          elem = _elements[i];
-          if (cond(elem) == true) {
-            _elements[i] = function(elem);
-          }
-          i += _columnStride;
+    double elem;
+    int idx = zero;
+    for (int r = 0; r < _rows; r++) {
+      for (int i = idx,
+          c = 0; c < _columns; c++) {
+        elem = _elements[i];
+        if (cond(elem) == true) {
+          _elements[i] = function(elem);
         }
-        idx += _rowStride;
+        i += _columnStride;
       }
+      idx += _rowStride;
+    }
     //}
     return this;
   }
@@ -499,19 +499,19 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-      double elem;
-      int idx = zero;
-      for (int r = 0; r < _rows; r++) {
-        for (int i = idx,
-            c = 0; c < _columns; c++) {
-          elem = _elements[i];
-          if (cond(elem) == true) {
-            _elements[i] = value;
-          }
-          i += _columnStride;
+    double elem;
+    int idx = zero;
+    for (int r = 0; r < _rows; r++) {
+      for (int i = idx,
+          c = 0; c < _columns; c++) {
+        elem = _elements[i];
+        if (cond(elem) == true) {
+          _elements[i] = value;
         }
-        idx += _rowStride;
+        i += _columnStride;
       }
+      idx += _rowStride;
+    }
     //}
     return this;
   }
@@ -541,15 +541,15 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-      int idx = zero;
-      for (int r = 0; r < _rows; r++) {
-        for (int i = idx,
-            c = 0; c < _columns; c++) {
-          elems[i] = value;
-          i += _columnStride;
-        }
-        idx += _rowStride;
+    int idx = zero;
+    for (int r = 0; r < _rows; r++) {
+      for (int i = idx,
+          c = 0; c < _columns; c++) {
+        elems[i] = value;
+        i += _columnStride;
       }
+      idx += _rowStride;
+    }
     //}
     return this;
   }
@@ -586,16 +586,16 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
         }
         ConcurrencyUtils.waitForCompletion(futures);
       } else {*/
-        int idxOther = 0;
-        int idx = zero;
-        for (int r = 0; r < _rows; r++) {
-          for (int i = idx,
-              c = 0; c < _columns; c++) {
-            _elements[i] = values[idxOther++];
-            i += _columnStride;
-          }
-          idx += _rowStride;
+      int idxOther = 0;
+      int idx = zero;
+      for (int r = 0; r < _rows; r++) {
+        for (int i = idx,
+            c = 0; c < _columns; c++) {
+          _elements[i] = values[idxOther++];
+          i += _columnStride;
         }
+        idx += _rowStride;
+      }
       //}
     }
     return this;
@@ -626,16 +626,16 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
         }
         ConcurrencyUtils.waitForCompletion(futures);
       } else {*/
-        int i = 0;
-        for (int r = 0; r < _rows; r++) {
-          List<double> currentRow = values[r];
-          if (currentRow.length != _columns) {
-            throw new ArgumentError("Must have same number of columns in every row: columns=${currentRow.length} columns()=${columns()}");
-          }
-          this._elements.setAll(i, currentRow);
-          //System.arraycopy(currentRow, 0, this._elements, i, _columns);
-          i += _columns;
+      int i = 0;
+      for (int r = 0; r < _rows; r++) {
+        List<double> currentRow = values[r];
+        if (currentRow.length != _columns) {
+          throw new ArgumentError("Must have same number of columns in every row: columns=${currentRow.length} columns()=${columns()}");
         }
+        this._elements.setAll(i, currentRow);
+        //System.arraycopy(currentRow, 0, this._elements, i, _columns);
+        i += _columns;
+      }
       //}
     } else {
       final int zero = this.index(0, 0);
@@ -662,19 +662,19 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
         }
         ConcurrencyUtils.waitForCompletion(futures);
       } else {*/
-        int idx = zero;
-        for (int r = 0; r < _rows; r++) {
-          List<double> currentRow = values[r];
-          if (currentRow.length != _columns) {
-            throw new ArgumentError("Must have same number of columns in every row: columns=${currentRow.length} columns()=${columns()}");
-          }
-          for (int i = idx,
-              c = 0; c < _columns; c++) {
-            _elements[i] = currentRow[c];
-            i += _columnStride;
-          }
-          idx += _rowStride;
+      int idx = zero;
+      for (int r = 0; r < _rows; r++) {
+        List<double> currentRow = values[r];
+        if (currentRow.length != _columns) {
+          throw new ArgumentError("Must have same number of columns in every row: columns=${currentRow.length} columns()=${columns()}");
         }
+        for (int i = idx,
+            c = 0; c < _columns; c++) {
+          _elements[i] = currentRow[c];
+          i += _columnStride;
+        }
+        idx += _rowStride;
+      }
       //}
       return this;
     }
@@ -738,19 +738,19 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-      int idx = zero;
-      int idxOther = zeroOther;
-      for (int r = 0; r < _rows; r++) {
-        for (int i = idx,
-            j = idxOther,
-            c = 0; c < _columns; c++) {
-          _elements[i] = elementsOther[j];
-          i += _columnStride;
-          j += columnStrideOther;
-        }
-        idx += _rowStride;
-        idxOther += rowStrideOther;
+    int idx = zero;
+    int idxOther = zeroOther;
+    for (int r = 0; r < _rows; r++) {
+      for (int i = idx,
+          j = idxOther,
+          c = 0; c < _columns; c++) {
+        _elements[i] = elementsOther[j];
+        i += _columnStride;
+        j += columnStrideOther;
       }
+      idx += _rowStride;
+      idxOther += rowStrideOther;
+    }
     //}
     return this;
   }
@@ -884,96 +884,81 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-      int idx;
-      int idxOther;
-      // specialized for speed
-      if (function == func.mult) {
-        // x[i] = x[i] * y[i]
+    int idx;
+    int idxOther;
+    // specialized for speed
+    if (function == func.mult) {
+      // x[i] = x[i] * y[i]
+      idx = zero;
+      idxOther = zeroOther;
+      for (int r = 0; r < _rows; r++) {
+        for (int i = idx,
+            j = idxOther,
+            c = 0; c < _columns; c++) {
+          _elements[i] *= elementsOther[j];
+          i += _columnStride;
+          j += columnStrideOther;
+        }
+        idx += _rowStride;
+        idxOther += rowStrideOther;
+      }
+    } else if (function == func.div) {
+      // x[i] = x[i] / y[i]
+      idx = zero;
+      idxOther = zeroOther;
+      for (int r = 0; r < _rows; r++) {
+        for (int i = idx,
+            j = idxOther,
+            c = 0; c < _columns; c++) {
+          _elements[i] /= elementsOther[j];
+          i += _columnStride;
+          j += columnStrideOther;
+        }
+        idx += _rowStride;
+        idxOther += rowStrideOther;
+      }
+    } else if (function is DoublePlusMultSecond) {
+      double multiplicator = (function as DoublePlusMultSecond).multiplicator;
+      if (multiplicator == 0) { // x[i] = x[i] + 0*y[i]
+        return this;
+      } else if (multiplicator == 1) { // x[i] = x[i] + y[i]
         idx = zero;
         idxOther = zeroOther;
         for (int r = 0; r < _rows; r++) {
           for (int i = idx,
               j = idxOther,
               c = 0; c < _columns; c++) {
-            _elements[i] *= elementsOther[j];
+            _elements[i] += elementsOther[j];
             i += _columnStride;
             j += columnStrideOther;
           }
           idx += _rowStride;
           idxOther += rowStrideOther;
         }
-      } else if (function == func.div) {
-        // x[i] = x[i] / y[i]
-        idx = zero;
-        idxOther = zeroOther;
-        for (int r = 0; r < _rows; r++) {
-          for (int i = idx,
-              j = idxOther,
-              c = 0; c < _columns; c++) {
-            _elements[i] /= elementsOther[j];
-            i += _columnStride;
-            j += columnStrideOther;
-          }
-          idx += _rowStride;
-          idxOther += rowStrideOther;
-        }
-      } else if (function is DoublePlusMultSecond) {
-        double multiplicator = (function as DoublePlusMultSecond).multiplicator;
-        if (multiplicator == 0) { // x[i] = x[i] + 0*y[i]
-          return this;
-        } else if (multiplicator == 1) { // x[i] = x[i] + y[i]
-          idx = zero;
-          idxOther = zeroOther;
-          for (int r = 0; r < _rows; r++) {
-            for (int i = idx,
-                j = idxOther,
-                c = 0; c < _columns; c++) {
-              _elements[i] += elementsOther[j];
-              i += _columnStride;
-              j += columnStrideOther;
-            }
-            idx += _rowStride;
-            idxOther += rowStrideOther;
-          }
 
-        } else if (multiplicator == -1) { // x[i] = x[i] - y[i]
-          idx = zero;
-          idxOther = zeroOther;
-          for (int r = 0; r < _rows; r++) {
-            for (int i = idx,
-                j = idxOther,
-                c = 0; c < _columns; c++) {
-              _elements[i] -= elementsOther[j];
-              i += _columnStride;
-              j += columnStrideOther;
-            }
-            idx += _rowStride;
-            idxOther += rowStrideOther;
-          }
-        } else { // the general case
-          // x[i] = x[i] + mult*y[i]
-          idx = zero;
-          idxOther = zeroOther;
-          for (int r = 0; r < _rows; r++) {
-            for (int i = idx,
-                j = idxOther,
-                c = 0; c < _columns; c++) {
-              _elements[i] += multiplicator * elementsOther[j];
-              i += _columnStride;
-              j += columnStrideOther;
-            }
-            idx += _rowStride;
-            idxOther += rowStrideOther;
-          }
-        }
-      } else { // the general case x[i] = f(x[i],y[i])
+      } else if (multiplicator == -1) { // x[i] = x[i] - y[i]
         idx = zero;
         idxOther = zeroOther;
         for (int r = 0; r < _rows; r++) {
           for (int i = idx,
               j = idxOther,
               c = 0; c < _columns; c++) {
-            _elements[i] = function(_elements[i], elementsOther[j]);
+            _elements[i] -= elementsOther[j];
+            i += _columnStride;
+            j += columnStrideOther;
+          }
+          idx += _rowStride;
+          idxOther += rowStrideOther;
+        }
+      } else { // the general case
+        // x[i] = x[i] + mult*y[i]
+        idx = zero;
+        idxOther = zeroOther;
+        for (int r = 0; r < _rows; r++) {
+          for (int i = idx,
+              j = idxOther,
+              c = 0; c < _columns; c++) {
+            _elements[i] += multiplicator * elementsOther[j];
             i += _columnStride;
             j += columnStrideOther;
           }
@@ -981,11 +966,26 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
           idxOther += rowStrideOther;
         }
       }
+    } else { // the general case x[i] = f(x[i],y[i])
+      idx = zero;
+      idxOther = zeroOther;
+      for (int r = 0; r < _rows; r++) {
+        for (int i = idx,
+            j = idxOther,
+            c = 0; c < _columns; c++) {
+          _elements[i] = function(_elements[i], elementsOther[j]);
+          i += _columnStride;
+          j += columnStrideOther;
+        }
+        idx += _rowStride;
+        idxOther += rowStrideOther;
+      }
+    }
     //}
     return this;
   }
 
-  DoubleMatrix2D assignMatrixFuncIndex(final DoubleMatrix2D y, DoubleDoubleFunction function, /*IntArrayList*/List<int> rowList, /*IntArrayList*/List<int> columnList) {
+  DoubleMatrix2D assignMatrixFuncIndex(final DoubleMatrix2D y, DoubleDoubleFunction function,  /*IntArrayList*/List<int> rowList,  /*IntArrayList*/List<int> columnList) {
     checkShape(y);
     final int size = rowList.length;
     final List<int> rowElements = rowList;//.elements();
@@ -1015,13 +1015,13 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-      int idx;
-      int idxOther;
-      for (int i = 0; i < size; i++) {
-        idx = zero + rowElements[i] * _rowStride + columnElements[i] * _columnStride;
-        idxOther = zeroOther + rowElements[i] * rowStrideOther + columnElements[i] * columnStrideOther;
-        _elements[idx] = function(_elements[idx], elementsOther[idxOther]);
-      }
+    int idx;
+    int idxOther;
+    for (int i = 0; i < size; i++) {
+      idx = zero + rowElements[i] * _rowStride + columnElements[i] * _columnStride;
+      idxOther = zeroOther + rowElements[i] * rowStrideOther + columnElements[i] * columnStrideOther;
+      _elements[idx] = function(_elements[idx], elementsOther[idxOther]);
+    }
     //}
     return this;
   }
@@ -1066,15 +1066,15 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
         e.printStackTrace();
       }
     } else {*/
-      int idx = zero;
-      for (int r = 0; r < _rows; r++) {
-        for (int i = idx,
-            c = 0; c < _columns; c++) {
-          if (_elements[i] != 0) cardinality++;
-          i += _columnStride;
-        }
-        idx += _rowStride;
+    int idx = zero;
+    for (int r = 0; r < _rows; r++) {
+      for (int i = idx,
+          c = 0; c < _columns; c++) {
+        if (_elements[i] != 0) cardinality++;
+        i += _columnStride;
       }
+      idx += _rowStride;
+    }
     //}
     return cardinality;
   }
@@ -1110,18 +1110,18 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-      int idx = zero;
-      for (int r = 0; r < _rows; r++) {
-        for (int i = idx,
-            c = 0; c < _columns; c++) {
-          double value = _elements[i];
-          if (value != 0) {
-            _elements[i] = function(r, c, value);
-          }
-          i += _columnStride;
+    int idx = zero;
+    for (int r = 0; r < _rows; r++) {
+      for (int i = idx,
+          c = 0; c < _columns; c++) {
+        double value = _elements[i];
+        if (value != 0) {
+          _elements[i] = function(r, c, value);
         }
-        idx += _rowStride;
+        i += _columnStride;
       }
+      idx += _rowStride;
+    }
     //}
     return this;
   }
@@ -1134,14 +1134,14 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
    *
    * @return this matrix with elements addressed internally in column major
    */
-  DenseColumnDoubleMatrix2D getColumnMajor() {
+  /*DenseColumnDoubleMatrix2D getColumnMajor() {
     DenseColumnDoubleMatrix2D R = new DenseColumnDoubleMatrix2D(_rows, _columns);
     final int zeroR = R.index(0, 0) as int;
     final int rowStrideR = R.rowStride();
     final int columnStrideR = R.columnStride();
     final List<double> elementsR = R.elements();
     final int zero = this.index(0, 0);
-    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
       List<Future> futures = new List<Future>(nthreads);
@@ -1166,7 +1166,7 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
         });
       }
       ConcurrencyUtils.waitForCompletion(futures);
-    } else {*/
+    } else {
       int idx = zero;
       int idxR = zeroR;
       for (int r = 0; r < _rows; r++) {
@@ -1180,9 +1180,9 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
         idx += _columnStride;
         idxR += columnStrideR;
       }
-    //}
+    }
     return R;
-  }
+  }*/
 
   List<double> getMaxLocation() {
     int rowLocation = 0;
@@ -1238,20 +1238,20 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
         e.printStackTrace();
       }
     } else {*/
-      maxValue = _elements[zero];
-      int d = 1;
-      double elem;
-      for (int r = 0; r < _rows; r++) {
-        for (int c = d; c < _columns; c++) {
-          elem = _elements[zero + r * _rowStride + c * _columnStride];
-          if (maxValue < elem) {
-            maxValue = elem;
-            rowLocation = r;
-            columnLocation = c;
-          }
+    maxValue = _elements[zero];
+    int d = 1;
+    double elem;
+    for (int r = 0; r < _rows; r++) {
+      for (int c = d; c < _columns; c++) {
+        elem = _elements[zero + r * _rowStride + c * _columnStride];
+        if (maxValue < elem) {
+          maxValue = elem;
+          rowLocation = r;
+          columnLocation = c;
         }
-        d = 0;
       }
+      d = 0;
+    }
     //}
     return [maxValue, rowLocation, columnLocation];
   }
@@ -1310,20 +1310,20 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
         e.printStackTrace();
       }
     } else {*/
-      minValue = _elements[zero];
-      int d = 1;
-      double elem;
-      for (int r = 0; r < _rows; r++) {
-        for (int c = d; c < _columns; c++) {
-          elem = _elements[zero + r * _rowStride + c * _columnStride];
-          if (minValue > elem) {
-            minValue = elem;
-            rowLocation = r;
-            columnLocation = c;
-          }
+    minValue = _elements[zero];
+    int d = 1;
+    double elem;
+    for (int r = 0; r < _rows; r++) {
+      for (int c = d; c < _columns; c++) {
+        elem = _elements[zero + r * _rowStride + c * _columnStride];
+        if (minValue > elem) {
+          minValue = elem;
+          rowLocation = r;
+          columnLocation = c;
         }
-        d = 0;
       }
+      d = 0;
+    }
     //}
     return [minValue, rowLocation, columnLocation];
   }
@@ -1434,16 +1434,16 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-      int idx = zero;
-      for (int r = 0; r < _rows; r++) {
-        List<double> currentRow = values[r];
-        for (int i = idx,
-            c = 0; c < _columns; c++) {
-          currentRow[c] = _elements[i];
-          i += _columnStride;
-        }
-        idx += _rowStride;
+    int idx = zero;
+    for (int r = 0; r < _rows; r++) {
+      List<double> currentRow = values[r];
+      for (int i = idx,
+          c = 0; c < _columns; c++) {
+        currentRow[c] = _elements[i];
+        i += _columnStride;
       }
+      idx += _rowStride;
+    }
     //}
     return values;
   }
@@ -1477,16 +1477,16 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-      int idx = zero;
-      int idxOther = zeroOther;
-      for (int c = 0; c < _columns; c++) {
-        idx = zero + c * _columnStride;
-        for (int r = 0; r < _rows; r++) {
-          elementsOther[idxOther] = _elements[idx];
-          idx += _rowStride;
-          idxOther += strideOther;
-        }
+    int idx = zero;
+    int idxOther = zeroOther;
+    for (int c = 0; c < _columns; c++) {
+      idx = zero + c * _columnStride;
+      for (int r = 0; r < _rows; r++) {
+        elementsOther[idxOther] = _elements[idx];
+        idx += _rowStride;
+        idxOther += strideOther;
       }
+    }
     //}
     return v;
   }
@@ -1614,21 +1614,21 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-      int idxZero = zero;
-      int idxZeroZ = zeroZ;
-      for (int r = 0; r < _rows; r++) {
-        double sum = 0.0;
-        int idx = idxZero;
-        int idxY = zeroY;
-        for (int c = 0; c < _columns; c++) {
-          sum += _elements[idx] * elemsY[idxY];
-          idx += _columnStride;
-          idxY += strideY;
-        }
-        elemsZ[idxZeroZ] = alpha * sum + beta * elemsZ[idxZeroZ];
-        idxZero += _rowStride;
-        idxZeroZ += strideZ;
+    int idxZero = zero;
+    int idxZeroZ = zeroZ;
+    for (int r = 0; r < _rows; r++) {
+      double sum = 0.0;
+      int idx = idxZero;
+      int idxY = zeroY;
+      for (int c = 0; c < _columns; c++) {
+        sum += _elements[idx] * elemsY[idxY];
+        idx += _columnStride;
+        idxY += strideY;
       }
+      elemsZ[idxZeroZ] = alpha * sum + beta * elemsZ[idxZeroZ];
+      idxZero += _rowStride;
+      idxZeroZ += strideZ;
+    }
     //}
     return z;
   }
@@ -1766,15 +1766,15 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
         e.printStackTrace();
       }
     } else {*/
-      int idx = zero;
-      for (int r = 0; r < _rows; r++) {
-        for (int i = idx,
-            c = 0; c < _columns; c++) {
-          sum += _elements[i];
-          i += _columnStride;
-        }
-        idx += _rowStride;
+    int idx = zero;
+    for (int r = 0; r < _rows; r++) {
+      for (int i = idx,
+          c = 0; c < _columns; c++) {
+        sum += _elements[i];
+        i += _columnStride;
       }
+      idx += _rowStride;
+    }
     //}
     return sum;
   }
@@ -1834,10 +1834,10 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
     int rC = CC._rowStride;
 
     /*
-     * A is blocked to hide memory latency xxxxxxx B xxxxxxx xxxxxxx A xxx
-     * xxxxxxx C xxx xxxxxxx --- ------- xxx xxxxxxx xxx xxxxxxx --- -------
-     * xxx xxxxxxx
-     */
+   * A is blocked to hide memory latency xxxxxxx B xxxxxxx xxxxxxx A xxx
+   * xxxxxxx C xxx xxxxxxx --- ------- xxx xxxxxxx xxx xxxxxxx --- -------
+   * xxx xxxxxxx
+   */
     final int BLOCK_SIZE = 30000; // * 8 == Level 2 cache in bytes
     int m_optimal = (BLOCK_SIZE - columnsA) ~/ (columnsA + 1);
     if (m_optimal <= 0) m_optimal = 1;
@@ -1895,10 +1895,435 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
   }
 
   DoubleMatrix2D _viewSelectionLike(List<int> rowOffsets, List<int> columnOffsets) {
-    return new SelectedDenseDoubleMatrix2D(this._elements, rowOffsets, columnOffsets, 0);
+    return new SelectedDenseDoubleMatrix2D.offset(this._elements, rowOffsets, columnOffsets, 0);
   }
 
   Object clone() {
     return new DenseDoubleMatrix2D(_rows, _columns, _elements, _rowZero, _columnZero, _rowStride, _columnStride, !_isNoView);
+  }
+}
+
+/**
+ * Selection view on dense 2-d matrices holding <tt>double</tt> elements. First
+ * see the <a href="package-summary.html">package summary</a> and javadoc <a
+ * href="package-tree.html">tree view</a> to get the broad picture.
+ * <p>
+ * <b>Implementation:</b>
+ * <p>
+ * Objects of this class are typically constructed via <tt>viewIndexes</tt>
+ * methods on some source matrix. The interface introduced in abstract super
+ * classes defines everything a user can do. From a user point of view there is
+ * nothing special about this class; it presents the same functionality with the
+ * same signatures and semantics as its abstract superclass(es) while
+ * introducing no additional functionality. Thus, this class need not be visible
+ * to users. By the way, the same principle applies to concrete DenseXXX and
+ * SparseXXX classes: they presents the same functionality with the same
+ * signatures and semantics as abstract superclass(es) while introducing no
+ * additional functionality. Thus, they need not be visible to users, either.
+ * Factory methods could hide all these concrete types.
+ * <p>
+ * This class uses no delegation. Its instances point directly to the data. Cell
+ * addressing overhead is 1 additional int addition and 2 additional array index
+ * accesses per get/set.
+ * <p>
+ * Note that this implementation is not synchronized.
+ * <p>
+ * <b>Memory requirements:</b>
+ * <p>
+ * <tt>memory [bytes] = 4*(rowIndexes.length+columnIndexes.length)</tt>. Thus,
+ * an index view with 1000 x 1000 indexes additionally uses 8 KB.
+ * <p>
+ * <b>Time complexity:</b>
+ * <p>
+ * Depends on the parent view holding cells.
+ * <p>
+ *
+ * @author wolfgang.hoschek@cern.ch
+ * @version 1.0, 09/24/99
+ *
+ * @author Piotr Wendykier (piotr.wendykier@gmail.com)
+ * @version 1.1, 08/22/2007
+ */
+class SelectedDenseDoubleMatrix2D extends DoubleMatrix2D {
+
+  /**
+   * The elements of this matrix.
+   */
+  Float64List _elements;
+
+  /**
+   * The offsets of the visible cells of this matrix.
+   */
+  Int32List _rowOffsets;
+
+  Int32List _columnOffsets;
+
+  /**
+   * The offset.
+   */
+  int _offset;
+
+  /**
+   * Constructs a matrix view with the given parameters.
+   *
+   * @param elements
+   *            the cells.
+   * @param rowOffsets
+   *            The row offsets of the cells that shall be visible.
+   * @param columnOffsets
+   *            The column offsets of the cells that shall be visible.
+   * @param offset
+   */
+  factory SelectedDenseDoubleMatrix2D.offset(Float64List elements, Int32List rowOffsets, Int32List columnOffsets, int offset) {
+    return new SelectedDenseDoubleMatrix2D(rowOffsets.length, columnOffsets.length, elements, 0, 0, 1, 1, rowOffsets, columnOffsets, offset, true);
+  }
+
+  /**
+   * Constructs a matrix view with the given parameters.
+   *
+   * @param rows
+   *            the number of rows the matrix shall have.
+   * @param columns
+   *            the number of columns the matrix shall have.
+   * @param elements
+   *            the cells.
+   * @param rowZero
+   *            the position of the first element.
+   * @param columnZero
+   *            the position of the first element.
+   * @param rowStride
+   *            the number of elements between two rows, i.e.
+   *            <tt>index(i+1,j)-index(i,j)</tt>.
+   * @param columnStride
+   *            the number of elements between two columns, i.e.
+   *            <tt>index(i,j+1)-index(i,j)</tt>.
+   * @param rowOffsets
+   *            The row offsets of the cells that shall be visible.
+   * @param columnOffsets
+   *            The column offsets of the cells that shall be visible.
+   * @param offset
+   */
+  SelectedDenseDoubleMatrix2D(int rows, int columns, Float64List elements, int rowZero, int columnZero, int rowStride, int columnStride, Int32List rowOffsets, Int32List columnOffsets, int offset, bool isView) {
+    // be sure parameters are valid, we do not check...
+    _setUp(rows, columns, rowZero, columnZero, rowStride, columnStride);
+
+    this._elements = elements;
+    this._rowOffsets = rowOffsets;
+    this._columnOffsets = columnOffsets;
+    this._offset = offset;
+
+    this._isNoView = !isView;
+  }
+
+  Float64List elements() {
+    return _elements;
+  }
+
+  /**
+   * Returns the matrix cell value at coordinate <tt>[row,column]</tt>.
+   *
+   * <p>
+   * Provided with invalid parameters this method may return invalid objects
+   * without throwing any exception. <b>You should only use this method when
+   * you are absolutely sure that the coordinate is within bounds.</b>
+   * Precondition (unchecked):
+   * <tt>0 &lt;= column &lt; columns() && 0 &lt;= row &lt; rows()</tt>.
+   *
+   * @param row
+   *            the index of the row-coordinate.
+   * @param column
+   *            the index of the column-coordinate.
+   * @return the value at the specified coordinate.
+   */
+  double getQuick(int row, int column) {
+    // if (debug) if (column<0 || column>=columns || row<0 || row>=rows)
+    // throw new IndexOutOfBoundsException("row:"+row+", column:"+column);
+    // return elements[index(row,column)];
+    // manually inlined:
+    return _elements[_offset + _rowOffsets[_rowZero + row * _rowStride] + _columnOffsets[_columnZero + column * _columnStride]];
+  }
+
+  /**
+   * Returns the position of the given coordinate within the (virtual or
+   * non-virtual) internal 1-dimensional array.
+   *
+   * @param row
+   *            the index of the row-coordinate.
+   * @param column
+   *            the index of the column-coordinate.
+   */
+  int index(int row, int column) {
+    // return this.offset + super.index(row,column);
+    // manually inlined:
+    return this._offset + _rowOffsets[_rowZero + row * _rowStride] + _columnOffsets[_columnZero + column * _columnStride];
+  }
+
+  /**
+   * Construct and returns a new empty matrix <i>of the same dynamic type</i>
+   * as the receiver, having the specified number of rows and columns. For
+   * example, if the receiver is an instance of type
+   * <tt>DenseDoubleMatrix2D</tt> the new matrix must also be of type
+   * <tt>DenseDoubleMatrix2D</tt>, if the receiver is an instance of type
+   * <tt>SparseDoubleMatrix2D</tt> the new matrix must also be of type
+   * <tt>SparseDoubleMatrix2D</tt>, etc. In general, the new matrix should
+   * have internal parametrization as similar as possible.
+   *
+   * @param rows
+   *            the number of rows the matrix shall have.
+   * @param columns
+   *            the number of columns the matrix shall have.
+   * @return a new empty matrix of the same dynamic type.
+   */
+  DoubleMatrix2D like2D(int rows, int columns) {
+    return new DenseDoubleMatrix2D(rows, columns);
+  }
+
+  /**
+   * Construct and returns a new 1-d matrix <i>of the corresponding dynamic
+   * type</i>, entirelly independent of the receiver. For example, if the
+   * receiver is an instance of type <tt>DenseDoubleMatrix2D</tt> the new
+   * matrix must be of type <tt>DenseDoubleMatrix1D</tt>, if the receiver is
+   * an instance of type <tt>SparseDoubleMatrix2D</tt> the new matrix must be
+   * of type <tt>SparseDoubleMatrix1D</tt>, etc.
+   *
+   * @param size
+   *            the number of cells the matrix shall have.
+   * @return a new matrix of the corresponding dynamic type.
+   */
+  DoubleMatrix1D like1D(int size) {
+    return new DenseDoubleMatrix1D(size);
+  }
+
+  /**
+   * Sets the matrix cell at coordinate <tt>[row,column]</tt> to the specified
+   * value.
+   *
+   * <p>
+   * Provided with invalid parameters this method may access illegal indexes
+   * without throwing any exception. <b>You should only use this method when
+   * you are absolutely sure that the coordinate is within bounds.</b>
+   * Precondition (unchecked):
+   * <tt>0 &lt;= column &lt; columns() && 0 &lt;= row &lt; rows()</tt>.
+   *
+   * @param row
+   *            the index of the row-coordinate.
+   * @param column
+   *            the index of the column-coordinate.
+   * @param value
+   *            the value to be filled into the specified cell.
+   */
+  void setQuick(int row, int column, double value) {
+    // if (debug) if (column<0 || column>=columns || row<0 || row>=rows)
+    // throw new IndexOutOfBoundsException("row:"+row+", column:"+column);
+    // elements[index(row,column)] = value;
+    // manually inlined:
+    _elements[_offset + _rowOffsets[_rowZero + row * _rowStride] + _columnOffsets[_columnZero + column * _columnStride]] = value;
+  }
+
+  /**
+   * Returns a vector obtained by stacking the columns of the matrix on top of
+   * one another.
+   *
+   * @return
+   */
+  DoubleMatrix1D vectorize() {
+    DenseDoubleMatrix1D v = new DenseDoubleMatrix1D(size());
+    int idx = 0;
+    for (int c = 0; c < _columns; c++) {
+      for (int r = 0; r < _rows; r++) {
+        v.setQuick(idx++, getQuick(c, r));
+      }
+    }
+    return v;
+  }
+
+  /**
+   * Constructs and returns a new <i>slice view</i> representing the rows of
+   * the given column. The returned view is backed by this matrix, so changes
+   * in the returned view are reflected in this matrix, and vice-versa. To
+   * obtain a slice view on subranges, construct a sub-ranging view (
+   * <tt>viewPart(...)</tt>), then apply this method to the sub-range view.
+   * <p>
+   * <b>Example:</b>
+   * <table border="0">
+   * <tr nowrap>
+   * <td valign="top">2 x 3 matrix: <br>
+   * 1, 2, 3<br>
+   * 4, 5, 6</td>
+   * <td>viewColumn(0) ==></td>
+   * <td valign="top">Matrix1D of size 2:<br>
+   * 1, 4</td>
+   * </tr>
+   * </table>
+   *
+   * @param the
+   *            column to fix.
+   * @return a new slice view.
+   * @throws IllegalArgumentException
+   *             if <tt>column < 0 || column >= columns()</tt>.
+   * @see #viewRow(int)
+   */
+  DoubleMatrix1D viewColumn(int column) {
+    _checkColumn(column);
+    int viewSize = this._rows;
+    int viewZero = this._rowZero;
+    int viewStride = this._rowStride;
+    Int32List viewOffsets = this._rowOffsets;
+    int viewOffset = this._offset + _columnOffset(_columnRank(column));
+    return new SelectedDenseDoubleMatrix1D(viewSize, this._elements, viewZero, viewStride, viewOffsets, viewOffset);
+  }
+
+  /**
+   * Constructs and returns a new <i>slice view</i> representing the columns
+   * of the given row. The returned view is backed by this matrix, so changes
+   * in the returned view are reflected in this matrix, and vice-versa. To
+   * obtain a slice view on subranges, construct a sub-ranging view (
+   * <tt>viewPart(...)</tt>), then apply this method to the sub-range view.
+   * <p>
+   * <b>Example:</b>
+   * <table border="0">
+   * <tr nowrap>
+   * <td valign="top">2 x 3 matrix: <br>
+   * 1, 2, 3<br>
+   * 4, 5, 6</td>
+   * <td>viewRow(0) ==></td>
+   * <td valign="top">Matrix1D of size 3:<br>
+   * 1, 2, 3</td>
+   * </tr>
+   * </table>
+   *
+   * @param the
+   *            row to fix.
+   * @return a new slice view.
+   * @throws IndexOutOfBoundsException
+   *             if <tt>row < 0 || row >= rows()</tt>.
+   * @see #viewColumn(int)
+   */
+  DoubleMatrix1D viewRow(int row) {
+    _checkRow(row);
+    int viewSize = this._columns;
+    int viewZero = _columnZero;
+    int viewStride = this._columnStride;
+    Int32List viewOffsets = this._columnOffsets;
+    int viewOffset = this._offset + _rowOffset(_rowRank(row));
+    return new SelectedDenseDoubleMatrix1D(viewSize, this._elements, viewZero, viewStride, viewOffsets, viewOffset);
+  }
+
+  /**
+   * Returns the position of the given absolute rank within the (virtual or
+   * non-virtual) internal 1-dimensional array. Default implementation.
+   * Override, if necessary.
+   *
+   * @param rank
+   *            the absolute rank of the element.
+   * @return the position.
+   */
+  int _columnOffset(int absRank) {
+    return _columnOffsets[absRank];
+  }
+
+  /**
+   * Returns the position of the given absolute rank within the (virtual or
+   * non-virtual) internal 1-dimensional array. Default implementation.
+   * Override, if necessary.
+   *
+   * @param rank
+   *            the absolute rank of the element.
+   * @return the position.
+   */
+  int _rowOffset(int absRank) {
+    return _rowOffsets[absRank];
+  }
+
+  /**
+   * Returns <tt>true</tt> if both matrices share common cells. More formally,
+   * returns <tt>true</tt> if <tt>other != null</tt> and at least one of the
+   * following conditions is met
+   * <ul>
+   * <li>the receiver is a view of the other matrix
+   * <li>the other matrix is a view of the receiver
+   * <li><tt>this == other</tt>
+   * </ul>
+   */
+  bool _haveSharedCellsRaw(DoubleMatrix2D other) {
+    if (other is SelectedDenseDoubleMatrix2D) {
+      return this._elements == other._elements;
+    } else if (other is DenseDoubleMatrix2D) {
+      return this._elements == other._elements;
+    }
+    return false;
+  }
+
+  /**
+   * Construct and returns a new 1-d matrix <i>of the corresponding dynamic
+   * type</i>, sharing the same cells. For example, if the receiver is an
+   * instance of type <tt>DenseDoubleMatrix2D</tt> the new matrix must be of
+   * type <tt>DenseDoubleMatrix1D</tt>, if the receiver is an instance of type
+   * <tt>SparseDoubleMatrix2D</tt> the new matrix must be of type
+   * <tt>SparseDoubleMatrix1D</tt>, etc.
+   *
+   * @param size
+   *            the number of cells the matrix shall have.
+   * @param zero
+   *            the index of the first element.
+   * @param stride
+   *            the number of indexes between any two elements, i.e.
+   *            <tt>index(i+1)-index(i)</tt>.
+   * @return a new matrix of the corresponding dynamic type.
+   */
+  DoubleMatrix1D _like1D(int size, int zero, int stride) {
+    throw new Error(); // this method is never called since
+    // viewRow() and viewColumn are overridden
+    // properly.
+  }
+
+  /**
+   * Sets up a matrix with a given number of rows and columns.
+   *
+   * @param rows
+   *            the number of rows the matrix shall have.
+   * @param columns
+   *            the number of columns the matrix shall have.
+   * @throws IllegalArgumentException
+   *             if <tt>(double)columns*rows > Integer.MAX_VALUE</tt>.
+   */
+  void _setUp2D(int rows, int columns) {
+    super._setUp(rows, columns);
+    this._rowStride = 1;
+    this._columnStride = 1;
+    this._offset = 0;
+  }
+
+  /**
+   * Self modifying version of viewDice().
+   */
+  AbstractMatrix2D _vDice() {
+    super._vDice();
+    // swap
+    Int32List tmp = _rowOffsets;
+    _rowOffsets = _columnOffsets;
+    _columnOffsets = tmp;
+
+    // flips stay unaffected
+
+    this._isNoView = false;
+    return this;
+  }
+
+  /**
+   * Construct and returns a new selection view.
+   *
+   * @param rowOffsets
+   *            the offsets of the visible elements.
+   * @param columnOffsets
+   *            the offsets of the visible elements.
+   * @return a new view.
+   */
+  DoubleMatrix2D _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets) {
+    return new SelectedDenseDoubleMatrix2D.offset(this._elements, rowOffsets, columnOffsets, this._offset);
+  }
+
+  Object clone() {
+    return new SelectedDenseDoubleMatrix2D(_rows, _columns, _elements, _rowZero, _columnZero, _rowStride, _columnStride, _rowOffsets, _columnOffsets, _offset, !_isNoView);
   }
 }

@@ -248,7 +248,7 @@ class SparseDoubleMatrix1D extends DoubleMatrix1D {
    * @return a new empty matrix of the same dynamic type.
    */
 
-  DoubleMatrix1D likeSize(int size) {
+  DoubleMatrix1D like1D(int size) {
     return new SparseDoubleMatrix1D(size);
   }
 
@@ -499,7 +499,6 @@ class SelectedSparseDoubleMatrix1D extends DoubleMatrix1D {
    *            the index of the cell.
    * @return the value of the specified cell.
    */
-
   double getQuick(int index) {
     // if (debug) if (index<0 || index>=size) checkIndex(index);
     // return elements.get(index(index));
@@ -515,7 +514,6 @@ class SelectedSparseDoubleMatrix1D extends DoubleMatrix1D {
    * @param rank
    *            the rank of the element.
    */
-
   int index(int rank) {
     // return this.offset + super.index(rank);
     // manually inlined:
@@ -535,8 +533,7 @@ class SelectedSparseDoubleMatrix1D extends DoubleMatrix1D {
    *            the number of cell the matrix shall have.
    * @return a new empty matrix of the same dynamic type.
    */
-
-  DoubleMatrix1D likeSize(int size) {
+  DoubleMatrix1D like1D(int size) {
     return new SparseDoubleMatrix1D(size);
   }
 
@@ -554,7 +551,6 @@ class SelectedSparseDoubleMatrix1D extends DoubleMatrix1D {
    *            the number of columns the matrix shall have.
    * @return a new matrix of the corresponding dynamic type.
    */
-
   DoubleMatrix2D like2D(int rows, int columns) {
     return new SparseDoubleMatrix2D(rows, columns);
   }
@@ -603,7 +599,6 @@ class SelectedSparseDoubleMatrix1D extends DoubleMatrix1D {
    * @param value
    *            the value to be filled into the specified cell.
    */
-
   void setQuick(int index, double value) {
     // if (debug) if (index<0 || index>=size) checkIndex(index);
     // int i = index(index);
@@ -632,7 +627,6 @@ class SelectedSparseDoubleMatrix1D extends DoubleMatrix1D {
   /**
    * Returns <tt>true</tt> if both matrices share at least one identical cell.
    */
-
   bool _haveSharedCellsRaw(DoubleMatrix1D other) {
     if (other is SelectedSparseDoubleMatrix1D) {
       return this._elements == other._elements;
@@ -648,7 +642,6 @@ class SelectedSparseDoubleMatrix1D extends DoubleMatrix1D {
    * @param size
    *            the number of cells the matrix shall have.
    */
-
   void _setUp(int size, [_, __]) {
     super._setUp(size);
     this._stride = 1;
@@ -662,7 +655,6 @@ class SelectedSparseDoubleMatrix1D extends DoubleMatrix1D {
    *            the offsets of the visible elements.
    * @return a new view.
    */
-
   DoubleMatrix1D _viewSelectionLike(Int32List offsets) {
     return new SelectedSparseDoubleMatrix1D.from(this._elements, offsets);
   }

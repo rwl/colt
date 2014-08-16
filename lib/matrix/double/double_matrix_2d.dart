@@ -1962,7 +1962,7 @@ abstract class DoubleMatrix2D extends AbstractMatrix2D {
     if (transposeA) return viewDice().zMult(y, z, alpha, beta, false);
     DoubleMatrix1D zz;
     if (z == null) {
-      zz = y.likeSize(_rows);
+      zz = y.like1D(_rows);
     } else {
       zz = z;
     }

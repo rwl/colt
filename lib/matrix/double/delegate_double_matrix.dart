@@ -77,4 +77,7 @@ class DelegateDoubleMatrix1D extends DoubleMatrix1D {
     throw new Error(); // should never get called
   }
 
+  Object clone() {
+    return new DelegateDoubleMatrix1D(_content, _row);
+  }
 }
