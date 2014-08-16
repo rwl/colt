@@ -13,6 +13,7 @@ import '../function/complex.dart' as cfunc;
 import '../math.dart';
 import '../util.dart';
 import 'double/algo/algo.dart';
+import 'complex/algo/algo.dart';
 import 'former.dart';
 
 //part 'abstract_formatter.dart';
@@ -35,3 +36,5 @@ part 'double/factory.dart';
 //part 'former_factory.dart';
 
 part 'complex/complex_matrix_1d.dart';
+part 'complex/complex_matrix_2d.dart';
+part 'complex/sparse_complex_matrix_1d.dart';

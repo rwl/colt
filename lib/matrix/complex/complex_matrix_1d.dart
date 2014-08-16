@@ -68,9 +68,9 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
       }
       a = ConcurrencyUtils.waitForCompletion(futures, aggr);
     } else {*/
-      for (int i = 1; i < size; i++) {
-        a = aggr(a, f(getQuick(i)));
-      }
+    for (int i = 1; i < size; i++) {
+      a = aggr(a, f(getQuick(i)));
+    }
     //}
     return a;
   }
@@ -121,9 +121,9 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
       }
       a = ConcurrencyUtils.waitForCompletion(futures, aggr);
     } else {*/
-      for (int i = 1; i < size; i++) {
-        a = aggr(a, f(getQuick(i), other.getQuick(i)));
-      }
+    for (int i = 1; i < size; i++) {
+      a = aggr(a, f(getQuick(i), other.getQuick(i)));
+    }
     //}
     return a;
   }
@@ -154,9 +154,9 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-      for (int i = 0; i < size; i++) {
-        setQuick(i, f(getQuick(i)));
-      }
+    for (int i = 0; i < size; i++) {
+      setQuick(i, f(getQuick(i)));
+    }
     //}
     return this;
   }
@@ -192,13 +192,13 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-      Float64List elem;
-      for (int i = 0; i < _size; i++) {
-        elem = getQuick(i);
-        if (cond(elem) == true) {
-          setQuick(i, f(elem));
-        }
+    Float64List elem;
+    for (int i = 0; i < _size; i++) {
+      elem = getQuick(i);
+      if (cond(elem) == true) {
+        setQuick(i, f(elem));
       }
+    }
     //}
     return this;
   }
@@ -234,13 +234,13 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-      Float64List elem;
-      for (int i = 0; i < _size; i++) {
-        elem = getQuick(i);
-        if (cond(elem) == true) {
-          setQuick(i, value);
-        }
+    Float64List elem;
+    for (int i = 0; i < _size; i++) {
+      elem = getQuick(i);
+      if (cond(elem) == true) {
+        setQuick(i, value);
       }
+    }
     //}
     return this;
   }
@@ -272,9 +272,9 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-      for (int i = 0; i < size; i++) {
-        setPartsQuick(i, f(getQuick(i)), 0.0);
-      }
+    for (int i = 0; i < size; i++) {
+      setPartsQuick(i, f(getQuick(i)), 0.0);
+    }
     //}
     return this;
   }
@@ -564,11 +564,11 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
         e.printStackTrace();
       }
     } else {*/
-      Float64List tmp = new Float64List(2);
-      for (int i = 0; i < size; i++) {
-        tmp = getQuick(i);
-        if ((tmp[0] != 0.0) || (tmp[1] != 0.0)) cardinality++;
-      }
+    Float64List tmp = new Float64List(2);
+    for (int i = 0; i < size; i++) {
+      tmp = getQuick(i);
+      if ((tmp[0] != 0.0) || (tmp[1] != 0.0)) cardinality++;
+    }
     //}
     return cardinality;
   }
@@ -598,7 +598,7 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
    *         <tt>false</tt> otherwise.
    */
   bool equalsValue(Float64List value) {
-    return DComplexProperty.DEFAULT.equals(this, value);
+    return DComplexProperty.DEFAULT.equalsValue1D(this, value);
   }
 
   /**
@@ -619,7 +619,7 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
     if (obj == null) return false;
     if (!(obj is DComplexMatrix1D)) return false;
 
-    return DComplexProperty.DEFAULT.equals(this, obj as DComplexMatrix1D);
+    return DComplexProperty.DEFAULT.equalsMatrix1D(this, obj as DComplexMatrix1D);
   }
 
   /**
@@ -995,7 +995,7 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
    * @return a new flip view.
    */
   DComplexMatrix1D viewFlip() {
-    return view()._vFlip() as DComplexMatrix1D;
+    return _view()._vFlip() as DComplexMatrix1D;
   }
 
   /**
@@ -1027,7 +1027,7 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
    *
    */
   DComplexMatrix1D viewPart(int index, int width) {
-    return view()._vPart(index, width) as DComplexMatrix1D;
+    return _view()._vPart(index, width) as DComplexMatrix1D;
   }
 
   /**
@@ -1089,7 +1089,7 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
     for (int i = 0; i < indexes.length; i++) {
       offsets[i] = index(indexes[i]);
     }
-    return viewSelectionLike(offsets);
+    return _viewSelectionLike(offsets);
   }
 
   /**
@@ -1106,7 +1106,7 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
    *
    */
   DComplexMatrix1D viewStrides(int stride) {
-    return view()._vStrides(stride) as DComplexMatrix1D;
+    return _view()._vStrides(stride) as DComplexMatrix1D;
   }
 
   /**
@@ -1183,14 +1183,14 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
         e.printStackTrace();
       }
     } else {*/
-      Float64List tmp;
-      int idx;
-      for (int k = 0; k < length; k++) {
-        idx = k + from;
-        tmp = y.getQuick(idx);
-        tmp[1] = -tmp[1]; // complex conjugate
-        sum = DComplex.plus(sum, DComplex.multiply(tmp, getQuick(idx)));
-      }
+    Float64List tmp;
+    int idx;
+    for (int k = 0; k < length; k++) {
+      idx = k + from;
+      tmp = y.getQuick(idx);
+      tmp[1] = -tmp[1]; // complex conjugate
+      sum = DComplex.plus(sum, DComplex.multiply(tmp, getQuick(idx)));
+    }
     //}
     return sum;
   }
@@ -1285,9 +1285,9 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
         e.printStackTrace();
       }
     } else {*/
-      for (int k = 0; k < _size; k++) {
-        sum = DComplex.plus(sum, getQuick(k));
-      }
+    for (int k = 0; k < _size; k++) {
+      sum = DComplex.plus(sum, getQuick(k));
+    }
     //}
     return sum;
   }
@@ -1301,7 +1301,7 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
    * @return number of cells having non-zero values, but at most
    *         maxCardinality.
    */
-  int cardinalityMax(int maxCardinality) {
+  int _cardinality(int maxCardinality) {
     int size = this.size();
     int cardinality = 0;
     int i = 0;
@@ -1317,7 +1317,7 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
    * Returns the content of this matrix if it is a wrapper; or <tt>this</tt>
    * otherwise. Override this method in wrappers.
    */
-  DComplexMatrix1D getContent() {
+  DComplexMatrix1D _getContent() {
     return this;
   }
 
@@ -1328,10 +1328,10 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
    *            matrix
    * @return <tt>true</tt> if both matrices share at least one identical cell
    */
-  bool haveSharedCells(DComplexMatrix1D other) {
+  bool _haveSharedCells(DComplexMatrix1D other) {
     if (other == null) return false;
     if (this == other) return true;
-    return getContent().haveSharedCellsRaw(other.getContent());
+    return _getContent()._haveSharedCellsRaw(other._getContent());
   }
 
   /**
@@ -1341,7 +1341,7 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
    *            matrix
    * @return false
    */
-  bool haveSharedCellsRaw(DComplexMatrix1D other) {
+  bool _haveSharedCellsRaw(DComplexMatrix1D other) {
     return false;
   }
 
@@ -1358,7 +1358,7 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
    *
    * @return a new view of the receiver.
    */
-  DComplexMatrix1D view() {
+  DComplexMatrix1D _view() {
     return clone() as DComplexMatrix1D;
   }
 
@@ -1369,7 +1369,7 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
    *            the offsets of the visible elements.
    * @return a new view.
    */
-  DComplexMatrix1D viewSelectionLike(Int32List offsets);
+  DComplexMatrix1D _viewSelectionLike(Int32List offsets);
 
   /**
    * Returns the dot product of two vectors x and y.
@@ -1380,9 +1380,9 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
    *            the indexes of cells in <tt>y</tt>having a non-zero value.
    * @return the sum of products.
    */
-  /*Float64List zDotProduct(DComplexMatrix1D y, IntArrayList nonZeroIndexes) {
-        return zDotProduct(y, 0, size(), nonZeroIndexes);
-    }*/
+  /*Float64List _zDotProduct(DComplexMatrix1D y, IntArrayList nonZeroIndexes) {
+    return zDotProduct(y, 0, size(), nonZeroIndexes);
+  }*/
 
   Object clone();
 }
