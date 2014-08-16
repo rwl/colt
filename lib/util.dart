@@ -1,7 +1,7 @@
 library edu.emory.mathcs.util;
 
 import 'dart:async';
-import 'function.dart';
+import 'function/double.dart';
 
 typedef void Computation();
 

@@ -6,9 +6,10 @@ import 'dart:typed_data';
 
 import 'package:csparse/csparse.dart';
 
-import '../function.dart' show DoubleFunction, DoubleDoubleFunction, DoubleDoubleProcedure,
+import '../function/double.dart' show DoubleFunction, DoubleDoubleFunction, DoubleDoubleProcedure,
   DoubleIntProcedure, DoubleProcedure;
-import '../function.dart' as func;
+import '../function/double.dart' as func;
+import '../function/complex.dart' as cfunc;
 import '../math.dart';
 import '../util.dart';
 import 'double/algo/algo.dart';
@@ -32,3 +33,5 @@ part 'double/double_matrix_2d.dart';
 part 'double/factory.dart';
 //part 'former.dart';
 //part 'former_factory.dart';
+
+part 'complex/complex_matrix_1d.dart';

@@ -6,7 +6,7 @@ import 'dart:async';
 import '../../matrix.dart';
 import '../../former.dart';
 import '../../../util.dart';
-import '../../../function.dart';
+import '../../../function/double.dart';
 
 part 'property.dart';
 //part 'formatter.dart';
