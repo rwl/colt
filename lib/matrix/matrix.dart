@@ -40,3 +40,7 @@ part 'complex/complex_matrix_2d.dart';
 part 'complex/sparse_complex_matrix_1d.dart';
 part 'complex/dense_complex_matrix_1d.dart';
 part 'complex/dense_complex_matrix_2d.dart';
+part 'complex/wrapper_complex_matrix_2d.dart';
+part 'complex/diagonal_complex_matrix_2d.dart';
+part 'complex/sparse_cc_complex_matrix_2d.dart';
+part 'complex/sparse_rc_complex_matrix_2d.dart';

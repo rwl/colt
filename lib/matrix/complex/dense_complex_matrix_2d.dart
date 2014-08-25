@@ -73,7 +73,8 @@ class DenseDComplexMatrix2D extends DComplexMatrix2D {
    *             .
    */
   factory DenseDComplexMatrix2D.fromValues(List<Float64List> values) {
-    return new DenseDComplexMatrix2D(values.length, values.length == 0 ? 0 : values[0].length / 2)..assignList(values);
+    return new DenseDComplexMatrix2D(values.length, values.length == 0 ? 0 : values[0].length / 2)
+      ..assignList(values);
   }
 
   /**
