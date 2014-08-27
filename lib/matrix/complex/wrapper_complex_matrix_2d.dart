@@ -50,10 +50,10 @@ class WrapperDComplexMatrix2D extends DComplexMatrix2D {
         }
         ConcurrencyUtils.waitForCompletion(futures);
       } else {*/
-        for (int i = 0; i < dlength; i++) {
-          elems[2 * i] = values[2 * i];
-          elems[2 * i + 1] = values[2 * i + 1];
-        }
+      for (int i = 0; i < dlength; i++) {
+        elems[2 * i] = values[2 * i];
+        elems[2 * i + 1] = values[2 * i + 1];
+      }
       //}
       return this;
     } else {
@@ -174,12 +174,12 @@ class WrapperDComplexMatrix2D extends DComplexMatrix2D {
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-      int idx = 0;
-      for (int c = 0; c < _columns; c++) {
-        for (int r = 0; r < _rows; r++) {
-          v.setQuick(idx++, getQuick(r, c));
-        }
+    int idx = 0;
+    for (int c = 0; c < _columns; c++) {
+      for (int r = 0; r < _rows; r++) {
+        v.setQuick(idx++, getQuick(r, c));
       }
+    }
     //}
     return v;
   }
@@ -295,11 +295,11 @@ class WrapperDComplexMatrix2D extends DComplexMatrix2D {
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-      for (int r = 0; r < _rows; r++) {
-        for (int c = 0; c < _columns; c++) {
-          Im.setQuick(r, c, getQuick(r, c)[1]);
-        }
+    for (int r = 0; r < _rows; r++) {
+      for (int c = 0; c < _columns; c++) {
+        Im.setQuick(r, c, getQuick(r, c)[1]);
       }
+    }
     //}
     return Im;
   }
@@ -324,12 +324,220 @@ class WrapperDComplexMatrix2D extends DComplexMatrix2D {
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-      for (int r = 0; r < _rows; r++) {
-        for (int c = 0; c < _columns; c++) {
-          Re.setQuick(r, c, getQuick(r, c)[0]);
-        }
+    for (int r = 0; r < _rows; r++) {
+      for (int c = 0; c < _columns; c++) {
+        Re.setQuick(r, c, getQuick(r, c)[0]);
       }
+    }
     //}
     return Re;
+  }
+}
+
+class ViewColumnFlipWrapperDComplexMatrix2D extends WrapperDComplexMatrix2D {
+
+  ViewColumnFlipWrapperDComplexMatrix2D(DComplexMatrix2D newContent) : super(newContent);
+
+  Float64List getQuick(int row, int column) {
+    return _content.getQuick(row, _columns - 1 - column);
+  }
+
+  void setQuick(int row, int column, Float64List value) {
+    _content.setQuick(row, _columns - 1 - column, value);
+  }
+
+  void setPartsQuick(int row, int column, double re, double im) {
+    _content.setPartsQuick(row, _columns - 1 - column, re, im);
+  }
+
+  Float64List get(int row, int column) {
+    return _content.get(row, _columns - 1 - column);
+  }
+
+  void set(int row, int column, Float64List value) {
+    _content.set(row, _columns - 1 - column, value);
+  }
+
+  void setParts(int row, int column, double re, double im) {
+    _content.setParts(row, _columns - 1 - column, re, im);
+  }
+
+  Object clone() {
+    return new ViewColumnFlipWrapperDComplexMatrix2D(_content);
+  }
+}
+
+class ViewDiceWrapperDComplexMatrix2D extends WrapperDComplexMatrix2D {
+
+  ViewDiceWrapperDComplexMatrix2D(DComplexMatrix2D newContent) : super(newContent);
+
+  Float64List getQuick(int row, int column) {
+    return _content.getQuick(column, row);
+  }
+
+  void setQuick(int row, int column, Float64List value) {
+    _content.setQuick(column, row, value);
+  }
+
+  void setPartsQuick(int row, int column, double re, double im) {
+    _content.setPartsQuick(column, row, re, im);
+  }
+
+  Float64List get(int row, int column) {
+    return _content.get(column, row);
+  }
+
+  void set(int row, int column, Float64List value) {
+    _content.set(column, row, value);
+  }
+
+  void setParts(int row, int column, double re, double im) {
+    _content.setParts(column, row, re, im);
+  }
+
+  Object clone() {
+    return new ViewDiceWrapperDComplexMatrix2D(_content);
+  }
+}
+
+class ViewPartWrapperDComplexMatrix2D extends WrapperDComplexMatrix2D {
+  final int row;
+  final int column;
+
+  ViewPartWrapperDComplexMatrix2D(DComplexMatrix2D newContent, int row, int column)
+      : super(newContent),
+        row = row,
+        column = column;
+
+  Float64List getQuick(int i, int j) {
+    return _content.getQuick(row + i, column + j);
+  }
+
+  void setQuick(int i, int j, Float64List value) {
+    _content.setQuick(row + i, column + j, value);
+  }
+
+  void setPartsQuick(int i, int j, double re, double im) {
+    _content.setPartsQuick(row + i, column + j, re, im);
+  }
+
+  Float64List get(int i, int j) {
+    return _content.get(row + i, column + j);
+  }
+
+  void set(int i, int j, Float64List value) {
+    _content.set(row + i, column + j, value);
+  }
+
+  void setParts(int i, int j, double re, double im) {
+    _content.setParts(row + i, column + j, re, im);
+  }
+
+  Object clone() {
+    return new ViewPartWrapperDComplexMatrix2D(_content, row, column);
+  }
+}
+
+class ViewRowWrapperDComplexMatrix2D extends WrapperDComplexMatrix2D {
+
+  ViewRowWrapperDComplexMatrix2D(DComplexMatrix2D newContent) : super(newContent);
+
+  Float64List getQuick(int row, int column) {
+    return _content.getQuick(_rows - 1 - row, column);
+  }
+
+  void setQuick(int row, int column, Float64List value) {
+    _content.setQuick(_rows - 1 - row, column, value);
+  }
+
+  void setPartsQuick(int row, int column, double re, double im) {
+    _content.setPartsQuick(_rows - 1 - row, column, re, im);
+  }
+
+  Float64List get(int row, int column) {
+    return _content.get(_rows - 1 - row, column);
+  }
+
+  void set(int row, int column, Float64List value) {
+    _content.set(_rows - 1 - row, column, value);
+  }
+
+  void setParts(int row, int column, double re, double im) {
+    _content.setParts(_rows - 1 - row, column, re, im);
+  }
+
+  Object clone() {
+    return new ViewRowWrapperDComplexMatrix2D(_content);
+  }
+}
+
+class ViewSelectionWrapperDComplexMatrix2D extends WrapperDComplexMatrix2D {
+  final Int32List cix;
+  final Int32List rix;
+
+  ViewSelectionWrapperDComplexMatrix2D(DComplexMatrix2D newContent, Int32List cix, Int32List rix)
+      : super(newContent),
+        cix = cix,
+        rix = rix;
+
+  Float64List getQuick(int i, int j) {
+    return _content.getQuick(rix[i], cix[j]);
+  }
+
+  void setQuick(int i, int j, Float64List value) {
+    _content.setQuick(rix[i], cix[j], value);
+  }
+
+  void setPartsQuick(int i, int j, double re, double im) {
+    _content.setPartsQuick(rix[i], cix[j], re, im);
+  }
+
+  Float64List get(int i, int j) {
+    return _content.get(rix[i], cix[j]);
+  }
+
+  void set(int i, int j, Float64List value) {
+    _content.set(rix[i], cix[j], value);
+  }
+
+  void setParts(int i, int j, double re, double im) {
+    _content.setParts(rix[i], cix[j], re, im);
+  }
+
+  Object clone() {
+    return new ViewSelectionWrapperDComplexMatrix2D(_content, cix, rix);
+  }
+}
+
+class ViewStridesWrapperDComplexMatrix2D extends WrapperDComplexMatrix2D {
+
+  ViewStridesWrapperDComplexMatrix2D(DComplexMatrix2D newContent) : super(newContent);
+
+  Float64List getQuick(int row, int column) {
+    return _content.getQuick(_rowStride * row, _columnStride * column);
+  }
+
+  void setQuick(int row, int column, Float64List value) {
+    _content.setQuick(_rowStride * row, _columnStride * column, value);
+  }
+
+  void setPartsQuick(int row, int column, double re, double im) {
+    _content.setPartsQuick(_rowStride * row, _columnStride * column, re, im);
+  }
+
+  Float64List get(int row, int column) {
+    return _content.get(_rowStride * row, _columnStride * column);
+  }
+
+  void set(int row, int column, Float64List value) {
+    _content.set(_rowStride * row, _columnStride * column, value);
+  }
+
+  void setParts(int row, int column, double re, double im) {
+    _content.setParts(_rowStride * row, _columnStride * column, re, im);
+  }
+
+  Object clone() {
+    return new ViewStridesWrapperDComplexMatrix2D(_content);
   }
 }

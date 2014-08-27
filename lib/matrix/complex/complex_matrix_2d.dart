@@ -1017,7 +1017,7 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
    *            the number of cells the matrix shall have.
    * @return a new matrix of the corresponding dynamic type.
    */
-  //DComplexMatrix1D like1D(int size);
+  DComplexMatrix1D like1D(int size);
 
   /**
    * Sets the matrix cell at coordinate <tt>[row,column]</tt> to the specified
