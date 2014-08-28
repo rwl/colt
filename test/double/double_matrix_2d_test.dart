@@ -1,31 +1,62 @@
-import 'dart:math' as math;
-import 'dart:typed_data';
+part of cern.colt.matrix.double.test;
 
-import 'package:unittest/unittest.dart';
-import 'package:colt/colt.dart';
-import 'package:colt/function/double.dart' hide equals;
+void testDoubleMatrix2D(DoubleMatrix2DTest t) {
+  group('DoubleMatrix2D', () {
+    setUp() => t.setUp;
+    tearDown() => t.tearDown();
+    test('aggregate', t.testAggregate);
+    test('aggregateProc', t.testAggregateProc);
+    test('aggregateIndex', t.testAggregateIndex);
+    test('aggregateFunc', t.testAggregateFunc);
+    test('assignValue', t.testAssignValue);
+    test('assignValues2D', t.testAssignValues2D);
+    test('assign', t.testAssign);
+    test('assignMatrix', t.testAssignMatrix);
+    test('assignFunc', t.testAssignFunc);
+    test('assignFuncIndex', t.testAssignFuncIndex);
+    test('assignProc', t.testAssignProc);
+    test('assignProcFunc', t.testAssignProcFunc);
+    test('cardinality', t.testCardinality);
+    test('equalsValue', t.testEqualsValue);
+    test('equals', t.testEquals);
+    test('forEachNonZero', t.testForEachNonZero);
+    test('maxLocation', t.testMaxLocation);
+    test('minLocation', t.testMinLocation);
+    test('getNegativeValues', t.testGetNegativeValues);
+    test('getNonZeros', t.testGetNonZeros);
+    test('getPositiveValues', t.testGetPositiveValues);
+    test('toArray', t.testToArray);
+    test('vectorize', t.testVectorize);
+    test('viewColumn', t.testViewColumn);
+    test('viewColumnFlip', t.testViewColumnFlip);
+    test('viewDice', t.testViewDice);
+    test('viewPart', t.testViewPart);
+    test('viewRow', t.testViewRow);
+    test('viewRowFlip', t.testViewRowFlip);
+    test('viewSelectionProc', t.testViewSelectionProc);
+    test('viewSelection', t.testViewSelection);
+    test('viewStrides', t.testViewStrides);
+    test('zMult', t.testZMult);
+    test('zMult2D', t.testZMult2D);
+    test('testZSum', t.testZSum);
+  });
+}
 
-final math.Random random = new math.Random(0);
+abstract class DoubleMatrix2DTest {
 
-doubleMatrix2DTest(Function createMatrix) {
-  /**
-   * Matrix to test
-   */
+  /** Matrix to test. */
   DoubleMatrix2D A;
 
-  /**
-   * Matrix of the same size as A
-   */
+  /** Matrix of the same size as [A]. */
   DoubleMatrix2D B;
 
-  /**
-   * Matrix of the size A.columns() x A.rows()
-   */
+  /** Matrix of the size A.columns() x A.rows(). */
   DoubleMatrix2D Bt;
 
-  int NROWS = 13;
+  final int NROWS = 13;
+  final int NCOLUMNS = 17;
 
-  int NCOLUMNS = 17;
+  final double TOL = 1e-10;
 
   void populateMatrices() {
     //ConcurrencyUtils.setThreadsBeginN_2D(1);
@@ -48,11 +79,52 @@ doubleMatrix2DTest(Function createMatrix) {
     }
   }
 
-  double TOL = 1e-10;
+  void createMatrices();
+
+  void runTests() {
+    group('DoubleMatrix2D', () {
+      setUp() => this.setUp;
+      tearDown() => this.tearDown();
+      test('aggregate', testAggregate);
+      test('aggregateProc', testAggregateProc);
+      test('aggregateIndex', testAggregateIndex);
+      test('aggregateFunc', testAggregateFunc);
+      test('assignValue', testAssignValue);
+      test('assignValues2D', testAssignValues2D);
+      test('assign', testAssign);
+      test('assignMatrix', testAssignMatrix);
+      test('assignFunc', testAssignFunc);
+      test('assignFuncIndex', testAssignFuncIndex);
+      test('assignProc', testAssignProc);
+      test('assignProcFunc', testAssignProcFunc);
+      test('cardinality', testCardinality);
+      test('equalsValue', testEqualsValue);
+      test('equals', testEquals);
+      test('forEachNonZero', testForEachNonZero);
+      test('maxLocation', testMaxLocation);
+      test('minLocation', testMinLocation);
+      test('getNegativeValues', testGetNegativeValues);
+      test('getNonZeros', testGetNonZeros);
+      test('getPositiveValues', testGetPositiveValues);
+      test('toArray', testToArray);
+      test('vectorize', testVectorize);
+      test('viewColumn', testViewColumn);
+      test('viewColumnFlip', testViewColumnFlip);
+      test('viewDice', testViewDice);
+      test('viewPart', testViewPart);
+      test('viewRow', testViewRow);
+      test('viewRowFlip', testViewRowFlip);
+      test('viewSelectionProc', testViewSelectionProc);
+      test('viewSelection', testViewSelection);
+      test('viewStrides', testViewStrides);
+      test('zMult', testZMult);
+      test('zMult2D', testZMult2D);
+      test('testZSum', testZSum);
+    });
+  }
 
   void setUp() {
-    A = createMatrix();
-    B = createMatrix();
+    createMatrices();
     populateMatrices();
   }
 
@@ -60,11 +132,7 @@ doubleMatrix2DTest(Function createMatrix) {
     A = B = Bt = null;
   }
 
-  //    void testToString() {
-  //        System.out.println(A.toString());
-  //    }
-
-  void testAggregateDoubleDoubleFunctionDoubleFunction() {
+  testAggregate() {
     double expected = 0.0;
     for (int r = 0; r < A.rows(); r++) {
       for (int c = 0; c < A.columns(); c++) {
@@ -76,7 +144,7 @@ doubleMatrix2DTest(Function createMatrix) {
     expect(expected, closeTo(result, TOL));
   }
 
-  void testAggregateDoubleDoubleFunctionDoubleFunctionDoubleProcedure() {
+  testAggregateProc() {
     bool procedure(double element) {
       if (element.abs() > 0.2) {
         return true;
@@ -84,7 +152,6 @@ doubleMatrix2DTest(Function createMatrix) {
         return false;
       }
     }
-    ;
     double expected = 0.0;
     for (int r = 0; r < A.rows(); r++) {
       for (int c = 0; c < A.columns(); c++) {
@@ -99,7 +166,7 @@ doubleMatrix2DTest(Function createMatrix) {
     expect(expected, closeTo(result, TOL));
   }
 
-  void testAggregateDoubleDoubleFunctionDoubleFunctionIntArrayListIntArrayList() {
+  testAggregateIndex() {
     List<int> rowList = new List<int>();
     List<int> columnList = new List<int>();
     for (int r = 0; r < A.rows(); r++) {
@@ -119,7 +186,7 @@ doubleMatrix2DTest(Function createMatrix) {
     expect(expected, closeTo(result, TOL));
   }
 
-  void testAggregateDoubleMatrix2DDoubleDoubleFunctionDoubleDoubleFunction() {
+  testAggregateFunc() {
     double expected = 0.0;
     for (int r = 0; r < A.rows(); r++) {
       for (int c = 0; c < A.columns(); c++) {
@@ -132,7 +199,7 @@ doubleMatrix2DTest(Function createMatrix) {
     expect(expected, closeTo(result, TOL));
   }
 
-  void testAssignDouble() {
+  testAssignValue() {
     double value = random.nextDouble();
     A.assignValue(value);
     for (int r = 0; r < A.rows(); r++) {
@@ -142,7 +209,7 @@ doubleMatrix2DTest(Function createMatrix) {
     }
   }
 
-  void testAssignDoubleArrayArray() {
+  testAssignValues2D() {
     List<Float64List> expected = new List<Float64List>(A.rows());//[A.columns()];
     for (int r = 0; r < A.rows(); r++) {
       expected[r] = new Float64List(A.columns());
@@ -159,7 +226,7 @@ doubleMatrix2DTest(Function createMatrix) {
     }
   }
 
-  void testAssignDoubleFunction() {
+  testAssign() {
     DoubleMatrix2D Acopy = A.copy();
     A.assign(acos);
     for (int r = 0; r < A.rows(); r++) {
@@ -170,7 +237,7 @@ doubleMatrix2DTest(Function createMatrix) {
     }
   }
 
-  void testAssignDoubleMatrix2D() {
+  testAssignMatrix() {
     A.assignMatrix(B);
     for (int r = 0; r < A.rows(); r++) {
       for (int c = 0; c < A.columns(); c++) {
@@ -179,7 +246,7 @@ doubleMatrix2DTest(Function createMatrix) {
     }
   }
 
-  void testAssignDoubleMatrix2DDoubleDoubleFunction() {
+  testAssignFunc() {
     DoubleMatrix2D Acopy = A.copy();
     A.assignFunc(B, plus);
     for (int r = 0; r < A.rows(); r++) {
@@ -189,7 +256,7 @@ doubleMatrix2DTest(Function createMatrix) {
     }
   }
 
-  void testAssignDoubleMatrix2DDoubleDoubleFunctionIntArrayListIntArrayList() {
+  testAssignFuncIndex() {
     List<int> rowList = new List<int>();
     List<int> columnList = new List<int>();
     for (int r = 0; r < A.rows(); r++) {
@@ -207,7 +274,7 @@ doubleMatrix2DTest(Function createMatrix) {
     }
   }
 
-  void testAssignDoubleProcedureDouble() {
+  testAssignProc() {
     bool procedure(double element) {
       if (element.abs() > 0.1) {
         return true;
@@ -215,7 +282,6 @@ doubleMatrix2DTest(Function createMatrix) {
         return false;
       }
     }
-    ;
     DoubleMatrix2D Acopy = A.copy();
     A.assignProc(procedure, -1.0);
     for (int r = 0; r < A.rows(); r++) {
@@ -229,7 +295,7 @@ doubleMatrix2DTest(Function createMatrix) {
     }
   }
 
-  void testAssignDoubleProcedureDoubleFunction() {
+  testAssignProcFunc() {
     bool procedure(double element) {
       if (element.abs() > 0.1) {
         return true;
@@ -237,7 +303,6 @@ doubleMatrix2DTest(Function createMatrix) {
         return false;
       }
     }
-    ;
     DoubleMatrix2D Acopy = A.copy();
     A.assignProcFunc(procedure, tan);
     for (int r = 0; r < A.rows(); r++) {
@@ -251,12 +316,12 @@ doubleMatrix2DTest(Function createMatrix) {
     }
   }
 
-  void testCardinality() {
+  testCardinality() {
     int card = A.cardinality();
     expect(A.rows() * A.columns(), equals(card));
   }
 
-  void testEqualsDouble() {
+  testEqualsValue() {
     double value = 1.0;
     A.assignValue(value);
     bool eq = A.equals(value);
@@ -265,14 +330,14 @@ doubleMatrix2DTest(Function createMatrix) {
     expect(eq, isFalse);
   }
 
-  void testEqualsObject() {
+  testEquals() {
     bool eq = A.equals(A);
     expect(eq, isTrue);
     eq = A.equals(B);
     expect(eq, isFalse);
   }
 
-  void testForEachNonZero() {
+  testForEachNonZero() {
     DoubleMatrix2D Acopy = A.copy();
     double function(int first, int second, double third) {
       return math.sqrt(third);
@@ -286,7 +351,7 @@ doubleMatrix2DTest(Function createMatrix) {
     }
   }
 
-  void testMaxLocation() {
+  testMaxLocation() {
     A.assignValue(0.0);
     A.setQuick(A.rows() ~/ 3, A.columns() ~/ 3, 0.7);
     A.setQuick(A.rows() ~/ 2, A.columns() ~/ 2, 0.1);
@@ -296,7 +361,7 @@ doubleMatrix2DTest(Function createMatrix) {
     expect(A.columns() / 3, equals(maxAndLoc[2]));
   }
 
-  void testMinLocation() {
+  testMinLocation() {
     A.assignValue(0.0);
     A.setQuick(A.rows() ~/ 3, A.columns() ~/ 3, -0.7);
     A.setQuick(A.rows() ~/ 2, A.columns() ~/ 2, -0.1);
@@ -306,7 +371,7 @@ doubleMatrix2DTest(Function createMatrix) {
     expect(A.columns() ~/ 3, equals(minAndLoc[2]));
   }
 
-  void testGetNegativeValues() {
+  testGetNegativeValues() {
     A.assignValue(0.0);
     A.setQuick(A.rows() ~/ 3, A.columns() ~/ 3, -0.7);
     A.setQuick(A.rows() ~/ 2, A.columns() ~/ 2, -0.1);
@@ -325,7 +390,7 @@ doubleMatrix2DTest(Function createMatrix) {
     expect(valueList.contains(-0.1), isTrue);
   }
 
-  void testGetNonZeros() {
+  testGetNonZeros() {
     A.assignValue(0.0);
     A.setQuick(A.rows() ~/ 3, A.columns() ~/ 3, 0.7);
     A.setQuick(A.rows() ~/ 2, A.columns() ~/ 2, 0.1);
@@ -344,7 +409,7 @@ doubleMatrix2DTest(Function createMatrix) {
     expect(valueList.contains(0.1), isTrue);
   }
 
-  void testGetPositiveValues() {
+  testGetPositiveValues() {
     A.assignValue(0.0);
     A.setQuick(A.rows() ~/ 3, A.columns() ~/ 3, 0.7);
     A.setQuick(A.rows() ~/ 2, A.columns() ~/ 2, 0.1);
@@ -363,7 +428,7 @@ doubleMatrix2DTest(Function createMatrix) {
     expect(valueList.contains(0.1), isTrue);
   }
 
-  void testToArray() {
+  testToArray() {
     List<Float64List> array = A.toArray();
     expect(A.rows() == array.length, isTrue);
     for (int r = 0; r < A.rows(); r++) {
@@ -374,7 +439,7 @@ doubleMatrix2DTest(Function createMatrix) {
     }
   }
 
-  void testVectorize() {
+  testVectorize() {
     DoubleMatrix1D Avec = A.vectorize();
     int idx = 0;
     for (int c = 0; c < A.columns(); c++) {
@@ -384,7 +449,7 @@ doubleMatrix2DTest(Function createMatrix) {
     }
   }
 
-  void testViewColumn() {
+  testViewColumn() {
     DoubleMatrix1D col = A.viewColumn(A.columns() ~/ 2);
     expect(A.rows(), equals(col.size()));
     for (int r = 0; r < A.rows(); r++) {
@@ -392,7 +457,7 @@ doubleMatrix2DTest(Function createMatrix) {
     }
   }
 
-  void testViewColumnFlip() {
+  testViewColumnFlip() {
     DoubleMatrix2D B = A.viewColumnFlip();
     expect(A.size(), equals(B.size()));
     for (int r = 0; r < A.rows(); r++) {
@@ -402,7 +467,7 @@ doubleMatrix2DTest(Function createMatrix) {
     }
   }
 
-  void testViewDice() {
+  testViewDice() {
     DoubleMatrix2D B = A.viewDice();
     expect(A.rows(), equals(B.columns()));
     expect(A.columns(), equals(B.rows()));
@@ -413,7 +478,7 @@ doubleMatrix2DTest(Function createMatrix) {
     }
   }
 
-  void testViewPart() {
+  testViewPart() {
     DoubleMatrix2D B = A.viewPart(A.rows() ~/ 2, A.columns() ~/ 2, A.rows() ~/ 3, A.columns() ~/ 3);
     expect(A.rows() / 3, equals(B.rows()));
     expect(A.columns() / 3, equals(B.columns()));
@@ -424,7 +489,7 @@ doubleMatrix2DTest(Function createMatrix) {
     }
   }
 
-  void testViewRow() {
+  testViewRow() {
     DoubleMatrix1D B = A.viewRow(A.rows() ~/ 2);
     expect(A.columns(), equals(B.size()));
     for (int r = 0; r < A.columns(); r++) {
@@ -432,7 +497,7 @@ doubleMatrix2DTest(Function createMatrix) {
     }
   }
 
-  void testViewRowFlip() {
+  testViewRowFlip() {
     DoubleMatrix2D B = A.viewRowFlip();
     expect(A.size(), equals(B.size()));
     for (int r = 0; r < A.rows(); r++) {
@@ -442,7 +507,7 @@ doubleMatrix2DTest(Function createMatrix) {
     }
   }
 
-  void testViewSelectionDoubleMatrix1DProcedure() {
+  testViewSelectionProc() {
     final double value = 2.0;
     A.assignValue(0.0);
     A.setQuick(A.rows() ~/ 4, 0, value);
@@ -460,7 +525,7 @@ doubleMatrix2DTest(Function createMatrix) {
     expect(A.getQuick(A.rows() ~/ 2, 0), closeTo(B.getQuick(1, 0), TOL));
   }
 
-  void testViewSelectionIntArrayIntArray() {
+  testViewSelection() {
     Int32List rowIndexes = new Int32List.fromList([A.rows() / 6, A.rows() / 5, A.rows() / 4, A.rows() / 3, A.rows() / 2]);
     Int32List colIndexes = new Int32List.fromList([A.columns() / 6, A.columns() / 5, A.columns() / 4, A.columns() / 3, A.columns() / 2, A.columns() - 1]);
     DoubleMatrix2D B = A.viewSelection(rowIndexes, colIndexes);
@@ -473,14 +538,14 @@ doubleMatrix2DTest(Function createMatrix) {
     }
   }
 
-  /*void testViewSorted() {
+  /*test('viewSorted', () {
     DoubleMatrix2D B = A.viewSorted(1);
     for (int r = 0; r < A.rows() - 1; r++) {
       expect(B.getQuick(r + 1, 1) >= B.getQuick(r, 1), isTrue);
     }
   }*/
 
-  void testViewStrides() {
+  testViewStrides() {
     int rowStride = 3;
     int colStride = 5;
     DoubleMatrix2D B = A.viewStrides(rowStride, colStride);
@@ -491,7 +556,7 @@ doubleMatrix2DTest(Function createMatrix) {
     }
   }
 
-  void testZMultDoubleMatrix1DDoubleMatrix1DDoubleDoubleBoolean() {
+  testZMult() {
     DoubleMatrix1D y = new DenseDoubleMatrix1D(A.columns());
     for (int i = 0; i < y.size(); i++) {
       y.setQuick(i, random.nextDouble());
@@ -561,7 +626,7 @@ doubleMatrix2DTest(Function createMatrix) {
     }
   }
 
-  void testZMultDoubleMatrix2DDoubleMatrix2DDoubleDoubleBooleanBoolean() {
+  testZMult2D() {
     double alpha = 3.0;
     double beta = 5.0;
     DoubleMatrix2D C = DoubleFactory2D.dense.random(A.rows(), A.rows());
@@ -717,7 +782,7 @@ doubleMatrix2DTest(Function createMatrix) {
 
   }
 
-  void testZSum() {
+  testZSum() {
     double sum = A.zSum();
     double expected = 0.0;
     for (int r = 0; r < A.rows(); r++) {
@@ -727,5 +792,4 @@ doubleMatrix2DTest(Function createMatrix) {
     }
     expect(expected, closeTo(sum, TOL));
   }
-
 }

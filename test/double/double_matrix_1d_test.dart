@@ -5,26 +5,23 @@ import 'package:unittest/unittest.dart';
 import 'package:colt/colt.dart';
 import 'package:colt/function/double.dart' hide equals;
 
-double random() => new math.Random().nextDouble();
+final math.Random random = new math.Random(0);
 
-int SIZE = 2 * 17 * 5;
-
-main() {
-  doubleMatrix1DTest(() => new DenseDoubleMatrix1D(SIZE));
+testDoubleMatrix1D() {
+  doubleMatrix1DTest((size) => new DenseDoubleMatrix1D(size));
+  doubleMatrix1DTest((size) => new DenseDoubleMatrix1D(size).viewFlip());
 }
 
-doubleMatrix1DTest(Function createMatrix) {//extends TestCase {
-  /**
-   * Matrix to test
-   */
+doubleMatrix1DTest(DoubleMatrix1D createMatrix(int size)) {//extends TestCase {
+  /** Matrix to test. */
   DoubleMatrix1D A;
 
-  /**
-   * Matrix of the same size as a
-   */
+  /** Matrix of the same size as [A]. */
   DoubleMatrix1D B;
 
   double TOL = 1e-10;
+
+  final int SIZE = 2 * 17 * 5;
 
   void populateMatrices() {
     //ConcurrencyUtils.setThreadsBeginN_1D(1);
@@ -41,8 +38,8 @@ doubleMatrix1DTest(Function createMatrix) {//extends TestCase {
   }
 
   void setUp() {//throws Exception {
-    A = createMatrix();
-    B = createMatrix();
+    A = createMatrix(SIZE);
+    B = createMatrix(SIZE);
     populateMatrices();
   }
 
@@ -88,7 +85,7 @@ doubleMatrix1DTest(Function createMatrix) {//extends TestCase {
     });
 
     test('assignValue', () {
-      double value = random();
+      double value = random.nextDouble();
       A.assignValue(value);
       for (int i = 0; i < A.size(); i++) {
         expect(value, closeTo(A.getQuick(i), TOL));
@@ -98,7 +95,7 @@ doubleMatrix1DTest(Function createMatrix) {//extends TestCase {
     test('assignValues', () {
       Float64List expected = new Float64List(A.size());
       for (int i = 0; i < A.size(); i++) {
-        expected[i] = random();
+        expected[i] = random.nextDouble();
       }
       A.assignValues(expected);
       for (int i = 0; i < A.size(); i++) {
