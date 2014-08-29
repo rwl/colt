@@ -1,7 +1,7 @@
 part of cern.colt.matrix.double.test;
 
-testDenseDoubleMatrix2D(DenseDoubleMatrix2DTest t) {
-  testDoubleMatrix2D(t);
+testDenseDoubleMatrix2D(String name, DenseDoubleMatrix2DTest t) {
+  testDoubleMatrix2D(name, t);
   group('DenseDoubleMatrix2D', () {
     setUp() => t.setUp;
     tearDown() => t.tearDown();

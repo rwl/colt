@@ -1,7 +1,7 @@
 part of cern.colt.matrix.double.test;
 
-testDoubleMatrix1D(DoubleMatrix1DTest t) {
-  group('DoubleMatrix1D', () {
+testDoubleMatrix1D(String name, DoubleMatrix1DTest t) {
+  group('DoubleMatrix1D ($name)', () {
     setUp() => t.setUp;
     tearDown() => t.tearDown();
     test('aggregate', t.testAggregate);
