@@ -1234,3 +1234,206 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
     return new SelectedDenseDComplexMatrix1D(this._elements, offsets);
   }
 }
+
+/**
+ * Selection view on dense 1-d matrices holding <tt>complex</tt> elements.
+ * <b>Implementation:</b>
+ * <p>
+ * Objects of this class are typically constructed via <tt>viewIndexes</tt>
+ * methods on some source matrix. The interface introduced in abstract super
+ * classes defines everything a user can do. From a user point of view there is
+ * nothing special about this class; it presents the same functionality with the
+ * same signatures and semantics as its abstract superclass(es) while
+ * introducing no additional functionality. Thus, this class need not be visible
+ * to users.
+ * <p>
+ * This class uses no delegation. Its instances point directly to the data. Cell
+ * addressing overhead is 1 additional array index access per get/set.
+ * <p>
+ * Note that this implementation is not synchronized.
+ *
+ * @author Piotr Wendykier (piotr.wendykier@gmail.com)
+ */
+class SelectedDenseDComplexMatrix1D extends DComplexMatrix1D {
+
+    /**
+     * The elements of this matrix.
+     */
+    Float64List _elements;
+
+    /**
+     * The offsets of visible indexes of this matrix.
+     */
+    Int32List _offsets;
+
+    /**
+     * The offset.
+     */
+    int __offset;
+
+    /**
+     * Constructs a matrix view with the given parameters.
+     *
+     * @param elements
+     *            the cells.
+     * @param indexes
+     *            The indexes of the cells that shall be visible.
+     */
+    factory SelectedDenseDComplexMatrix1D.offset(Float64List elements, Int32List offsets) {
+        return new SelectedDenseDComplexMatrix1D(offsets.length, elements, 0, 1, offsets, 0);
+    }
+
+    /**
+     * Constructs a matrix view with the given parameters.
+     *
+     * @param size
+     *            the number of cells the matrix shall have.
+     * @param elements
+     *            the cells.
+     * @param zero
+     *            the index of the first element.
+     * @param stride
+     *            the number of indexes between any two elements, i.e.
+     *            <tt>index(i+1)-index(i)</tt>.
+     * @param offsets
+     *            the offsets of the cells that shall be visible.
+     * @param offset
+     */
+    SelectedDenseDComplexMatrix1D(int size, Float64List elements, int zero, int stride, Int32List offsets, int offset) {
+        _setUp(size, zero, stride);
+
+        this._elements = elements;
+        this._offsets = offsets;
+        this.__offset = offset;
+        this._isNoView = false;
+    }
+
+    int _offset(int absRank) {
+        return _offsets[absRank];
+    }
+
+    Float64List getQuick(int index) {
+        int idx = _zero + index * _stride;
+        return new Float64List.fromList([ _elements[__offset + _offsets[idx]], _elements[__offset + _offsets[idx] + 1] ]);
+    }
+
+    DoubleMatrix1D getRealPart() {
+        final DenseDoubleMatrix1D R = new DenseDoubleMatrix1D(_size);
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, _size);
+            List<Future> futures = new List<Future>(nthreads);
+            int k = _size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? _size : firstIdx + k;
+                futures[j] = ConcurrencyUtils.submit(() {
+                        for (int k = firstIdx; k < lastIdx; k++) {
+                            final tmp = getQuick(k);
+                            R.setQuick(k, tmp[0]);
+                        }
+                });
+            }
+            ConcurrencyUtils.waitForCompletion(futures);
+        } else {
+            Float64List tmp;
+            for (int i = 0; i < _size; i++) {
+                tmp = getQuick(i);
+                R.setQuick(i, tmp[0]);
+            }
+        }
+        return R;
+    }
+
+    DoubleMatrix1D getImaginaryPart() {
+        final DenseDoubleMatrix1D Im = new DenseDoubleMatrix1D(_size);
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, _size);
+            List<Future> futures = new List<Future>(nthreads);
+            int k = _size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? _size : firstIdx + k;
+                futures[j] = ConcurrencyUtils.submit(() {
+                        for (int k = firstIdx; k < lastIdx; k++) {
+                            final tmp = getQuick(k);
+                            Im.setQuick(k, tmp[1]);
+                        }
+                });
+            }
+            ConcurrencyUtils.waitForCompletion(futures);
+        } else {
+            Float64List tmp;
+            for (int i = 0; i < _size; i++) {
+                tmp = getQuick(i);
+                Im.setQuick(i, tmp[1]);
+            }
+        }
+
+        return Im;
+    }
+
+    Float64List elements() {
+        throw new UnsupportedError("This method is not supported.");
+    }
+
+    /**
+     * Returns <tt>true</tt> if both matrices share at least one identical cell.
+     *
+     * @param other
+     *            matrix
+     * @return <tt>true</tt> if both matrices share at least one identical cell.
+     */
+
+    bool _haveSharedCellsRaw(DComplexMatrix1D other) {
+        if (other is SelectedDenseDComplexMatrix1D) {
+            return this._elements == other._elements;
+        } else if (other is DenseDComplexMatrix1D) {
+            return this._elements == other._elements;
+        }
+        return false;
+    }
+
+    int index(int rank) {
+        return __offset + _offsets[_zero + rank * _stride];
+    }
+
+    DComplexMatrix1D like1D(int size) {
+        return new DenseDComplexMatrix1D(size);
+    }
+
+    DComplexMatrix2D like2D(int rows, int columns) {
+        return new DenseDComplexMatrix2D(rows, columns);
+    }
+
+    DComplexMatrix2D reshape(int rows, int columns) {
+        throw new UnsupportedError("This method is not supported.");
+    }
+
+    DComplexMatrix3D reshape3D(int slices, int rows, int columns) {
+        throw new UnsupportedError("This method is not supported.");
+    }
+
+    void setQuick(int index, Float64List value) {
+        int idx = _zero + index * _stride;
+        _elements[__offset + _offsets[idx]] = value[0];
+        _elements[__offset + _offsets[idx] + 1] = value[1];
+    }
+
+    void setPartsQuick(int index, double re, double im) {
+        int idx = _zero + index * _stride;
+        _elements[__offset + _offsets[idx]] = re;
+        _elements[__offset + _offsets[idx] + 1] = im;
+    }
+
+    void _setUp(int size, [int zero = 0, int stride = 1]) {
+        super._setUp(size, zero, stride);
+        this.__offset = 0;
+    }
+
+    DComplexMatrix1D _viewSelectionLike(Int32List offsets) {
+        return new SelectedDenseDComplexMatrix1D.offset(this._elements, offsets);
+    }
+
+}

@@ -1,5 +1,41 @@
 part of cern.colt.matrix.complex.test;
 
+testDComplexMatrix1D(String name, DComplexMatrix1DTest t) {
+  group('DComplexMatrix1D ($name)', () {
+    test('aggregate', t.testAggregate);
+    test('aggregateMatrix', t.testAggregateMatrix);
+    test('assign', t.testAssign);
+    test('assignMatrix', t.testAssignMatrix);
+    test('assignMatrixFunc', t.testAssignMatrixFunc);
+    test('assignProc', t.testAssignProc);
+    test('assignProcValue', t.testAssignProcValue);
+    test('assignRealFunc', t.testAssignRealFunc);
+    test('assignValues', t.testAssignValues);
+    test('assignValue', t.testAssignValue);
+    test('assignImaginary', t.testAssignImaginary);
+    test('assignReal', t.testAssignReal);
+    test('cardinality', t.testCardinality);
+    test('equalsValue', t.testEqualsValue);
+    test('equals', t.testEquals);
+    test('getImaginaryPart', t.testGetImaginaryPart);
+    test('getRealPart', t.testGetRealPart);
+    test('getNonZeros', t.testGetNonZeros);
+    test('reshape', t.testReshape);
+    test('swap', t.testSwap);
+    test('toArray', t.testToArray);
+    test('toArrayFill', t.testToArrayFill);
+    test('viewFlip', t.testViewFlip);
+    test('viewPart', t.testViewPart);
+    test('viewSelectionProc', t.testViewSelectionProc);
+    test('viewSelection', t.testViewSelection);
+    test('viewStrides', t.testViewStrides);
+    test('zDotProduct', t.testZDotProduct);
+    test('zDotProductRange', t.testZDotProductRange);
+    test('zDotProductIndex', t.testZDotProductIndex);
+    test('zSum', t.testZSum);
+  });
+}
+
 abstract class DComplexMatrix1DTest {
 
   /** Matrix to test. */
@@ -35,7 +71,7 @@ abstract class DComplexMatrix1DTest {
     A = B = null;
   }
 
-  void testAggregateDoubleDoubleFunctionDoubleFunction() {
+  void testAggregate() {
     Float64List expected = new Float64List(2);
     for (int i = 0; i < A.size(); i++) {
       expected = DComplex.plus(expected, DComplex.square(A.getQuick(i)));
@@ -44,7 +80,7 @@ abstract class DComplexMatrix1DTest {
     assertEquals(expected, result, TOL);
   }
 
-  void testAggregateComplexMatrix1DComplexComplexFunctionComplexComplexFunction() {
+  void testAggregateMatrix() {
     Float64List actual = A.aggregateMatrix(B, plus, mult);
     Float64List expected = new Float64List(2);
     for (int i = 0; i < A.size(); i++) {
@@ -53,7 +89,7 @@ abstract class DComplexMatrix1DTest {
     assertEquals(expected, actual, TOL);
   }
 
-  void testAssignComplexComplexFunction() {
+  void testAssign() {
     DComplexMatrix1D Acopy = A.copy();
     A.assign(acos);
     for (int i = 0; i < A.size(); i++) {
@@ -62,7 +98,7 @@ abstract class DComplexMatrix1DTest {
     }
   }
 
-  void testAssignComplexMatrix1D() {
+  void testAssignMatrix() {
     A.assignMatrix(B);
     expect(A.size() == B.size(), isTrue);
     for (int i = 0; i < A.size(); i++) {
@@ -70,7 +106,7 @@ abstract class DComplexMatrix1DTest {
     }
   }
 
-  void testAssignComplexMatrix1DComplexComplexFunction() {
+  void testAssignMatrixFunc() {
     DComplexMatrix1D Acopy = A.copy();
     A.assignMatrixFunc(B, div);
     for (int i = 0; i < A.size(); i++) {
@@ -78,7 +114,7 @@ abstract class DComplexMatrix1DTest {
     }
   }
 
-  void testAssignComplexProcedureComplexComplexFunction() {
+  void testAssignProc() {
     bool procedure(Float64List element) {
       if (DComplex.abs(element) > 0.1) {
         return true;
@@ -86,7 +122,6 @@ abstract class DComplexMatrix1DTest {
         return false;
       }
     }
-    ;
     DComplexMatrix1D Acopy = A.copy();
     A.assignProc(procedure, tan);
     for (int i = 0; i < A.size(); i++) {
@@ -98,7 +133,7 @@ abstract class DComplexMatrix1DTest {
     }
   }
 
-  void testAssignComplexProcedureDoubleArray() {
+  void testAssignProcValue() {
     bool procedure(Float64List element) {
       if (DComplex.abs(element) > 0.1) {
         return true;
@@ -118,7 +153,7 @@ abstract class DComplexMatrix1DTest {
     }
   }
 
-  void testAssignComplexRealFunction() {
+  void testAssignRealFunc() {
     DComplexMatrix1D Acopy = A.copy();
     A.assignRealFunc(abs);
     for (int i = 0; i < A.size(); i++) {
@@ -128,7 +163,7 @@ abstract class DComplexMatrix1DTest {
     }
   }
 
-  void testAssignDoubleArray() {
+  void testAssignValues() {
     Float64List expected = new Float64List(2 * A.size());
     for (int i = 0; i < 2 * A.size(); i++) {
       expected[i] = random.nextDouble();
@@ -142,7 +177,7 @@ abstract class DComplexMatrix1DTest {
 
   }
 
-  void testAssignDoubleDouble() {
+  void testAssignValue() {
     double re = random.nextDouble();
     double im = random.nextDouble();
     A.assignValue(re, im);
@@ -180,16 +215,16 @@ abstract class DComplexMatrix1DTest {
     expect(A.size(), equals(card));
   }
 
-  void testEqualsDouble() {
+  void testEqualsValue() {
     Float64List value = new Float64List.fromList([1, 2]);
     A.assignValue(value[0], value[1]);
-    bool eq = A.equals(value);
+    bool eq = A.equalsValue(value);
     expect(eq, isTrue);
     eq = A.equals(new Float64List.fromList([2, 2]));
     expect(eq, isFalse);
   }
 
-  void testEqualsObject() {
+  void testEquals() {
     bool eq = A.equals(A);
     expect(eq, isTrue);
     eq = A.equals(B);
@@ -210,7 +245,7 @@ abstract class DComplexMatrix1DTest {
     }
   }
 
-  void testGetNonZerosIntArrayListArrayListOfdouble() {
+  void testGetNonZeros() {
     List<int> indexList = new List<int>();
     List<Float64List> valueList = new List<Float64List>();
     A.getNonZeros(indexList, valueList);
@@ -222,7 +257,7 @@ abstract class DComplexMatrix1DTest {
     }
   }
 
-  void testReshapeIntInt() {
+  void testReshape() {
     int rows = 10;
     int columns = 17;
     DComplexMatrix2D B = A.reshape(rows, columns);
@@ -268,7 +303,7 @@ abstract class DComplexMatrix1DTest {
     }
   }
 
-  void testToArrayDoubleArray() {
+  void testToArrayFill() {
     Float64List array = new Float64List(2 * A.size());
     A.toArrayFill(array);
     for (int i = 0; i < A.size(); i++) {
@@ -292,7 +327,7 @@ abstract class DComplexMatrix1DTest {
     }
   }
 
-  void testViewSelectionComplexProcedure() {
+  void testViewSelectionProc() {
     DComplexMatrix1D B = A.viewSelectionProc((Float64List element) {
       if (element[0] < element[1]) {
         return true;
@@ -308,7 +343,7 @@ abstract class DComplexMatrix1DTest {
     }
   }
 
-  void testViewSelectionIntArray() {
+  void testViewSelection() {
     Int32List indexes = new Int32List.fromList([A.size() / 6, A.size() / 5, A.size() / 4, A.size() / 3, A.size() / 2]);
     DComplexMatrix1D B = A.viewSelection(indexes);
     for (int i = 0; i < indexes.length; i++) {
@@ -324,7 +359,7 @@ abstract class DComplexMatrix1DTest {
     }
   }
 
-  void testZDotProductComplexMatrix1D() {
+  void testZDotProduct() {
     Float64List actual = A.zDotProduct(B);
     Float64List expected = new Float64List(2);
     for (int i = 0; i < A.size(); i++) {
@@ -333,7 +368,7 @@ abstract class DComplexMatrix1DTest {
     assertEquals(expected, actual, TOL);
   }
 
-  void testZDotProductComplexMatrix1DIntInt() {
+  void testZDotProductRange() {
     Float64List actual = A.zDotProduct(B, 5, B.size() - 10);
     Float64List expected = new Float64List(2);
     for (int i = 5; i < A.size() - 5; i++) {
@@ -342,7 +377,7 @@ abstract class DComplexMatrix1DTest {
     assertEquals(expected, actual, TOL);
   }
 
-  void testZDotProductComplexMatrix1DIntIntIntArrayList() {
+  void testZDotProductIndex() {
     List<int> indexList = new List<int>();
     List<Float64List> valueList = new List<Float64List>();
     B.getNonZeros(indexList, valueList);

@@ -149,15 +149,15 @@ class SparseDComplexMatrix1D extends DComplexMatrix1D {
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-      int idx = 0;
-      for (int c = 0; c < columns; c++) {
-        for (int r = 0; r < rows; r++) {
-          Float64List elem = getQuick(idx++);
-          if ((elem[0] != 0) || (elem[1] != 0)) {
-            M.setQuick(r, c, elem);
-          }
+    int idx = 0;
+    for (int c = 0; c < columns; c++) {
+      for (int r = 0; r < rows; r++) {
+        Float64List elem = getQuick(idx++);
+        if ((elem[0] != 0) || (elem[1] != 0)) {
+          M.setQuick(r, c, elem);
         }
       }
+    }
     //}
     return M;
   }
@@ -226,7 +226,7 @@ class SparseDComplexMatrix1D extends DComplexMatrix1D {
   }
 
   DComplexMatrix1D _viewSelectionLike(Int32List offsets) {
-    return new SelectedSparseDComplexMatrix1D(this._elements, offsets);
+    return new SelectedSparseDComplexMatrix1D.offsets(this._elements, offsets);
   }
 
   DoubleMatrix1D getImaginaryPart() {
@@ -247,9 +247,9 @@ class SparseDComplexMatrix1D extends DComplexMatrix1D {
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-      for (int i = 0; i < _size; i++) {
-        Im.setQuick(i, getQuick(i)[1]);
-      }
+    for (int i = 0; i < _size; i++) {
+      Im.setQuick(i, getQuick(i)[1]);
+    }
     //}
     return Im;
   }
@@ -272,10 +272,192 @@ class SparseDComplexMatrix1D extends DComplexMatrix1D {
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-      for (int i = 0; i < _size; i++) {
-        Re.setQuick(i, getQuick(i)[0]);
-      }
+    for (int i = 0; i < _size; i++) {
+      Re.setQuick(i, getQuick(i)[0]);
+    }
     //}
     return Re;
   }
+}
+
+/**
+ * Selection view on sparse 1-d matrices holding <tt>complex</tt> elements. This
+ * implementation uses ConcurrentHashMap
+ *
+ * @author Piotr Wendykier (piotr.wendykier@gmail.com)
+ */
+class SelectedSparseDComplexMatrix1D extends DComplexMatrix1D {
+
+  /*
+   * The elements of the matrix.
+   */
+  Map<int, Float64List> _elements;
+
+  /**
+   * The offsets of visible indexes of this matrix.
+   */
+  Int32List _offsets;
+
+  /**
+   * The offset.
+   */
+  int __offset;
+
+  /**
+   * Constructs a matrix view with the given parameters.
+   *
+   * @param size
+   *            the number of cells the matrix shall have.
+   * @param elements
+   *            the cells.
+   * @param zero
+   *            the index of the first element.
+   * @param stride
+   *            the number of indexes between any two elements, i.e.
+   *            <tt>index(i+1)-index(i)</tt>.
+   * @param offsets
+   *            the offsets of the cells that shall be visible.
+   * @param offset
+   */
+  SelectedSparseDComplexMatrix1D(int size, Map<int, Float64List> elements, int zero, int stride, Int32List offsets, int offset) {
+    _setUp(size, zero, stride);
+
+    this._elements = elements;
+    this._offsets = offsets;
+    this.__offset = offset;
+    this._isNoView = false;
+  }
+
+  /**
+   * Constructs a matrix view with the given parameters.
+   *
+   * @param elements
+   *            the cells.
+   * @param indexes
+   *            The indexes of the cells that shall be visible.
+   */
+  factory SelectedSparseDComplexMatrix1D.offsets(Map<int, Float64List> elements, Int32List offsets) {
+    return new SelectedSparseDComplexMatrix1D(offsets.length, elements, 0, 1, offsets, 0);
+  }
+
+  int _offset(int absRank) {
+    return _offsets[absRank];
+  }
+
+  Float64List getQuick(int index) {
+    return _elements[__offset + _offsets[_zero + index * _stride]];
+  }
+
+  Map<int, Float64List> elements() {
+    throw new UnsupportedError("This method is not supported.");
+  }
+
+  /**
+   * Returns <tt>true</tt> if both matrices share at least one identical cell.
+   */
+
+  bool _haveSharedCellsRaw(DComplexMatrix1D other) {
+    if (other is SelectedSparseDComplexMatrix1D) {
+      return this._elements == other._elements;
+    } else if (other is SparseDComplexMatrix1D) {
+      return this._elements == other._elements;
+    }
+    return false;
+  }
+
+  int index(int rank) {
+    // return this.offset + super.index(rank);
+    // manually inlined:
+    return __offset + _offsets[_zero + rank * _stride];
+  }
+
+  DComplexMatrix1D like1D(int size) {
+    return new SparseDComplexMatrix1D(size);
+  }
+
+  DComplexMatrix2D like2D(int rows, int columns) {
+    return new SparseDComplexMatrix2D(rows, columns);
+  }
+
+  DComplexMatrix2D reshape(int rows, int columns) {
+    throw new UnsupportedError("This method is not supported.");
+  }
+
+  /*DComplexMatrix3D reshape3D(int slices, int rows, int columns) {
+    throw new UnsupportedError("This method is not supported.");
+  }*/
+
+  /**
+   * Sets the matrix cell at coordinate <tt>index</tt> to the specified value.
+   *
+   * <p>
+   * Provided with invalid parameters this method may access illegal indexes
+   * without throwing any exception. <b>You should only use this method when
+   * you are absolutely sure that the coordinate is within bounds.</b>
+   * Precondition (unchecked): <tt>index&lt;0 || index&gt;=size()</tt>.
+   *
+   * @param index
+   *            the index of the cell.
+   * @param value
+   *            the value to be filled into the specified cell.
+   */
+  void setQuick(int index, Float64List value) {
+    int i = __offset + _offsets[_zero + index * _stride];
+    if (value[0] == 0 && value[1] == 0) {
+      this._elements.remove(i);
+    } else {
+      this._elements[i] = value;
+    }
+  }
+
+  /**
+   * Sets the matrix cell at coordinate <tt>index</tt> to the specified value.
+   *
+   * <p>
+   * Provided with invalid parameters this method may access illegal indexes
+   * without throwing any exception. <b>You should only use this method when
+   * you are absolutely sure that the coordinate is within bounds.</b>
+   * Precondition (unchecked): <tt>index&lt;0 || index&gt;=size()</tt>.
+   *
+   * @param index
+   *            the index of the cell.
+   * @param value
+   *            the value to be filled into the specified cell.
+   */
+  void setPartsQuick(int index, double re, double im) {
+    int i = __offset + _offsets[_zero + index * _stride];
+    if (re == 0 && im == 0) this._elements.remove(i); else this._elements[i] = new Float64List.fromList([re, im]);
+  }
+
+  /**
+   * Sets up a matrix with a given number of cells.
+   *
+   * @param size
+   *            the number of cells the matrix shall have.
+   */
+  void _setUp(int size, [int zero = 0, int stride = 1]) {
+    super._setUp(size);
+    this._stride = 1;
+    this.__offset = 0;
+  }
+
+  /**
+   * Construct and returns a new selection view.
+   *
+   * @param offsets
+   *            the offsets of the visible elements.
+   * @return a new view.
+   */
+  DComplexMatrix1D _viewSelectionLike(Int32List offsets) {
+    return new SelectedSparseDComplexMatrix1D.offsets(this._elements, offsets);
+  }
+
+  DoubleMatrix1D getImaginaryPart() {
+    throw new UnsupportedError("This method is not supported.");
+  }
+
+  DoubleMatrix1D getRealPart() {
+    throw new UnsupportedError("This method is not supported.");
+  }
+
 }

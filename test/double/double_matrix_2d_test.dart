@@ -2,7 +2,7 @@ part of cern.colt.matrix.double.test;
 
 void testDoubleMatrix2D(String name, DoubleMatrix2DTest t) {
   group('DoubleMatrix2D ($name)', () {
-    setUp() => t.setUp;
+    setUp() => t.setUp();
     tearDown() => t.tearDown();
     test('aggregate', t.testAggregate);
     test('aggregateProc', t.testAggregateProc);

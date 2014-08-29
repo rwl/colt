@@ -38,6 +38,7 @@ part 'double/factory.dart';
 part 'complex/complex_matrix_1d.dart';
 part 'complex/complex_matrix_2d.dart';
 part 'complex/sparse_complex_matrix_1d.dart';
+part 'complex/sparse_complex_matrix_2d.dart';
 part 'complex/dense_complex_matrix_1d.dart';
 part 'complex/dense_complex_matrix_2d.dart';
 part 'complex/wrapper_complex_matrix_2d.dart';

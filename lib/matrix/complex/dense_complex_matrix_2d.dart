@@ -1830,6 +1830,282 @@ class DenseDComplexMatrix2D extends DComplexMatrix2D {
   }
 
   DComplexMatrix2D _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets) {
-    return new SelectedDenseDComplexMatrix2D(this._elements, rowOffsets, columnOffsets, 0);
+    return new SelectedDenseDComplexMatrix2D.offsets(this._elements, rowOffsets, columnOffsets, 0);
   }
+}
+
+
+/**
+ * Selection view on dense 2-d matrices holding <tt>complex</tt> elements.
+ * <b>Implementation:</b>
+ * <p>
+ * Objects of this class are typically constructed via <tt>viewIndexes</tt>
+ * methods on some source matrix. The interface introduced in abstract super
+ * classes defines everything a user can do. From a user point of view there is
+ * nothing special about this class; it presents the same functionality with the
+ * same signatures and semantics as its abstract superclass(es) while
+ * introducing no additional functionality. Thus, this class need not be visible
+ * to users.
+ * <p>
+ * This class uses no delegation. Its instances point directly to the data. Cell
+ * addressing overhead is 1 additional int addition and 2 additional array index
+ * accesses per get/set.
+ * <p>
+ * Note that this implementation is not synchronized.
+ *
+ * @author Piotr Wendykier (piotr.wendykier@gmail.com)
+ */
+class SelectedDenseDComplexMatrix2D extends DComplexMatrix2D {
+
+    /**
+     * The elements of this matrix.
+     */
+    Float64List _elements;
+
+    /**
+     * The offsets of the visible cells of this matrix.
+     */
+    Int32List _rowOffsets;
+
+    Int32List _columnOffsets;
+
+    /**
+     * The offset.
+     */
+    int _offset;
+
+    /**
+     * Constructs a matrix view with the given parameters.
+     *
+     * @param elements
+     *            the cells.
+     * @param rowOffsets
+     *            The row offsets of the cells that shall be visible.
+     * @param columnOffsets
+     *            The column offsets of the cells that shall be visible.
+     * @param offset
+     */
+    factory SelectedDenseDComplexMatrix2D.offsets(Float64List elements, Int32List rowOffsets, Int32List columnOffsets, int offset) {
+        return new SelectedDenseDComplexMatrix2D(rowOffsets.length, columnOffsets.length, elements, 0, 0, 1, 1, rowOffsets, columnOffsets, offset);
+    }
+
+    /**
+     * Constructs a matrix view with the given parameters.
+     *
+     * @param rows
+     *            the number of rows the matrix shall have.
+     * @param columns
+     *            the number of columns the matrix shall have.
+     * @param elements
+     *            the cells.
+     * @param rowZero
+     *            the position of the first element.
+     * @param columnZero
+     *            the position of the first element.
+     * @param rowStride
+     *            the number of elements between two rows, i.e.
+     *            <tt>index(i+1,j)-index(i,j)</tt>.
+     * @param columnStride
+     *            the number of elements between two columns, i.e.
+     *            <tt>index(i,j+1)-index(i,j)</tt>.
+     * @param rowOffsets
+     *            The row offsets of the cells that shall be visible.
+     * @param columnOffsets
+     *            The column offsets of the cells that shall be visible.
+     * @param offset
+     */
+    SelectedDenseDComplexMatrix2D(int rows, int columns, Float64List elements, int rowZero, int columnZero,
+            int rowStride, int columnStride, Int32List rowOffsets, Int32List columnOffsets, int offset) {
+        // be sure parameters are valid, we do not check...
+        _setUp(rows, columns, rowZero, columnZero, rowStride, columnStride);
+
+        this._elements = elements;
+        this._rowOffsets = rowOffsets;
+        this._columnOffsets = columnOffsets;
+        this._offset = offset;
+
+        this._isNoView = false;
+    }
+
+    int _columnOffset(int absRank) {
+        return _columnOffsets[absRank];
+    }
+
+    int _rowOffset(int absRank) {
+        return _rowOffsets[absRank];
+    }
+
+    Float64List getQuick(int row, int column) {
+        int idxr = _rowZero + row * _rowStride;
+        int idxc = _columnZero + column * _columnStride;
+        return new Float64List.fromList([ _elements[_offset + _rowOffsets[idxr] + _columnOffsets[idxc]],
+                _elements[_offset + _rowOffsets[idxr] + _columnOffsets[idxc] + 1] ]);
+    }
+
+    Float64List elements() {
+        throw new UnsupportedError("This method is not supported.");
+
+    }
+
+    /**
+     * Returns <tt>true</tt> if both matrices share common cells. More formally,
+     * returns <tt>true</tt> if <tt>other != null</tt> and at least one of the
+     * following conditions is met
+     * <ul>
+     * <li>the receiver is a view of the other matrix
+     * <li>the other matrix is a view of the receiver
+     * <li><tt>this == other</tt>
+     * </ul>
+     */
+
+    bool _haveSharedCellsRaw(DComplexMatrix2D other) {
+        if (other is SelectedDenseDComplexMatrix2D) {
+            return this._elements == other._elements;
+        } else if (other is DenseDComplexMatrix2D) {
+            return this._elements == other._elements;
+        }
+        return false;
+    }
+
+    int index(int row, int column) {
+        return this._offset + _rowOffsets[_rowZero + row * _rowStride] + _columnOffsets[_columnZero + column * _columnStride];
+    }
+
+    DComplexMatrix2D like2D(int rows, int columns) {
+        return new DenseDComplexMatrix2D(rows, columns);
+    }
+
+    DComplexMatrix1D like1D(int size) {
+        return new DenseDComplexMatrix1D(size);
+    }
+
+    DComplexMatrix1D _like1D(int size, int zero, int stride) {
+        throw new Error(); // this method is never called since
+        // viewRow() and viewColumn are overridden
+        // properly.
+    }
+
+    void setQuick(int row, int column, Float64List value) {
+        int idxr = _rowZero + row * _rowStride;
+        int idxc = _columnZero + column * _columnStride;
+        _elements[_offset + _rowOffsets[idxr] + _columnOffsets[idxc]] = value[0];
+        _elements[_offset + _rowOffsets[idxr] + _columnOffsets[idxc] + 1] = value[1];
+    }
+
+    DComplexMatrix1D vectorize() {
+        throw new UnsupportedError("This method is not supported.");
+    }
+
+    void setPartsQuick(int row, int column, double re, double im) {
+        int idxr = _rowZero + row * _rowStride;
+        int idxc = _columnZero + column * _columnStride;
+        _elements[_offset + _rowOffsets[idxr] + _columnOffsets[idxc]] = re;
+        _elements[_offset + _rowOffsets[idxr] + _columnOffsets[idxc] + 1] = im;
+    }
+
+    void _setUp(int rows, int columns, [int rowZero = 0, int columnZero = 0, int rowStride = null, int columnStride = 1]) {
+        super._setUp(rows, columns);
+        this._rowStride = 1;
+        this._columnStride = 2;
+        this._offset = 0;
+    }
+
+    AbstractMatrix2D _vDice() {
+        super._vDice();
+        // swap
+        Int32List tmp = _rowOffsets;
+        _rowOffsets = _columnOffsets;
+        _columnOffsets = tmp;
+
+        this._isNoView = false;
+        return this;
+    }
+
+    DComplexMatrix1D viewColumn(int column) {
+        _checkColumn(column);
+        int viewSize = this._rows;
+        int viewZero = this._rowZero;
+        int viewStride = this._rowStride;
+        Int32List viewOffsets = this._rowOffsets;
+        int viewOffset = this._offset + _columnOffset(_columnRank(column));
+        return new SelectedDenseDComplexMatrix1D(viewSize, this._elements, viewZero, viewStride, viewOffsets, viewOffset);
+    }
+
+    DComplexMatrix1D viewRow(int row) {
+        _checkRow(row);
+        int viewSize = this._columns;
+        int viewZero = _columnZero;
+        int viewStride = this._columnStride;
+        Int32List viewOffsets = this._columnOffsets;
+        int viewOffset = this._offset + _rowOffset(_rowRank(row));
+        return new SelectedDenseDComplexMatrix1D(viewSize, this._elements, viewZero, viewStride, viewOffsets, viewOffset);
+    }
+
+    DComplexMatrix2D _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets) {
+        return new SelectedDenseDComplexMatrix2D.offsets(this._elements, rowOffsets, columnOffsets, this._offset);
+    }
+
+    DoubleMatrix2D getRealPart() {
+        final DenseDoubleMatrix2D R = new DenseDoubleMatrix2D(_rows, _columns);
+        /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, _rows);
+            List<Future> futures = new List<Future>(nthreads);
+            int k = _rows / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstRow = j * k;
+                final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
+                futures[j] = ConcurrencyUtils.submit(() {
+                        Float64List tmp;
+                        for (int r = firstRow; r < lastRow; r++) {
+                            for (int c = 0; c < _columns; c++) {
+                                tmp = getQuick(r, c);
+                                R.setQuick(r, c, tmp[0]);
+                            }
+                        }
+                });
+            }
+            ConcurrencyUtils.waitForCompletion(futures);
+        } else {*/
+            for (int r = 0; r < _rows; r++) {
+                for (int c = 0; c < _columns; c++) {
+                    final tmp = getQuick(r, c);
+                    R.setQuick(r, c, tmp[0]);
+                }
+            }
+        //}
+        return R;
+    }
+
+    DoubleMatrix2D getImaginaryPart() {
+        final DenseDoubleMatrix2D Im = new DenseDoubleMatrix2D(_rows, _columns);
+        /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, _rows);
+            List<Future> futures = new List<Future>(nthreads);
+            int k = _rows / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstRow = j * k;
+                final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
+                futures[j] = ConcurrencyUtils.submit(() {
+                        Float64List tmp;
+                        for (int r = firstRow; r < lastRow; r++) {
+                            for (int c = 0; c < _columns; c++) {
+                                tmp = getQuick(r, c);
+                                Im.setQuick(r, c, tmp[1]);
+                            }
+                        }
+                });
+            }
+            ConcurrencyUtils.waitForCompletion(futures);
+        } else {*/
+            for (int r = 0; r < _rows; r++) {
+                for (int c = 0; c < _columns; c++) {
+                    final tmp = getQuick(r, c);
+                    Im.setQuick(r, c, tmp[1]);
+                }
+            }
+        //}
+        return Im;
+    }
 }
