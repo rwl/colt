@@ -57,7 +57,7 @@ class SparseCCDComplexMatrix2D extends WrapperDComplexMatrix2D {
    *             .
    */
   factory SparseCCDComplexMatrix2D.fromValues(List<Float64List> values) {
-    return new SparseCCDComplexMatrix2D(values.length, values[0].length)
+    return new SparseCCDComplexMatrix2D.sized(values.length, values[0].length)
       ..assignList(values);
   }
 
@@ -265,9 +265,15 @@ class SparseCCDComplexMatrix2D extends WrapperDComplexMatrix2D {
   DComplexMatrix2D assign(final cfunc.DComplexDComplexFunction function) {
     if (function is cfunc.DComplexMult) { // x[i] = mult*x[i]
       final Float64List alpha = (function as cfunc.DComplexMult).multiplicator;
-      if (alpha[0] == 1 && alpha[1] == 0) return this;
-      if (alpha[0] == 0 && alpha[1] == 0) return assignValue(0, 0);
-      if (alpha[0] != alpha[0] || alpha[1] != alpha[1]) return assignValues(alpha); // the funny definition of isNaN(). This should better not happen.
+      if (alpha[0] == 1 && alpha[1] == 0) {
+        return this;
+      }
+      if (alpha[0] == 0 && alpha[1] == 0) {
+        return assignValue(0.0, 0.0);
+      }
+      if (alpha[0] != alpha[0] || alpha[1] != alpha[1]) {
+        return assignValues(alpha); // the funny definition of isNaN(). This should better not happen.
+      }
 
       final Float64List valuesE = _values;
       int nz = cardinality();
@@ -275,7 +281,7 @@ class SparseCCDComplexMatrix2D extends WrapperDComplexMatrix2D {
       for (int j = 0; j < nz; j++) {
         valE[0] = valuesE[2 * j];
         valE[1] = valuesE[2 * j + 1];
-        valE = DComplex.mult(valE, alpha);
+        valE = DComplex.multiply(valE, alpha);
         valuesE[2 * j] = valE[0];
         valuesE[2 * j + 1] = valE[1];
       }
@@ -289,9 +295,12 @@ class SparseCCDComplexMatrix2D extends WrapperDComplexMatrix2D {
 
   DComplexMatrix2D assignValue(double re, double im) {
     if (re == 0 && im == 0) {
-      Arrays.fill(_rowIndexes, 0);
-      Arrays.fill(_columnPointers, 0);
-      Arrays.fill(_values, 0);
+      //Arrays.fill(_rowIndexes, 0);
+      //Arrays.fill(_columnPointers, 0);
+      //Arrays.fill(_values, 0);
+      _rowIndexes.fillRange(0, _rowIndexes.length, 0);
+      _columnPointers.fillRange(0, _columnPointers.length, 0);
+      _values.fillRange(0, _values.length, 0.0);
     } else {
       int nnz = cardinality();
       for (int i = 0; i < nnz; i++) {
@@ -307,22 +316,25 @@ class SparseCCDComplexMatrix2D extends WrapperDComplexMatrix2D {
     checkShape(source);
 
     if (source is SparseCCDComplexMatrix2D) {
-      SparseCCDComplexMatrix2D other = source as SparseCCDComplexMatrix2D;
-      System.arraycopy(other.getColumnPointers(), 0, _columnPointers, 0, _columns + 1);
+      SparseCCDComplexMatrix2D other = source;
+      //System.arraycopy(other.getColumnPointers(), 0, _columnPointers, 0, _columns + 1);
+      _columnPointers.setAll(0, other.getColumnPointers());
       int nzmax = other.getRowIndexes().length;
       if (_rowIndexes.length < nzmax) {
         _rowIndexes = new Int32List(nzmax);
         _values = new Float64List(2 * nzmax);
       }
-      System.arraycopy(other.getRowIndexes(), 0, _rowIndexes, 0, nzmax);
-      System.arraycopy(other.getValues(), 0, _values, 0, other.getValues().length);
+      //System.arraycopy(other.getRowIndexes(), 0, _rowIndexes, 0, nzmax);
+      _rowIndexes.setAll(0, other.getRowIndexes());
+      //System.arraycopy(other.getValues(), 0, _values, 0, other.getValues().length);
+      _values.setAll(0, other.getValues());
     } else if (source is SparseRCDComplexMatrix2D) {
-      SparseRCDComplexMatrix2D other = (source as SparseRCDComplexMatrix2D).getConjugateTranspose();
+      SparseRCDComplexMatrix2D other = source.getConjugateTranspose();
       _columnPointers = other.getRowPointers();
       _rowIndexes = other.getColumnIndexes();
       _values = other.getValues();
     } else {
-      assignValue(0, 0);
+      assignValue(0.0, 0.0);
       source.forEachNonZero((int i, int j, Float64List value) {
         setQuick(i, j, value);
         return value;
@@ -334,8 +346,8 @@ class SparseCCDComplexMatrix2D extends WrapperDComplexMatrix2D {
   DComplexMatrix2D assignFunc(final DComplexMatrix2D y, cfunc.DComplexDComplexDComplexFunction function) {
     checkShape(y);
 
-    if ((y is SparseCCDComplexMatrix2D) && (function == cfunc.DComplexFunctions.plus)) { // x[i] = x[i] + y[i]
-      SparseCCDComplexMatrix2D yy = y as SparseCCDComplexMatrix2D;
+    if ((y is SparseCCDComplexMatrix2D) && (function == cfunc.plus)) { // x[i] = x[i] + y[i]
+      SparseCCDComplexMatrix2D yy = y;
       int p,
           j,
           nz = 0,
@@ -352,7 +364,7 @@ class SparseCCDComplexMatrix2D extends WrapperDComplexMatrix2D {
       /* get workspace */
       x = new Float64List(2 * m);
       /* get workspace */
-      SparseCCDComplexMatrix2D C = new SparseCCDComplexMatrix2D(m, n, anz + bnz);
+      SparseCCDComplexMatrix2D C = new SparseCCDComplexMatrix2D.sized(m, n, anz + bnz);
       /* allocate result*/
       Cp = C._columnPointers;
       Ci = C._rowIndexes;
@@ -384,7 +396,7 @@ class SparseCCDComplexMatrix2D extends WrapperDComplexMatrix2D {
         return this; // nothing to do
       }
       y.forEachNonZero((int i, int j, Float64List value) {
-        setQuick(i, j, DComplex.plus(getQuick(i, j), DComplex.mult(alpha, value)));
+        setQuick(i, j, DComplex.plus(getQuick(i, j), DComplex.multiply(alpha, value)));
         return value;
       });
       return this;
@@ -394,13 +406,13 @@ class SparseCCDComplexMatrix2D extends WrapperDComplexMatrix2D {
       final Float64List alpha = (function as cfunc.DComplexPlusMultFirst).multiplicator;
       if (alpha[0] == 0 && alpha[1] == 0) return assignMatrix(y);
       y.forEachNonZero((int i, int j, Float64List value) {
-        setQuick(i, j, DComplex.plus(DComplex.mult(alpha, getQuick(i, j)), value));
+        setQuick(i, j, DComplex.plus(DComplex.multiply(alpha, getQuick(i, j)), value));
         return value;
       });
       return this;
     }
 
-    if (function == cfunc.DComplexFunctions.mult) { // x[i] = x[i] * y[i]
+    if (function == cfunc.mult) { // x[i] = x[i] * y[i]
       final Int32List rowIndexesA = _rowIndexes;
       final Int32List columnPointersA = _columnPointers;
       final Float64List valuesA = _values;
@@ -411,7 +423,7 @@ class SparseCCDComplexMatrix2D extends WrapperDComplexMatrix2D {
           int i = rowIndexesA[k];
           valA[0] = valuesA[2 * k];
           valA[1] = valuesA[2 * k + 1];
-          valA = DComplex.mult(valA, y.getQuick(i, j));
+          valA = DComplex.multiply(valA, y.getQuick(i, j));
           valuesA[2 * k] = valA[0];
           valuesA[2 * k + 1] = valA[1];
           if (valuesA[2 * k] == 0 && valuesA[2 * k + 1] == 0) _remove(i, j);
@@ -420,7 +432,7 @@ class SparseCCDComplexMatrix2D extends WrapperDComplexMatrix2D {
       return this;
     }
 
-    if (function == cfunc.DComplexFunctions.div) { // x[i] = x[i] / y[i]
+    if (function == cfunc.div) { // x[i] = x[i] / y[i]
       final Int32List rowIndexesA = _rowIndexes;
       final Int32List columnPointersA = _columnPointers;
       final Float64List valuesA = _values;
@@ -432,7 +444,7 @@ class SparseCCDComplexMatrix2D extends WrapperDComplexMatrix2D {
           int i = rowIndexesA[k];
           valA[0] = valuesA[2 * k];
           valA[1] = valuesA[2 * k + 1];
-          valA = DComplex.div(valA, y.getQuick(i, j));
+          valA = DComplex.div_(valA, y.getQuick(i, j));
           valuesA[2 * k] = valA[0];
           valuesA[2 * k + 1] = valA[1];
           if (valuesA[2 * k] == 0 && valuesA[2 * k + 1] == 0) _remove(i, j);
@@ -511,7 +523,7 @@ class SparseCCDComplexMatrix2D extends WrapperDComplexMatrix2D {
    */
   SparseRCDComplexMatrix2D getRowCompressed() {
     SparseCCDComplexMatrix2D tr = getConjugateTranspose();
-    SparseRCDComplexMatrix2D rc = new SparseRCDComplexMatrix2D(_rows, _columns);
+    SparseRCDComplexMatrix2D rc = new SparseRCDComplexMatrix2D.sized(_rows, _columns);
     rc._columnIndexes = tr._rowIndexes;
     rc._rowPointers = tr._columnPointers;
     rc._values = tr._values;
@@ -535,7 +547,7 @@ class SparseCCDComplexMatrix2D extends WrapperDComplexMatrix2D {
     cs.p = _columnPointers;
     cs.x = _values;
     cs.nz = -1;
-    cs.nzmax = _values.length / 2;
+    cs.nzmax = _values.length ~/ 2;
     return cs;
   }
 
@@ -547,7 +559,7 @@ class SparseCCDComplexMatrix2D extends WrapperDComplexMatrix2D {
    * @return the transpose of this matrix
    */
   SparseCCDComplexMatrix2D getTranspose() {
-    DZcs dzcst = DZcs_transpose.cs_transpose(elements(), true);
+    DZcs dzcst = cxsparse.cs_transpose(elements(), true);
     SparseCCDComplexMatrix2D tr = new SparseCCDComplexMatrix2D(dzcst);
     return tr;
   }
@@ -561,7 +573,7 @@ class SparseCCDComplexMatrix2D extends WrapperDComplexMatrix2D {
     Ap = _columnPointers;
     Ai = _rowIndexes;
     Ax = _values;
-    SparseCCDComplexMatrix2D C = new SparseCCDComplexMatrix2D(_columns, _rows, Ai.length);
+    SparseCCDComplexMatrix2D C = new SparseCCDComplexMatrix2D.sized(_columns, _rows, Ai.length);
     /* allocate result */
     w = new Int32List(m);
     /* get workspace */
@@ -593,7 +605,7 @@ class SparseCCDComplexMatrix2D extends WrapperDComplexMatrix2D {
   }
 
   DComplexMatrix2D like2D(int rows, int columns) {
-    return new SparseCCDComplexMatrix2D(rows, columns);
+    return new SparseCCDComplexMatrix2D.sized(rows, columns);
   }
 
   DComplexMatrix1D like1D(int size) {
@@ -636,7 +648,7 @@ class SparseCCDComplexMatrix2D extends WrapperDComplexMatrix2D {
 
     if (re != 0 || im != 0) {
       k = -k - 1;
-      _insert(row, column, k, re, im);
+      _insertParts(row, column, k, re, im);
     }
   }
 
@@ -738,24 +750,30 @@ class SparseCCDComplexMatrix2D extends WrapperDComplexMatrix2D {
   }
 
   String toString() {
-    StringBuilder builder = new StringBuilder();
-    builder.append(_rows).append(" x ").append(_columns).append(" sparse matrix, nnz = ").append(cardinality()).append('\n');
+    StringBuffer builder = new StringBuffer();
+    builder..write(_rows)..write(" x ")..write(_columns)..write(" sparse matrix, nnz = ")..write(cardinality())..write('\n');
     for (int i = 0; i < _columns; i++) {
       int high = _columnPointers[i + 1];
       for (int j = _columnPointers[i]; j < high; j++) {
         if (_values[2 * j + 1] > 0) {
-          builder.append('(').append(_rowIndexes[j]).append(',').append(i).append(')').append('\t').append(_values[2 * j]).append('+').append(_values[2 * j + 1]).append('i').append('\n');
+          builder..write('(')..write(_rowIndexes[j])..write(',')..write(i)..write(')')..write('\t')..write(_values[2 * j])..write('+')..write(_values[2 * j + 1])..write('i')..write('\n');
         } else if (_values[2 * j + 1] == 0) {
-          builder.append('(').append(_rowIndexes[j]).append(',').append(i).append(')').append('\t').append(_values[2 * j]).append('\n');
+          builder..write('(')..write(_rowIndexes[j])..write(',')..write(i)..write(')')..write('\t')..write(_values[2 * j])..write('\n');
         } else {
-          builder.append('(').append(_rowIndexes[j]).append(',').append(i).append(')').append('\t').append(_values[2 * j]).append('-').append(_values[2 * j + 1]).append('i').append('\n');
+          builder..write('(')..write(_rowIndexes[j])..write(',')..write(i)..write(')')..write('\t')..write(_values[2 * j])..write('-')..write(_values[2 * j + 1])..write('i')..write('\n');
         }
       }
     }
     return builder.toString();
   }
 
-  DComplexMatrix1D zMult(DComplexMatrix1D y, DComplexMatrix1D z, final Float64List alpha, final Float64List beta, final bool transposeA) {
+  DComplexMatrix1D zMult(DComplexMatrix1D y, DComplexMatrix1D z, [Float64List alpha = null, Float64List beta = null, bool transposeA = false]) {
+    if (alpha == null) {
+      alpha = new Float64List.fromList([1.0, 0.0]);
+    }
+    if (beta == null) {
+      beta = (z == null ? new Float64List.fromList([1.0, 0.0]) : new Float64List.fromList([0.0, 0.0]));
+    }
     final int rowsA = transposeA ? _columns : _rows;
     final int columnsA = transposeA ? _rows : _columns;
 
@@ -783,13 +801,13 @@ class SparseCCDComplexMatrix2D extends WrapperDComplexMatrix2D {
     final Float64List valuesA = _values;
 
     int zidx = zeroZ;
-    int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    //int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if (!transposeA) {
       if ((!ignore) && !(beta[0] == 1 && beta[1] == 0)) {
-        z.assign(cfunc.DComplexFunctions.mult(beta));
+        z.assign(cfunc.multiply(beta));
       }
 
-      if ((nthreads > 1) && (cardinality() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+      /*if ((nthreads > 1) && (cardinality() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
         nthreads = 2;
         List<Future> futures = new List<Future>(nthreads);
         final Float64List result = new Float64List(2 * rowsA);
@@ -839,7 +857,7 @@ class SparseCCDComplexMatrix2D extends WrapperDComplexMatrix2D {
           elementsZ[zeroZ + j * strideZ] += result[2 * j];
           elementsZ[zeroZ + j * strideZ + 1] += result[2 * j + 1];
         }
-      } else {
+      } else {*/
         Float64List yElem = new Float64List(2);
         Float64List valA = new Float64List(2);
         for (int i = 0; i < _columns; i++) {
@@ -850,15 +868,15 @@ class SparseCCDComplexMatrix2D extends WrapperDComplexMatrix2D {
             int j = rowIndexesA[k];
             valA[0] = valuesA[2 * k];
             valA[1] = valuesA[2 * k + 1];
-            valA = DComplex.mult(valA, yElem);
-            valA = DComplex.mult(valA, alpha);
+            valA = DComplex.multiply(valA, yElem);
+            valA = DComplex.multiply(valA, alpha);
             elementsZ[zeroZ + strideZ * j] += valA[0];
             elementsZ[zeroZ + strideZ * j + 1] += valA[1];
           }
         }
-      }
+      //}
     } else {
-      if ((nthreads > 1) && (cardinality() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+      /*if ((nthreads > 1) && (cardinality() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
         List<Future> futures = new List<Future>(nthreads);
         int k = _columns / nthreads;
         for (int j = 0; j < nthreads; j++) {
@@ -890,7 +908,7 @@ class SparseCCDComplexMatrix2D extends WrapperDComplexMatrix2D {
           });
         }
         ConcurrencyUtils.waitForCompletion(futures);
-      } else {
+      } else {*/
         Float64List valA = new Float64List(2);
         Float64List valY = new Float64List(2);
         Float64List valZ = new Float64List(2);
@@ -902,22 +920,28 @@ class SparseCCDComplexMatrix2D extends WrapperDComplexMatrix2D {
             valA[1] = -valuesA[2 * k + 1];
             valY[0] = elementsY[zeroY + strideY * _rowIndexes[k]];
             valY[1] = elementsY[zeroY + strideY * _rowIndexes[k] + 1];
-            sum = DComplex.plus(sum, DComplex.mult(valA, valY));
+            sum = DComplex.plus(sum, DComplex.multiply(valA, valY));
           }
-          sum = DComplex.mult(alpha, sum);
+          sum = DComplex.multiply(alpha, sum);
           valZ[0] = elementsZ[zidx];
           valZ[1] = elementsZ[zidx + 1];
-          valZ = DComplex.mult(valZ, beta);
+          valZ = DComplex.multiply(valZ, beta);
           elementsZ[zidx] = sum[0] + valZ[0];
           elementsZ[zidx + 1] = sum[1] + valZ[1];
           zidx += strideZ;
         }
-      }
+      //}
     }
     return z;
   }
 
-  DComplexMatrix2D zMult2D(DComplexMatrix2D B, DComplexMatrix2D C, final Float64List alpha, Float64List beta, final bool transposeA, bool transposeB) {
+  DComplexMatrix2D zMult2D(DComplexMatrix2D B, DComplexMatrix2D C, [Float64List alpha = null, Float64List beta = null, bool transposeA = false, bool transposeB = false]) {
+    if (alpha == null) {
+      alpha = new Float64List.fromList([1.0, 0.0]);
+    }
+    if (beta == null) {
+      beta = (C == null ? new Float64List.fromList([1.0, 0.0]) : new Float64List.fromList([0.0, 0.0]));
+    }
     int rowsA = _rows;
     int columnsA = _columns;
     if (transposeA) {
@@ -934,18 +958,24 @@ class SparseCCDComplexMatrix2D extends WrapperDComplexMatrix2D {
     bool ignore = (C == null);
     if (C == null) {
       if (B is SparseCCDComplexMatrix2D) {
-        C = new SparseCCDComplexMatrix2D(rowsA, p, (rowsA * p));
+        C = new SparseCCDComplexMatrix2D.sized(rowsA, p, (rowsA * p));
       } else {
         C = new DenseDComplexMatrix2D(rowsA, p);
       }
     }
 
-    if (rowsB != columnsA) throw new ArgumentError("Matrix2D inner dimensions must agree:" + toStringShort() + ", " + (transposeB ? B.viewDice() : B).toStringShort());
-    if (C.rows() != rowsA || C.columns() != p) throw new ArgumentError("Incompatible result matrix: " + toStringShort() + ", " + (transposeB ? B.viewDice() : B).toStringShort() + ", " + C.toStringShort());
-    if (this == C || B == C) throw new ArgumentError("Matrices must not be identical");
+    if (rowsB != columnsA) {
+      throw new ArgumentError("Matrix2D inner dimensions must agree:" + toStringShort() + ", " + (transposeB ? B.viewDice() : B).toStringShort());
+    }
+    if (C.rows() != rowsA || C.columns() != p) {
+      throw new ArgumentError("Incompatible result matrix: " + toStringShort() + ", " + (transposeB ? B.viewDice() : B).toStringShort() + ", " + C.toStringShort());
+    }
+    if (this == C || B == C) {
+      throw new ArgumentError("Matrices must not be identical");
+    }
 
     if (!ignore && !(beta[0] == 1 && beta[1] == 0)) {
-      C.assign(cfunc.DComplexFunctions.mult(beta));
+      C.assign(cfunc.multiply(beta));
     }
 
     if ((B is DenseDComplexMatrix2D) && (C is DenseDComplexMatrix2D)) {
@@ -959,9 +989,9 @@ class SparseCCDComplexMatrix2D extends WrapperDComplexMatrix2D {
       if (transposeB) {
         BB = B.getConjugateTranspose() as DenseDComplexMatrix2D;
       } else {
-        BB = B as DenseDComplexMatrix2D;
+        BB = B;
       }
-      DenseDComplexMatrix2D CC = C as DenseDComplexMatrix2D;
+      DenseDComplexMatrix2D CC = C;
       Int32List columnPointersA = AA._columnPointers;
       Int32List rowIndexesA = AA._rowIndexes;
       Float64List valuesA = AA._values;
@@ -986,14 +1016,14 @@ class SparseCCDComplexMatrix2D extends WrapperDComplexMatrix2D {
             int j = rowIndexesA[ii];
             valA[0] = valuesA[2 * ii];
             valA[1] = valuesA[2 * ii + 1];
-            valA = DComplex.mult(valA, valB);
+            valA = DComplex.multiply(valA, valB);
             elementsC[zeroC + j * rowStrideC + jj * columnStrideC] += valA[0];
             elementsC[zeroC + j * rowStrideC + jj * columnStrideC + 1] += valA[1];
           }
         }
       }
       if (!(alpha[0] == 1.0 && alpha[1] == 0)) {
-        C.assign(cfunc.DComplexFunctions.mult(alpha));
+        C.assign(cfunc.multiply(alpha));
       }
 
     } else if ((B is SparseCCDComplexMatrix2D) && (C is SparseCCDComplexMatrix2D)) {
@@ -1003,11 +1033,11 @@ class SparseCCDComplexMatrix2D extends WrapperDComplexMatrix2D {
       } else {
         AA = this;
       }
-      SparseCCDComplexMatrix2D BB = B as SparseCCDComplexMatrix2D;
+      SparseCCDComplexMatrix2D BB = B;
       if (transposeB) {
         BB = BB.getConjugateTranspose();
       }
-      SparseCCDComplexMatrix2D CC = C as SparseCCDComplexMatrix2D;
+      SparseCCDComplexMatrix2D CC = C;
       int j,
           nz = 0,
           m,
@@ -1031,10 +1061,12 @@ class SparseCCDComplexMatrix2D extends WrapperDComplexMatrix2D {
         if (nz + m > nzmaxC) {
           nzmaxC = 2 * nzmaxC + m;
           Int32List rowIndexesNew = new Int32List(nzmaxC);
-          System.arraycopy(Ci, 0, rowIndexesNew, 0, Ci.length);
+          //System.arraycopy(Ci, 0, rowIndexesNew, 0, Ci.length);
+          rowIndexesNew.setAll(0, Ci);
           Ci = rowIndexesNew;
           Float64List valuesNew = new Float64List(2 * nzmaxC);
-          System.arraycopy(Cx, 0, valuesNew, 0, Cx.length);
+          //System.arraycopy(Cx, 0, valuesNew, 0, Cx.length);
+          valuesNew.setAll(0, Cx);
           Cx = valuesNew;
         }
         Cp[j] = nz;
@@ -1053,7 +1085,7 @@ class SparseCCDComplexMatrix2D extends WrapperDComplexMatrix2D {
       Cp[n] = nz;
       /* finalize the last column of C */
       if (!(alpha[0] == 1.0 && alpha[1] == 0)) {
-        CC.assign(cfunc.DComplexFunctions.mult(alpha));
+        CC.assign(cfunc.multiply(alpha));
       }
     } else {
       if (transposeB) {
@@ -1081,8 +1113,12 @@ class SparseCCDComplexMatrix2D extends WrapperDComplexMatrix2D {
           int j = rowIndexesA[k];
           valA[0] = valuesA[2 * k];
           valA[1] = valuesA[2 * k + 1];
-          fun.multiplicator = DComplex.mult(valA, alpha);
-          if (!transposeA) Crows[j].assignFunc(Brows[i], fun); else Crows[i].assignFunc(Brows[j], fun);
+          fun.multiplicator = DComplex.multiply(valA, alpha);
+          if (!transposeA) {
+            Crows[j].assignMatrixFunc(Brows[i], fun);
+          } else {
+            Crows[i].assignMatrixFunc(Brows[j], fun);
+          }
         }
       }
     }
@@ -1094,40 +1130,46 @@ class SparseCCDComplexMatrix2D extends WrapperDComplexMatrix2D {
   }
 
   void _insert(int row, int column, int index, Float64List value) {
-    IntArrayList rowIndexesList = new IntArrayList(_rowIndexes);
-    rowIndexesList._setSizeRaw(_columnPointers[_columns]);
-    DoubleArrayList valuesList = new DoubleArrayList(_values);
-    valuesList._setSizeRaw(2 * _columnPointers[_columns]);
-    rowIndexesList.beforeInsert(index, row);
-    valuesList.beforeInsert(2 * index, value[0]);
-    valuesList.beforeInsert(2 * index + 1, value[1]);
-    for (int i = _columnPointers.length; --i > column; ) _columnPointers[i]++;
-    _rowIndexes = rowIndexesList.elements();
-    _values = valuesList.elements();
+    List<int> rowIndexesList = new List<int>.from(_rowIndexes);
+    //rowIndexesList._setSizeRaw(_columnPointers[_columns]);
+    List<double> valuesList = new List<double>.from(_values);
+    //valuesList._setSizeRaw(2 * _columnPointers[_columns]);
+    rowIndexesList.insert(index, row);
+    valuesList.insert(2 * index, value[0]);
+    valuesList.insert(2 * index + 1, value[1]);
+    for (int i = _columnPointers.length; --i > column; ) {
+      _columnPointers[i]++;
+    }
+    _rowIndexes = new Int32List.fromList(rowIndexesList);
+    _values = new Float64List.fromList(valuesList);
   }
 
   void _insertParts(int row, int column, int index, double re, double im) {
-    IntArrayList rowIndexesList = new IntArrayList(_rowIndexes);
-    rowIndexesList._setSizeRaw(_columnPointers[_columns]);
-    DoubleArrayList valuesList = new DoubleArrayList(_values);
-    valuesList._setSizeRaw(2 * _columnPointers[_columns]);
-    rowIndexesList.beforeInsert(index, row);
-    valuesList.beforeInsert(2 * index, re);
-    valuesList.beforeInsert(2 * index + 1, im);
-    for (int i = _columnPointers.length; --i > column; ) _columnPointers[i]++;
-    _rowIndexes = rowIndexesList.elements();
-    _values = valuesList.elements();
+    List<int> rowIndexesList = new List<int>.from(_rowIndexes);
+    //rowIndexesList._setSizeRaw(_columnPointers[_columns]);
+    List<double> valuesList = new List<double>.from(_values);
+    //valuesList._setSizeRaw(2 * _columnPointers[_columns]);
+    rowIndexesList.insert(index, row);
+    valuesList.insert(2 * index, re);
+    valuesList.insert(2 * index + 1, im);
+    for (int i = _columnPointers.length; --i > column; ) {
+      _columnPointers[i]++;
+    }
+    _rowIndexes = new Int32List.fromList(rowIndexesList);
+    _values = new Float64List.fromList(valuesList);
   }
 
   void _remove(int column, int index) {
-    IntArrayList rowIndexesList = new IntArrayList(_rowIndexes);
-    DoubleArrayList valuesList = new DoubleArrayList(_values);
+    List<int> rowIndexesList = new List<int>.from(_rowIndexes);
+    List<double> valuesList = new List<double>.from(_values);
     rowIndexesList.remove(index);
     valuesList.remove(2 * index);
     valuesList.remove(2 * index + 1);
-    for (int i = _columnPointers.length; --i > column; ) _columnPointers[i]--;
-    _rowIndexes = rowIndexesList.elements();
-    _values = valuesList.elements();
+    for (int i = _columnPointers.length; --i > column; ) {
+      _columnPointers[i]--;
+    }
+    _rowIndexes = new Int32List.fromList(rowIndexesList);
+    _values = new Float64List.fromList(valuesList);
   }
 
   static int _searchFromTo(Int32List list, int key, int from, int to) {
@@ -1159,11 +1201,13 @@ class SparseCCDComplexMatrix2D extends WrapperDComplexMatrix2D {
     if (nzmax <= 0) nzmax = _columnPointers[_columns];
     Int32List rowIndexesNew = new Int32List(nzmax);
     int length = Math.min(nzmax, _rowIndexes.length);
-    System.arraycopy(_rowIndexes, 0, rowIndexesNew, 0, length);
+    //System.arraycopy(_rowIndexes, 0, rowIndexesNew, 0, length);
+    rowIndexesNew.setAll(0, _rowIndexes);
     _rowIndexes = rowIndexesNew;
     Float64List valuesNew = new Float64List(2 * nzmax);
     length = Math.min(nzmax, _values.length);
-    System.arraycopy(_values, 0, valuesNew, 0, length);
+    //System.arraycopy(_values, 0, valuesNew, 0, length);
+    valuesNew.setAll(0, _values);
     _values = valuesNew;
   }
 
@@ -1188,7 +1232,7 @@ class SparseCCDComplexMatrix2D extends WrapperDComplexMatrix2D {
         if (x != null) {
           valA[0] = Ax[2 * p];
           valA[1] = Ax[2 * p + 1];
-          valA = DComplex.mult(beta, valA);
+          valA = DComplex.multiply(beta, valA);
           x[2 * i] = valA[0];
           /* x(i) = beta*A(i,j) */
           x[2 * i + 1] = valA[1];
@@ -1196,7 +1240,7 @@ class SparseCCDComplexMatrix2D extends WrapperDComplexMatrix2D {
       } else if (x != null) {
         valA[0] = Ax[2 * p];
         valA[1] = Ax[2 * p + 1];
-        valA = DComplex.mult(beta, valA);
+        valA = DComplex.multiply(beta, valA);
         x[2 * i] += valA[0];
         /* i exists in C(:,j) already */
         x[2 * i + 1] += valA[1];

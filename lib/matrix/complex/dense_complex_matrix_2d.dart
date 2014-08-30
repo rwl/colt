@@ -180,13 +180,13 @@ class DenseDComplexMatrix2D extends DComplexMatrix2D {
       }
       a = ConcurrencyUtils.waitForCompletion(futures, aggr);
     } else {*/
-      a = f(_elements[zero], _elements[zero + 1]);
+      a = f(new Float64List.fromList([ _elements[zero], _elements[zero + 1] ]));
       int d = 1; // first cell already done
       int idx;
       for (int r = 0; r < _rows; r++) {
         for (int c = d; c < _columns; c++) {
           idx = zero + r * _rowStride + c * _columnStride;
-          a = aggr(a, f(_elements[idx], _elements[idx + 1]));
+          a = aggr(a, f(new Float64List.fromList([ _elements[idx], _elements[idx + 1] ])));
         }
         d = 0;
       }
@@ -303,8 +303,8 @@ class DenseDComplexMatrix2D extends DComplexMatrix2D {
     } else {*/
       int idx = zero;
       Float64List tmp = new Float64List(2);
-      if (function is DComplexMult) {
-        Float64List multiplicator = (function as DComplexMult).multiplicator;
+      if (function is cfunc.DComplexMult) {
+        Float64List multiplicator = (function as cfunc.DComplexMult).multiplicator;
         // x[i] = mult*x[i]
         for (int r = 0; r < _rows; r++) {
           for (int i = idx,
@@ -321,7 +321,7 @@ class DenseDComplexMatrix2D extends DComplexMatrix2D {
         for (int r = 0; r < _rows; r++) {
           for (int i = idx,
               c = 0; c < _columns; c++) {
-            tmp = function(_elements[i], _elements[i + 1]);
+            tmp = function(new Float64List.fromList([_elements[i], _elements[i + 1]]));
             _elements[i] = tmp[0];
             _elements[i + 1] = tmp[1];
             i += _columnStride;
@@ -878,7 +878,7 @@ class DenseDComplexMatrix2D extends DComplexMatrix2D {
     if (values.length != _rows) {
       throw new ArgumentError("Must have same number of rows: rows=${values.length} rows()=${rows()}");
     }
-    int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    //int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if (this._isNoView) {
       /*if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
         nthreads = Math.min(nthreads, _rows);
@@ -1584,7 +1584,7 @@ class DenseDComplexMatrix2D extends DComplexMatrix2D {
       throw new ArgumentError("Matrices must not be identical");
     }
     int flops = 2 * rowsA * columnsA * columnsB;
-    int noOfTasks = Math.min(flops / 30000, ConcurrencyUtils.getNumberOfThreads()); // each
+    int noOfTasks = 1;//Math.min(flops / 30000, ConcurrencyUtils.getNumberOfThreads()); // each
     /* thread should process at least 30000 flops */
     bool splitB = (columnsB >= noOfTasks);
     int width = splitB ? columnsB : rowsA;
@@ -1612,11 +1612,12 @@ class DenseDComplexMatrix2D extends DComplexMatrix2D {
         CC = C.viewPart(offset, 0, span, columnsB);
       }
 
-      subTasks[i] = ConcurrencyUtils.submit(() {
+      /*subTasks[i] = ConcurrencyUtils.submit(() {
         (AA as DenseDComplexMatrix2D)._zMultSeq(BB, CC, alpha, beta, transposeA, transposeB);
-      });
+      });*/
+      (AA as DenseDComplexMatrix2D)._zMultSeq(BB, CC, alpha, beta, transposeA, transposeB);
     }
-    ConcurrencyUtils.waitForCompletion(subTasks);
+    //ConcurrencyUtils.waitForCompletion(subTasks);
 
     return C;
   }

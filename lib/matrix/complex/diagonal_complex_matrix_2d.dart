@@ -111,9 +111,9 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
     _elements = new Float64List(2 * _dlength);
   }
 
-  DComplexMatrix2D assign(final DComplexDComplexFunction function) {
-    if (function is DComplexMult) { // x[i] = mult*x[i]
-      final Float64List alpha = (function as DComplexMult).multiplicator;
+  DComplexMatrix2D assign(final cfunc.DComplexDComplexFunction function) {
+    if (function is cfunc.DComplexMult) { // x[i] = mult*x[i]
+      final Float64List alpha = (function as cfunc.DComplexMult).multiplicator;
       if (alpha[0] == 1 && alpha[1] == 0) {
         return this;
       }
@@ -127,7 +127,7 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
       for (int j = 0; j < _dlength; j++) {
         elem[0] = _elements[2 * j];
         elem[1] = _elements[2 * j + 1];
-        elem = DComplex.mult(elem, alpha);
+        elem = DComplex.multiply(elem, alpha);
         _elements[2 * j] = elem[0];
         _elements[2 * j + 1] = elem[1];
       }
@@ -136,7 +136,7 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
       for (int j = 0; j < _dlength; j++) {
         elem[0] = _elements[2 * j];
         elem[1] = _elements[2 * j + 1];
-        elem = function.apply(elem);
+        elem = function(elem);
         _elements[2 * j] = elem[0];
         _elements[2 * j + 1] = elem[1];
       }
@@ -153,8 +153,8 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
   }
 
   DComplexMatrix2D assignValues(final Float64List values) {
-    if (values.length != 2 * _dlength) throw new ArgumentError("Must have same length: length=" + values.length + " 2*dlength=" + 2 * _dlength);
-    int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    if (values.length != 2 * _dlength) throw new ArgumentError("Must have same length: length=${values.length} 2*dlength=${2 * _dlength}");
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_dlength >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _dlength);
       list<Future> futures = new List<Future>(nthreads);
@@ -170,12 +170,12 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
         });
       }
       ConcurrencyUtils.waitForCompletion(futures);
-    } else {
+    } else {*/
       for (int i = 0; i < _dlength; i++) {
         _elements[2 * i] = values[2 * i];
         _elements[2 * i + 1] = values[2 * i + 1];
       }
-    }
+    //}
     return this;
   }
 
@@ -193,7 +193,7 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
     }
     for (int i = 0; i < _dlength; i++) {
       if (values[i].length != 2 * _columns) {
-        throw new ArgumentError("Must have same number of columns in every row: columns=" + values[r].length + "2 * columns()=" + 2 * columns());
+        throw new ArgumentError("Must have same number of columns in every row: columns=${values[r].length} 2 * columns()=${2 * columns()}");
       }
       _elements[2 * i] = values[r][2 * c];
       _elements[2 * i + 1] = values[r][2 * c + 1];
@@ -209,33 +209,34 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
     checkShape(source);
 
     if (source is DiagonalDComplexMatrix2D) {
-      DiagonalDComplexMatrix2D other = source as DiagonalDComplexMatrix2D;
+      DiagonalDComplexMatrix2D other = source;
       if ((_dindex != other._dindex) || (_dlength != other._dlength)) {
         throw new ArgumentError("source is DiagonalDComplexMatrix2D with different diagonal stored.");
       }
       // quickest
-      System.arraycopy(other._elements, 0, this._elements, 0, this._elements.length);
+      //System.arraycopy(other._elements, 0, this._elements, 0, this._elements.length);
+      this._elements.setAll(0, other._elements);
       return this;
     } else {
       return super.assignMatrix(source);
     }
   }
 
-  DComplexMatrix2D assignFunc(final DComplexMatrix2D y, final DComplexDComplexDComplexFunction function) {
+  DComplexMatrix2D assignFunc(final DComplexMatrix2D y, final cfunc.DComplexDComplexDComplexFunction function) {
     checkShape(y);
     if (y is DiagonalDComplexMatrix2D) {
-      DiagonalDComplexMatrix2D other = y as DiagonalDComplexMatrix2D;
+      DiagonalDComplexMatrix2D other = y;
       if ((_dindex != other._dindex) || (_dlength != other._dlength)) {
         throw new ArgumentError("y is DiagonalDComplexMatrix2D with different diagonal stored.");
       }
-      if (function is DComplexPlusMultSecond) { // x[i] = x[i] + alpha*y[i]
-        final Float64List alpha = (function as DComplexPlusMultSecond).multiplicator;
+      if (function is cfunc.DComplexPlusMultSecond) { // x[i] = x[i] + alpha*y[i]
+        final Float64List alpha = (function as cfunc.DComplexPlusMultSecond).multiplicator;
         if (alpha[0] == 0 && alpha[1] == 0) {
           return this; // nothing to do
         }
       }
       final Float64List otherElements = other._elements;
-      int nthreads = ConcurrencyUtils.getNumberOfThreads();
+      /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
       if ((nthreads > 1) && (_dlength >= ConcurrencyUtils.getThreadsBeginN_2D())) {
         nthreads = Math.min(nthreads, _dlength);
         list<Future> futures = new List<Future>(nthreads);
@@ -301,9 +302,9 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
           });
         }
         ConcurrencyUtils.waitForCompletion(futures);
-      } else {
-        if (function is DComplexPlusMultSecond) { // x[i] = x[i] + alpha*y[i]
-          final Float64List alpha = (function as DComplexPlusMultSecond).multiplicator;
+      } else {*/
+        if (function is cfunc.DComplexPlusMultSecond) { // x[i] = x[i] + alpha*y[i]
+          final Float64List alpha = (function as cfunc.DComplexPlusMultSecond).multiplicator;
           if (alpha[0] == 1 && alpha[1] == 0) {
             for (int j = 0; j < _dlength; j++) {
               _elements[2 * j] += otherElements[2 * j];
@@ -314,12 +315,12 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
             for (int j = 0; j < _dlength; j++) {
               elem[0] = otherElements[2 * j];
               elem[1] = otherElements[2 * j + 1];
-              elem = DComplex.mult(alpha, elem);
+              elem = DComplex.multiply(alpha, elem);
               _elements[2 * j] += elem[0];
               _elements[2 * j + 1] += elem[1];
             }
           }
-        } else if (function == DComplexFunctions.mult) { // x[i] = x[i] * y[i]
+        } else if (function == cfunc.mult) { // x[i] = x[i] * y[i]
           Float64List elem = new Float64List(2);
           Float64List otherElem = new Float64List(2);
           for (int j = 0; j < _dlength; j++) {
@@ -327,11 +328,11 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
             otherElem[1] = otherElements[2 * j + 1];
             elem[0] = _elements[2 * j];
             elem[1] = _elements[2 * j + 1];
-            elem = DComplex.mult(elem, otherElem);
+            elem = DComplex.multiply(elem, otherElem);
             _elements[2 * j] = elem[0];
             _elements[2 * j + 1] = elem[1];
           }
-        } else if (function == DComplexFunctions.div) { // x[i] = x[i] /  y[i]
+        } else if (function == cfunc.div) { // x[i] = x[i] /  y[i]
           Float64List elem = new Float64List(2);
           Float64List otherElem = new Float64List(2);
           for (int j = 0; j < _dlength; j++) {
@@ -339,7 +340,7 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
             otherElem[1] = otherElements[2 * j + 1];
             elem[0] = _elements[2 * j];
             elem[1] = _elements[2 * j + 1];
-            elem = DComplex.div(elem, otherElem);
+            elem = DComplex.div_(elem, otherElem);
             _elements[2 * j] = elem[0];
             _elements[2 * j + 1] = elem[1];
           }
@@ -351,12 +352,12 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
             otherElem[1] = otherElements[2 * j + 1];
             elem[0] = _elements[2 * j];
             elem[1] = _elements[2 * j + 1];
-            elem = function.apply(elem, otherElem);
+            elem = function(elem, otherElem);
             _elements[2 * j] = elem[0];
             _elements[2 * j + 1] = elem[1];
           }
         }
-      }
+      //}
       return this;
     } else {
       return super.assignFunc(y, function);
@@ -365,7 +366,7 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
 
   int cardinality() {
     int cardinality = 0;
-    int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_dlength >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _dlength);
       list<Future> futures = new List<Future>(nthreads);
@@ -395,11 +396,13 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
       } on InterruptedException catch (e) {
         e.printStackTrace();
       }
-    } else {
+    } else {*/
       for (int i = 0; i < _dlength; i++) {
-        if (_elements[2 * i] != 0 || _elements[2 * i + 1] != 0) cardinality++;
+        if (_elements[2 * i] != 0 || _elements[2 * i + 1] != 0) {
+          cardinality++;
+        }
       }
-    }
+    //}
     return cardinality;
   }
 
@@ -408,17 +411,17 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
   }
 
   bool equalsValue(Float64List value) {
-    double epsilon = cern.colt.matrix.tdcomplex.algo.DComplexProperty.DEFAULT.tolerance();
+    double epsilon = DComplexProperty.DEFAULT.tolerance();
     Float64List x = new Float64List(2);
     Float64List diff = new Float64List(2);
     for (int i = 0; i < _dlength; i++) {
       x[0] = _elements[2 * i];
       x[1] = _elements[2 * i + 1];
-      diff[0] = Math.abs(value[0] - x[0]);
-      diff[1] = Math.abs(value[1] - x[1]);
+      diff[0] = (value[0] - x[0]).abs();
+      diff[1] = (value[1] - x[1]).abs();
       if (((diff[0] != diff[0]) || (diff[1] != diff[1])) && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1])))) || (DComplex.isEqual(value, x, epsilon))) {
-        diff[0] = 0;
-        diff[1] = 0;
+        diff[0] = 0.0;
+        diff[1] = 0.0;
       }
       if ((diff[0] > epsilon) || (diff[1] > epsilon)) {
         return false;
@@ -429,7 +432,7 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
 
   bool equals(Object obj) {
     if (obj is DiagonalDComplexMatrix2D) {
-      DiagonalDComplexMatrix2D other = obj as DiagonalDComplexMatrix2D;
+      DiagonalDComplexMatrix2D other = obj;
       double epsilon = DComplexProperty.DEFAULT.tolerance();
       if (this == obj) return true;
       if (!(this != null && obj != null)) return false;
@@ -448,11 +451,11 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
         x[1] = _elements[2 * i + 1];
         value[0] = otherElements[2 * i];
         value[1] = otherElements[2 * i + 1];
-        diff[0] = Math.abs(value[0] - x[0]);
-        diff[1] = Math.abs(value[1] - x[1]);
+        diff[0] = (value[0] - x[0]).abs();
+        diff[1] = (value[1] - x[1]).abs();
         if (((diff[0] != diff[0]) || (diff[1] != diff[1])) && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1])))) || (DComplex.isEqual(value, x, epsilon))) {
-          diff[0] = 0;
-          diff[1] = 0;
+          diff[0] = 0.0;
+          diff[1] = 0.0;
         }
         if ((diff[0] > epsilon) || (diff[1] > epsilon)) {
           return false;
@@ -464,13 +467,13 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
     }
   }
 
-  DComplexMatrix2D forEachNonZero(final IntIntDComplexFunction function) {
+  DComplexMatrix2D forEachNonZero(final cfunc.IntIntDComplexFunction function) {
     Float64List value = new Float64List(2);
     for (int i = 0; i < _dlength; i++) {
       value[0] = _elements[2 * i];
       value[1] = _elements[2 * i + 1];
       if (value[0] != 0 || value[1] != 0) {
-        value = function.apply(i, i, value);
+        value = function(i, i, value);
         _elements[2 * i] = value[0];
         _elements[2 * i + 1] = value[1];
       }
@@ -580,7 +583,13 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
     }
   }
 
-  DComplexMatrix1D zMult(DComplexMatrix1D y, DComplexMatrix1D z, Float64List alpha, Float64List beta, final boolean transposeA) {
+  DComplexMatrix1D zMult(DComplexMatrix1D y, DComplexMatrix1D z, [Float64List alpha = null, Float64List beta = null, bool transposeA = false]) {
+    if (alpha == null) {
+      alpha = new Float64List.fromList([1.0, 0.0]);
+    }
+    if (beta == null) {
+      beta = (z == null ? new Float64List.fromList([1.0, 0.0]) : new Float64List.fromList([0.0, 0.0]));
+    }
     int rowsA = _rows;
     int columnsA = _columns;
     if (transposeA) {
@@ -588,7 +597,7 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
       columnsA = _rows;
     }
 
-    boolean ignore = (z == null);
+    bool ignore = (z == null);
     if (z == null) z = new DenseDComplexMatrix1D(rowsA);
 
     if (!(this._isNoView && y is DenseDComplexMatrix1D && z is DenseDComplexMatrix1D)) {
@@ -600,7 +609,7 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
     }
 
     if ((!ignore) && !((beta[0] == 1) && (beta[1] == 0))) {
-      z.assign(DComplexFunctions.mult(beta));
+      z.assign(cfunc.multiply(beta));
     }
 
     DenseDComplexMatrix1D zz = z as DenseDComplexMatrix1D;
@@ -613,7 +622,9 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
     final int strideY = yy.stride();
     final int zeroY = y.index(0);
 
-    if (elementsY == null || elementsZ == null) throw new InternalError();
+    if (elementsY == null || elementsZ == null) {
+      throw new Error();
+    }
     Float64List elemA = new Float64List(2);
     Float64List elemY = new Float64List(2);
     if (!transposeA) {
@@ -623,8 +634,8 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
           elemA[1] = _elements[2 * i + 1];
           elemY[0] = elementsY[2 * _dindex + zeroY + strideY * i];
           elemY[1] = elementsY[2 * _dindex + zeroY + strideY * i + 1];
-          elemA = DComplex.mult(elemA, elemY);
-          elemA = DComplex.mult(alpha, elemA);
+          elemA = DComplex.multiply(elemA, elemY);
+          elemA = DComplex.multiply(alpha, elemA);
           elementsZ[zeroZ + strideZ * i] += elemA[0];
           elementsZ[zeroZ + strideZ * i + 1] += elemA[1];
         }
@@ -634,8 +645,8 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
           elemA[1] = _elements[2 * i + 1];
           elemY[0] = elementsY[zeroY + strideY * i];
           elemY[1] = elementsY[zeroY + strideY * i + 1];
-          elemA = DComplex.mult(elemA, elemY);
-          elemA = DComplex.mult(alpha, elemA);
+          elemA = DComplex.multiply(elemA, elemY);
+          elemA = DComplex.multiply(alpha, elemA);
           elementsZ[-2 * _dindex + zeroZ + strideZ * i] += elemA[0];
           elementsZ[-2 * _dindex + zeroZ + strideZ * i + 1] += elemA[1];
         }
@@ -647,8 +658,8 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
           elemA[1] = -_elements[2 * i + 1];
           elemY[0] = elementsY[zeroY + strideY * i];
           elemY[1] = elementsY[zeroY + strideY * i + 1];
-          elemA = DComplex.mult(elemA, elemY);
-          elemA = DComplex.mult(alpha, elemA);
+          elemA = DComplex.multiply(elemA, elemY);
+          elemA = DComplex.multiply(alpha, elemA);
           elementsZ[2 * _dindex + zeroZ + strideZ * i] += elemA[0];
           elementsZ[2 * _dindex + zeroZ + strideZ * i + 1] += elemA[1];
         }
@@ -658,8 +669,8 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
           elemA[1] = -_elements[2 * i + 1];
           elemY[0] = elementsY[-2 * _dindex + zeroY + strideY * i];
           elemY[1] = elementsY[-2 * _dindex + zeroY + strideY * i + 1];
-          elemA = DComplex.mult(elemA, elemY);
-          elemA = DComplex.mult(alpha, elemA);
+          elemA = DComplex.multiply(elemA, elemY);
+          elemA = DComplex.multiply(alpha, elemA);
           elementsZ[zeroZ + strideZ * i] += elemA[0];
           elementsZ[zeroZ + strideZ * i + 1] += elemA[1];
         }

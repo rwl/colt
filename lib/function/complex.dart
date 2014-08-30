@@ -6,7 +6,7 @@ import 'dart:typed_data';
 import '../math.dart';
 
 typedef Float64List DComplexDComplexDComplexFunction(Float64List x, Float64List y);
-//typedef Float64List DComplexDComplexFunction(double re, double im);
+typedef Float64List DComplexDComplexFunc(double re, double im);
 typedef Float64List DComplexDComplexFunction(Float64List x);
 typedef bool DComplexDComplexProcedure(Float64List x, Float64List y);
 typedef double DComplexDComplexRealFunction(Float64List x, Float64List y);

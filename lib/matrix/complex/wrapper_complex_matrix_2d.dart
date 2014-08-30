@@ -93,7 +93,7 @@ class WrapperDComplexMatrix2D extends DComplexMatrix2D {
 
   bool equals(Object obj) {
     if (_content is DiagonalDComplexMatrix2D && obj is DiagonalDComplexMatrix2D) {
-      DiagonalDComplexMatrix2D other = obj as DiagonalDComplexMatrix2D;
+      DiagonalDComplexMatrix2D other = obj;
       int dlength = (_content as DiagonalDComplexMatrix2D)._dlength;
       double epsilon = DComplexProperty.DEFAULT.tolerance();
       if (this == obj) {
@@ -103,7 +103,7 @@ class WrapperDComplexMatrix2D extends DComplexMatrix2D {
         return false;
       }
       DiagonalDComplexMatrix2D A = _content as DiagonalDComplexMatrix2D;
-      DiagonalDComplexMatrix2D B = obj as DiagonalDComplexMatrix2D;
+      DiagonalDComplexMatrix2D B = obj;
       if (A.columns() != B.columns() || A.rows() != B.rows() || A.diagonalIndex() != B.diagonalIndex() || A.diagonalLength() != B.diagonalLength()) {
         return false;
       }

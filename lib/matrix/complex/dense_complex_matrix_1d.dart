@@ -194,8 +194,8 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
     if (this._elements == null) {
       throw new Error();
     }
-    if (function is DComplexMult) {
-      Float64List multiplicator = (function as DComplexMult).multiplicator;
+    if (function is cfunc.DComplexMult) {
+      Float64List multiplicator = (function as cfunc.DComplexMult).multiplicator;
       if (multiplicator[0] == 1 && multiplicator[1] == 0) {
         return this;
       }
@@ -234,8 +234,8 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
     } else {*/
     Float64List tmp = new Float64List(2);
     int idx = _zero;
-    if (function is DComplexMult) {
-      Float64List multiplicator = (function as DComplexMult).multiplicator;
+    if (function is cfunc.DComplexMult) {
+      Float64List multiplicator = (function as cfunc.DComplexMult).multiplicator;
       for (int k = 0; k < _size; k++) {
         _elements[idx] = _elements[idx] * multiplicator[0] - _elements[idx + 1] * multiplicator[1];
         _elements[idx + 1] = _elements[idx + 1] * multiplicator[0] + _elements[idx] * multiplicator[1];
@@ -441,7 +441,7 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
     final int strideOther = other._stride;
     final int zeroOther = other.index(0);
 
-    int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
       List<Future> futures = new List<Future>(nthreads);
@@ -461,7 +461,7 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
         });
       }
       ConcurrencyUtils.waitForCompletion(futures);
-    } else {
+    } else {*/
       int idx = _zero;
       int idxOther = zeroOther;
       for (int k = 0; k < _size; k++) {
@@ -470,7 +470,7 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
         idx += _stride;
         idxOther += strideOther;
       }
-    }
+    //}
     return this;
   }
 
@@ -666,7 +666,7 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
   }
 
   DComplexMatrix1D assignValue(final double re, final double im) {
-    int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
       List<Future> futures = new List<Future>(nthreads);
@@ -684,14 +684,14 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
         });
       }
       ConcurrencyUtils.waitForCompletion(futures);
-    } else {
+    } else {*/
       int idx = _zero;
       for (int i = 0; i < _size; i++) {
         this._elements[idx] = re;
         this._elements[idx + 1] = im;
         idx += _stride;
       }
-    }
+    //}
     return this;
   }
 
@@ -716,7 +716,7 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
     final int zeroOther = other.index(0);
     final int strideOther = other.stride();
     final Float64List elemsOther = other.elements() as Float64List;
-    int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
       List<Future> futures = new List<Future>(nthreads);
@@ -735,7 +735,7 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
         });
       }
       ConcurrencyUtils.waitForCompletion(futures);
-    } else {
+    } else {*/
       int idx = _zero;
       int idxOther = zeroOther;
       for (int i = 0; i < _size; i++) {
@@ -743,7 +743,7 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
         idx += _stride;
         idxOther += strideOther;
       }
-    }
+    //}
     return this;
   }
 
@@ -755,7 +755,7 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
     final int zeroOther = other.index(0);
     final int strideOther = other.stride();
     final Float64List elemsOther = other.elements() as Float64List;
-    int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
       List<Future> futures = new List<Future>(nthreads);
@@ -774,7 +774,7 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
         });
       }
       ConcurrencyUtils.waitForCompletion(futures);
-    } else {
+    } else {*/
       int idx = _zero;
       int idxOther = zeroOther;
       for (int i = 0; i < _size; i++) {
@@ -782,7 +782,7 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
         idx += _stride;
         idxOther += strideOther;
       }
-    }
+    //}
     return this;
   }
 
@@ -795,7 +795,7 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
     final Float64List elemsOther = Im.elements();
     final int zeroOther = Im.index(0);
     final int strideOther = Im.stride();
-    int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
       List<Future> futures = new List<Future>(nthreads);
@@ -814,7 +814,7 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
         });
       }
       ConcurrencyUtils.waitForCompletion(futures);
-    } else {
+    } else {*/
       int idx = _zero;
       int idxOther = zeroOther;
       for (int i = 0; i < _size; i++) {
@@ -822,7 +822,7 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
         idx += _stride;
         idxOther += strideOther;
       }
-    }
+    //}
     return Im;
   }
 
@@ -854,7 +854,7 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
     final Float64List elemsOther = R.elements();
     final int zeroOther = R.index(0);
     final int strideOther = R.stride();
-    int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
       List<Future> futures = new List<Future>(nthreads);
@@ -873,7 +873,7 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
         });
       }
       ConcurrencyUtils.waitForCompletion(futures);
-    } else {
+    } else {*/
       int idx = _zero;
       int idxOther = zeroOther;
       for (int i = 0; i < _size; i++) {
@@ -881,7 +881,7 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
         idx += _stride;
         idxOther += strideOther;
       }
-    }
+    //}
     return R;
   }
 
@@ -902,7 +902,7 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
     final int zeroOther = M.index(0, 0);
     final int rowStrideOther = M.rowStride();
     final int columnStrideOther = M.columnStride();
-    int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
       List<Future> futures = new List<Future>(nthreads);
@@ -926,7 +926,7 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
         });
       }
       ConcurrencyUtils.waitForCompletion(futures);
-    } else {
+    } else {*/
       int idxOther;
       int idx = _zero;
       for (int c = 0; c < columns; c++) {
@@ -938,7 +938,7 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
           idx += _stride;
         }
       }
-    }
+    //}
     return M;
   }
 
@@ -1025,7 +1025,7 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
     final int strideOther = y._stride;
     final int zeroOther = y.index(0);
 
-    int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
       List<Future> futures = new List<Future>(nthreads);
@@ -1050,7 +1050,7 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
         });
       }
       ConcurrencyUtils.waitForCompletion(futures);
-    } else {
+    } else {*/
       int idx = _zero;
       int idxOther = zeroOther;
       double tmp;
@@ -1064,7 +1064,7 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
         idx += _stride;
         idxOther += strideOther;
       }
-    }
+    //}
   }
 
   void toArrayFill(Float64List values) {
@@ -1231,7 +1231,7 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
   }
 
   DComplexMatrix1D _viewSelectionLike(Int32List offsets) {
-    return new SelectedDenseDComplexMatrix1D(this._elements, offsets);
+    return new SelectedDenseDComplexMatrix1D.offset(this._elements, offsets);
   }
 }
 
@@ -1319,11 +1319,11 @@ class SelectedDenseDComplexMatrix1D extends DComplexMatrix1D {
 
   DoubleMatrix1D getRealPart() {
     final DenseDoubleMatrix1D R = new DenseDoubleMatrix1D(_size);
-    int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
       List<Future> futures = new List<Future>(nthreads);
-      int k = _size / nthreads;
+      int k = _size ~/ nthreads;
       for (int j = 0; j < nthreads; j++) {
         final int firstIdx = j * k;
         final int lastIdx = (j == nthreads - 1) ? _size : firstIdx + k;
@@ -1335,19 +1335,18 @@ class SelectedDenseDComplexMatrix1D extends DComplexMatrix1D {
         });
       }
       ConcurrencyUtils.waitForCompletion(futures);
-    } else {
-      Float64List tmp;
+    } else {*/
       for (int i = 0; i < _size; i++) {
-        tmp = getQuick(i);
+        final tmp = getQuick(i);
         R.setQuick(i, tmp[0]);
       }
-    }
+    //}
     return R;
   }
 
   DoubleMatrix1D getImaginaryPart() {
     final DenseDoubleMatrix1D Im = new DenseDoubleMatrix1D(_size);
-    int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
       List<Future> futures = new List<Future>(nthreads);
@@ -1363,13 +1362,12 @@ class SelectedDenseDComplexMatrix1D extends DComplexMatrix1D {
         });
       }
       ConcurrencyUtils.waitForCompletion(futures);
-    } else {
-      Float64List tmp;
+    } else {*/
       for (int i = 0; i < _size; i++) {
-        tmp = getQuick(i);
+        final tmp = getQuick(i);
         Im.setQuick(i, tmp[1]);
       }
-    }
+    //}
 
     return Im;
   }
@@ -1411,9 +1409,9 @@ class SelectedDenseDComplexMatrix1D extends DComplexMatrix1D {
     throw new UnsupportedError("This method is not supported.");
   }
 
-  DComplexMatrix3D reshape3D(int slices, int rows, int columns) {
+  /*DComplexMatrix3D reshape3D(int slices, int rows, int columns) {
     throw new UnsupportedError("This method is not supported.");
-  }
+  }*/
 
   void setQuick(int index, Float64List value) {
     int idx = _zero + index * _stride;

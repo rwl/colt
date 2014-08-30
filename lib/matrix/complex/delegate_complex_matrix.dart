@@ -71,9 +71,9 @@ class DelegateDComplexMatrix1D extends DComplexMatrix1D {
     throw new ArgumentError("This method is not supported.");
   }
 
-  DComplexMatrix3D reshape3D(int slices, int rows, int columns) {
+  /*DComplexMatrix3D reshape3D(int slices, int rows, int columns) {
     throw new ArgumentError("This method is not supported.");
-  }
+  }*/
 
   DComplexMatrix1D _viewSelectionLike(Int32List offsets) {
     throw new ArgumentError("This method is not supported.");
@@ -95,7 +95,7 @@ class DelegateDComplexMatrix1D extends DComplexMatrix1D {
  *
  * @author Piotr Wendykier (piotr.wendykier@gmail.com)
  */
-class DelegateDComplexMatrix2D extends DComplexMatrix2D {
+/*class DelegateDComplexMatrix2D extends DComplexMatrix2D {
 
   /*
      * The elements of the matrix.
@@ -248,4 +248,4 @@ class DelegateDComplexMatrix2D extends DComplexMatrix2D {
     }
   }
 
-}
+}*/

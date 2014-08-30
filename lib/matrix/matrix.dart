@@ -4,14 +4,16 @@ import 'dart:math' as Math;
 import 'dart:async' show Future;
 import 'dart:typed_data';
 
-import 'package:csparse/csparse.dart';
+import 'package:csparse/double/csparse.dart';
+import 'package:csparse/complex/cxsparse.dart' show DZcs;
+import 'package:csparse/complex/cxsparse.dart' as cxsparse;
 
 import '../function/double.dart' show DoubleFunction, DoubleDoubleFunction, DoubleDoubleProcedure,
   DoubleIntProcedure, DoubleProcedure;
 import '../function/double.dart' as func;
 import '../function/complex.dart' as cfunc;
 import '../math.dart';
-import '../util.dart';
+//import '../util.dart';
 import 'double/algo/algo.dart';
 import 'complex/algo/algo.dart';
 import 'former.dart';

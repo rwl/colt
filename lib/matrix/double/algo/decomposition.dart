@@ -8,6 +8,8 @@ import 'package:btf/btf.dart' as btf;
 import '../../matrix.dart';
 import 'algo.dart';
 
+typedef void solve(DoubleMatrix2D A, DoubleMatrix1D b);
+
 /**
  * For a square matrix <tt>A</tt>, the LU decomposition is an unit lower
  * triangular matrix <tt>L</tt>, an upper triangular matrix <tt>U</tt>, and a
