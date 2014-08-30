@@ -619,13 +619,12 @@ class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
 
 class DiagonalDoubleMatrix2DViewTest extends DiagonalDoubleMatrix2DTest {
 
-    void createMatrices() {
-        DINDEX = 3;
-        A = new DiagonalDoubleMatrix2D(NCOLUMNS, NROWS, -DINDEX);
-        DLENGTH = (A as DiagonalDoubleMatrix2D).diagonalLength();
-        A = A.viewDice();
-        B = new DiagonalDoubleMatrix2D(NCOLUMNS, NROWS, -DINDEX).viewDice();
-        Bt = new DiagonalDoubleMatrix2D(NROWS, NCOLUMNS, DINDEX).viewDice();
-    }
+  void createMatrices() {
+    DINDEX = 3;
+    A = new DiagonalDoubleMatrix2D(NCOLUMNS, NROWS, -DINDEX);
+    A = A.viewDice();
+    B = new DiagonalDoubleMatrix2D(NCOLUMNS, NROWS, -DINDEX).viewDice();
+    Bt = new DiagonalDoubleMatrix2D(NROWS, NCOLUMNS, DINDEX).viewDice();
+  }
 
 }

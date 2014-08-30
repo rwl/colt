@@ -73,8 +73,8 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
    */
   factory DenseDComplexMatrix1D.fromParts(DoubleMatrix1D realPart, DoubleMatrix1D imaginaryPart) {
     return new DenseDComplexMatrix1D(realPart.size())
-      ..assignReal(realPart)
-      ..assignImaginary(imaginaryPart);
+        ..assignReal(realPart)
+        ..assignImaginary(imaginaryPart);
   }
 
   /**
@@ -131,12 +131,12 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
       }
       a = ConcurrencyUtils.waitForCompletion(futures, aggr);
     } else {*/
-      a = f([_elements[_zero], _elements[_zero + 1]]);
-      int idx = _zero;
-      for (int i = 1; i < _size; i++) {
-        idx += _stride;
-        a = aggr(a, f([_elements[idx], _elements[idx + 1]]));
-      }
+    a = f([_elements[_zero], _elements[_zero + 1]]);
+    int idx = _zero;
+    for (int i = 1; i < _size; i++) {
+      idx += _stride;
+      a = aggr(a, f([_elements[idx], _elements[idx + 1]]));
+    }
     //}
     return a;
   }
@@ -178,14 +178,14 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
       }
       a = ConcurrencyUtils.waitForCompletion(futures, aggr);
     } else {*/
-      int idx = _zero;
-      int idxOther = zeroOther;
-      a = f([_elements[_zero], _elements[_zero + 1]], [elemsOther[zeroOther], elemsOther[zeroOther + 1]]);
-      for (int i = 1; i < _size; i++) {
-        idx += _stride;
-        idxOther += strideOther;
-        a = aggr(a, f([_elements[idx], _elements[idx + 1]], [elemsOther[idxOther], elemsOther[idxOther + 1]]));
-      }
+    int idx = _zero;
+    int idxOther = zeroOther;
+    a = f([_elements[_zero], _elements[_zero + 1]], [elemsOther[zeroOther], elemsOther[zeroOther + 1]]);
+    for (int i = 1; i < _size; i++) {
+      idx += _stride;
+      idxOther += strideOther;
+      a = aggr(a, f([_elements[idx], _elements[idx + 1]], [elemsOther[idxOther], elemsOther[idxOther + 1]]));
+    }
     //}
     return a;
   }
@@ -232,25 +232,25 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-      Float64List tmp = new Float64List(2);
-      int idx = _zero;
-      if (function is DComplexMult) {
-        Float64List multiplicator = (function as DComplexMult).multiplicator;
-        for (int k = 0; k < _size; k++) {
-          _elements[idx] = _elements[idx] * multiplicator[0] - _elements[idx + 1] * multiplicator[1];
-          _elements[idx + 1] = _elements[idx + 1] * multiplicator[0] + _elements[idx] * multiplicator[1];
-          idx += _stride;
-        }
-      } else {
-        for (int k = 0; k < _size; k++) {
-          tmp[0] = _elements[idx];
-          tmp[1] = _elements[idx + 1];
-          tmp = function(tmp);
-          _elements[idx] = tmp[0];
-          _elements[idx + 1] = tmp[1];
-          idx += _stride;
-        }
+    Float64List tmp = new Float64List(2);
+    int idx = _zero;
+    if (function is DComplexMult) {
+      Float64List multiplicator = (function as DComplexMult).multiplicator;
+      for (int k = 0; k < _size; k++) {
+        _elements[idx] = _elements[idx] * multiplicator[0] - _elements[idx + 1] * multiplicator[1];
+        _elements[idx + 1] = _elements[idx + 1] * multiplicator[0] + _elements[idx] * multiplicator[1];
+        idx += _stride;
       }
+    } else {
+      for (int k = 0; k < _size; k++) {
+        tmp[0] = _elements[idx];
+        tmp[1] = _elements[idx + 1];
+        tmp = function(tmp);
+        _elements[idx] = tmp[0];
+        _elements[idx + 1] = tmp[1];
+        idx += _stride;
+      }
+    }
     //}
     return this;
   }
@@ -281,18 +281,18 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-      Float64List elem = new Float64List(2);
-      int idx = _zero;
-      for (int i = 0; i < _size; i++) {
-        elem[0] = _elements[idx];
-        elem[1] = _elements[idx + 1];
-        if (cond(elem) == true) {
-          elem = function(elem);
-          _elements[idx] = elem[0];
-          _elements[idx + 1] = elem[1];
-        }
-        idx += _stride;
+    Float64List elem = new Float64List(2);
+    int idx = _zero;
+    for (int i = 0; i < _size; i++) {
+      elem[0] = _elements[idx];
+      elem[1] = _elements[idx + 1];
+      if (cond(elem) == true) {
+        elem = function(elem);
+        _elements[idx] = elem[0];
+        _elements[idx + 1] = elem[1];
       }
+      idx += _stride;
+    }
     //}
     return this;
   }
@@ -322,17 +322,17 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-      Float64List elem = new Float64List(2);
-      int idx = _zero;
-      for (int i = 0; i < _size; i++) {
-        elem[0] = _elements[idx];
-        elem[1] = _elements[idx + 1];
-        if (cond(elem) == true) {
-          _elements[idx] = value[0];
-          _elements[idx + 1] = value[1];
-        }
-        idx += _stride;
+    Float64List elem = new Float64List(2);
+    int idx = _zero;
+    for (int i = 0; i < _size; i++) {
+      elem[0] = _elements[idx];
+      elem[1] = _elements[idx + 1];
+      if (cond(elem) == true) {
+        _elements[idx] = value[0];
+        _elements[idx + 1] = value[1];
       }
+      idx += _stride;
+    }
     //}
     return this;
   }
@@ -382,34 +382,34 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-      int idx = _zero;
-      if (function == cfunc.abs) {
-        for (int k = 0; k < _size; k++) {
-          double absX = _elements[idx].abs();
-          double absY = _elements[idx + 1].abs();
-          if (absX == 0.0 && absY == 0.0) {
-            _elements[idx] = 0.0;
-          } else if (absX >= absY) {
-            double d = _elements[idx + 1] / _elements[idx];
-            _elements[idx] = absX * Math.sqrt(1.0 + d * d);
-          } else {
-            double d = _elements[idx] / _elements[idx + 1];
-            _elements[idx] = absY * Math.sqrt(1.0 + d * d);
-          }
-          _elements[idx + 1] = 0.0;
-          idx += _stride;
+    int idx = _zero;
+    if (function == cfunc.abs) {
+      for (int k = 0; k < _size; k++) {
+        double absX = _elements[idx].abs();
+        double absY = _elements[idx + 1].abs();
+        if (absX == 0.0 && absY == 0.0) {
+          _elements[idx] = 0.0;
+        } else if (absX >= absY) {
+          double d = _elements[idx + 1] / _elements[idx];
+          _elements[idx] = absX * Math.sqrt(1.0 + d * d);
+        } else {
+          double d = _elements[idx] / _elements[idx + 1];
+          _elements[idx] = absY * Math.sqrt(1.0 + d * d);
         }
-      } else {
-        Float64List tmp = new Float64List(2);
-        for (int k = 0; k < _size; k++) {
-          tmp[0] = _elements[idx];
-          tmp[1] = _elements[idx + 1];
-          tmp[0] = function(tmp);
-          _elements[idx] = tmp[0];
-          _elements[idx + 1] = 0.0;
-          idx += _stride;
-        }
+        _elements[idx + 1] = 0.0;
+        idx += _stride;
       }
+    } else {
+      Float64List tmp = new Float64List(2);
+      for (int k = 0; k < _size; k++) {
+        tmp[0] = _elements[idx];
+        tmp[1] = _elements[idx + 1];
+        tmp[0] = function(tmp);
+        _elements[idx] = tmp[0];
+        _elements[idx + 1] = 0.0;
+        idx += _stride;
+      }
+    }
     //}
     return this;
   }
@@ -580,87 +580,87 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-      int idx = _zero;
-      int idxOther = zeroOther;
-      if (function == cfunc.plus) {
-        for (int k = 0; k < _size; k++) {
-          _elements[idx] += elemsOther[idxOther];
-          _elements[idx + 1] += elemsOther[idxOther + 1];
-          idx += _stride;
-          idxOther += strideOther;
-        }
-      } else if (function == cfunc.minus) {
-        for (int k = 0; k < _size; k++) {
-          _elements[idx] -= elemsOther[idxOther];
-          _elements[idx + 1] -= elemsOther[idxOther + 1];
-          idx += _stride;
-          idxOther += strideOther;
-        }
-      } else if (function == cfunc.div) {
-        Float64List tmp = new Float64List(2);
-        for (int k = 0; k < _size; k++) {
-          double re = elemsOther[idxOther];
-          double im = elemsOther[idxOther + 1];
-          double scalar;
-          if (re.abs() >= im.abs()) {
-            scalar = (1.0 / (re + im * (im / re)));
-            tmp[0] = scalar * (_elements[idx] + _elements[idx + 1] * (im / re));
-            tmp[1] = scalar * (_elements[idx + 1] - _elements[idx] * (im / re));
-          } else {
-            scalar = (1.0 / (re * (re / im) + im));
-            tmp[0] = scalar * (_elements[idx] * (re / im) + _elements[idx + 1]);
-            tmp[1] = scalar * (_elements[idx + 1] * (re / im) - _elements[idx]);
-          }
-          _elements[idx] = tmp[0];
-          _elements[idx + 1] = tmp[1];
-          idx += _stride;
-          idxOther += strideOther;
-        }
-      } else if (function == cfunc.mult) {
-        Float64List tmp = new Float64List(2);
-        for (int k = 0; k < _size; k++) {
-          tmp[0] = _elements[idx] * elemsOther[idxOther] - _elements[idx + 1] * elemsOther[idxOther + 1];
-          tmp[1] = _elements[idx + 1] * elemsOther[idxOther] + _elements[idx] * elemsOther[idxOther + 1];
-          _elements[idx] = tmp[0];
-          _elements[idx + 1] = tmp[1];
-          idx += _stride;
-          idxOther += strideOther;
-        }
-      } else if (function == cfunc.multConjFirst) {
-        Float64List tmp = new Float64List(2);
-        for (int k = 0; k < _size; k++) {
-          tmp[0] = _elements[idx] * elemsOther[idxOther] + _elements[idx + 1] * elemsOther[idxOther + 1];
-          tmp[1] = -_elements[idx + 1] * elemsOther[idxOther] + _elements[idx] * elemsOther[idxOther + 1];
-          _elements[idx] = tmp[0];
-          _elements[idx + 1] = tmp[1];
-          idx += _stride;
-          idxOther += strideOther;
-        }
-      } else if (function == cfunc.multConjSecond) {
-        Float64List tmp = new Float64List(2);
-        for (int k = 0; k < _size; k++) {
-          tmp[0] = _elements[idx] * elemsOther[idxOther] + _elements[idx + 1] * elemsOther[idxOther + 1];
-          tmp[1] = _elements[idx + 1] * elemsOther[idxOther] - _elements[idx] * elemsOther[idxOther + 1];
-          _elements[idx] = tmp[0];
-          _elements[idx + 1] = tmp[1];
-          idx += _stride;
-          idxOther += strideOther;
-        }
-      } else {
-        Float64List tmp1 = new Float64List(2);
-        Float64List tmp2 = new Float64List(2);
-        for (int k = 0; k < _size; k++) {
-          tmp1[0] = _elements[idx];
-          tmp1[1] = _elements[idx + 1];
-          tmp2[0] = elemsOther[idxOther];
-          tmp2[1] = elemsOther[idxOther + 1];
-          tmp1 = function(tmp1, tmp2);
-          _elements[idx] = tmp1[0];
-          _elements[idx + 1] = tmp1[1];
-          idx += _stride;
-          idxOther += strideOther;
-        }
+    int idx = _zero;
+    int idxOther = zeroOther;
+    if (function == cfunc.plus) {
+      for (int k = 0; k < _size; k++) {
+        _elements[idx] += elemsOther[idxOther];
+        _elements[idx + 1] += elemsOther[idxOther + 1];
+        idx += _stride;
+        idxOther += strideOther;
       }
+    } else if (function == cfunc.minus) {
+      for (int k = 0; k < _size; k++) {
+        _elements[idx] -= elemsOther[idxOther];
+        _elements[idx + 1] -= elemsOther[idxOther + 1];
+        idx += _stride;
+        idxOther += strideOther;
+      }
+    } else if (function == cfunc.div) {
+      Float64List tmp = new Float64List(2);
+      for (int k = 0; k < _size; k++) {
+        double re = elemsOther[idxOther];
+        double im = elemsOther[idxOther + 1];
+        double scalar;
+        if (re.abs() >= im.abs()) {
+          scalar = (1.0 / (re + im * (im / re)));
+          tmp[0] = scalar * (_elements[idx] + _elements[idx + 1] * (im / re));
+          tmp[1] = scalar * (_elements[idx + 1] - _elements[idx] * (im / re));
+        } else {
+          scalar = (1.0 / (re * (re / im) + im));
+          tmp[0] = scalar * (_elements[idx] * (re / im) + _elements[idx + 1]);
+          tmp[1] = scalar * (_elements[idx + 1] * (re / im) - _elements[idx]);
+        }
+        _elements[idx] = tmp[0];
+        _elements[idx + 1] = tmp[1];
+        idx += _stride;
+        idxOther += strideOther;
+      }
+    } else if (function == cfunc.mult) {
+      Float64List tmp = new Float64List(2);
+      for (int k = 0; k < _size; k++) {
+        tmp[0] = _elements[idx] * elemsOther[idxOther] - _elements[idx + 1] * elemsOther[idxOther + 1];
+        tmp[1] = _elements[idx + 1] * elemsOther[idxOther] + _elements[idx] * elemsOther[idxOther + 1];
+        _elements[idx] = tmp[0];
+        _elements[idx + 1] = tmp[1];
+        idx += _stride;
+        idxOther += strideOther;
+      }
+    } else if (function == cfunc.multConjFirst) {
+      Float64List tmp = new Float64List(2);
+      for (int k = 0; k < _size; k++) {
+        tmp[0] = _elements[idx] * elemsOther[idxOther] + _elements[idx + 1] * elemsOther[idxOther + 1];
+        tmp[1] = -_elements[idx + 1] * elemsOther[idxOther] + _elements[idx] * elemsOther[idxOther + 1];
+        _elements[idx] = tmp[0];
+        _elements[idx + 1] = tmp[1];
+        idx += _stride;
+        idxOther += strideOther;
+      }
+    } else if (function == cfunc.multConjSecond) {
+      Float64List tmp = new Float64List(2);
+      for (int k = 0; k < _size; k++) {
+        tmp[0] = _elements[idx] * elemsOther[idxOther] + _elements[idx + 1] * elemsOther[idxOther + 1];
+        tmp[1] = _elements[idx + 1] * elemsOther[idxOther] - _elements[idx] * elemsOther[idxOther + 1];
+        _elements[idx] = tmp[0];
+        _elements[idx + 1] = tmp[1];
+        idx += _stride;
+        idxOther += strideOther;
+      }
+    } else {
+      Float64List tmp1 = new Float64List(2);
+      Float64List tmp2 = new Float64List(2);
+      for (int k = 0; k < _size; k++) {
+        tmp1[0] = _elements[idx];
+        tmp1[1] = _elements[idx + 1];
+        tmp2[0] = elemsOther[idxOther];
+        tmp2[1] = elemsOther[idxOther + 1];
+        tmp1 = function(tmp1, tmp2);
+        _elements[idx] = tmp1[0];
+        _elements[idx + 1] = tmp1[1];
+        idx += _stride;
+        idxOther += strideOther;
+      }
+    }
     //}
     return this;
   }
@@ -1079,7 +1079,7 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
     }
   }
 
-  Float64List zDotProduct(final DComplexMatrix1D y, [final int from=0, int length=null]) {
+  Float64List zDotProduct(final DComplexMatrix1D y, [final int from = 0, int length = null]) {
     if (length == null) {
       length = this.size();
     }
@@ -1141,14 +1141,14 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
         e.printStackTrace();
       }
     } else {*/
-      int idx = zero;
-      int idxOther = zeroOther;
-      for (int k = 0; k < length; k++) {
-        sum[0] += _elements[idx] * elemsOther[idxOther] + _elements[idx + 1] * elemsOther[idxOther + 1];
-        sum[1] += _elements[idx + 1] * elemsOther[idxOther] - _elements[idx] * elemsOther[idxOther + 1];
-        idx += _stride;
-        idxOther += strideOther;
-      }
+    int idx = zero;
+    int idxOther = zeroOther;
+    for (int k = 0; k < length; k++) {
+      sum[0] += _elements[idx] * elemsOther[idxOther] + _elements[idx + 1] * elemsOther[idxOther + 1];
+      sum[1] += _elements[idx + 1] * elemsOther[idxOther] - _elements[idx] * elemsOther[idxOther + 1];
+      idx += _stride;
+      idxOther += strideOther;
+    }
     //}
     return sum;
   }
@@ -1193,12 +1193,12 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
         e.printStackTrace();
       }
     } else {*/
-      int idx = _zero;
-      for (int k = 0; k < _size; k++) {
-        sum[0] += _elements[idx];
-        sum[1] += _elements[idx + 1];
-        idx += _stride;
-      }
+    int idx = _zero;
+    for (int k = 0; k < _size; k++) {
+      sum[0] += _elements[idx];
+      sum[1] += _elements[idx + 1];
+      idx += _stride;
+    }
     //}
     return sum;
   }
@@ -1256,184 +1256,184 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
  */
 class SelectedDenseDComplexMatrix1D extends DComplexMatrix1D {
 
-    /**
-     * The elements of this matrix.
-     */
-    Float64List _elements;
+  /**
+   * The elements of this matrix.
+   */
+  Float64List _elements;
 
-    /**
-     * The offsets of visible indexes of this matrix.
-     */
-    Int32List _offsets;
+  /**
+   * The offsets of visible indexes of this matrix.
+   */
+  Int32List _offsets;
 
-    /**
-     * The offset.
-     */
-    int __offset;
+  /**
+   * The offset.
+   */
+  int __offset;
 
-    /**
-     * Constructs a matrix view with the given parameters.
-     *
-     * @param elements
-     *            the cells.
-     * @param indexes
-     *            The indexes of the cells that shall be visible.
-     */
-    factory SelectedDenseDComplexMatrix1D.offset(Float64List elements, Int32List offsets) {
-        return new SelectedDenseDComplexMatrix1D(offsets.length, elements, 0, 1, offsets, 0);
+  /**
+   * Constructs a matrix view with the given parameters.
+   *
+   * @param elements
+   *            the cells.
+   * @param indexes
+   *            The indexes of the cells that shall be visible.
+   */
+  factory SelectedDenseDComplexMatrix1D.offset(Float64List elements, Int32List offsets) {
+    return new SelectedDenseDComplexMatrix1D(offsets.length, elements, 0, 1, offsets, 0);
+  }
+
+  /**
+   * Constructs a matrix view with the given parameters.
+   *
+   * @param size
+   *            the number of cells the matrix shall have.
+   * @param elements
+   *            the cells.
+   * @param zero
+   *            the index of the first element.
+   * @param stride
+   *            the number of indexes between any two elements, i.e.
+   *            <tt>index(i+1)-index(i)</tt>.
+   * @param offsets
+   *            the offsets of the cells that shall be visible.
+   * @param offset
+   */
+  SelectedDenseDComplexMatrix1D(int size, Float64List elements, int zero, int stride, Int32List offsets, int offset) {
+    _setUp(size, zero, stride);
+
+    this._elements = elements;
+    this._offsets = offsets;
+    this.__offset = offset;
+    this._isNoView = false;
+  }
+
+  int _offset(int absRank) {
+    return _offsets[absRank];
+  }
+
+  Float64List getQuick(int index) {
+    int idx = _zero + index * _stride;
+    return new Float64List.fromList([_elements[__offset + _offsets[idx]], _elements[__offset + _offsets[idx] + 1]]);
+  }
+
+  DoubleMatrix1D getRealPart() {
+    final DenseDoubleMatrix1D R = new DenseDoubleMatrix1D(_size);
+    int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+      nthreads = Math.min(nthreads, _size);
+      List<Future> futures = new List<Future>(nthreads);
+      int k = _size / nthreads;
+      for (int j = 0; j < nthreads; j++) {
+        final int firstIdx = j * k;
+        final int lastIdx = (j == nthreads - 1) ? _size : firstIdx + k;
+        futures[j] = ConcurrencyUtils.submit(() {
+          for (int k = firstIdx; k < lastIdx; k++) {
+            final tmp = getQuick(k);
+            R.setQuick(k, tmp[0]);
+          }
+        });
+      }
+      ConcurrencyUtils.waitForCompletion(futures);
+    } else {
+      Float64List tmp;
+      for (int i = 0; i < _size; i++) {
+        tmp = getQuick(i);
+        R.setQuick(i, tmp[0]);
+      }
+    }
+    return R;
+  }
+
+  DoubleMatrix1D getImaginaryPart() {
+    final DenseDoubleMatrix1D Im = new DenseDoubleMatrix1D(_size);
+    int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+      nthreads = Math.min(nthreads, _size);
+      List<Future> futures = new List<Future>(nthreads);
+      int k = _size / nthreads;
+      for (int j = 0; j < nthreads; j++) {
+        final int firstIdx = j * k;
+        final int lastIdx = (j == nthreads - 1) ? _size : firstIdx + k;
+        futures[j] = ConcurrencyUtils.submit(() {
+          for (int k = firstIdx; k < lastIdx; k++) {
+            final tmp = getQuick(k);
+            Im.setQuick(k, tmp[1]);
+          }
+        });
+      }
+      ConcurrencyUtils.waitForCompletion(futures);
+    } else {
+      Float64List tmp;
+      for (int i = 0; i < _size; i++) {
+        tmp = getQuick(i);
+        Im.setQuick(i, tmp[1]);
+      }
     }
 
-    /**
-     * Constructs a matrix view with the given parameters.
-     *
-     * @param size
-     *            the number of cells the matrix shall have.
-     * @param elements
-     *            the cells.
-     * @param zero
-     *            the index of the first element.
-     * @param stride
-     *            the number of indexes between any two elements, i.e.
-     *            <tt>index(i+1)-index(i)</tt>.
-     * @param offsets
-     *            the offsets of the cells that shall be visible.
-     * @param offset
-     */
-    SelectedDenseDComplexMatrix1D(int size, Float64List elements, int zero, int stride, Int32List offsets, int offset) {
-        _setUp(size, zero, stride);
+    return Im;
+  }
 
-        this._elements = elements;
-        this._offsets = offsets;
-        this.__offset = offset;
-        this._isNoView = false;
+  Float64List elements() {
+    throw new UnsupportedError("This method is not supported.");
+  }
+
+  /**
+   * Returns <tt>true</tt> if both matrices share at least one identical cell.
+   *
+   * @param other
+   *            matrix
+   * @return <tt>true</tt> if both matrices share at least one identical cell.
+   */
+
+  bool _haveSharedCellsRaw(DComplexMatrix1D other) {
+    if (other is SelectedDenseDComplexMatrix1D) {
+      return this._elements == other._elements;
+    } else if (other is DenseDComplexMatrix1D) {
+      return this._elements == other._elements;
     }
+    return false;
+  }
 
-    int _offset(int absRank) {
-        return _offsets[absRank];
-    }
+  int index(int rank) {
+    return __offset + _offsets[_zero + rank * _stride];
+  }
 
-    Float64List getQuick(int index) {
-        int idx = _zero + index * _stride;
-        return new Float64List.fromList([ _elements[__offset + _offsets[idx]], _elements[__offset + _offsets[idx] + 1] ]);
-    }
+  DComplexMatrix1D like1D(int size) {
+    return new DenseDComplexMatrix1D(size);
+  }
 
-    DoubleMatrix1D getRealPart() {
-        final DenseDoubleMatrix1D R = new DenseDoubleMatrix1D(_size);
-        int nthreads = ConcurrencyUtils.getNumberOfThreads();
-        if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            nthreads = Math.min(nthreads, _size);
-            List<Future> futures = new List<Future>(nthreads);
-            int k = _size / nthreads;
-            for (int j = 0; j < nthreads; j++) {
-                final int firstIdx = j * k;
-                final int lastIdx = (j == nthreads - 1) ? _size : firstIdx + k;
-                futures[j] = ConcurrencyUtils.submit(() {
-                        for (int k = firstIdx; k < lastIdx; k++) {
-                            final tmp = getQuick(k);
-                            R.setQuick(k, tmp[0]);
-                        }
-                });
-            }
-            ConcurrencyUtils.waitForCompletion(futures);
-        } else {
-            Float64List tmp;
-            for (int i = 0; i < _size; i++) {
-                tmp = getQuick(i);
-                R.setQuick(i, tmp[0]);
-            }
-        }
-        return R;
-    }
+  DComplexMatrix2D like2D(int rows, int columns) {
+    return new DenseDComplexMatrix2D(rows, columns);
+  }
 
-    DoubleMatrix1D getImaginaryPart() {
-        final DenseDoubleMatrix1D Im = new DenseDoubleMatrix1D(_size);
-        int nthreads = ConcurrencyUtils.getNumberOfThreads();
-        if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            nthreads = Math.min(nthreads, _size);
-            List<Future> futures = new List<Future>(nthreads);
-            int k = _size / nthreads;
-            for (int j = 0; j < nthreads; j++) {
-                final int firstIdx = j * k;
-                final int lastIdx = (j == nthreads - 1) ? _size : firstIdx + k;
-                futures[j] = ConcurrencyUtils.submit(() {
-                        for (int k = firstIdx; k < lastIdx; k++) {
-                            final tmp = getQuick(k);
-                            Im.setQuick(k, tmp[1]);
-                        }
-                });
-            }
-            ConcurrencyUtils.waitForCompletion(futures);
-        } else {
-            Float64List tmp;
-            for (int i = 0; i < _size; i++) {
-                tmp = getQuick(i);
-                Im.setQuick(i, tmp[1]);
-            }
-        }
+  DComplexMatrix2D reshape(int rows, int columns) {
+    throw new UnsupportedError("This method is not supported.");
+  }
 
-        return Im;
-    }
+  DComplexMatrix3D reshape3D(int slices, int rows, int columns) {
+    throw new UnsupportedError("This method is not supported.");
+  }
 
-    Float64List elements() {
-        throw new UnsupportedError("This method is not supported.");
-    }
+  void setQuick(int index, Float64List value) {
+    int idx = _zero + index * _stride;
+    _elements[__offset + _offsets[idx]] = value[0];
+    _elements[__offset + _offsets[idx] + 1] = value[1];
+  }
 
-    /**
-     * Returns <tt>true</tt> if both matrices share at least one identical cell.
-     *
-     * @param other
-     *            matrix
-     * @return <tt>true</tt> if both matrices share at least one identical cell.
-     */
+  void setPartsQuick(int index, double re, double im) {
+    int idx = _zero + index * _stride;
+    _elements[__offset + _offsets[idx]] = re;
+    _elements[__offset + _offsets[idx] + 1] = im;
+  }
 
-    bool _haveSharedCellsRaw(DComplexMatrix1D other) {
-        if (other is SelectedDenseDComplexMatrix1D) {
-            return this._elements == other._elements;
-        } else if (other is DenseDComplexMatrix1D) {
-            return this._elements == other._elements;
-        }
-        return false;
-    }
+  void _setUp(int size, [int zero = 0, int stride = 1]) {
+    super._setUp(size, zero, stride);
+    this.__offset = 0;
+  }
 
-    int index(int rank) {
-        return __offset + _offsets[_zero + rank * _stride];
-    }
-
-    DComplexMatrix1D like1D(int size) {
-        return new DenseDComplexMatrix1D(size);
-    }
-
-    DComplexMatrix2D like2D(int rows, int columns) {
-        return new DenseDComplexMatrix2D(rows, columns);
-    }
-
-    DComplexMatrix2D reshape(int rows, int columns) {
-        throw new UnsupportedError("This method is not supported.");
-    }
-
-    DComplexMatrix3D reshape3D(int slices, int rows, int columns) {
-        throw new UnsupportedError("This method is not supported.");
-    }
-
-    void setQuick(int index, Float64List value) {
-        int idx = _zero + index * _stride;
-        _elements[__offset + _offsets[idx]] = value[0];
-        _elements[__offset + _offsets[idx] + 1] = value[1];
-    }
-
-    void setPartsQuick(int index, double re, double im) {
-        int idx = _zero + index * _stride;
-        _elements[__offset + _offsets[idx]] = re;
-        _elements[__offset + _offsets[idx] + 1] = im;
-    }
-
-    void _setUp(int size, [int zero = 0, int stride = 1]) {
-        super._setUp(size, zero, stride);
-        this.__offset = 0;
-    }
-
-    DComplexMatrix1D _viewSelectionLike(Int32List offsets) {
-        return new SelectedDenseDComplexMatrix1D.offset(this._elements, offsets);
-    }
+  DComplexMatrix1D _viewSelectionLike(Int32List offsets) {
+    return new SelectedDenseDComplexMatrix1D.offset(this._elements, offsets);
+  }
 
 }
