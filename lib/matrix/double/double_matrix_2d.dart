@@ -207,11 +207,11 @@ abstract class DoubleMatrix2D extends AbstractMatrix2D {
    * @return the aggregated measure.
    * @see cern.jet.math.tdouble.DoubleFunctions
    */
-  double aggregateIndex(final DoubleDoubleFunction aggr, final DoubleFunction f, final /*/*IntArrayList*/List<int>*/List<int> rowList, final /*/*IntArrayList*/List<int>*/List<int> columnList) {
+  double aggregateIndex(final DoubleDoubleFunction aggr, final DoubleFunction f, final /*/*IntArrayList*/Int32List*/Int32List rowList, final /*/*IntArrayList*/Int32List*/Int32List columnList) {
     if (this.size() == 0) return double.NAN;
     final int size = rowList.length;
-    final List<int> rowElements = rowList;//.elements();
-    final List<int> columnElements = columnList;//.elements();
+    final Int32List rowElements = rowList;//.elements();
+    final Int32List columnElements = columnList;//.elements();
     double a = 0.0;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -752,11 +752,11 @@ abstract class DoubleMatrix2D extends AbstractMatrix2D {
    *             <tt>columns() != other.columns() || rows() != other.rows()</tt>
    * @see cern.jet.math.tdouble.DoubleFunctions
    */
-  DoubleMatrix2D assignFuncIndex(final DoubleMatrix2D y, final DoubleDoubleFunction function, /*IntArrayList*/List<int> rowList, /*IntArrayList*/List<int> columnList) {
+  DoubleMatrix2D assignFuncIndex(final DoubleMatrix2D y, final DoubleDoubleFunction function, /*IntArrayList*/Int32List rowList, /*IntArrayList*/Int32List columnList) {
     checkShape(y);
     final int size = rowList.length;
-    final List<int> rowElements = rowList;//.elements();
-    final List<int> columnElements = columnList;//.elements();
+    final Int32List rowElements = rowList;//.elements();
+    final Int32List columnElements = columnList;//.elements();
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
@@ -838,7 +838,7 @@ abstract class DoubleMatrix2D extends AbstractMatrix2D {
     if ((nthreads > 1) && (_rows * _columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
       List<Future> futures = new List<Future>(nthreads);
-      List<int> results = new List<int>(nthreads);
+      Int32List results = new Int32List(nthreads);
       int k = _rows ~/ nthreads;
       for (int j = 0; j < nthreads; j++) {
         final int firstRow = j * k;
@@ -1260,76 +1260,76 @@ abstract class DoubleMatrix2D extends AbstractMatrix2D {
   }
 
   /**
-     * Returns the matrix cell value at coordinate <tt>[row,column]</tt>.
-     *
-     * <p>
-     * Provided with invalid parameters this method may return invalid objects
-     * without throwing any exception. <b>You should only use this method when
-     * you are absolutely sure that the coordinate is within bounds.</b>
-     * Precondition (unchecked):
-     * <tt>0 &lt;= column &lt; columns() && 0 &lt;= row &lt; rows()</tt>.
-     *
-     * @param row
-     *            the index of the row-coordinate.
-     * @param column
-     *            the index of the column-coordinate.
-     * @return the value at the specified coordinate.
-     */
+   * Returns the matrix cell value at coordinate <tt>[row,column]</tt>.
+   *
+   * <p>
+   * Provided with invalid parameters this method may return invalid objects
+   * without throwing any exception. <b>You should only use this method when
+   * you are absolutely sure that the coordinate is within bounds.</b>
+   * Precondition (unchecked):
+   * <tt>0 &lt;= column &lt; columns() && 0 &lt;= row &lt; rows()</tt>.
+   *
+   * @param row
+   *            the index of the row-coordinate.
+   * @param column
+   *            the index of the column-coordinate.
+   * @return the value at the specified coordinate.
+   */
   double getQuick(int row, int column);
 
   /**
-     * Construct and returns a new empty matrix <i>of the same dynamic type</i>
-     * as the receiver, having the same number of rows and columns. For example,
-     * if the receiver is an instance of type <tt>DenseDoubleMatrix2D</tt> the
-     * new matrix must also be of type <tt>DenseDoubleMatrix2D</tt>, if the
-     * receiver is an instance of type <tt>SparseDoubleMatrix2D</tt> the new
-     * matrix must also be of type <tt>SparseDoubleMatrix2D</tt>, etc. In
-     * general, the new matrix should have internal parametrization as similar
-     * as possible.
-     *
-     * @return a new empty matrix of the same dynamic type.
-     */
+   * Construct and returns a new empty matrix <i>of the same dynamic type</i>
+   * as the receiver, having the same number of rows and columns. For example,
+   * if the receiver is an instance of type <tt>DenseDoubleMatrix2D</tt> the
+   * new matrix must also be of type <tt>DenseDoubleMatrix2D</tt>, if the
+   * receiver is an instance of type <tt>SparseDoubleMatrix2D</tt> the new
+   * matrix must also be of type <tt>SparseDoubleMatrix2D</tt>, etc. In
+   * general, the new matrix should have internal parametrization as similar
+   * as possible.
+   *
+   * @return a new empty matrix of the same dynamic type.
+   */
   DoubleMatrix2D like() {
     return like2D(_rows, _columns);
   }
 
   /**
-     * Construct and returns a new empty matrix <i>of the same dynamic type</i>
-     * as the receiver, having the specified number of rows and columns. For
-     * example, if the receiver is an instance of type
-     * <tt>DenseDoubleMatrix2D</tt> the new matrix must also be of type
-     * <tt>DenseDoubleMatrix2D</tt>, if the receiver is an instance of type
-     * <tt>SparseDoubleMatrix2D</tt> the new matrix must also be of type
-     * <tt>SparseDoubleMatrix2D</tt>, etc. In general, the new matrix should
-     * have internal parametrization as similar as possible.
-     *
-     * @param rows
-     *            the number of rows the matrix shall have.
-     * @param columns
-     *            the number of columns the matrix shall have.
-     * @return a new empty matrix of the same dynamic type.
-     */
+   * Construct and returns a new empty matrix <i>of the same dynamic type</i>
+   * as the receiver, having the specified number of rows and columns. For
+   * example, if the receiver is an instance of type
+   * <tt>DenseDoubleMatrix2D</tt> the new matrix must also be of type
+   * <tt>DenseDoubleMatrix2D</tt>, if the receiver is an instance of type
+   * <tt>SparseDoubleMatrix2D</tt> the new matrix must also be of type
+   * <tt>SparseDoubleMatrix2D</tt>, etc. In general, the new matrix should
+   * have internal parametrization as similar as possible.
+   *
+   * @param rows
+   *            the number of rows the matrix shall have.
+   * @param columns
+   *            the number of columns the matrix shall have.
+   * @return a new empty matrix of the same dynamic type.
+   */
   DoubleMatrix2D like2D(int rows, int columns);
 
   /**
-     * Construct and returns a new 1-d matrix <i>of the corresponding dynamic
-     * type</i>, entirelly independent of the receiver. For example, if the
-     * receiver is an instance of type <tt>DenseDoubleMatrix2D</tt> the new
-     * matrix must be of type <tt>DenseDoubleMatrix1D</tt>, if the receiver is
-     * an instance of type <tt>SparseDoubleMatrix2D</tt> the new matrix must be
-     * of type <tt>SparseDoubleMatrix1D</tt>, etc.
-     *
-     * @param size
-     *            the number of cells the matrix shall have.
-     * @return a new matrix of the corresponding dynamic type.
-     */
+   * Construct and returns a new 1-d matrix <i>of the corresponding dynamic
+   * type</i>, entirelly independent of the receiver. For example, if the
+   * receiver is an instance of type <tt>DenseDoubleMatrix2D</tt> the new
+   * matrix must be of type <tt>DenseDoubleMatrix1D</tt>, if the receiver is
+   * an instance of type <tt>SparseDoubleMatrix2D</tt> the new matrix must be
+   * of type <tt>SparseDoubleMatrix1D</tt>, etc.
+   *
+   * @param size
+   *            the number of cells the matrix shall have.
+   * @return a new matrix of the corresponding dynamic type.
+   */
   DoubleMatrix1D like1D(int size);
 
   /**
-     * Normalizes this matrix, i.e. makes the sum of all elements equal to 1.0
-     * If the matrix contains negative elements then all the values are shifted
-     * to ensure non-negativity.
-     */
+   * Normalizes this matrix, i.e. makes the sum of all elements equal to 1.0
+   * If the matrix contains negative elements then all the values are shifted
+   * to ensure non-negativity.
+   */
   void normalize() {
     double min = getMinLocation()[0];
     if (min < 0) {
@@ -1418,6 +1418,7 @@ abstract class DoubleMatrix2D extends AbstractMatrix2D {
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
       for (int r = 0; r < _rows; r++) {
+        values[r] = new Float64List(_columns);
         List<double> currentRow = values[r];
         for (int c = 0; c < _columns; c++) {
           currentRow[c] = getQuick(r, c);
@@ -1696,7 +1697,7 @@ abstract class DoubleMatrix2D extends AbstractMatrix2D {
     }
 
     //matches.trimToSize();
-    return viewSelection(matches/*.elements()*/, null); // take all columns
+    return viewSelection(new Int32List.fromList(matches)/*.elements()*/, null); // take all columns
   }
 
   /**
@@ -1745,21 +1746,21 @@ abstract class DoubleMatrix2D extends AbstractMatrix2D {
    *             if <tt>!(0 <= columnIndexes[i] < columns())</tt> for any
    *             <tt>i=0..columnIndexes.length()-1</tt>.
    */
-  DoubleMatrix2D viewSelection(List<int> rowIndexes, List<int> columnIndexes) {
+  DoubleMatrix2D viewSelection(Int32List rowIndexes, Int32List columnIndexes) {
     // check for "all"
     if (rowIndexes == null) {
-      rowIndexes = new List<int>(_rows);
+      rowIndexes = new Int32List(_rows);
       for (int i = 0; i < _rows; i++) rowIndexes[i] = i;
     }
     if (columnIndexes == null) {
-      columnIndexes = new List<int>(_columns);
+      columnIndexes = new Int32List(_columns);
       for (int i = 0; i < _columns; i++) columnIndexes[i] = i;
     }
 
     _checkRowIndexes(rowIndexes);
     _checkColumnIndexes(columnIndexes);
-    List<int> rowOffsets = new List<int>(rowIndexes.length);
-    List<int> columnOffsets = new List<int>(columnIndexes.length);
+    Int32List rowOffsets = new Int32List(rowIndexes.length);
+    Int32List columnOffsets = new Int32List(columnIndexes.length);
     for (int i = 0; i < rowIndexes.length; i++) {
       rowOffsets[i] = _rowOffset(_rowRank(rowIndexes[i]));
     }
@@ -1769,22 +1770,22 @@ abstract class DoubleMatrix2D extends AbstractMatrix2D {
     return _viewSelectionLike(rowOffsets, columnOffsets);
   }
 
-  DoubleMatrix2D viewSelectionSet(Set<List<int>> indexes) {
+  DoubleMatrix2D viewSelectionSet(Set<Int32List> indexes) {
     int n = indexes.length;
-    List<int> rowIndexes = new List<int>(n);
-    List<int> columnIndexes = new List<int>(n);
+    Int32List rowIndexes = new Int32List(n);
+    Int32List columnIndexes = new Int32List(n);
     int idx = 0;
-    for (Iterator<List<int>> iterator = indexes.iterator; iterator.current != null; ) {
+    for (Iterator<Int32List> iterator = indexes.iterator; iterator.current != null; ) {
       iterator.moveNext();
-      List<int> _is = iterator.current;
+      Int32List _is = iterator.current;
       rowIndexes[idx] = _is[0];
       columnIndexes[idx] = _is[1];
       idx++;
     }
     _checkRowIndexes(rowIndexes);
     _checkColumnIndexes(columnIndexes);
-    List<int> rowOffsets = new List<int>(rowIndexes.length);
-    List<int> columnOffsets = new List<int>(columnIndexes.length);
+    Int32List rowOffsets = new Int32List(rowIndexes.length);
+    Int32List columnOffsets = new Int32List(columnIndexes.length);
     for (int i = 0; i < rowIndexes.length; i++) {
       rowOffsets[i] = _rowOffset(_rowRank(rowIndexes[i]));
     }
@@ -1932,32 +1933,32 @@ abstract class DoubleMatrix2D extends AbstractMatrix2D {
   }
 
   /**
-     * Linear algebraic matrix-vector multiplication; <tt>z = A * y</tt>;
-     * Equivalent to <tt>return A.zMult(y,z,1,0);</tt>
-     */
+   * Linear algebraic matrix-vector multiplication; <tt>z = A * y</tt>;
+   * Equivalent to <tt>return A.zMult(y,z,1,0);</tt>
+   */
   //    DoubleMatrix1D zMult(DoubleMatrix1D y, DoubleMatrix1D z) {
   //        return zMult(y, z, 1, 0, false);
   //    }
 
   /**
-     * Linear algebraic matrix-vector multiplication;
-     * <tt>z = alpha * A * y + beta*z</tt>.
-     * <tt>z[i] = alpha*Sum(A[i,j] * y[j]) + beta*z[i], i=0..A.rows()-1, j=0..y.size()-1</tt>
-     * . Where <tt>A == this</tt>. <br>
-     * Note: Matrix shape conformance is checked <i>after</i> potential
-     * transpositions.
-     *
-     * @param y
-     *            the source vector.
-     * @param z
-     *            the vector where results are to be stored. Set this parameter
-     *            to <tt>null</tt> to indicate that a new result vector shall be
-     *            constructed.
-     * @return z (for convenience only).
-     *
-     * @throws ArgumentError
-     *             if <tt>A.columns() != y.size() || A.rows() > z.size())</tt>.
-     */
+   * Linear algebraic matrix-vector multiplication;
+   * <tt>z = alpha * A * y + beta*z</tt>.
+   * <tt>z[i] = alpha*Sum(A[i,j] * y[j]) + beta*z[i], i=0..A.rows()-1, j=0..y.size()-1</tt>
+   * . Where <tt>A == this</tt>. <br>
+   * Note: Matrix shape conformance is checked <i>after</i> potential
+   * transpositions.
+   *
+   * @param y
+   *            the source vector.
+   * @param z
+   *            the vector where results are to be stored. Set this parameter
+   *            to <tt>null</tt> to indicate that a new result vector shall be
+   *            constructed.
+   * @return z (for convenience only).
+   *
+   * @throws ArgumentError
+   *             if <tt>A.columns() != y.size() || A.rows() > z.size())</tt>.
+   */
   DoubleMatrix1D zMult(final DoubleMatrix1D y, DoubleMatrix1D z, [double alpha = 1.0, double beta = 0.0, bool transposeA = false]) {
     if (transposeA) return viewDice().zMult(y, z, alpha, beta, false);
     DoubleMatrix1D zz;
@@ -2159,7 +2160,7 @@ abstract class DoubleMatrix2D extends AbstractMatrix2D {
    *            the offsets of the visible elements.
    * @return a new view.
    */
-  DoubleMatrix2D _viewSelectionLike(List<int> rowOffsets, List<int> columnOffsets);
+  DoubleMatrix2D _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets);
 
   Object clone();
 }

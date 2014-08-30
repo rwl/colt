@@ -3,8 +3,8 @@ part of cern.colt.matrix.double.test;
 testDenseDoubleMatrix2D(String name, DenseDoubleMatrix2DTest t) {
   testDoubleMatrix2D(name, t);
   group('DenseDoubleMatrix2D', () {
-    setUp() => t.setUp;
-    tearDown() => t.tearDown();
+    setUp(t.setUp);
+    tearDown(t.tearDown);
     test('assignValues', t.testAssignValues);
   });
 }
@@ -15,15 +15,6 @@ class DenseDoubleMatrix2DTest extends DoubleMatrix2DTest {
     A = new DenseDoubleMatrix2D(NROWS, NCOLUMNS);
     B = new DenseDoubleMatrix2D(NROWS, NCOLUMNS);
     Bt = new DenseDoubleMatrix2D(NCOLUMNS, NROWS);
-  }
-
-  void runTests() {
-    super.runTests();
-    group('DenseDoubleMatrix2D', () {
-      setUp() => this.setUp;
-      tearDown() => this.tearDown();
-      test('assignValues', testAssignValues);
-    });
   }
 
   void testAssignValues() {

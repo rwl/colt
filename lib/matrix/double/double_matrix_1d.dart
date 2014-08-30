@@ -108,10 +108,10 @@ abstract class DoubleMatrix1D extends AbstractMatrix1D {
    * @return the aggregated measure.
    * @see cern.jet.math.tdouble.DoubleFunctions
    */
-  double aggregateIndex(final DoubleDoubleFunction aggr, DoubleFunction f,  /*IntArrayList*/List<int> indexList) {
+  double aggregateIndex(final DoubleDoubleFunction aggr, DoubleFunction f,  /*IntArrayList*/Int32List indexList) {
     if (this.size() == 0) return double.NAN;
     final int size = indexList.length;
-    final List<int> indexElements = indexList;
+    final Int32List indexElements = indexList;
     double a = 0.0;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
@@ -185,8 +185,8 @@ abstract class DoubleMatrix1D extends AbstractMatrix1D {
     checkSize(other);
     if (_size == 0) return double.NAN;
     double a = f(getQuick(0), other.getQuick(0));
-    int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    /*if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
         nthreads = Math.min(nthreads, _size);
         List<Future> futures = new List<Future>(nthreads);
         int k = _size ~/ nthreads;
@@ -235,8 +235,8 @@ abstract class DoubleMatrix1D extends AbstractMatrix1D {
    * @see cern.jet.math.tdouble.DoubleFunctions
    */
   DoubleMatrix1D assign(final DoubleFunction f) {
-    int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    /*if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
         nthreads = Math.min(nthreads, _size);
         List<Future> futures = new List<Future>(nthreads);
         int k = _size ~/ nthreads;
@@ -270,8 +270,8 @@ abstract class DoubleMatrix1D extends AbstractMatrix1D {
    * @see cern.jet.math.tdouble.DoubleFunctions
    */
   DoubleMatrix1D assignProc(final DoubleProcedure cond, DoubleFunction f) {
-    int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    /*if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
       List<Future> futures = new List<Future>(nthreads);
       int k = _size ~/ nthreads;
@@ -313,8 +313,8 @@ abstract class DoubleMatrix1D extends AbstractMatrix1D {
    *
    */
   DoubleMatrix1D assignProcValue(DoubleProcedure cond, double value) {
-    int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    /*if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
       List<Future> futures = new List<Future>(nthreads);
       int k = _size ~/ nthreads;
@@ -352,8 +352,8 @@ abstract class DoubleMatrix1D extends AbstractMatrix1D {
    * @return <tt>this</tt> (for convenience only).
    */
   DoubleMatrix1D assignValue(final double value) {
-    int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    /*if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
       List<Future> futures = new List<Future>(nthreads);
       int k = _size ~/ nthreads;
@@ -392,8 +392,8 @@ abstract class DoubleMatrix1D extends AbstractMatrix1D {
     if (values.length != _size) {
       throw new ArgumentError("Must have same number of cells: length=${values.length} size()=${size()}");
     }
-    int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    /*if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
       List<Future> futures = new List<Future>(nthreads);
       int k = _size ~/ nthreads;
@@ -438,8 +438,8 @@ abstract class DoubleMatrix1D extends AbstractMatrix1D {
     } else {
       source = other;
     }
-    int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    /*if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
       List<Future> futures = new List<Future>(nthreads);
       int k = _size ~/ nthreads;
@@ -493,8 +493,8 @@ abstract class DoubleMatrix1D extends AbstractMatrix1D {
    */
   DoubleMatrix1D assignFunc(DoubleMatrix1D y, DoubleDoubleFunction function) {
     checkSize(y);
-    int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    /*if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
       List<Future> futures = new List<Future>(nthreads);
       int k = _size ~/ nthreads;
@@ -556,9 +556,9 @@ abstract class DoubleMatrix1D extends AbstractMatrix1D {
    *             if <tt>size() != y.size()</tt>.
    * @see cern.jet.math.tdouble.DoubleFunctions
    */
-  DoubleMatrix1D assignFuncIndex(DoubleMatrix1D y, DoubleDoubleFunction function, /*IntArrayList*/List<int> nonZeroIndexes) {
+  DoubleMatrix1D assignFuncIndex(DoubleMatrix1D y, DoubleDoubleFunction function, /*IntArrayList*/Int32List nonZeroIndexes) {
     checkSize(y);
-    List<int> nonZeroElements = nonZeroIndexes;//.elements();
+    Int32List nonZeroElements = nonZeroIndexes;//.elements();
 
     // specialized for speed
     if (function == func.mult) { // x[i] = x[i] * y[i]
@@ -606,7 +606,7 @@ abstract class DoubleMatrix1D extends AbstractMatrix1D {
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
       List<Future> futures = new List<Future>(nthreads);
-      List<int> results = new List<int>(nthreads);
+      Int32List results = new Int32List(nthreads);
       int k = _size ~/ nthreads;
       for (int j = 0; j < nthreads; j++) {
           final int firstIdx = j * k;
@@ -1236,7 +1236,7 @@ abstract class DoubleMatrix1D extends AbstractMatrix1D {
    * @return an array filled with the values of the cells.
    */
   List<double> toArray() {
-    List<double> values = new List<double>(_size);
+    Float64List values = new Float64List(_size);
     toArrayValues(values);
     return values;
   }
@@ -1365,7 +1365,7 @@ abstract class DoubleMatrix1D extends AbstractMatrix1D {
       if (condition(getQuick(i))) matches.add(i);
     }
     //matches.trimToSize();
-    return viewSelectionIndex(matches/*.elements()*/);
+    return viewSelectionIndex(new Int32List.fromList(matches)/*.elements()*/);
   }
 
   /**
@@ -1399,15 +1399,15 @@ abstract class DoubleMatrix1D extends AbstractMatrix1D {
    *             if <tt>!(0 <= indexes[i] < size())</tt> for any
    *             <tt>i=0..indexes.length()-1</tt>.
    */
-  DoubleMatrix1D viewSelectionIndex(List<int> indexes) {
+  DoubleMatrix1D viewSelectionIndex(Int32List indexes) {
     // check for "all"
     if (indexes == null) {
-      indexes = new List<int>(_size);
+      indexes = new Int32List(_size);
       for (int i = 0; i < _size; i++) indexes[i] = i;
     }
 
     _checkIndexes(indexes);
-    List<int> offsets = new List<int>(indexes.length);
+    Int32List offsets = new Int32List(indexes.length);
     for (int i = 0; i < indexes.length; i++) {
       offsets[i] = index(indexes[i]);
     }
@@ -1531,7 +1531,7 @@ abstract class DoubleMatrix1D extends AbstractMatrix1D {
    *            the indexes of cells in <tt>y</tt>having a non-zero value.
    * @return the sum of products.
    */
-  double zDotProductIndex(DoubleMatrix1D y, int from, int length,  /*IntArrayList*/List<int> nonZeroIndexes) {
+  double zDotProductIndex(DoubleMatrix1D y, int from, int length,  /*IntArrayList*/Int32List nonZeroIndexes) {
     // determine minimum length
     if (from < 0 || length <= 0) return 0.0;
 
@@ -1540,10 +1540,10 @@ abstract class DoubleMatrix1D extends AbstractMatrix1D {
     if (y._size < tail) tail = y._size;
     length = tail - from;
     if (length <= 0) return 0.0;
-    /*IntArrayList*/List<int> indexesCopy = new List<int>.from(nonZeroIndexes);
+    /*IntArrayList*/Int32List indexesCopy = new Int32List.fromList(nonZeroIndexes);
     //indexesCopy.trimToSize();
     //indexesCopy.quickSort();
-    List<int> nonZeroIndexElements = indexesCopy;//.elements();
+    Int32List nonZeroIndexElements = indexesCopy;//.elements();
     int index = 0;
     int s = indexesCopy.length;
     // skip to start
@@ -1629,7 +1629,7 @@ abstract class DoubleMatrix1D extends AbstractMatrix1D {
    *            the offsets of the visible elements.
    * @return a new view.
    */
-  DoubleMatrix1D _viewSelectionLike(List<int> offsets);
+  DoubleMatrix1D _viewSelectionLike(Int32List offsets);
 
   /**
    * Returns the dot product of two vectors x and y, which is
@@ -1641,7 +1641,7 @@ abstract class DoubleMatrix1D extends AbstractMatrix1D {
    *            the indexes of cells in <tt>y</tt>having a non-zero value.
    * @return the sum of products.
    */
-  double _zDotProduct(DoubleMatrix1D y,  /*IntArrayList*/List<int> nonZeroIndexes) {
+  double _zDotProduct(DoubleMatrix1D y,  /*IntArrayList*/Int32List nonZeroIndexes) {
     return zDotProductIndex(y, 0, _size, nonZeroIndexes);
   }
 

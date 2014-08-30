@@ -2,38 +2,38 @@ part of cern.colt.matrix.double.test;
 
 testDoubleMatrix1D(String name, DoubleMatrix1DTest t) {
   group('DoubleMatrix1D ($name)', () {
-    setUp() => t.setUp;
-    tearDown() => t.tearDown();
+    setUp(t.setUp);
+    tearDown(t.tearDown);
     test('aggregate', t.testAggregate);
     test('aggregateIndex', t.testAggregateIndex);
-    test('aggregateMatrix', t.testAggregateMatrix());
-    test('assignValue', t.testAssignValue());
-    test('assignValues', t.testAssignValues());
-    test('assign', t.testAssign());
-    test('assignMatrix', t.testAssignMatrix());
-    test('assignFunc', t.testAssignFunc());
-    test('assignProcValue', t.testAssignProceValue());
-    test('assignProc', t.testAssignProc());
-    test('cardinality', t.testCardinality());
-    test('equalsValue', t.testEqualsValue());
-    test('equals', t.testEquals());
-    test('maxLocation', t.testMaxLocation());
-    test('minLocation', t.testMinLocation());
-    test('getNegativeValues', t.testGetNegativeValues());
-    test('getNonZeros', t.testGetNonZeros());
-    test('getPositiveValues', t.testGetPositiveValues());
-    test('toArray', t.testToArray());
-    test('toArrayFill', t.testToArrayFill());
-    test('reshape', t.testReshape());
-    test('swap', t.testSwap());
-    test('viewFlip', t.testViewFlip());
-    test('viewPart', t.testViewPart());
-    test('viewSelection', t.testViewSelection());
-    test('viewSelectionIndex', t.testViewSelectionIndex());
-    test('viewStrides', t.testViewStrides());
-    test('zDotProduct', t.testZDotProduct());
-    test('zDotProductRange', t.testZDotProductRange());
-    test('zDotProductIndex', t.testZDotProductIndex());
+    test('aggregateMatrix', t.testAggregateMatrix);
+    test('assignValue', t.testAssignValue);
+    test('assignValues', t.testAssignValues);
+    test('assign', t.testAssign);
+    test('assignMatrix', t.testAssignMatrix);
+    test('assignFunc', t.testAssignFunc);
+    test('assignProcValue', t.testAssignProceValue);
+    test('assignProc', t.testAssignProc);
+    test('cardinality', t.testCardinality);
+    test('equalsValue', t.testEqualsValue);
+    test('equals', t.testEquals);
+    test('maxLocation', t.testMaxLocation);
+    test('minLocation', t.testMinLocation);
+    test('getNegativeValues', t.testGetNegativeValues);
+    test('getNonZeros', t.testGetNonZeros);
+    test('getPositiveValues', t.testGetPositiveValues);
+    test('toArray', t.testToArray);
+    test('toArrayFill', t.testToArrayFill);
+    test('reshape', t.testReshape);
+    test('swap', t.testSwap);
+    test('viewFlip', t.testViewFlip);
+    test('viewPart', t.testViewPart);
+    test('viewSelection', t.testViewSelection);
+    test('viewSelectionIndex', t.testViewSelectionIndex);
+    test('viewStrides', t.testViewStrides);
+    test('zDotProduct', t.testZDotProduct);
+    test('zDotProductRange', t.testZDotProductRange);
+    test('zDotProductIndex', t.testZDotProductIndex);
   });
 }
 
@@ -218,7 +218,7 @@ abstract class DoubleMatrix1DTest {
     A.setQuick(A.size() ~/ 2, 0.1);
     Float64List maxAndLoc = A.getMaxLocation();
     expect(0.7, closeTo(maxAndLoc[0], TOL));
-    expect(A.size() / 3, equals(maxAndLoc[1]));
+    expect(A.size() ~/ 3, equals(maxAndLoc[1]));
   }
 
   testMinLocation() {
@@ -227,7 +227,7 @@ abstract class DoubleMatrix1DTest {
     A.setQuick(A.size() ~/ 2, -0.1);
     Float64List minAndLoc = A.getMinLocation();
     expect(-0.7, closeTo(minAndLoc[0], TOL));
-    expect(A.size() / 3, equals(minAndLoc[1]));
+    expect(A.size() ~/ 3, equals(minAndLoc[1]));
   }
 
   testGetNegativeValues() {
@@ -239,8 +239,8 @@ abstract class DoubleMatrix1DTest {
     A.getNegativeValues(indexList, valueList);
     expect(2, indexList.length);
     expect(2, valueList.length);
-    expect(indexList.contains(A.size() / 3), isTrue);
-    expect(indexList.contains(A.size() / 2), isTrue);
+    expect(indexList.contains(A.size() ~/ 3), isTrue);
+    expect(indexList.contains(A.size() ~/ 2), isTrue);
     expect(valueList.contains(-0.7), isTrue);
     expect(valueList.contains(-0.1), isTrue);
   }
@@ -254,8 +254,8 @@ abstract class DoubleMatrix1DTest {
     A.getNonZeros(indexList, valueList);
     expect(2, indexList.length);
     expect(2, valueList.length);
-    expect(indexList.contains(A.size() / 3), isTrue);
-    expect(indexList.contains(A.size() / 2), isTrue);
+    expect(indexList.contains(A.size() ~/ 3), isTrue);
+    expect(indexList.contains(A.size() ~/ 2), isTrue);
     expect(valueList.contains(0.7), isTrue);
     expect(valueList.contains(0.1), isTrue);
   }
@@ -269,8 +269,8 @@ abstract class DoubleMatrix1DTest {
     A.getPositiveValues(indexList, valueList);
     expect(2, indexList.length);
     expect(2, valueList.length);
-    expect(indexList.contains(A.size() / 3), isTrue);
-    expect(indexList.contains(A.size() / 2), isTrue);
+    expect(indexList.contains(A.size() ~/ 3), isTrue);
+    expect(indexList.contains(A.size() ~/ 2), isTrue);
     expect(valueList.contains(0.7), isTrue);
     expect(valueList.contains(0.1), isTrue);
   }
@@ -401,7 +401,7 @@ abstract class DoubleMatrix1DTest {
     List<int> indexList = new List<int>();
     List<double> valueList = new List<double>();
     B.getNonZeros(indexList, valueList);
-    double product = A.zDotProductIndex(B, 5, B.size() - 10, indexList);
+    double product = A.zDotProductIndex(B, 5, B.size() - 10, new Int32List.fromList(indexList));
     double expected = 0.0;
     for (int i = 5; i < A.size() - 5; i++) {
       expected += A.getQuick(i) * B.getQuick(i);

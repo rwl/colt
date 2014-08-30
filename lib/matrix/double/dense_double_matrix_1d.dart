@@ -70,7 +70,7 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
    */
   //    DenseDoubleMatrix1D(int size) {
   //        _setUp(size);
-  //        this._elements = new List<double>(size);
+  //        this._elements = new Float64List(size);
   //    }
 
   /**
@@ -92,7 +92,7 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
    */
   DenseDoubleMatrix1D(int size, [Float64List elements = null, int zero = 0, int stride = 1, bool isView = false]) {
     if (elements == null) {
-      elements = new List<double>(size);
+      elements = new Float64List(size);
     }
     _setUp(size, zero, stride);
     this._elements = elements;
@@ -177,7 +177,7 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
     if (_size == 0) return double.NAN;
     final int zeroOther = other.index(0);
     final int strideOther = other.stride();
-    final List<double> elementsOther = other.elements() as List<double>;
+    final Float64List elementsOther = other.elements() as Float64List;
     double a = 0.0;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
@@ -334,8 +334,8 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
   }
 
   DoubleMatrix1D assignValue(final double value) {
-    final List<double> elems = this._elements;
-    int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    final Float64List elems = this._elements;
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
       List<Future> futures = new List<Future>(nthreads);
@@ -352,13 +352,13 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
         });
       }
       ConcurrencyUtils.waitForCompletion(futures);
-    } else {
+    } else {*/
       int idx = _zero;
       for (int i = 0; i < _size; i++) {
         elems[idx] = value;
         idx += _stride;
       }
-    }
+    //}
     return this;
   }
 
@@ -423,7 +423,7 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
       other = c as DenseDoubleMatrix1D;
     }
 
-    final List<double> elementsOther = other._elements;
+    final Float64List elementsOther = other._elements;
     if (_elements == null || elementsOther == null) {
       throw new Error();
     }
@@ -469,7 +469,7 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
     checkSize(y);
     final int zeroOther = y.index(0);
     final int strideOther = y.stride();
-    final List<double> elementsOther = y.elements() as List<double>;
+    final Float64List elementsOther = y.elements() as Float64List;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
@@ -804,14 +804,14 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
     }
   }
 
-  List<double> getMaxLocation() {
+  Float64List getMaxLocation() {
     int location = 0;
     double maxValue = 0.0;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
       List<Future> futures = new List<Future>(nthreads);
-      List<List<double>> results = new List<List<double>>(nthreads);//[2];
+      List<Float64List> results = new List<Float64List>(nthreads);//[2];
       int k = _size ~/ nthreads;
       for (int j = 0; j < nthreads; j++) {
         final int firstIdx = j * k;
@@ -832,7 +832,7 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
       }
       try {
         for (int j = 0; j < nthreads; j++) {
-          results[j] = futures[j].get() as List<double>;
+          results[j] = futures[j].get() as Float64List;
         }
         maxValue = results[0][0];
         location = results[0][1] as int;
@@ -859,17 +859,17 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
       }
     }
     //}
-    return [maxValue, location];
+    return new Float64List.fromList([maxValue, location.toDouble()]);
   }
 
-  List<double> getMinLocation() {
+  Float64List getMinLocation() {
     int location = 0;
     double minValue = 0.0;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
       List<Future> futures = new List<Future>(nthreads);
-      List<List<double>> results = new List<List<double>>(nthreads);//[2];
+      List<List<double>> results = new List<Float64List>(nthreads);//[2];
       int k = _size ~/ nthreads;
       for (int j = 0; j < nthreads; j++) {
         final int firstIdx = j * k;
@@ -890,7 +890,7 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
       }
       try {
         for (int j = 0; j < nthreads; j++) {
-          results[j] = futures[j].get() as List<double>;
+          results[j] = futures[j].get() as Float64List;
         }
         minValue = results[0][0];
         location = results[0][1] as int;
@@ -917,7 +917,7 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
       }
     }
     //}
-    return [minValue, location];
+    return new Float64List.fromList([minValue, location.toDouble()]);
   }
 
   double getQuick(int index) {
@@ -937,11 +937,11 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
       throw new ArgumentError("rows*columns != size");
     }
     DoubleMatrix2D M = new DenseDoubleMatrix2D(rows, columns);
-    final List<double> elementsOther = M.elements() as List<double>;
+    final Float64List elementsOther = M.elements() as Float64List;
     final int zeroOther = M.index(0, 0);
     final int rowStrideOther = M.rowStride();
     final int columnStrideOther = M.columnStride();
-    int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
       List<Future> futures = new List<Future>(nthreads);
@@ -964,18 +964,17 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
         });
       }
       ConcurrencyUtils.waitForCompletion(futures);
-    } else {
-      int idxOther;
+    } else {*/
       int idx = _zero;
       for (int c = 0; c < columns; c++) {
-        idxOther = zeroOther + c * columnStrideOther;
+        int idxOther = zeroOther + c * columnStrideOther;
         for (int r = 0; r < rows; r++) {
           elementsOther[idxOther] = _elements[idx];
           idxOther += rowStrideOther;
           idx += _stride;
         }
       }
-    }
+    //}
     return M;
   }
 
@@ -984,7 +983,7 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
       throw new ArgumentError("slices*rows*columns != size");
     }
     DoubleMatrix3D M = new DenseDoubleMatrix3D(slices, rows, columns);
-    final List<double> elementsOther = M.elements() as List<double>;
+    final Float64List elementsOther = M.elements() as Float64List;
     final int zeroOther = M.index(0, 0, 0) as int;
     final int sliceStrideOther = M.sliceStride();
     final int rowStrideOther = M.rowStride();
@@ -1043,7 +1042,7 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
     DenseDoubleMatrix1D y = other as DenseDoubleMatrix1D;
     if (y == this) return;
     checkSize(y);
-    final List<double> elementsOther = y._elements;
+    final Float64List elementsOther = y._elements;
     if (_elements == null || elementsOther == null) throw new Error();
     final int zeroOther = other.index(0);
     final int strideOther = other.stride();
@@ -1081,7 +1080,7 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
     //}
   }
 
-  void toArrayValues(List<double> values) {
+  void toArrayValues(Float64List values) {
     if (values.length < _size) throw new ArgumentError("values too small");
     if (this._isNoView) {
       values.setAll(0, this._elements);
@@ -1101,7 +1100,7 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
     if (from < 0 || length < 0) return 0.0;
     if (_size < tail) tail = _size;
     if (y.size() < tail) tail = y.size();
-    final List<double> elementsOther = yy._elements;
+    final Float64List elementsOther = yy._elements;
     int zeroThis = index(from);
     int zeroOther = yy.index(from);
     int strideOther = yy._stride;
@@ -1114,7 +1113,7 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
       final int strideOtherF = strideOther;
       nthreads = Math.min(nthreads, length);
       List<Future> futures = new List<Future>(nthreads);
-      List<double> results = new List<double>(nthreads);
+      Float64List results = new Float64List(nthreads);
       int k = length ~/ nthreads;
       for (int j = 0; j < nthreads; j++) {
         final int firstIdx = j * k;
@@ -1164,13 +1163,13 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
 
   double zSum() {
     double sum = 0.0;
-    final List<double> elems = this._elements;
+    final Float64List elems = this._elements;
     if (elems == null) throw new Error();
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
       List<Future> futures = new List<Future>(nthreads);
-      List<double> results = new List<double>(nthreads);
+      Float64List results = new Float64List(nthreads);
       int k = _size ~/ nthreads;
       for (int j = 0; j < nthreads; j++) {
         final int firstIdx = j * k;
@@ -1211,7 +1210,7 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
   int _cardinality(int maxCardinality) {
     int cardinality = 0;
     int index = _zero;
-    List<double> elems = this._elements;
+    Float64List elems = this._elements;
     int i = _size;
     while (--i >= 0 && cardinality < maxCardinality) {
       if (elems[index] != 0) cardinality++;

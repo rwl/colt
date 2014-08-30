@@ -70,7 +70,7 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
    *             <tt>for any 1 &lt;= row &lt; values.length: values[row].length != values[row-1].length</tt>
    *             .
    */
-  factory DenseDoubleMatrix2D.from(List<List<double>> values) {
+  factory DenseDoubleMatrix2D.from(List<Float64List> values) {
     final m = new DenseDoubleMatrix2D(values.length, values.length == 0 ? 0 : values[0].length);
     assignValues2D(values);
     return m;
@@ -91,7 +91,7 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
    */
   //    DenseDoubleMatrix2D(int rows, int columns) {
   //        _setUp(rows, columns);
-  //        this._elements = new List<double>(rows * columns);
+  //        this._elements = new Float64List(rows * columns);
   //    }
 
   /**
@@ -120,9 +120,9 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
    *             <tt>rows<0 || columns<0 || (double)columns*rows > Integer.MAX_VALUE</tt>
    *             or flip's are illegal.
    */
-  DenseDoubleMatrix2D(int rows, int columns, [List<double> elements = null, int rowZero = 0, int columnZero = 0, int rowStride = 1, int columnStride = 1, bool isView = false]) {
+  DenseDoubleMatrix2D(int rows, int columns, [Float64List elements = null, int rowZero = 0, int columnZero = 0, int rowStride = 1, int columnStride = 1, bool isView = false]) {
     if (elements == null) {
-      elements = new List<double>(rows * columns);
+      elements = new Float64List(rows * columns);
     }
     _setUp(rows, columns, rowZero, columnZero, rowStride, columnStride);
     this._elements = elements;
@@ -150,11 +150,11 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
 
     MatrixSize size = reader.readMatrixSize(info);
     final m = new DenseDoubleMatrix2D(size.numRows(), size.numColumns());
-    m._elements = new List<double>(_rows * _columns);
+    m._elements = new Float64List(_rows * _columns);
     int numEntries = size.numEntries();
     List<int> columnIndexes = new List<int>(numEntries);
     List<int> rowIndexes = new List<int>(numEntries);
-    List<double> values = new List<double>(numEntries);
+    Float64List values = new Float64List(numEntries);
     reader.readCoordinate(rowIndexes, columnIndexes, values);
     for (int i = 0; i < numEntries; i++) {
       m.setQuick(rowIndexes[i], columnIndexes[i], values[i]);
@@ -313,7 +313,7 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
     final int zeroOther = other.index(0, 0);
     final int rowStrideOther = other.rowStride();
     final int colStrideOther = other.columnStride();
-    final List<double> elementsOther = other.elements() as List<double>;
+    final Float64List elementsOther = other.elements() as Float64List;
     double a = 0.0;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -350,7 +350,7 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
   }
 
   DoubleMatrix2D assign(DoubleFunction function) {
-    final List<double> elems = this._elements;
+    final Float64List elems = this._elements;
     if (elems == null) throw new Error();
     final int zero = index(0, 0);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -517,7 +517,7 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
   }
 
   DoubleMatrix2D assignValue(final double value) {
-    final List<double> elems = this._elements;
+    final Float64List elems = this._elements;
     final int zero = index(0, 0);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -554,11 +554,11 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
     return this;
   }
 
-  DoubleMatrix2D assignValues(final List<double> values) {
+  DoubleMatrix2D assignValues(final Float64List values) {
     if (values.length != size()) {
       throw new ArgumentError("Must have same length: length=${values.length} rows()*columns()=${rows() * columns()}");
     }
-    int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    //int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if (this._isNoView) {
       this._elements.setAll(0, values);
       //System.arraycopy(values, 0, this._elements, 0, values.length);
@@ -601,11 +601,11 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
     return this;
   }
 
-  DoubleMatrix2D assignValues2D(final List<List<double>> values) {
+  DoubleMatrix2D assignValues2D(final List<Float64List> values) {
     if (values.length != _rows) {
       throw new ArgumentError("Must have same number of rows: rows=${values.length} rows()=${rows()}");
     }
-    int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    //int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if (this._isNoView) {
       /*if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
         nthreads = Math.min(nthreads, _rows);
@@ -617,7 +617,7 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
           futures[j] = ConcurrencyUtils.submit(() {
             int i = firstRow * _rowStride;
             for (int r = firstRow; r < lastRow; r++) {
-              List<double> currentRow = values[r];
+              Float64List currentRow = values[r];
               if (currentRow.length != _columns) throw new ArgumentError("Must have same number of columns in every row: columns=" + currentRow.length + "columns()=" + columns());
               System.arraycopy(currentRow, 0, _elements, i, _columns);
               i += _columns;
@@ -628,7 +628,7 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
       } else {*/
       int i = 0;
       for (int r = 0; r < _rows; r++) {
-        List<double> currentRow = values[r];
+        Float64List currentRow = values[r];
         if (currentRow.length != _columns) {
           throw new ArgumentError("Must have same number of columns in every row: columns=${currentRow.length} columns()=${columns()}");
         }
@@ -649,7 +649,7 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
           futures[j] = ConcurrencyUtils.submit(() {
             int idx = zero + firstRow * _rowStride;
             for (int r = firstRow; r < lastRow; r++) {
-              List<double> currentRow = values[r];
+              Float64List currentRow = values[r];
               if (currentRow.length != _columns) throw new ArgumentError("Must have same number of columns in every row: columns=" + currentRow.length + "columns()=" + columns());
               for (int i = idx,
                   c = 0; c < _columns; c++) {
@@ -664,7 +664,7 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
       } else {*/
       int idx = zero;
       for (int r = 0; r < _rows; r++) {
-        List<double> currentRow = values[r];
+        Float64List currentRow = values[r];
         if (currentRow.length != _columns) {
           throw new ArgumentError("Must have same number of columns in every row: columns=${currentRow.length} columns()=${columns()}");
         }
@@ -687,10 +687,10 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
       super.assignMatrix(source);
       return this;
     }
-    DenseDoubleMatrix2D other = double as DenseDoubleMatrix2D;
+    DenseDoubleMatrix2D other = source as DenseDoubleMatrix2D;
     if (other == this) return this; // nothing to do
     checkShape(other);
-    int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    //int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if (this._isNoView && other._isNoView) { // quickest
       this._elements.setAll(0, other._elements);
       //System.arraycopy(other._elements, 0, this._elements, 0, this._elements.length);
@@ -705,7 +705,7 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
       other = c as DenseDoubleMatrix2D;
     }
 
-    final List<double> elementsOther = other._elements;
+    final Float64List elementsOther = other._elements;
     if (_elements == null || elementsOther == null) {
       throw new Error();
     }
@@ -763,7 +763,7 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
     }
     DenseDoubleMatrix2D other = y as DenseDoubleMatrix2D;
     checkShape(y);
-    final List<double> elementsOther = other._elements;
+    final Float64List elementsOther = other._elements;
     if (_elements == null || elementsOther == null) throw new Error();
     final int zeroOther = other.index(0, 0);
     final int zero = this.index(0, 0);
@@ -990,7 +990,7 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
     final int size = rowList.length;
     final List<int> rowElements = rowList;//.elements();
     final List<int> columnElements = columnList;//.elements();
-    final List<double> elementsOther = y.elements() as List<double>;
+    final Float64List elementsOther = y.elements() as Float64List;
     final int zeroOther = y.index(0, 0);
     final int zero = this.index(0, 0);
     final int columnStrideOther = y.columnStride();
@@ -1079,7 +1079,7 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
     return cardinality;
   }
 
-  List<double> elements() {
+  Float64List elements() {
     return _elements;
   }
 
@@ -1139,7 +1139,7 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
     final int zeroR = R.index(0, 0) as int;
     final int rowStrideR = R.rowStride();
     final int columnStrideR = R.columnStride();
-    final List<double> elementsR = R.elements();
+    final Float64List elementsR = R.elements();
     final int zero = this.index(0, 0);
     int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -1184,7 +1184,7 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
     return R;
   }*/
 
-  List<double> getMaxLocation() {
+  Float64List getMaxLocation() {
     int rowLocation = 0;
     int columnLocation = 0;
     final int zero = this.index(0, 0);
@@ -1193,7 +1193,7 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
       List<Future> futures = new List<Future>(nthreads);
-      List<List<double>> results = new List<List<double>>(nthreads);//[2];
+      List<Float64List> results = new List<Float64List>(nthreads);//[2];
       int k = _rows ~/ nthreads;
       for (int j = 0; j < nthreads; j++) {
         final int firstRow = j * k;
@@ -1220,7 +1220,7 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
       }
       try {
         for (int j = 0; j < nthreads; j++) {
-          results[j] = futures[j].get() as List<double>;
+          results[j] = futures[j].get() as Float64List;
         }
         maxValue = results[0][0];
         rowLocation = results[0][1] as int;
@@ -1253,10 +1253,10 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
       d = 0;
     }
     //}
-    return [maxValue, rowLocation, columnLocation];
+    return new Float64List.fromList([maxValue, rowLocation.toDouble(), columnLocation.toDouble()]);
   }
 
-  List<double> getMinLocation() {
+  Float64List getMinLocation() {
     int rowLocation = 0;
     int columnLocation = 0;
     final int zero = this.index(0, 0);
@@ -1265,7 +1265,7 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
       List<Future> futures = new List<Future>(nthreads);
-      List<List<double>> results = new List<List<double>>(nthreads);//[2];
+      List<Float64List> results = new List<Float64List>(nthreads);//[2];
       int k = _rows ~/ nthreads;
       for (int j = 0; j < nthreads; j++) {
         final int firstRow = j * k;
@@ -1292,7 +1292,7 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
       }
       try {
         for (int j = 0; j < nthreads; j++) {
-          results[j] = futures[j].get() as List<double>;
+          results[j] = futures[j].get() as Float64List;
         }
         minValue = results[0][0];
         rowLocation = results[0][1] as int;
@@ -1325,7 +1325,7 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
       d = 0;
     }
     //}
-    return [minValue, rowLocation, columnLocation];
+    return new Float64List.fromList([minValue, rowLocation.toDouble(), columnLocation.toDouble()]);
   }
 
   void getNegativeValues(final /*IntArrayList*/List<int> rowList, final /*IntArrayList*/List<int> columnList, final /*DoubleArrayList*/List<double> valueList) {
@@ -1408,8 +1408,8 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
     _elements[_rowZero + row * _rowStride + _columnZero + column * _columnStride] = value;
   }
 
-  List<List<double>> toArray() {
-    final List<List<double>> values = new List<List<double>>(_rows);//[_columns];
+  List<Float64List> toArray() {
+    final List<Float64List> values = new List<Float64List>(_rows);//[_columns];
     final int zero = this.index(0, 0);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -1422,7 +1422,7 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
         futures[j] = ConcurrencyUtils.submit(() {
           int idx = zero + firstRow * _rowStride;
           for (int r = firstRow; r < lastRow; r++) {
-            List<double> currentRow = values[r];
+            Float64List currentRow = values[r];
             for (int i = idx,
                 c = 0; c < _columns; c++) {
               currentRow[c] = _elements[i];
@@ -1436,7 +1436,8 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
     } else {*/
     int idx = zero;
     for (int r = 0; r < _rows; r++) {
-      List<double> currentRow = values[r];
+      values[r] = new Float64List(_columns);
+      Float64List currentRow = values[r];
       for (int i = idx,
           c = 0; c < _columns; c++) {
         currentRow[c] = _elements[i];
@@ -1453,7 +1454,7 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
     final int zero = index(0, 0);
     final int zeroOther = v.index(0);
     final int strideOther = v.stride();
-    final List<double> elementsOther = v.elements();
+    final Float64List elementsOther = v.elements();
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _columns);
@@ -1514,8 +1515,8 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
     int B_rs = BB._rowStride;
     int A_cs = _columnStride;
     int B_cs = BB._columnStride;
-    List<double> elems = this._elements;
-    List<double> B_elems = BB._elements;
+    Float64List elems = this._elements;
+    Float64List B_elems = BB._elements;
     if (elems == null || B_elems == null) throw new Error();
 
     int A_index = index(1, 1);
@@ -1576,8 +1577,8 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
 
     if (_columns != y.size() || _rows > z.size()) throw new ArgumentError("Incompatible args: " + toStringShort() + ", " + y.toStringShort() + ", " + z.toStringShort());
 
-    final List<double> elemsY = y.elements() as List<double>;
-    final List<double> elemsZ = z.elements() as List<double>;
+    final Float64List elemsY = y.elements() as Float64List;
+    final Float64List elemsZ = z.elements() as Float64List;
     if (_elements == null || elemsY == null || elemsZ == null) {
       throw new Error();
     }
@@ -1689,7 +1690,7 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
     }
 
     int flops = 2 * rowsA * columnsA * columnsB;
-    int noOfTasks = Math.min(flops / 30000, ConcurrencyUtils.getNumberOfThreads()) as int; // each
+    int noOfTasks = 1;//Math.min(flops / 30000, ConcurrencyUtils.getNumberOfThreads()) as int; // each
     /* thread should process at least 30000 flops */
     bool splitB = (columnsB >= noOfTasks);
     int width = splitB ? columnsB : rowsA;
@@ -1719,12 +1720,13 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
         CC = C.viewPart(offset, 0, span, columnsB);
       }
 
-      subTasks[i] = ConcurrencyUtils.submit(() {
+      /*subTasks[i] = ConcurrencyUtils.submit(() {
         (AA as DenseDoubleMatrix2D).zMultSequential(BB, CC, alpha, beta, transposeA, transposeB);
-      });
+      });*/
+      (AA as DenseDoubleMatrix2D).zMultSequential(BB, CC, alpha, beta, transposeA, transposeB);
     }
 
-    ConcurrencyUtils.waitForCompletion(subTasks);
+    //ConcurrencyUtils.waitForCompletion(subTasks);
     return C;
   }
 
@@ -1818,9 +1820,9 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
 
     DenseDoubleMatrix2D BB = B as DenseDoubleMatrix2D;
     DenseDoubleMatrix2D CC = C as DenseDoubleMatrix2D;
-    final List<double> AElems = this._elements;
-    final List<double> BElems = BB._elements;
-    final List<double> CElems = CC._elements;
+    final Float64List AElems = this._elements;
+    final Float64List BElems = BB._elements;
+    final Float64List CElems = CC._elements;
     if (AElems == null || BElems == null || CElems == null) {
       throw new Error();
     }
@@ -1894,7 +1896,7 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
     return new DenseDoubleMatrix1D(size, this._elements, zero, stride, true);
   }
 
-  DoubleMatrix2D _viewSelectionLike(List<int> rowOffsets, List<int> columnOffsets) {
+  DoubleMatrix2D _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets) {
     return new SelectedDenseDoubleMatrix2D.offset(this._elements, rowOffsets, columnOffsets, 0);
   }
 

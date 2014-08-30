@@ -2,8 +2,8 @@ part of cern.colt.matrix.double.test;
 
 void testDoubleMatrix2D(String name, DoubleMatrix2DTest t) {
   group('DoubleMatrix2D ($name)', () {
-    setUp() => t.setUp();
-    tearDown() => t.tearDown();
+    setUp(t.setUp);
+    tearDown(t.tearDown);
     test('aggregate', t.testAggregate);
     test('aggregateProc', t.testAggregateProc);
     test('aggregateIndex', t.testAggregateIndex);
@@ -80,48 +80,6 @@ abstract class DoubleMatrix2DTest {
   }
 
   void createMatrices();
-
-  void runTests() {
-    group('DoubleMatrix2D', () {
-      setUp() => this.setUp;
-      tearDown() => this.tearDown();
-      test('aggregate', testAggregate);
-      test('aggregateProc', testAggregateProc);
-      test('aggregateIndex', testAggregateIndex);
-      test('aggregateFunc', testAggregateFunc);
-      test('assignValue', testAssignValue);
-      test('assignValues2D', testAssignValues2D);
-      test('assign', testAssign);
-      test('assignMatrix', testAssignMatrix);
-      test('assignFunc', testAssignFunc);
-      test('assignFuncIndex', testAssignFuncIndex);
-      test('assignProc', testAssignProc);
-      test('assignProcFunc', testAssignProcFunc);
-      test('cardinality', testCardinality);
-      test('equalsValue', testEqualsValue);
-      test('equals', testEquals);
-      test('forEachNonZero', testForEachNonZero);
-      test('maxLocation', testMaxLocation);
-      test('minLocation', testMinLocation);
-      test('getNegativeValues', testGetNegativeValues);
-      test('getNonZeros', testGetNonZeros);
-      test('getPositiveValues', testGetPositiveValues);
-      test('toArray', testToArray);
-      test('vectorize', testVectorize);
-      test('viewColumn', testViewColumn);
-      test('viewColumnFlip', testViewColumnFlip);
-      test('viewDice', testViewDice);
-      test('viewPart', testViewPart);
-      test('viewRow', testViewRow);
-      test('viewRowFlip', testViewRowFlip);
-      test('viewSelectionProc', testViewSelectionProc);
-      test('viewSelection', testViewSelection);
-      test('viewStrides', testViewStrides);
-      test('zMult', testZMult);
-      test('zMult2D', testZMult2D);
-      test('testZSum', testZSum);
-    });
-  }
 
   void setUp() {
     createMatrices();
@@ -266,7 +224,7 @@ abstract class DoubleMatrix2DTest {
       }
     }
     DoubleMatrix2D Acopy = A.copy();
-    A.assignFuncIndex(B, div, rowList, columnList);
+    A.assignFuncIndex(B, div, new Int32List.fromList(rowList), new Int32List.fromList(columnList));
     for (int r = 0; r < A.rows(); r++) {
       for (int c = 0; c < A.columns(); c++) {
         expect(Acopy.getQuick(r, c) / B.getQuick(r, c), closeTo(A.getQuick(r, c), TOL));
@@ -324,7 +282,7 @@ abstract class DoubleMatrix2DTest {
   testEqualsValue() {
     double value = 1.0;
     A.assignValue(value);
-    bool eq = A.equals(value);
+    bool eq = A.equalsValue(value);
     expect(eq, isTrue);
     eq = A.equals(2);
     expect(eq, isFalse);
@@ -357,8 +315,8 @@ abstract class DoubleMatrix2DTest {
     A.setQuick(A.rows() ~/ 2, A.columns() ~/ 2, 0.1);
     Float64List maxAndLoc = A.getMaxLocation();
     expect(0.7, closeTo(maxAndLoc[0], TOL));
-    expect(A.rows() / 3, equals(maxAndLoc[1]));
-    expect(A.columns() / 3, equals(maxAndLoc[2]));
+    expect(A.rows() ~/ 3, equals(maxAndLoc[1]));
+    expect(A.columns() ~/ 3, equals(maxAndLoc[2]));
   }
 
   testMinLocation() {
@@ -382,10 +340,10 @@ abstract class DoubleMatrix2DTest {
     expect(2, equals(rowList.length));
     expect(2, equals(columnList.length));
     expect(2, equals(valueList.length));
-    expect(rowList.contains(A.rows() / 3), isTrue);
-    expect(rowList.contains(A.rows() / 2), isTrue);
-    expect(columnList.contains(A.columns() / 3), isTrue);
-    expect(columnList.contains(A.columns() / 2), isTrue);
+    expect(rowList.contains(A.rows() ~/ 3), isTrue);
+    expect(rowList.contains(A.rows() ~/ 2), isTrue);
+    expect(columnList.contains(A.columns() ~/ 3), isTrue);
+    expect(columnList.contains(A.columns() ~/ 2), isTrue);
     expect(valueList.contains(-0.7), isTrue);
     expect(valueList.contains(-0.1), isTrue);
   }
@@ -401,10 +359,10 @@ abstract class DoubleMatrix2DTest {
     expect(2, equals(rowList.length));
     expect(2, equals(columnList.length));
     expect(2, equals(valueList.length));
-    expect(rowList.contains(A.rows() / 3), isTrue);
-    expect(rowList.contains(A.rows() / 2), isTrue);
-    expect(columnList.contains(A.columns() / 3), isTrue);
-    expect(columnList.contains(A.columns() / 2), isTrue);
+    expect(rowList.contains(A.rows() ~/ 3), isTrue);
+    expect(rowList.contains(A.rows() ~/ 2), isTrue);
+    expect(columnList.contains(A.columns() ~/ 3), isTrue);
+    expect(columnList.contains(A.columns() ~/ 2), isTrue);
     expect(valueList.contains(0.7), isTrue);
     expect(valueList.contains(0.1), isTrue);
   }
@@ -420,10 +378,10 @@ abstract class DoubleMatrix2DTest {
     expect(2, equals(rowList.length));
     expect(2, equals(columnList.length));
     expect(2, equals(valueList.length));
-    expect(rowList.contains(A.rows() / 3), isTrue);
-    expect(rowList.contains(A.rows() / 2), isTrue);
-    expect(columnList.contains(A.columns() / 3), isTrue);
-    expect(columnList.contains(A.columns() / 2), isTrue);
+    expect(rowList.contains(A.rows() ~/ 3), isTrue);
+    expect(rowList.contains(A.rows() ~/ 2), isTrue);
+    expect(columnList.contains(A.columns() ~/ 3), isTrue);
+    expect(columnList.contains(A.columns() ~/ 2), isTrue);
     expect(valueList.contains(0.7), isTrue);
     expect(valueList.contains(0.1), isTrue);
   }
@@ -480,8 +438,8 @@ abstract class DoubleMatrix2DTest {
 
   testViewPart() {
     DoubleMatrix2D B = A.viewPart(A.rows() ~/ 2, A.columns() ~/ 2, A.rows() ~/ 3, A.columns() ~/ 3);
-    expect(A.rows() / 3, equals(B.rows()));
-    expect(A.columns() / 3, equals(B.columns()));
+    expect(A.rows() ~/ 3, equals(B.rows()));
+    expect(A.columns() ~/ 3, equals(B.columns()));
     for (int r = 0; r < A.rows() / 3; r++) {
       for (int c = 0; c < A.columns() / 3; c++) {
         expect(A.getQuick(A.rows() ~/ 2 + r, A.columns() ~/ 2 + c), closeTo(B.getQuick(r, c), TOL));
@@ -526,8 +484,8 @@ abstract class DoubleMatrix2DTest {
   }
 
   testViewSelection() {
-    Int32List rowIndexes = new Int32List.fromList([A.rows() / 6, A.rows() / 5, A.rows() / 4, A.rows() / 3, A.rows() / 2]);
-    Int32List colIndexes = new Int32List.fromList([A.columns() / 6, A.columns() / 5, A.columns() / 4, A.columns() / 3, A.columns() / 2, A.columns() - 1]);
+    Int32List rowIndexes = new Int32List.fromList([A.rows() ~/ 6, A.rows() ~/ 5, A.rows() ~/ 4, A.rows() ~/ 3, A.rows() ~/ 2]);
+    Int32List colIndexes = new Int32List.fromList([A.columns() ~/ 6, A.columns() ~/ 5, A.columns() ~/ 4, A.columns() ~/ 3, A.columns() ~/ 2, A.columns() - 1]);
     DoubleMatrix2D B = A.viewSelection(rowIndexes, colIndexes);
     expect(rowIndexes.length, equals(B.rows()));
     expect(colIndexes.length, equals(B.columns()));
