@@ -1,5 +1,9 @@
 name: colt
 description: A pub package
 dependencies:
-  csparse: any
+  btf: any
+  csparse:
+    path: ../csparse
   intl: any
+  klu:
+    path: ../klu
