@@ -86,6 +86,10 @@ class DelegateDComplexMatrix1D extends DComplexMatrix1D {
   DoubleMatrix1D getRealPart() {
     return _content.viewRow(_row).getRealPart();
   }
+  
+  Object clone() {
+    return new DelegateDComplexMatrix1D(_content, _row);
+  }
 
 }
 

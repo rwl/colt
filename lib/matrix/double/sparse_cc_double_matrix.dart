@@ -285,6 +285,7 @@ class SparseCCDoubleMatrix2D extends WrapperDoubleMatrix2D {
         throw new ArgumentError("Exception occured in cs_dupl()!");
       }
     }
+    bool rowIndexesSorted = false;
     if (sortRowIndexes) {
       //sort row indexes
       dcs = cs_transpose(dcs, true);
@@ -292,9 +293,10 @@ class SparseCCDoubleMatrix2D extends WrapperDoubleMatrix2D {
       if (dcs == null) {
         throw new ArgumentError("Exception occured in cs_transpose()!");
       }
-      _rowIndexesSorted = true;
+      rowIndexesSorted = true;
     }
-    return new SparseCCDoubleMatrix2D(dcs);
+    return new SparseCCDoubleMatrix2D(dcs)
+      .._rowIndexesSorted = rowIndexesSorted;
   }
 
   /**
@@ -350,16 +352,17 @@ class SparseCCDoubleMatrix2D extends WrapperDoubleMatrix2D {
         throw new ArgumentError("Exception occured in cs_dupl()!");
       }
     }
-    //sort row indexes
+    bool rowIndexesSorted = false;
     if (sortRowIndexes) {
       dcs = cs_transpose(dcs, true);
       dcs = cs_transpose(dcs, true);
       if (dcs == null) {
         throw new ArgumentError("Exception occured in cs_transpose()!");
       }
-      _rowIndexesSorted = true;
+      rowIndexesSorted = true;
     }
-    return new SparseCCDoubleMatrix2D(dcs);
+    return new SparseCCDoubleMatrix2D(dcs)
+      .._rowIndexesSorted = rowIndexesSorted;
   }
 
   DoubleMatrix2D assign(final func.DoubleFunction function) {
@@ -708,7 +711,7 @@ class SparseCCDoubleMatrix2D extends WrapperDoubleMatrix2D {
     final Float64List valuesA = _dcs.x;
 
     int zidx = zeroZ;
-    int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    //int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if (!transposeA) {
       if ((!ignore) && (beta / alpha != 1.0)) {
         z.assign(func.multiply(beta / alpha));

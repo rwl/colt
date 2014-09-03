@@ -66,13 +66,13 @@ class SparseDComplexMatrix2D extends DComplexMatrix2D {
    *             <tt>rows<0 || columns<0 || (double)columns*rows > Integer.MAX_VALUE</tt>
    *             or flip's are illegal.
    */
-  SparseDComplexMatrix2D(int rows, int columns, [Map<int, Float64List> elements = null, int rowZero = 0, int columnZero = 0, int rowStride = 1, int columnStride = 1]) {
+  SparseDComplexMatrix2D(int rows, int columns, [Map<int, Float64List> elements = null, int rowZero = 0, int columnZero = 0, int rowStride = 1, int columnStride = 1, bool isNoView = false]) {
     if (elements == null) {
       elements = new Map<int, Float64List>();
     }
     _setUp(rows, columns, rowZero, columnZero, rowStride, columnStride);
     this._elements = elements;
-    this._isNoView = false;
+    this._isNoView = isNoView;
   }
 
   DComplexMatrix2D assignValues(Float64List value) {
@@ -293,6 +293,10 @@ class SparseDComplexMatrix2D extends DComplexMatrix2D {
 
     return Re;
   }
+  
+  Object clone() {
+    return new SparseDComplexMatrix2D(_rows, _columns, _elements, _rowZero, _columnZero, _rowStride, _columnStride, _isNoView);
+  }
 }
 
 /**
@@ -490,6 +494,10 @@ class SelectedSparseDComplexMatrix2D extends DComplexMatrix2D {
 
   DoubleMatrix2D getRealPart() {
     throw new UnsupportedError("This method is not supported.");
+  }
+  
+  Object clone() {
+    return new SelectedSparseDComplexMatrix2D(_rows, _columns, _elements, _rowZero, _columnZero, _rowStride, _columnStride, _rowOffsets, _columnOffsets, _offset);
   }
 
 }

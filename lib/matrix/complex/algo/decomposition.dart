@@ -1,7 +1,7 @@
 library cern.colt.matrix.complex.algo.decomposition;
 
 import 'dart:typed_data';
-import 'package:csparse/complex/csparse.dart';
+import 'package:csparse/complex/cxsparse.dart';
 import 'package:klu/complex.dart' as klu;
 import 'package:btf/btf.dart' as btf;
 
@@ -67,16 +67,16 @@ class SparseDComplexLUDecomposition {
     }
     n = A.rows();
 
-    S = DZcs_sqr.cs_sqr(order, dcs, false);
+    S = cs_sqr(order, dcs, false);
     if (S == null) {
       throw new ArgumentError("Exception occured in cs_sqr()");
     }
-    N = DZcs_lu.cs_lu(dcs, S, 1);
+    N = cs_lu(dcs, S, 1.0);
     if (N == null) {
       throw new ArgumentError("Exception occured in cs_lu()");
     }
     if (checkIfSingular) {
-      DZcsd D = DZcs_dmperm.cs_dmperm(dcs, 1);
+      DZcsd D = cs_dmperm(dcs, 1);
       /* check if matrix is singular */
       if (D != null && D.rr[3] < n) {
         isNonSingular = false;

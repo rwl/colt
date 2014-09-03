@@ -96,7 +96,7 @@ class DComplexProperty {
    */
   void checkSquare(DComplexMatrix2D A) {
     if (A.rows() != A.columns()) {
-      throw new ArgumentError("Matrix must be square: " + AbstractFormatter.shape(A));
+      throw new ArgumentError("Matrix must be square: " + AbstractFormatter.shape2D(A));
     }
   }
 

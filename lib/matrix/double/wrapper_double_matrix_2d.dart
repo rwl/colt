@@ -149,8 +149,8 @@ class WrapperDoubleMatrix2D extends DoubleMatrix2D {
 
   DoubleMatrix1D vectorize() {
     final DenseDoubleMatrix1D v = new DenseDoubleMatrix1D(size());
-    int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    /*if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _columns);
       List<Future> futures = new List<Future>(nthreads);
       int k = _columns ~/ nthreads;

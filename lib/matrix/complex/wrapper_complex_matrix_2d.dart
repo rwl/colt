@@ -332,6 +332,10 @@ class WrapperDComplexMatrix2D extends DComplexMatrix2D {
     //}
     return Re;
   }
+  
+  Object clone() {
+    return new WrapperDComplexMatrix2D(_content);
+  }
 }
 
 class ViewColumnFlipWrapperDComplexMatrix2D extends WrapperDComplexMatrix2D {

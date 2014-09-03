@@ -11,6 +11,9 @@ library cern.jet.math;
 import 'dart:math' as Math;
 import 'dart:typed_data';
 
+//const MAX_INT = 2147483647; // 2^31-1
+const MAX_INT = 576460752303423487;// 2^59-1
+
 /**
  * Only for performance tuning of compute intensive linear algebraic
  * computations. Constructs functions that return one of

@@ -54,7 +54,7 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
    *             .
    */
   factory DiagonalDComplexMatrix2D.fromValues(List<Float64List> values, int dindex) {
-    return new DiagonalDComplexMatrix2D(values.length, values.length == 0 ? 0 : values[0].length, dindex)..assignList(values);
+    return new DiagonalDComplexMatrix2D.index(values.length, values.length == 0 ? 0 : values[0].length, dindex)..assignList(values);
   }
 
   /**
@@ -70,7 +70,48 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
    * @throws ArgumentError
    *             if <tt>size<0 (double)size > Integer.MAX_VALUE</tt>.
    */
-  DiagonalDComplexMatrix2D(int rows, int columns, int dindex) : super(null) {
+  factory DiagonalDComplexMatrix2D.index(int rows, int columns, int dindex) {
+    /*try {
+      _setUp(rows, columns);
+    } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
+      if ("matrix too large" != exc.message) {
+        throw exc;
+      }
+    }*/
+    if ((dindex < -rows + 1) || (dindex > columns - 1)) {
+      throw new ArgumentError("index is out of bounds");
+    }
+    int dlength;
+    if (dindex == 0) {
+      dlength = Math.min(rows, columns);
+    } else if (dindex > 0) {
+      if (rows >= columns) {
+        dlength = columns - dindex;
+      } else {
+        int diff = columns - rows;
+        if (dindex <= diff) {
+          dlength = rows;
+        } else {
+          dlength = rows - (dindex - diff);
+        }
+      }
+    } else {
+      if (rows >= columns) {
+        int diff = rows - columns;
+        if (-dindex <= diff) {
+          dlength = columns;
+        } else {
+          dlength = columns + dindex + diff;
+        }
+      } else {
+        dlength = rows + dindex;
+      }
+    }
+    final elements = new Float64List(2 * dlength);
+    return new DiagonalDComplexMatrix2D._internal(rows, columns, elements, dlength, dindex);
+  }
+  
+  DiagonalDComplexMatrix2D._internal(int rows, int columns, this._elements, this._dlength, this._dindex) : super(null) {
     try {
       _setUp(rows, columns);
     } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
@@ -78,37 +119,6 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
         throw exc;
       }
     }
-    if ((dindex < -rows + 1) || (dindex > columns - 1)) {
-      throw new ArgumentError("index is out of bounds");
-    } else {
-      this._dindex = dindex;
-    }
-    if (dindex == 0) {
-      _dlength = Math.min(rows, columns);
-    } else if (dindex > 0) {
-      if (rows >= columns) {
-        _dlength = columns - dindex;
-      } else {
-        int diff = columns - rows;
-        if (dindex <= diff) {
-          _dlength = rows;
-        } else {
-          _dlength = rows - (dindex - diff);
-        }
-      }
-    } else {
-      if (rows >= columns) {
-        int diff = rows - columns;
-        if (-dindex <= diff) {
-          _dlength = columns;
-        } else {
-          _dlength = columns + dindex + diff;
-        }
-      } else {
-        _dlength = rows + dindex;
-      }
-    }
-    _elements = new Float64List(2 * _dlength);
   }
 
   DComplexMatrix2D assign(final cfunc.DComplexDComplexFunction function) {
@@ -682,5 +692,9 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
 
   DComplexMatrix2D _getContent() {
     return this;
+  }
+  
+  Object clone() {
+    return new DiagonalDComplexMatrix2D._internal(_rows, _columns, _elements, _dlength, _dindex);
   }
 }

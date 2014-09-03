@@ -1174,24 +1174,25 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
    *
    */
   String toStringFormat(String format) {
+    final f = new NumberFormat(format);
     StringBuffer s = new StringBuffer("ComplexMatrix2D: $_rows rows, $_columns columns\n\n");
     Float64List elem = new Float64List(2);
     for (int r = 0; r < _rows; r++) {
       for (int c = 0; c < _columns; c++) {
         elem = getQuick(r, c);
         if (elem[1] == 0) {
-          s.write(String.format(format + "\t", elem[0]));
+          s.write(f.format(elem[0]) + "\t");
           continue;
         }
         if (elem[0] == 0) {
-          s.write(String.format(format + "i\t", elem[1]));
+          s.write(f.format(elem[1]) + "i\t");
           continue;
         }
         if (elem[1] < 0) {
-          s.write(String.format(format + " - " + format + "i\t", elem[0], -elem[1]));
+          s.write(f.format(elem[0]) + " - " + f.format(-elem[1]) + "i\t");
           continue;
         }
-        s.write(String.format(format + " + " + format + "i\t", elem[0], elem[1]));
+        s.write(f.format(elem[0]) + " + " + f.format(elem[1]) + "i\t");
       }
       s.write("\n");
     }

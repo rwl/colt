@@ -462,14 +462,14 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-      int idx = _zero;
-      int idxOther = zeroOther;
-      for (int k = 0; k < _size; k++) {
-        _elements[idx] = elemsOther[idxOther];
-        _elements[idx + 1] = elemsOther[idxOther + 1];
-        idx += _stride;
-        idxOther += strideOther;
-      }
+    int idx = _zero;
+    int idxOther = zeroOther;
+    for (int k = 0; k < _size; k++) {
+      _elements[idx] = elemsOther[idxOther];
+      _elements[idx + 1] = elemsOther[idxOther + 1];
+      idx += _stride;
+      idxOther += strideOther;
+    }
     //}
     return this;
   }
@@ -685,12 +685,12 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-      int idx = _zero;
-      for (int i = 0; i < _size; i++) {
-        this._elements[idx] = re;
-        this._elements[idx + 1] = im;
-        idx += _stride;
-      }
+    int idx = _zero;
+    for (int i = 0; i < _size; i++) {
+      this._elements[idx] = re;
+      this._elements[idx + 1] = im;
+      idx += _stride;
+    }
     //}
     return this;
   }
@@ -736,13 +736,13 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-      int idx = _zero;
-      int idxOther = zeroOther;
-      for (int i = 0; i < _size; i++) {
-        _elements[idx + 1] = elemsOther[idxOther];
-        idx += _stride;
-        idxOther += strideOther;
-      }
+    int idx = _zero;
+    int idxOther = zeroOther;
+    for (int i = 0; i < _size; i++) {
+      _elements[idx + 1] = elemsOther[idxOther];
+      idx += _stride;
+      idxOther += strideOther;
+    }
     //}
     return this;
   }
@@ -775,13 +775,13 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-      int idx = _zero;
-      int idxOther = zeroOther;
-      for (int i = 0; i < _size; i++) {
-        _elements[idx] = elemsOther[idxOther];
-        idx += _stride;
-        idxOther += strideOther;
-      }
+    int idx = _zero;
+    int idxOther = zeroOther;
+    for (int i = 0; i < _size; i++) {
+      _elements[idx] = elemsOther[idxOther];
+      idx += _stride;
+      idxOther += strideOther;
+    }
     //}
     return this;
   }
@@ -815,13 +815,13 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-      int idx = _zero;
-      int idxOther = zeroOther;
-      for (int i = 0; i < _size; i++) {
-        elemsOther[idxOther] = _elements[idx + 1];
-        idx += _stride;
-        idxOther += strideOther;
-      }
+    int idx = _zero;
+    int idxOther = zeroOther;
+    for (int i = 0; i < _size; i++) {
+      elemsOther[idxOther] = _elements[idx + 1];
+      idx += _stride;
+      idxOther += strideOther;
+    }
     //}
     return Im;
   }
@@ -874,13 +874,13 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-      int idx = _zero;
-      int idxOther = zeroOther;
-      for (int i = 0; i < _size; i++) {
-        elemsOther[idxOther] = _elements[idx];
-        idx += _stride;
-        idxOther += strideOther;
-      }
+    int idx = _zero;
+    int idxOther = zeroOther;
+    for (int i = 0; i < _size; i++) {
+      elemsOther[idxOther] = _elements[idx];
+      idx += _stride;
+      idxOther += strideOther;
+    }
     //}
     return R;
   }
@@ -927,17 +927,17 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-      int idxOther;
-      int idx = _zero;
-      for (int c = 0; c < columns; c++) {
-        idxOther = zeroOther + c * columnStrideOther;
-        for (int r = 0; r < rows; r++) {
-          elemsOther[idxOther] = _elements[idx];
-          elemsOther[idxOther + 1] = _elements[idx + 1];
-          idxOther += rowStrideOther;
-          idx += _stride;
-        }
+    int idxOther;
+    int idx = _zero;
+    for (int c = 0; c < columns; c++) {
+      idxOther = zeroOther + c * columnStrideOther;
+      for (int r = 0; r < rows; r++) {
+        elemsOther[idxOther] = _elements[idx];
+        elemsOther[idxOther + 1] = _elements[idx + 1];
+        idxOther += rowStrideOther;
+        idx += _stride;
       }
+    }
     //}
     return M;
   }
@@ -1051,19 +1051,19 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-      int idx = _zero;
-      int idxOther = zeroOther;
-      double tmp;
-      for (int k = 0; k < _size; k++) {
-        tmp = _elements[idx];
-        _elements[idx] = elemsOther[idxOther];
-        elemsOther[idxOther] = tmp;
-        tmp = _elements[idx + 1];
-        _elements[idx + 1] = elemsOther[idxOther + 1];
-        elemsOther[idxOther + 1] = tmp;
-        idx += _stride;
-        idxOther += strideOther;
-      }
+    int idx = _zero;
+    int idxOther = zeroOther;
+    double tmp;
+    for (int k = 0; k < _size; k++) {
+      tmp = _elements[idx];
+      _elements[idx] = elemsOther[idxOther];
+      elemsOther[idxOther] = tmp;
+      tmp = _elements[idx + 1];
+      _elements[idx + 1] = elemsOther[idxOther + 1];
+      elemsOther[idxOther + 1] = tmp;
+      idx += _stride;
+      idxOther += strideOther;
+    }
     //}
   }
 
@@ -1233,6 +1233,10 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
   DComplexMatrix1D _viewSelectionLike(Int32List offsets) {
     return new SelectedDenseDComplexMatrix1D.offset(this._elements, offsets);
   }
+
+  Object clone() {
+    return new DenseDComplexMatrix1D(_size, _elements, _zero, _stride, _isNoView);
+  }
 }
 
 /**
@@ -1336,10 +1340,10 @@ class SelectedDenseDComplexMatrix1D extends DComplexMatrix1D {
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-      for (int i = 0; i < _size; i++) {
-        final tmp = getQuick(i);
-        R.setQuick(i, tmp[0]);
-      }
+    for (int i = 0; i < _size; i++) {
+      final tmp = getQuick(i);
+      R.setQuick(i, tmp[0]);
+    }
     //}
     return R;
   }
@@ -1363,10 +1367,10 @@ class SelectedDenseDComplexMatrix1D extends DComplexMatrix1D {
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-      for (int i = 0; i < _size; i++) {
-        final tmp = getQuick(i);
-        Im.setQuick(i, tmp[1]);
-      }
+    for (int i = 0; i < _size; i++) {
+      final tmp = getQuick(i);
+      Im.setQuick(i, tmp[1]);
+    }
     //}
 
     return Im;
@@ -1432,6 +1436,10 @@ class SelectedDenseDComplexMatrix1D extends DComplexMatrix1D {
 
   DComplexMatrix1D _viewSelectionLike(Int32List offsets) {
     return new SelectedDenseDComplexMatrix1D.offset(this._elements, offsets);
+  }
+
+  Object clone() {
+    return new SelectedDenseDComplexMatrix1D(_size, _elements, _zero, _stride, _offsets, __offset);
   }
 
 }

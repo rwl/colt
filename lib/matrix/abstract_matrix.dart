@@ -21,8 +21,6 @@ part of cern.colt.matrix;
  */
 abstract class AbstractMatrix {
 
-  final _MAX = 576460752303423487;
-
   bool _isNoView = true;
 
   //static bool debug = true;

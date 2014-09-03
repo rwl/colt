@@ -71,9 +71,8 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
    *             .
    */
   factory DenseDoubleMatrix2D.from(List<Float64List> values) {
-    final m = new DenseDoubleMatrix2D(values.length, values.length == 0 ? 0 : values[0].length);
-    assignValues2D(values);
-    return m;
+    return new DenseDoubleMatrix2D(values.length, values.length == 0 ? 0 : values[0].length)
+      ..assignValues2D(values);
   }
 
   /**
