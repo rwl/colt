@@ -1,7 +1,7 @@
 part of cern.colt.matrix.double.test;
 
 void testDoubleMatrix2D(String name, DoubleMatrix2DTest t) {
-  group('DoubleMatrix2D ($name)', () {
+  group(name, () {
     setUp(t.setUp);
     tearDown(t.tearDown);
     test('aggregate', t.testAggregate);
@@ -608,9 +608,8 @@ abstract class DoubleMatrix2DTest {
     //---
     C = null;
     C = A.zMult2D(Bt, C, alpha, beta, false, false);
-    expected = new List<Float64List>(A.rows());//[A.rows()];
+    expected = new List<Float64List>.generate(A.rows(), (_) => new Float64List(A.rows()));
     for (int j = 0; j < A.rows(); j++) {
-      expected[j] = new Float64List(A.rows());
       for (int i = 0; i < A.rows(); i++) {
         double s = 0.0;
         for (int k = 0; k < A.columns(); k++) {
@@ -646,9 +645,9 @@ abstract class DoubleMatrix2DTest {
     //---
     C = null;
     C = A.zMult2D(B, C, alpha, beta, true, false);
-    expected = new List<Float64List>(A.columns());//[A.columns()];
+    expected = new List<Float64List>.generate(A.columns(),
+        (_) => new Float64List(A.columns()));
     for (int j = 0; j < A.columns(); j++) {
-      expected[j] = new Float64List(A.columns());
       for (int i = 0; i < A.columns(); i++) {
         double s = 0.0;
         for (int k = 0; k < A.rows(); k++) {
@@ -684,9 +683,9 @@ abstract class DoubleMatrix2DTest {
     //---
     C = null;
     C = A.zMult2D(B, C, alpha, beta, false, true);
-    expected = new List<Float64List>(A.rows());//[A.rows()];
+    expected = new List<Float64List>.generate(A.rows(),
+        (_) => new Float64List(A.rows()));
     for (int j = 0; j < A.rows(); j++) {
-      expected[j] = new Float64List(A.rows());
       for (int i = 0; i < A.rows(); i++) {
         double s = 0.0;
         for (int k = 0; k < A.columns(); k++) {
@@ -721,9 +720,9 @@ abstract class DoubleMatrix2DTest {
     //---
     C = null;
     C = A.zMult2D(Bt, C, alpha, beta, true, true);
-    expected = new List<Float64List>(A.columns());//[A.columns()];
+    expected = new List<Float64List>.generate(A.columns(),
+        (_) => new Float64List(A.columns()));
     for (int j = 0; j < A.columns(); j++) {
-      expected[j] = new Float64List(A.columns());
       for (int i = 0; i < A.columns(); i++) {
         double s = 0.0;
         for (int k = 0; k < A.rows(); k++) {

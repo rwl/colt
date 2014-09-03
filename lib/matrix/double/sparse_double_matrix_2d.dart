@@ -281,7 +281,7 @@ class SparseDoubleMatrix2D extends DoubleMatrix2D {
    *             <tt>rows<0 || columns<0 || (double)columns*rows > Integer.MAX_VALUE</tt>
    *             or flip's are illegal.
    */
-  SparseDoubleMatrix2D(int rows, int columns, [Map<int, double> elements = null, int rowZero = 0, int columnZero = 0, int rowStride = 1, int columnStride = 1, bool isView = false]) {
+  SparseDoubleMatrix2D(int rows, int columns, [Map<int, double> elements = null, int rowZero = 0, int columnZero = 0, int rowStride = null, int columnStride = 1, bool isView = false]) {
     try {
       _setUp(rows, columns, rowZero, columnZero, rowStride, columnStride);
     } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !

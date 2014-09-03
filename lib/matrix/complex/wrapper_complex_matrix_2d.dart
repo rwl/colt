@@ -22,7 +22,9 @@ class WrapperDComplexMatrix2D extends DComplexMatrix2D {
   DComplexMatrix2D _content;
 
   WrapperDComplexMatrix2D(DComplexMatrix2D newContent) {
-    if (newContent != null) _setUp(newContent.rows(), newContent.columns());
+    if (newContent != null) {
+      _setUp(newContent.rows(), newContent.columns());
+    }
     this._content = newContent;
   }
 

@@ -137,7 +137,7 @@ class DenseDComplexMatrix2D extends DComplexMatrix2D {
    *             <tt>rows<0 || columns<0 || (double)columns*rows > Integer.MAX_VALUE</tt>
    *             or flip's are illegal.
    */
-  DenseDComplexMatrix2D(int rows, int columns, [Float64List elements = null, int rowZero = 0, int columnZero = 0, int rowStride = 1, int columnStride = 1, bool isNoView = true]) {
+  DenseDComplexMatrix2D(int rows, int columns, [Float64List elements = null, int rowZero = 0, int columnZero = 0, int rowStride = null, int columnStride = 1, bool isNoView = true]) {
     if (elements == null) {
       elements = new Float64List(rows * 2 * columns);
     }

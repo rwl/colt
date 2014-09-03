@@ -66,7 +66,7 @@ class SparseDComplexMatrix2D extends DComplexMatrix2D {
    *             <tt>rows<0 || columns<0 || (double)columns*rows > Integer.MAX_VALUE</tt>
    *             or flip's are illegal.
    */
-  SparseDComplexMatrix2D(int rows, int columns, [Map<int, Float64List> elements = null, int rowZero = 0, int columnZero = 0, int rowStride = 1, int columnStride = 1, bool isNoView = false]) {
+  SparseDComplexMatrix2D(int rows, int columns, [Map<int, Float64List> elements = null, int rowZero = 0, int columnZero = 0, int rowStride = null, int columnStride = 1, bool isNoView = false]) {
     if (elements == null) {
       elements = new Map<int, Float64List>();
     }

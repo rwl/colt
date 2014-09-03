@@ -25,10 +25,12 @@ class WrapperDoubleMatrix2D extends DoubleMatrix2D {
   DoubleMatrix2D _content;
 
   WrapperDoubleMatrix2D(DoubleMatrix2D newContent) {
-    if (newContent != null) try {
-      _setUp(newContent.rows(), newContent.columns());
-    } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
-      if ("matrix too large" != exc.message) throw exc;
+    if (newContent != null) {
+      try {
+        _setUp(newContent.rows(), newContent.columns());
+      } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
+        if ("matrix too large" != exc.message) throw exc;
+      }
     }
     this._content = newContent;
   }

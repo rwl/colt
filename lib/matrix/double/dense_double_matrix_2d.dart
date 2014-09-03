@@ -119,7 +119,7 @@ class DenseDoubleMatrix2D extends DoubleMatrix2D {
    *             <tt>rows<0 || columns<0 || (double)columns*rows > Integer.MAX_VALUE</tt>
    *             or flip's are illegal.
    */
-  DenseDoubleMatrix2D(int rows, int columns, [Float64List elements = null, int rowZero = 0, int columnZero = 0, int rowStride = 1, int columnStride = 1, bool isView = false]) {
+  DenseDoubleMatrix2D(int rows, int columns, [Float64List elements = null, int rowZero = 0, int columnZero = 0, int rowStride = null, int columnStride = 1, bool isView = false]) {
     if (elements == null) {
       elements = new Float64List(rows * columns);
     }
