@@ -75,7 +75,9 @@ class WrapperDoubleMatrix2D extends DoubleMatrix2D {
       final columnList = new List<int>();
       final valueList = new List<double>();
       y.getNonZeros(rowList, columnList, valueList);
-      assignFuncIndex(y, function, rowList, columnList);
+      assignFuncIndex(y, function,
+          new Int32List.fromList(rowList),
+          new Int32List.fromList(columnList));
     } else {
       super.assignFunc(y, function);
     }
@@ -106,7 +108,7 @@ class WrapperDoubleMatrix2D extends DoubleMatrix2D {
       }
       return true;
     } else {
-      return super.equals(value);
+      return super.equalsValue(value);
     }
   }
 

@@ -54,7 +54,7 @@ class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
    *             .
    */
   factory DiagonalDoubleMatrix2D.fromList(List<Float64List> values, int dindex) {
-    return new DiagonalDoubleMatrix2D.index(values.length, values.length == 0 ? 0 : values[0].length, dindex)
+    return new DiagonalDoubleMatrix2D(values.length, values.length == 0 ? 0 : values[0].length, dindex)
       ..assignValues2D(values);
   }
 
@@ -71,38 +71,44 @@ class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
    * @throws ArgumentError
    *             if <tt>size<0 (double)size > Integer.MAX_VALUE</tt>.
    */
-  factory DiagonalDoubleMatrix2D.index(int rows, int columns, int dindex) {
-    if ((dindex < -rows + 1) || (dindex > columns - 1)) {
+  DiagonalDoubleMatrix2D(int rows, int columns, this._dindex) : super(null) {
+    try {
+      _setUp(rows, columns);
+    } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
+      if ("matrix too large" != exc.message) {
+        throw exc;
+      }
+    } 
+    if ((_dindex < -rows + 1) || (_dindex > columns - 1)) {
       throw new ArgumentError("index is out of bounds");
     }
-    int dlength;
-    if (dindex == 0) {
-      dlength = Math.min(rows, columns);
-    } else if (dindex > 0) {
+    _dlength;
+    if (_dindex == 0) {
+      _dlength = Math.min(rows, columns);
+    } else if (_dindex > 0) {
       if (rows >= columns) {
-        dlength = columns - dindex;
+        _dlength = columns - _dindex;
       } else {
         int diff = columns - rows;
-        if (dindex <= diff) {
-          dlength = rows;
+        if (_dindex <= diff) {
+          _dlength = rows;
         } else {
-          dlength = rows - (dindex - diff);
+          _dlength = rows - (_dindex - diff);
         }
       }
     } else {
       if (rows >= columns) {
         int diff = rows - columns;
-        if (-dindex <= diff) {
-          dlength = columns;
+        if (-_dindex <= diff) {
+          _dlength = columns;
         } else {
-          dlength = columns + dindex + diff;
+          _dlength = columns + _dindex + diff;
         }
       } else {
-        dlength = rows + dindex;
+        _dlength = rows + _dindex;
       }
     }
-    final elements = new Float64List(dlength);
-    return new DiagonalDoubleMatrix2D._internal(rows, columns, elements, dlength, dindex); 
+    this._elements = new Float64List(_dlength);
   }
   
   DiagonalDoubleMatrix2D._internal(int rows, int columns, this._elements, this._dlength, this._dindex) : super(null) {
@@ -336,7 +342,7 @@ class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
     return _elements;
   }
 
-  bool equalsValues(double value) {
+  bool equalsValue(double value) {
     double epsilon = DoubleProperty.DEFAULT.tolerance();
     for (int r = 0; r < _dlength; r++) {
       double x = _elements[r];
@@ -409,7 +415,7 @@ class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
     return _dindex;
   }
 
-  Float64List getMaxLocation() {
+  List<num> getMaxLocation() {
     int location = 0;
     double maxValue = 0.0;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -478,7 +484,7 @@ class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
     return [maxValue, rowLocation, columnLocation];
   }
 
-  Float64List getMinLocation() {
+  List<num> getMinLocation() {
     int location = 0;
     double minValue = 0.0;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();

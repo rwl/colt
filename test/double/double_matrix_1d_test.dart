@@ -1,7 +1,7 @@
 part of cern.colt.matrix.double.test;
 
 testDoubleMatrix1D(String name, DoubleMatrix1DTest t) {
-  group('DoubleMatrix1D ($name)', () {
+  group(name, () {
     setUp(t.setUp);
     tearDown(t.tearDown);
     test('aggregate', t.testAggregate);
@@ -94,7 +94,8 @@ abstract class DoubleMatrix1DTest {
       double elem = A.getQuick(i);
       expected += elem * elem;
     }
-    double result = A.aggregateIndex(plus, square, indexList);
+    double result = A.aggregateIndex(plus, square,
+        new Int32List.fromList(indexList));
     expect(result, closeTo(expected, TOL));
   }
 
@@ -216,7 +217,7 @@ abstract class DoubleMatrix1DTest {
     A.assignValue(0.0);
     A.setQuick(A.size() ~/ 3, 0.7);
     A.setQuick(A.size() ~/ 2, 0.1);
-    Float64List maxAndLoc = A.getMaxLocation();
+    List<num> maxAndLoc = A.getMaxLocation();
     expect(0.7, closeTo(maxAndLoc[0], TOL));
     expect(A.size() ~/ 3, equals(maxAndLoc[1]));
   }
@@ -225,7 +226,7 @@ abstract class DoubleMatrix1DTest {
     A.assignValue(0.0);
     A.setQuick(A.size() ~/ 3, -0.7);
     A.setQuick(A.size() ~/ 2, -0.1);
-    Float64List minAndLoc = A.getMinLocation();
+    List<num> minAndLoc = A.getMinLocation();
     expect(-0.7, closeTo(minAndLoc[0], TOL));
     expect(A.size() ~/ 3, equals(minAndLoc[1]));
   }

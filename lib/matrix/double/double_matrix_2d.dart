@@ -1001,9 +1001,9 @@ abstract class DoubleMatrix2D extends AbstractMatrix2D {
   /**
    * Return the maximum value of this matrix together with its location
    *
-   * @return maximum_value, row_location, column_location };
+   * @return maximum_value, row_location, column_location;
    */
-  List<double> getMaxLocation() {
+  List<num> getMaxLocation() {
     int rowLocation = 0;
     int columnLocation = 0;
     double maxValue = 0.0;
@@ -1079,7 +1079,7 @@ abstract class DoubleMatrix2D extends AbstractMatrix2D {
    *
    * @return minimum_value, row_location, column_location};
    */
-  List<double> getMinLocation() {
+  List<num> getMinLocation() {
     int rowLocation = 0;
     int columnLocation = 0;
     double minValue = 0.0;
@@ -1396,8 +1396,9 @@ abstract class DoubleMatrix2D extends AbstractMatrix2D {
    *
    * @return an array filled with the values of the cells.
    */
-  List<List<double>> toArray() {
-    final List<List<double>> values = new List<List<double>>(_rows);//[_columns];
+  List<Float64List> toArray() {
+    final List<Float64List> values = new List<Float64List>.generate(_rows,
+        (_) => new Float64List(_columns));
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
@@ -1418,7 +1419,6 @@ abstract class DoubleMatrix2D extends AbstractMatrix2D {
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
       for (int r = 0; r < _rows; r++) {
-        values[r] = new Float64List(_columns);
         List<double> currentRow = values[r];
         for (int c = 0; c < _columns; c++) {
           currentRow[c] = getQuick(r, c);
@@ -1693,7 +1693,9 @@ abstract class DoubleMatrix2D extends AbstractMatrix2D {
   DoubleMatrix2D viewSelectionProc(DoubleMatrix1DProcedure condition) {
     /*IntArrayList*/List<int> matches = new /*IntArrayList*/List<int>();
     for (int i = 0; i < _rows; i++) {
-      if (condition(viewRow(i))) matches.add(i);
+      if (condition(viewRow(i))) {
+        matches.add(i);
+      }
     }
 
     //matches.trimToSize();

@@ -140,7 +140,9 @@ abstract class DoubleMatrix2DTest {
         expected += elem * elem;
       }
     }
-    double result = A.aggregateIndex(plus, square, rowList, columnList);
+    double result = A.aggregateIndex(plus, square,
+        new Int32List.fromList(rowList), 
+        new Int32List.fromList(columnList));
     expect(expected, closeTo(result, TOL));
   }
 
@@ -284,7 +286,7 @@ abstract class DoubleMatrix2DTest {
     A.assignValue(value);
     bool eq = A.equalsValue(value);
     expect(eq, isTrue);
-    eq = A.equals(2);
+    eq = A.equalsValue(2.0);
     expect(eq, isFalse);
   }
 
@@ -313,7 +315,7 @@ abstract class DoubleMatrix2DTest {
     A.assignValue(0.0);
     A.setQuick(A.rows() ~/ 3, A.columns() ~/ 3, 0.7);
     A.setQuick(A.rows() ~/ 2, A.columns() ~/ 2, 0.1);
-    Float64List maxAndLoc = A.getMaxLocation();
+    List<num> maxAndLoc = A.getMaxLocation();
     expect(0.7, closeTo(maxAndLoc[0], TOL));
     expect(A.rows() ~/ 3, equals(maxAndLoc[1]));
     expect(A.columns() ~/ 3, equals(maxAndLoc[2]));
@@ -323,7 +325,7 @@ abstract class DoubleMatrix2DTest {
     A.assignValue(0.0);
     A.setQuick(A.rows() ~/ 3, A.columns() ~/ 3, -0.7);
     A.setQuick(A.rows() ~/ 2, A.columns() ~/ 2, -0.1);
-    Float64List minAndLoc = A.getMinLocation();
+    List<num> minAndLoc = A.getMinLocation();
     expect(-0.7, closeTo(minAndLoc[0], TOL));
     expect(A.rows() ~/ 3, equals(minAndLoc[1]));
     expect(A.columns() ~/ 3, equals(minAndLoc[2]));
