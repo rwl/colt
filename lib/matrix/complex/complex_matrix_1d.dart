@@ -1053,7 +1053,7 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
       }
     }
     //matches.trimToSize();
-    return viewSelection(matches);
+    return viewSelection(new Int32List.fromList(matches));
   }
 
   /**
@@ -1223,7 +1223,8 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
     }
 
     // setup
-    List<int> indexesCopy = new List<int>.from(nonZeroIndexes);
+    //List<int> indexesCopy = new List<int>.from(nonZeroIndexes);
+    Int32List indexesCopy = new Int32List.fromList(nonZeroIndexes);
     //indexesCopy.trimToSize();
     indexesCopy.sort();
     Int32List nonZeroIndexElements = indexesCopy;//.elements();
@@ -1231,7 +1232,9 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
     int s = indexesCopy.length;
 
     // skip to start
-    while ((index < s) && nonZeroIndexElements[index] < from) index++;
+    while ((index < s) && nonZeroIndexElements[index] < from) {
+      index++;
+    }
 
     // now the sparse dot product
     int i;

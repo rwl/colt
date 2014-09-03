@@ -94,7 +94,7 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
    * @throws IllegalArgumentException
    *             if <tt>size<0</tt>.
    */
-  DenseDComplexMatrix1D(int size, [Float64List elements = null, int zero = 0, int stride = 1, bool isNoView = true]) {
+  DenseDComplexMatrix1D(int size, [Float64List elements = null, int zero = 0, int stride = 2, bool isNoView = true]) {
     if (elements == null) {
       elements = new Float64List(2 * size);
     }
@@ -131,11 +131,12 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
       }
       a = ConcurrencyUtils.waitForCompletion(futures, aggr);
     } else {*/
-    a = f([_elements[_zero], _elements[_zero + 1]]);
+    a = f(new Float64List.fromList([_elements[_zero], _elements[_zero + 1]]));
     int idx = _zero;
     for (int i = 1; i < _size; i++) {
       idx += _stride;
-      a = aggr(a, f([_elements[idx], _elements[idx + 1]]));
+      a = aggr(a, f(new Float64List.fromList([_elements[idx],
+                                              _elements[idx + 1]])));
     }
     //}
     return a;
@@ -180,11 +181,13 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
     } else {*/
     int idx = _zero;
     int idxOther = zeroOther;
-    a = f([_elements[_zero], _elements[_zero + 1]], [elemsOther[zeroOther], elemsOther[zeroOther + 1]]);
+    a = f(new Float64List.fromList([_elements[_zero], _elements[_zero + 1]]),
+        new Float64List.fromList([elemsOther[zeroOther], elemsOther[zeroOther + 1]]));
     for (int i = 1; i < _size; i++) {
       idx += _stride;
       idxOther += strideOther;
-      a = aggr(a, f([_elements[idx], _elements[idx + 1]], [elemsOther[idxOther], elemsOther[idxOther + 1]]));
+      a = aggr(a, f(new Float64List.fromList([_elements[idx], _elements[idx + 1]]),
+          new Float64List.fromList([elemsOther[idxOther], elemsOther[idxOther + 1]])));
     }
     //}
     return a;

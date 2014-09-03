@@ -18,22 +18,22 @@ final math.Random random = new math.Random(0);
 
 complexMatrix1DTests() {
   testDComplexMatrix1D('DenseDComplexMatrix1D', new DenseDComplexMatrix1DTest());
-  testDComplexMatrix1D('DenseDComplexMatrix1D', new DenseDComplexMatrix1DViewTest());
+  testDComplexMatrix1D('DenseDComplexMatrix1D viewFlip', new DenseDComplexMatrix1DViewTest());
 
   testDComplexMatrix1D('SparseDComplexMatrix1D', new SparseDComplexMatrix1DTest());
-  testDComplexMatrix1D('SparseDComplexMatrix1D', new SparseDComplexMatrix1DViewTest());
+  testDComplexMatrix1D('SparseDComplexMatrix1D viewFlip', new SparseDComplexMatrix1DViewTest());
 }
 
 complexMatrix2DTests() {
   testDComplexMatrix2D('DenseDComplexMatrix2D', new DenseDComplexMatrix2DTest());
-  testDComplexMatrix2D('DenseDComplexMatrix2D', new DenseDComplexMatrix2DViewTest());
+  testDComplexMatrix2D('DenseDComplexMatrix2D viewDice', new DenseDComplexMatrix2DViewTest());
   testDComplexMatrix2D('DiagonalDComplexMatrix2D', new DiagonalDComplexMatrix2DTest());
-  testDComplexMatrix2D('DiagonalDComplexMatrix2D', new DiagonalDComplexMatrix2DViewTest());
+  testDComplexMatrix2D('DiagonalDComplexMatrix2D viewDice', new DiagonalDComplexMatrix2DViewTest());
 
   testDComplexMatrix2D('SparseCCDComplexMatrix2D', new SparseCCDComplexMatrix2DTest());
-  testDComplexMatrix2D('SparseCCDComplexMatrix2D', new SparseCCDComplexMatrix2DViewTest());
+  testDComplexMatrix2D('SparseCCDComplexMatrix2D viewDice', new SparseCCDComplexMatrix2DViewTest());
   testDComplexMatrix2D('SparseDComplexMatrix2D', new SparseDComplexMatrix2DTest());
-  testDComplexMatrix2D('SparseDComplexMatrix2D', new SparseDComplexMatrix2DViewTest());
+  testDComplexMatrix2D('SparseDComplexMatrix2D viewDice', new SparseDComplexMatrix2DViewTest());
   testDComplexMatrix2D('SparseRCDComplexMatrix2D', new SparseRCDComplexMatrix2DTest());
-  testDComplexMatrix2D('SparseRCDComplexMatrix2D', new SparseRCDComplexMatrix2DViewTest());
+  testDComplexMatrix2D('SparseRCDComplexMatrix2D viewDice', new SparseRCDComplexMatrix2DViewTest());
 }

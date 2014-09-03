@@ -1122,7 +1122,8 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
    * @return an array filled with the values of the cells.
    */
   List<Float64List> toArray() {
-    final List<Float64List> values = new List<Float64List>(_rows);//[2 * _columns];
+    final List<Float64List> values = new List<Float64List>.generate(_rows,
+        (_) => new Float64List(2 * _columns));
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);

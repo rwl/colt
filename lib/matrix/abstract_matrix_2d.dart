@@ -238,6 +238,7 @@ abstract class AbstractMatrix2D extends AbstractMatrix {
    *             or flip's are illegal.
    */
   void _setUp(int rows, int columns, [int rowZero = 0, int columnZero = 0, int rowStride = null, int columnStride = 1]) {
+  //void _setUp(int rows, int columns, int rowZero, int columnZero, int rowStride, int columnStride) {
     if (rowStride == null) {
       rowStride = columns;
     }

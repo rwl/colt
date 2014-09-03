@@ -137,7 +137,10 @@ class DenseDComplexMatrix2D extends DComplexMatrix2D {
    *             <tt>rows<0 || columns<0 || (double)columns*rows > Integer.MAX_VALUE</tt>
    *             or flip's are illegal.
    */
-  DenseDComplexMatrix2D(int rows, int columns, [Float64List elements = null, int rowZero = 0, int columnZero = 0, int rowStride = null, int columnStride = 1, bool isNoView = true]) {
+  DenseDComplexMatrix2D(int rows, int columns, [Float64List elements = null, int rowZero = 0, int columnZero = 0, int rowStride = null, int columnStride = 2, bool isNoView = true]) {
+    if (rowStride == null) {
+      rowStride = 2 * columns;
+    }
     if (elements == null) {
       elements = new Float64List(rows * 2 * columns);
     }
@@ -1354,7 +1357,8 @@ class DenseDComplexMatrix2D extends DComplexMatrix2D {
   }
 
   List<Float64List> toArray() {
-    final List<Float64List> values = new List<Float64List>(_rows);//[2 * _columns];
+    final List<Float64List> values = new List<Float64List>.generate(_rows,
+        (_) => new Float64List(2 * _columns));
     final int zero = index(0, 0);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -2004,12 +2008,12 @@ class SelectedDenseDComplexMatrix2D extends DComplexMatrix2D {
     _elements[_offset + _rowOffsets[idxr] + _columnOffsets[idxc] + 1] = im;
   }
 
-  void _setUp(int rows, int columns, [int rowZero = 0, int columnZero = 0, int rowStride = null, int columnStride = 1]) {
-    super._setUp(rows, columns);
-    this._rowStride = 1;
-    this._columnStride = 2;
-    this._offset = 0;
-  }
+//  void _setUp(int rows, int columns, [int rowZero = 0, int columnZero = 0, int rowStride = null, int columnStride = 1]) {
+//    super._setUp(rows, columns);
+//    this._rowStride = 1;
+//    this._columnStride = 2;
+//    this._offset = 0;
+//  }
 
   AbstractMatrix2D _vDice() {
     super._vDice();

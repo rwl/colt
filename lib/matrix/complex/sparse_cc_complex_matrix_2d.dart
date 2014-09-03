@@ -171,7 +171,7 @@ class SparseCCDComplexMatrix2D extends WrapperDComplexMatrix2D {
    * @param removeDuplicates
    *            if true, then duplicates (if any) are removed
    */
-  factory SparseCCDComplexMatrix2D.value(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, double re, double im, bool removeDuplicates) : super(null) {
+  factory SparseCCDComplexMatrix2D.value(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, double re, double im, bool removeDuplicates) {
     /*try {
       _setUp(rows, columns);
     } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
@@ -227,7 +227,7 @@ class SparseCCDComplexMatrix2D extends WrapperDComplexMatrix2D {
    * @param removeZeroes
    *            if true, then zeroes (if any) are removed
    */
-  factory SparseCCDComplexMatrix2D.values(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, Float64List values, bool removeDuplicates, bool removeZeroes) : super(null) {
+  factory SparseCCDComplexMatrix2D.values(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, Float64List values, bool removeDuplicates, bool removeZeroes) {
     /*try {
       _setUp(rows, columns);
     } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !

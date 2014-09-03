@@ -1,9 +1,9 @@
 part of cern.colt.matrix.complex.test;
 
 testDComplexMatrix2D(String name, DComplexMatrix2DTest t) {
-  group('DComplexMatrix2D ($name', () {
-    setUp() => t.setUp();
-    tearDown() => t.tearDown();
+  group(name, () {
+    setUp(t.setUp);
+    tearDown(t.tearDown);
     test('aggregate', t.testAggregate);
     test('aggregateMatrix', t.testAggregateMatrix);
     test('assign', t.testAssign);
@@ -216,7 +216,8 @@ abstract class DComplexMatrix2DTest {
   }
 
   void testAssignList() {
-    List<Float64List> expected = new List<Float64List>(A.rows());//[2 * A.columns()];
+    List<Float64List> expected = new List<Float64List>.generate(A.rows(),
+        (_) => new Float64List(2 * A.columns()));
     for (int r = 0; r < A.rows(); r++) {
       for (int c = 0; c < 2 * A.columns(); c++) {
         expected[r][c] = random.nextDouble();
@@ -277,7 +278,7 @@ abstract class DComplexMatrix2DTest {
     A.assignValue(value[0], value[1]);
     bool eq = A.equalsValue(value);
     expect(eq, isTrue);
-    eq = A.equals(new Float64List.fromList([value[0] + 1, value[1] + 1]));
+    eq = A.equalsValue(new Float64List.fromList([value[0] + 1, value[1] + 1]));
     expect(eq, isFalse);
   }
 
@@ -438,8 +439,8 @@ abstract class DComplexMatrix2DTest {
   }
 
   void testViewSelection() {
-    Int32List rowIndexes = new Int32List.fromList([A.rows() / 6, A.rows() / 5, A.rows() / 4, A.rows() / 3, A.rows() / 2]);
-    Int32List colIndexes = new Int32List.fromList([A.columns() / 6, A.columns() / 5, A.columns() / 4, A.columns() / 3, A.columns() / 2, A.columns() - 1]);
+    Int32List rowIndexes = new Int32List.fromList([A.rows() ~/ 6, A.rows() ~/ 5, A.rows() ~/ 4, A.rows() ~/ 3, A.rows() ~/ 2]);
+    Int32List colIndexes = new Int32List.fromList([A.columns() ~/ 6, A.columns() ~/ 5, A.columns() ~/ 4, A.columns() ~/ 3, A.columns() ~/ 2, A.columns() - 1]);
     DComplexMatrix2D B = A.viewSelection(rowIndexes, colIndexes);
     expect(rowIndexes.length, equals(B.rows()));
     expect(colIndexes.length, equals(B.columns()));
@@ -466,8 +467,8 @@ abstract class DComplexMatrix2DTest {
     for (int i = 0; i < y.size(); i++) {
       y.setQuick(i, new Float64List.fromList([random.nextDouble(), random.nextDouble()]));
     }
-    Float64List alpha = new Float64List.fromList([3, 2]);
-    Float64List beta = new Float64List.fromList([5, 4]);
+    Float64List alpha = new Float64List.fromList([3.0, 2.0]);
+    Float64List beta = new Float64List.fromList([5.0, 4.0]);
     DComplexMatrix1D z = null;
     z = A.zMult(y, z, alpha, beta, false);
     Float64List expected = new Float64List(2 * A.rows());
@@ -516,14 +517,14 @@ abstract class DComplexMatrix2DTest {
   }
 
   void testZMult2D() {
-    Float64List alpha = new Float64List.fromList([3, 2]);
-    Float64List beta = new Float64List.fromList([5, 4]);
+    Float64List alpha = new Float64List.fromList([3.0, 2.0]);
+    Float64List beta = new Float64List.fromList([5.0, 4.0]);
     Float64List tmp = new Float64List(2);
     DComplexMatrix2D C = null;
     C = A.zMult2D(Bt, C, alpha, beta, false, false);
-    List<Float64List> expected = new List<Float64List>(A.rows());//[2 * A.rows()];
+    List<Float64List> expected = new List<Float64List>.generate(A.rows(),
+        (_) => new Float64List(2 * A.rows()));
     for (int j = 0; j < A.rows(); j++) {
-      expected[j] = new Float64List(2 * A.rows());
       for (int i = 0; i < A.rows(); i++) {
         Float64List s = new Float64List(2);
         for (int k = 0; k < A.columns(); k++) {
@@ -547,9 +548,9 @@ abstract class DComplexMatrix2DTest {
     //transposeA
     C = null;
     C = A.zMult2D(B, C, alpha, beta, true, false);
-    expected = new List<Float64List>(A.columns());//[2 * A.columns()];
+    expected = new List<Float64List>.generate(A.columns(),
+        (_) => new Float64List(2 * A.columns()));
     for (int j = 0; j < A.columns(); j++) {
-      expected[j] = new Float64List(2 * A.columns());
       for (int i = 0; i < A.columns(); i++) {
         Float64List s = new Float64List(2);
         for (int k = 0; k < A.rows(); k++) {
@@ -572,9 +573,9 @@ abstract class DComplexMatrix2DTest {
     //transposeB
     C = null;
     C = A.zMult2D(B, C, alpha, beta, false, true);
-    expected = new List<Float64List>(A.rows());//[2 * A.rows()];
+    expected = new List<Float64List>.generate(A.rows(),
+        (_) => new Float64List(2 * A.rows()));
     for (int j = 0; j < A.rows(); j++) {
-      expected[j] = new Float64List(2 * A.rows());
       for (int i = 0; i < A.rows(); i++) {
         Float64List s = new Float64List(2);
         for (int k = 0; k < A.columns(); k++) {
@@ -597,9 +598,9 @@ abstract class DComplexMatrix2DTest {
     //transposeA and transposeB
     C = null;
     C = A.zMult2D(Bt, C, alpha, beta, true, true);
-    expected = new List<Float64List>(A.columns());//[2 * A.columns()];
+    expected = new List<Float64List>.generate(A.columns(),
+        (_) => new Float64List(2 * A.columns()));
     for (int j = 0; j < A.columns(); j++) {
-      expected[j] = new Float64List(2 * A.columns());
       for (int i = 0; i < A.columns(); i++) {
         Float64List s = new Float64List(2);
         for (int k = 0; k < A.rows(); k++) {
