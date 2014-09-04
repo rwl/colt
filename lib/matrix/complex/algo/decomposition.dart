@@ -1,7 +1,7 @@
 library cern.colt.matrix.complex.algo.decomposition;
 
 import 'dart:typed_data';
-import 'package:csparse/complex/csparse.dart';
+import 'package:csparse/complex/cxsparse.dart';
 import 'package:klu/complex.dart' as klu;
 import 'package:btf/btf.dart' as btf;
 
@@ -21,16 +21,64 @@ import 'algo.dart';
  *
  * @author Piotr Wendykier (piotr.wendykier@gmail.com)
  */
-class SparseDComplexLUDecomposition {
-  DZcss S;
-  DZcsn N;
-  DComplexMatrix2D L;
-  DComplexMatrix2D U;
-  bool rcMatrix = false;
-  bool isNonSingular = true;
+abstract class SparseDComplexLUDecomposition {
+
   /**
-   * Row and column dimension (square matrix).
+   * Returns the determinant, <tt>det(A)</tt>.
    */
+  Float64List det();
+
+  /**
+   * Returns the lower triangular factor, <tt>L</tt>.
+   */
+  DComplexMatrix2D getL();
+
+  /**
+   * Returns a copy of the pivot permutation vector.
+   */
+  Int32List getPivot();
+
+  /**
+   * Returns the upper triangular factor, <tt>U</tt>.
+   */
+  DComplexMatrix2D getU();
+
+  /**
+   * Returns a copy of the symbolic LU analysis object.
+   */
+  Object getSymbolicAnalysis();
+
+  /**
+   * Returns whether the matrix is nonsingular (has an inverse).
+   *
+   * @return true if <tt>U</tt>, and hence <tt>A</tt>, is nonsingular; false
+   *         otherwise.
+   */
+  bool isNonsingular();
+
+  /**
+   * Solves <tt>A*x = b</tt>(in-place). Upon return <tt>b</tt> is overridden
+   * with the result <tt>x</tt>.
+   *
+   * @param b
+   *            A vector with of size A.rows();
+   * @exception IllegalArgumentException
+   *                if <tt>b.size() != A.rows()</tt> or if A is singular.
+   */
+  void solve(DComplexMatrix1D b);
+
+}
+
+class CSparseDComplexLUDecomposition implements SparseDComplexLUDecomposition {
+
+  DZcss _S;
+  DZcsn _N;
+  DComplexMatrix2D _L;
+  DComplexMatrix2D _U;
+  bool _rcMatrix = false;
+  bool _isNonSingular = true;
+
+  /** Row and column dimension (square matrix). */
   int n;
 
   /**
@@ -51,7 +99,7 @@ class SparseDComplexLUDecomposition {
    * @throws ArgumentError
    *             if <tt>order</tt> is not in [0,3]
    */
-  SparseDComplexLUDecomposition(DComplexMatrix2D A, int order, bool checkIfSingular) {
+  CSparseDComplexLUDecomposition(DComplexMatrix2D A, int order, bool checkIfSingular) {
     DComplexProperty.DEFAULT.checkSquare(A);
     DComplexProperty.DEFAULT.checkSparse(A);
 
@@ -60,137 +108,98 @@ class SparseDComplexLUDecomposition {
     }
     DZcs dcs;
     if (A is SparseRCDComplexMatrix2D) {
-      rcMatrix = true;
+      _rcMatrix = true;
       dcs = (A).getColumnCompressed().elements();
     } else {
       dcs = A.elements() as DZcs;
     }
     n = A.rows();
 
-    S = DZcs_sqr.cs_sqr(order, dcs, false);
-    if (S == null) {
+    _S = DZcs_sqr.cs_sqr(order, dcs, false);
+    if (_S == null) {
       throw new ArgumentError("Exception occured in cs_sqr()");
     }
-    N = DZcs_lu.cs_lu(dcs, S, 1);
-    if (N == null) {
+    _N = DZcs_lu.cs_lu(dcs, _S, 1);
+    if (_N == null) {
       throw new ArgumentError("Exception occured in cs_lu()");
     }
     if (checkIfSingular) {
       DZcsd D = DZcs_dmperm.cs_dmperm(dcs, 1);
       /* check if matrix is singular */
       if (D != null && D.rr[3] < n) {
-        isNonSingular = false;
+        _isNonSingular = false;
       }
     }
   }
 
-  /**
-   * Returns the determinant, <tt>det(A)</tt>.
-   *
-   */
   Float64List det() {
     if (!isNonsingular()) return new Float64List.fromList([0, 0]); // avoid rounding errors
     int pivsign = 1;
     for (int i = 0; i < n; i++) {
-      if (N.pinv[i] != i) {
+      if (_N.pinv[i] != i) {
         pivsign = -pivsign;
       }
     }
-    if (U == null) {
-      U = new SparseCCDComplexMatrix2D(N.U);
-      if (rcMatrix) {
-        U = (U as SparseCCDComplexMatrix2D).getRowCompressed();
+    if (_U == null) {
+      _U = new SparseCCDComplexMatrix2D(_N.U);
+      if (_rcMatrix) {
+        _U = (_U as SparseCCDComplexMatrix2D).getRowCompressed();
       }
     }
     Float64List det = new Float64List.fromList([pivsign, 0]);
     for (int j = 0; j < n; j++) {
-      det = multiply(det)(U.getQuick(j, j));
+      det = multiply(det)(_U.getQuick(j, j));
     }
     return det;
   }
 
-  /**
-   * Returns the lower triangular factor, <tt>L</tt>.
-   *
-   * @return <tt>L</tt>
-   */
   DComplexMatrix2D getL() {
-    if (L == null) {
-      L = new SparseCCDComplexMatrix2D(N.L);
-      if (rcMatrix) {
-        L = (L as SparseCCDComplexMatrix2D).getRowCompressed();
+    if (_L == null) {
+      _L = new SparseCCDComplexMatrix2D(_N.L);
+      if (_rcMatrix) {
+        _L = (_L as SparseCCDComplexMatrix2D).getRowCompressed();
       }
     }
-    return L.copy();
+    return _L.copy();
   }
 
-  /**
-   * Returns a copy of the pivot permutation vector.
-   *
-   * @return piv
-   */
   Int32List getPivot() {
-    if (N.pinv == null) {
+    if (_N.pinv == null) {
       return null;
     }
-    Int32List pinv = new Int32List(N.pinv.length);
+    Int32List pinv = new Int32List(_N.pinv.length);
     //System.arraycopy(N.pinv, 0, pinv, 0, pinv.length);
-    pinv.setAll(0, N.pinv);
+    pinv.setAll(0, _N.pinv);
     return pinv;
   }
 
-  /**
-   * Returns the upper triangular factor, <tt>U</tt>.
-   *
-   * @return <tt>U</tt>
-   */
   DComplexMatrix2D getU() {
-    if (U == null) {
-      U = new SparseCCDComplexMatrix2D(N.U);
-      if (rcMatrix) {
-        U = (U as SparseCCDComplexMatrix2D).getRowCompressed();
+    if (_U == null) {
+      _U = new SparseCCDComplexMatrix2D(_N.U);
+      if (_rcMatrix) {
+        _U = (_U as SparseCCDComplexMatrix2D).getRowCompressed();
       }
     }
-    return U.copy();
+    return _U.copy();
   }
 
-  /**
-   * Returns a copy of the symbolic LU analysis object
-   *
-   * @return symbolic LU analysis
-   */
   DZcss getSymbolicAnalysis() {
     DZcss S2 = new DZcss();
-    S2.cp = S.cp != null ? S.cp.clone() : null;
-    S2.leftmost = S.leftmost != null ? S.leftmost.clone() : null;
-    S2.lnz = S.lnz;
-    S2.m2 = S.m2;
-    S2.parent = S.parent != null ? S.parent.clone() : null;
-    S2.pinv = S.pinv != null ? S.pinv.clone() : null;
-    S2.q = S.q != null ? S.q.clone() : null;
-    S2.unz = S.unz;
+    S2.cp = _S.cp != null ? _S.cp.clone() : null;
+    S2.leftmost = _S.leftmost != null ? _S.leftmost.clone() : null;
+    S2.lnz = _S.lnz;
+    S2.m2 = _S.m2;
+    S2.parent = _S.parent != null ? _S.parent.clone() : null;
+    S2.pinv = _S.pinv != null ? _S.pinv.clone() : null;
+    S2.q = _S.q != null ? _S.q.clone() : null;
+    S2.unz = _S.unz;
     return S2;
   }
 
-  /**
-   * Returns whether the matrix is nonsingular (has an inverse).
-   *
-   * @return true if <tt>U</tt>, and hence <tt>A</tt>, is nonsingular; false
-   *         otherwise.
-   */
   bool isNonsingular() {
-    return isNonSingular;
+    return _isNonSingular;
   }
 
-  /**
-   * Solves <tt>A*x = b</tt>(in-place). Upon return <tt>b</tt> is overridden
-   * with the result <tt>x</tt>.
-   *
-   * @param b
-   *            A vector with of size A.rows();
-   * @exception ArgumentError
-   *                if <tt>b.size() != A.rows()</tt> or if A is singular.
-   */
   void solve(DComplexMatrix1D b) {
     if (b.size() != n) {
       throw new ArgumentError("b.size() != A.rows()");
@@ -206,13 +215,13 @@ class SparseDComplexLUDecomposition {
     } else {
       x = new DZcsa(b.elements() as Float64List);
     }
-    cs_ipvec(N.pinv, x, y, n);
+    cs_ipvec(_N.pinv, x, y, n);
     /* y = b(p) */
-    cs_lsolve(N.L, y);
+    cs_lsolve(_N.L, y);
     /* y = L\y */
-    cs_usolve(N.U, y);
+    cs_usolve(_N.U, y);
     /* y = U\y */
-    cs_ipvec(S.q, y, x, n);
+    cs_ipvec(_S.q, y, x, n);
     /* b(q) = x */
 
     if (b.isView()) {
