@@ -147,7 +147,6 @@ class SparseDoubleMatrix1D extends DoubleMatrix1D {
    *            the value to be filled into the cells.
    * @return <tt>this</tt> (for convenience only).
    */
-
   DoubleMatrix1D assignValue(double value) {
     // overriden for performance only
     if (this._isNoView && value == 0) {
@@ -161,7 +160,6 @@ class SparseDoubleMatrix1D extends DoubleMatrix1D {
   /**
    * Returns the number of cells having non-zero values.
    */
-
   int cardinality() {
     if (this._isNoView) {
       return this._elements.length;
@@ -175,7 +173,6 @@ class SparseDoubleMatrix1D extends DoubleMatrix1D {
    *
    * @return the elements
    */
-
   Object elements() {
     return _elements;
   }
@@ -211,12 +208,15 @@ class SparseDoubleMatrix1D extends DoubleMatrix1D {
    *            the index of the cell.
    * @return the value of the specified cell.
    */
-
   double getQuick(int index) {
     // if (debug) if (index<0 || index>=size) checkIndex(index);
     // return this.elements.get(index(index));
     // manually inlined:
-    return _elements[_zero + index * _stride];
+    final i = _zero + index * _stride;
+    if (_elements.containsKey(i)) {
+      return _elements[i];
+    } 
+    return 0.0;
   }
 
   /**
@@ -227,7 +227,6 @@ class SparseDoubleMatrix1D extends DoubleMatrix1D {
    * @param rank
    *            the rank of the element.
    */
-
   int index(int rank) {
     // overriden for manual inlining only
     // return __offset(_rank(rank));
@@ -247,7 +246,6 @@ class SparseDoubleMatrix1D extends DoubleMatrix1D {
    *            the number of cell the matrix shall have.
    * @return a new empty matrix of the same dynamic type.
    */
-
   DoubleMatrix1D like1D(int size) {
     return new SparseDoubleMatrix1D(size);
   }
@@ -266,7 +264,6 @@ class SparseDoubleMatrix1D extends DoubleMatrix1D {
    *            the number of columns the matrix shall have.
    * @return a new matrix of the corresponding dynamic type.
    */
-
   DoubleMatrix2D like2D(int rows, int columns) {
     return new SparseDoubleMatrix2D(rows, columns);
   }
@@ -363,7 +360,6 @@ class SparseDoubleMatrix1D extends DoubleMatrix1D {
   /**
    * Returns <tt>true</tt> if both matrices share at least one identical cell.
    */
-
   bool _haveSharedCellsRaw(DoubleMatrix1D other) {
     if (other is SelectedSparseDoubleMatrix1D) {
       return this._elements == other._elements;
@@ -380,7 +376,6 @@ class SparseDoubleMatrix1D extends DoubleMatrix1D {
    *            the offsets of the visible elements.
    * @return a new view.
    */
-
   DoubleMatrix1D _viewSelectionLike(Int32List offsets) {
     return new SelectedSparseDoubleMatrix1D.from(this._elements, offsets);
   }

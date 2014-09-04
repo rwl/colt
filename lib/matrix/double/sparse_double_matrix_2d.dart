@@ -281,11 +281,14 @@ class SparseDoubleMatrix2D extends DoubleMatrix2D {
    *             <tt>rows<0 || columns<0 || (double)columns*rows > Integer.MAX_VALUE</tt>
    *             or flip's are illegal.
    */
-  SparseDoubleMatrix2D(int rows, int columns, [Map<int, double> elements = null, int rowZero = 0, int columnZero = 0, int rowStride = 1, int columnStride = 1, bool isView = false]) {
+  SparseDoubleMatrix2D(int rows, int columns, [Map<int, double> elements = null, int rowZero = 0, int columnZero = 0, int rowStride = null, int columnStride = 1, bool isView = false]) {
     try {
       _setUp(rows, columns, rowZero, columnZero, rowStride, columnStride);
     } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
       if ("matrix too large" != exc.message) throw exc;
+    }
+    if (elements == null) {
+      elements = new Map<int, double>();
     }
     this._elements = elements;
     this._isNoView = !isView;
@@ -600,7 +603,11 @@ class SparseDoubleMatrix2D extends DoubleMatrix2D {
   }
 
   double getQuick(int row, int column) {
-    return this._elements[_rowZero + row * _rowStride + _columnZero + column * _columnStride];
+    final i = _rowZero + row * _rowStride + _columnZero + column * _columnStride;
+    if (_elements.containsKey(i)) {
+      return _elements[i];
+    }
+    return 0.0;
   }
 
   int index(int row, int column) {
@@ -617,7 +624,7 @@ class SparseDoubleMatrix2D extends DoubleMatrix2D {
 
   void setQuick(int row, int column, double value) {
     int index = _rowZero + row * _rowStride + _columnZero + column * _columnStride;
-    if (value == 0) {
+    if (value == 0.0) {
       this._elements.remove(index);
     } else {
       this._elements[index] = value;

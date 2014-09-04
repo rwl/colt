@@ -297,12 +297,12 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
     if (other == this) return this;
     checkSize(other);
     DComplexMatrix1D otherLoc;
-    if (haveSharedCells(other)) {
+    if (_haveSharedCells(other)) {
       otherLoc = other.copy();
     } else {
       otherLoc = other;
     }
-    int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
       List<Future> futures = new List<Future>(nthreads);
@@ -317,11 +317,11 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
         });
       }
       ConcurrencyUtils.waitForCompletion(futures);
-    } else {
+    } else {*/
       for (int i = 0; i < _size; i++) {
         setQuick(i, otherLoc.getQuick(i));
       }
-    }
+    //}
     return this;
   }
 
@@ -342,7 +342,7 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
   DComplexMatrix1D assignMatrixFunc(final DComplexMatrix1D y, final cfunc.DComplexDComplexDComplexFunction f) {
     int size = this.size();
     checkSize(y);
-    int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, size);
       List<Future> futures = new List<Future>(nthreads);
@@ -357,11 +357,11 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
         });
       }
       ConcurrencyUtils.waitForCompletion(futures);
-    } else {
+    } else {*/
       for (int i = 0; i < size; i++) {
         setQuick(i, f(getQuick(i), y.getQuick(i)));
       }
-    }
+    //}
     return this;
   }
 
@@ -377,7 +377,7 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
    */
   DComplexMatrix1D assignValue(final double re, final double im) {
     int size = this.size();
-    int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, size);
       List<Future> futures = new List<Future>(nthreads);
@@ -392,11 +392,11 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
         });
       }
       ConcurrencyUtils.waitForCompletion(futures);
-    } else {
+    } else {*/
       for (int i = 0; i < size; i++) {
         setPartsQuick(i, re, im);
       }
-    }
+    //}
     return this;
   }
 
@@ -420,7 +420,7 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
     if (values.length != 2 * size) {
       throw new ArgumentError("The length of values[] must be equal to 2*size()=$size");
     }
-    int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, size);
       List<Future> futures = new List<Future>(nthreads);
@@ -435,11 +435,11 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
         });
       }
       ConcurrencyUtils.waitForCompletion(futures);
-    } else {
+    } else {*/
       for (int i = 0; i < size; i++) {
         setPartsQuick(i, values[2 * i], values[2 * i + 1]);
       }
-    }
+    //}
     return this;
   }
 
@@ -456,7 +456,7 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
    */
   DComplexMatrix1D assignImaginary(final DoubleMatrix1D other) {
     checkSize(other);
-    int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
       List<Future> futures = new List<Future>(nthreads);
@@ -473,13 +473,13 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
         });
       }
       ConcurrencyUtils.waitForCompletion(futures);
-    } else {
+    } else {*/
       for (int i = 0; i < _size; i++) {
         double re = getQuick(i)[0];
         double im = other.getQuick(i);
         setPartsQuick(i, re, im);
       }
-    }
+    //}
     return this;
   }
 
@@ -496,7 +496,7 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
    */
   DComplexMatrix1D assignReal(final DoubleMatrix1D other) {
     checkSize(other);
-    int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
       List<Future> futures = new List<Future>(nthreads);
@@ -513,13 +513,13 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
         });
       }
       ConcurrencyUtils.waitForCompletion(futures);
-    } else {
+    } else {*/
       for (int i = 0; i < _size; i++) {
         double re = other.getQuick(i);
         double im = getQuick(i)[1];
         setPartsQuick(i, re, im);
       }
-    }
+    //}
     return this;
   }
 
@@ -854,7 +854,7 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
   void swap(final DComplexMatrix1D other) {
     int size = this.size();
     checkSize(other);
-    int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, size);
       List<Future> futures = new List<Future>(nthreads);
@@ -872,14 +872,14 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
         });
       }
       ConcurrencyUtils.waitForCompletion(futures);
-    } else {
+    } else {*/
       Float64List tmp;
       for (int i = 0; i < size; i++) {
         tmp = getQuick(i);
         setQuick(i, other.getQuick(i));
         other.setQuick(i, tmp);
       }
-    }
+    //}
   }
 
   /**
@@ -919,7 +919,7 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
   void toArrayFill(final Float64List values) {
     int size = this.size();
     if (values.length < 2 * size) throw new ArgumentError("values too small");
-    int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, size);
       List<Future> futures = new List<Future>(nthreads);
@@ -937,14 +937,14 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
         });
       }
       ConcurrencyUtils.waitForCompletion(futures);
-    } else {
+    } else {*/
       Float64List tmp;
       for (int i = 0; i < size; i++) {
         tmp = getQuick(i);
         values[2 * i] = tmp[0];
         values[2 * i + 1] = tmp[1];
       }
-    }
+    //}
   }
 
   /**
@@ -964,23 +964,24 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
    * @return a string representation of the matrix.
    */
   String toStringFormat(String format) {
+    final f = new NumberFormat(format);
     StringBuffer s = new StringBuffer("ComplexMatrix1D: ${size()} elements\n\n");
     Float64List elem = new Float64List(2);
     for (int i = 0; i < size(); i++) {
       elem = getQuick(i);
       if (elem[1] == 0) {
-        s.write(String.format(format + "\n", elem[0]));
+        s.write(f.format(elem[0]) + "\n");
         continue;
       }
       if (elem[0] == 0) {
-        s.write(String.format(format + "i\n", elem[1]));
+        s.write(f.format(elem[1]) + "i\n");
         continue;
       }
       if (elem[1] < 0) {
-        s.write(String.format(format + " - " + format + "i\n", elem[0], -elem[1]));
+        s.write(f.format(elem[0]) + " - " + f.format(-elem[1]) + "i\n");
         continue;
       }
-      s.write(String.format(format + " + " + format + "i\n", elem[0], elem[1]));
+      s.write(f.format(elem[0]) + " + " + f.format(elem[1]) + "i\n");
     }
     return s.toString();
   }
@@ -1052,7 +1053,7 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
       }
     }
     //matches.trimToSize();
-    return viewSelection(matches);
+    return viewSelection(new Int32List.fromList(matches));
   }
 
   /**
@@ -1222,7 +1223,8 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
     }
 
     // setup
-    List<int> indexesCopy = new List<int>.from(nonZeroIndexes);
+    //List<int> indexesCopy = new List<int>.from(nonZeroIndexes);
+    Int32List indexesCopy = new Int32List.fromList(nonZeroIndexes);
     //indexesCopy.trimToSize();
     indexesCopy.sort();
     Int32List nonZeroIndexElements = indexesCopy;//.elements();
@@ -1230,7 +1232,9 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
     int s = indexesCopy.length;
 
     // skip to start
-    while ((index < s) && nonZeroIndexElements[index] < from) index++;
+    while ((index < s) && nonZeroIndexElements[index] < from) {
+      index++;
+    }
 
     // now the sparse dot product
     int i;

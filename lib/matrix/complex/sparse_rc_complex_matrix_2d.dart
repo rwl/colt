@@ -109,16 +109,17 @@ class SparseRCDComplexMatrix2D extends WrapperDComplexMatrix2D {
     if (nzmax == null) {
       nzmax = 10 * rows;//Math.min(10 * rows, Integer.MAX_VALUE);
     }
-    try {
+    /*try {
       _setUp(rows, columns);
     } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
       if ("matrix too large" != exc.message) {
         throw exc;
       }
-    }
-    _columnIndexes = new Int32List(nzmax);
-    _values = new Float64List(2 * nzmax);
-    _rowPointers = new Int32List(rows + 1);
+    }*/
+    final columnIndexes = new Int32List(nzmax);
+    final values = new Float64List(2 * nzmax);
+    final rowPointers = new Int32List(rows + 1);
+    return new SparseRCDComplexMatrix2D(rows, columns, rowPointers, columnIndexes, values);
   }
 
   /**
@@ -141,14 +142,14 @@ class SparseRCDComplexMatrix2D extends WrapperDComplexMatrix2D {
    * @param removeDuplicates
    *            if true, then duplicates (if any) are removed
    */
-  factory SparseRCDComplexMatrix2D.value(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, double re, double im, bool removeDuplicates) : super(null) {
-    try {
+  factory SparseRCDComplexMatrix2D.value(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, double re, double im, bool removeDuplicates) {
+    /*try {
       _setUp(rows, columns);
     } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
       if ("matrix too large" != exc.message) {
         throw exc;
       }
-    }
+    }*/
     if (rowIndexes.length != columnIndexes.length) {
       throw new ArgumentError("rowIndexes.length != columnIndexes.length");
     }
@@ -197,14 +198,14 @@ class SparseRCDComplexMatrix2D extends WrapperDComplexMatrix2D {
    * @param removeZeroes
    *            if true, then zeroes (if any) are removed
    */
-  factory SparseRCDComplexMatrix2D.values(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, Float64List values, bool removeDuplicates, bool removeZeroes) : super(null) {
-    try {
+  factory SparseRCDComplexMatrix2D.values(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, Float64List values, bool removeDuplicates, bool removeZeroes) {
+    /*try {
       _setUp(rows, columns);
     } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
       if ("matrix too large" != exc.message) {
         throw exc;
       }
-    }
+    }*/
     if (rowIndexes.length != columnIndexes.length) {
       throw new ArgumentError("rowIndexes.length != columnIndexes.length");
     } else if (2 * rowIndexes.length != values.length) {
@@ -357,7 +358,7 @@ class SparseRCDComplexMatrix2D extends WrapperDComplexMatrix2D {
       final Float64List valuesY = yy._values;
 
       final Int32List rowPointersC = new Int32List(_rows + 1);
-      int cnz = Math.max(_columnIndexes.length, Math.min(Integer.MAX_VALUE, _rowPointers[_rows] + rowPointersY[_rows]));
+      int cnz = Math.max(_columnIndexes.length, Math.min(MAX_INT, _rowPointers[_rows] + rowPointersY[_rows]));
       final Int32List columnIndexesC = new Int32List(cnz);
       final Float64List valuesC = new Float64List(2 * cnz);
       int nrow = _rows;
@@ -1165,7 +1166,7 @@ class SparseRCDComplexMatrix2D extends WrapperDComplexMatrix2D {
     return C;
   }
 
-  double _cumsum(Int32List p, Int32List c, int n) {
+  static double _cumsum(Int32List p, Int32List c, int n) {
     int nz = 0;
     double nz2 = 0.0;
     for (int k = 0; k < n; k++) {
@@ -1239,6 +1240,10 @@ class SparseRCDComplexMatrix2D extends WrapperDComplexMatrix2D {
     }
     _columnIndexes = new Int32List.fromList(columnIndexesList);
     _values = new Float64List.fromList(valuesList);
+  }
+  
+  Object clone() {
+    return new SparseRCDComplexMatrix2D(_rows, _columns, _rowPointers, _columnIndexes, _values);
   }
 
 }

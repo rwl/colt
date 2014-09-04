@@ -61,13 +61,13 @@ class SparseDComplexMatrix1D extends DComplexMatrix1D {
    * @throws IllegalArgumentException
    *             if <tt>size<0</tt>.
    */
-  SparseDComplexMatrix1D(int size, [Map<int, Float64List> elements = null, int offset = 0, int stride = 1]) {
+  SparseDComplexMatrix1D(int size, [Map<int, Float64List> elements = null, int offset = 0, int stride = 1, bool isNoView = false]) {
     if (elements == null) {
       elements = new Map<int, Float64List>();
     }
     _setUp(size, offset, stride);
     this._elements = elements;
-    this._isNoView = false;
+    this._isNoView = isNoView;
   }
 
   DComplexMatrix1D assignValues(Float64List value) {
@@ -278,6 +278,10 @@ class SparseDComplexMatrix1D extends DComplexMatrix1D {
     //}
     return Re;
   }
+  
+  Object clone() {
+    return new SparseDComplexMatrix1D(_size, _elements, _zero, _stride, _isNoView);
+  }
 }
 
 /**
@@ -458,6 +462,10 @@ class SelectedSparseDComplexMatrix1D extends DComplexMatrix1D {
 
   DoubleMatrix1D getRealPart() {
     throw new UnsupportedError("This method is not supported.");
+  }
+  
+  Object clone() {
+    return new SelectedSparseDComplexMatrix1D(_size, _elements, _zero, _stride, _offsets, __offset);
   }
 
 }

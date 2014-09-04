@@ -4,6 +4,8 @@ import 'dart:math' as Math;
 import 'dart:async' show Future;
 import 'dart:typed_data';
 
+import 'package:intl/intl.dart';
+
 import 'package:csparse/double/csparse.dart';
 import 'package:csparse/complex/cxsparse.dart' show DZcs;
 import 'package:csparse/complex/cxsparse.dart' as cxsparse;
@@ -24,6 +26,7 @@ part 'abstract_matrix_2d.dart';
 part 'abstract_matrix.dart';
 part 'double/dense_double_matrix_1d.dart';
 part 'double/dense_double_matrix_2d.dart';
+part 'double/dense_large_double_matrix_2d.dart';
 part 'double/sparse_double_matrix_1d.dart';
 part 'double/sparse_double_matrix_2d.dart';
 part 'double/sparse_rc_double_matrix.dart';

@@ -238,7 +238,10 @@ abstract class AbstractMatrix2D extends AbstractMatrix {
    *             or flip's are illegal.
    */
   void _setUp(int rows, int columns, [int rowZero = 0, int columnZero = 0, int rowStride = null, int columnStride = 1]) {
-    if (rowStride == null) rowStride = columns;
+  //void _setUp(int rows, int columns, int rowZero, int columnZero, int rowStride, int columnStride) {
+    if (rowStride == null) {
+      rowStride = columns;
+    }
     if (rows < 0 || columns < 0) {
       throw new ArgumentError("negative size");
     }
@@ -252,7 +255,7 @@ abstract class AbstractMatrix2D extends AbstractMatrix {
     this._columnStride = columnStride;
 
     this._isNoView = true;
-    if (columns * rows > _MAX) {
+    if (columns * rows > MAX_INT) {
       throw new ArgumentError("matrix too large");
     }
   }

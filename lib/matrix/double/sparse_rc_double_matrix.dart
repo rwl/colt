@@ -199,11 +199,11 @@ class SparseRCDoubleMatrix2D extends WrapperDoubleMatrix2D {
     if (nzmax == null) {
       nzmax = 10 * rows;//Math.min(10 * rows, Integer.MAX_VALUE);
     }
-    try {
+    /*try {
       _setUp(rows, columns);
     } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
       if ("matrix too large" != exc.message) throw exc;
-    }
+    }*/
     final columnIndexes = new Int32List(nzmax);
     final values = new Float64List(nzmax);
     final rowPointers = new Int32List(rows + 1);
@@ -230,11 +230,11 @@ class SparseRCDoubleMatrix2D extends WrapperDoubleMatrix2D {
    *            if true, then column indexes are sorted
    */
   factory SparseRCDoubleMatrix2D.value(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, double value, bool removeDuplicates, bool sortColumnIndexes) {
-    try {
+    /*try {
       _setUp(rows, columns);
     } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
       if ("matrix too large" != exc.message) throw exc;
-    }
+    }*/
     if (rowIndexes.length != columnIndexes.length) {
       throw new ArgumentError("rowIndexes.length != columnIndexes.length");
     }
@@ -288,11 +288,11 @@ class SparseRCDoubleMatrix2D extends WrapperDoubleMatrix2D {
    *            if true, then column indexes are sorted
    */
   factory SparseRCDoubleMatrix2D.values(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, Float64List values, bool removeDuplicates, bool removeZeroes, bool sortColumnIndexes) {
-    try {
+    /*try {
       _setUp(rows, columns);
     } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
       if ("matrix too large" != exc.message) throw exc;
-    }
+    }*/
     if (rowIndexes.length != columnIndexes.length) {
       throw new ArgumentError("rowIndexes.length != columnIndexes.length");
     } else if (rowIndexes.length != values.length) {
@@ -830,7 +830,7 @@ class SparseRCDoubleMatrix2D extends WrapperDoubleMatrix2D {
     final Float64List elementsY = yy._elements;
     final int strideY = yy.stride();
     final int zeroY = y.index(0);
-    int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    //int nthreads = ConcurrencyUtils.getNumberOfThreads();
 
     if (transposeA) {
       if ((!ignore) && (beta != 1.0)) {
@@ -1136,7 +1136,7 @@ class SparseRCDoubleMatrix2D extends WrapperDoubleMatrix2D {
     return C;
   }
 
-  double _cumsum(Int32List p, Int32List c, int n) {
+  static double _cumsum(Int32List p, Int32List c, int n) {
     int nz = 0;
     double nz2 = 0.0;
     for (int k = 0; k < n; k++) {

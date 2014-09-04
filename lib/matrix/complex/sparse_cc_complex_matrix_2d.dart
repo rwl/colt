@@ -171,14 +171,14 @@ class SparseCCDComplexMatrix2D extends WrapperDComplexMatrix2D {
    * @param removeDuplicates
    *            if true, then duplicates (if any) are removed
    */
-  factory SparseCCDComplexMatrix2D.value(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, double re, double im, bool removeDuplicates) : super(null) {
-    try {
+  factory SparseCCDComplexMatrix2D.value(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, double re, double im, bool removeDuplicates) {
+    /*try {
       _setUp(rows, columns);
     } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
       if ("matrix too large" != exc.message) {
         throw exc;
       }
-    }
+    }*/
     if (rowIndexes.length != columnIndexes.length) {
       throw new ArgumentError("rowIndexes.length != columnIndexes.length");
     }
@@ -227,14 +227,14 @@ class SparseCCDComplexMatrix2D extends WrapperDComplexMatrix2D {
    * @param removeZeroes
    *            if true, then zeroes (if any) are removed
    */
-  factory SparseCCDComplexMatrix2D.values(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, Float64List values, bool removeDuplicates, bool removeZeroes) : super(null) {
-    try {
+  factory SparseCCDComplexMatrix2D.values(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, Float64List values, bool removeDuplicates, bool removeZeroes) {
+    /*try {
       _setUp(rows, columns);
     } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
       if ("matrix too large" != exc.message) {
         throw exc;
       }
-    }
+    }*/
     if (rowIndexes.length != columnIndexes.length) {
       throw new ArgumentError("rowIndexes.length != columnIndexes.length");
     } else if (2 * rowIndexes.length != values.length) {
@@ -560,7 +560,7 @@ class SparseCCDComplexMatrix2D extends WrapperDComplexMatrix2D {
    */
   SparseCCDComplexMatrix2D getTranspose() {
     DZcs dzcst = cxsparse.cs_transpose(elements(), true);
-    SparseCCDComplexMatrix2D tr = new SparseCCDComplexMatrix2D(dzcst);
+    SparseCCDComplexMatrix2D tr = new SparseCCDComplexMatrix2D(dzcst.m, dzcst.n, dzcst.i, dzcst.p, dzcst.x);
     return tr;
   }
 
@@ -1184,7 +1184,7 @@ class SparseCCDComplexMatrix2D extends WrapperDComplexMatrix2D {
     return -(from + 1); // key not found.
   }
 
-  int _cumsum(Int32List p, Int32List c, int n) {
+  static int _cumsum(Int32List p, Int32List c, int n) {
     int nz = 0;
     int nz2 = 0;
     for (int k = 0; k < n; k++) {
@@ -1247,5 +1247,9 @@ class SparseCCDComplexMatrix2D extends WrapperDComplexMatrix2D {
       }
     }
     return nz;
+  }
+  
+  Object clone() {
+    return new SparseCCDComplexMatrix2D(_rows, _columns, _rowIndexes, _columnPointers, _values);
   }
 }

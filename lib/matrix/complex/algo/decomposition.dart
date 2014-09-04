@@ -115,16 +115,16 @@ class CSparseDComplexLUDecomposition implements SparseDComplexLUDecomposition {
     }
     n = A.rows();
 
-    _S = DZcs_sqr.cs_sqr(order, dcs, false);
-    if (_S == null) {
+    S = cs_sqr(order, dcs, false);
+    if (S == null) {
       throw new ArgumentError("Exception occured in cs_sqr()");
     }
-    _N = DZcs_lu.cs_lu(dcs, _S, 1);
-    if (_N == null) {
+    N = cs_lu(dcs, S, 1.0);
+    if (N == null) {
       throw new ArgumentError("Exception occured in cs_lu()");
     }
     if (checkIfSingular) {
-      DZcsd D = DZcs_dmperm.cs_dmperm(dcs, 1);
+      DZcsd D = cs_dmperm(dcs, 1);
       /* check if matrix is singular */
       if (D != null && D.rr[3] < n) {
         _isNonSingular = false;

@@ -25,10 +25,12 @@ class WrapperDoubleMatrix2D extends DoubleMatrix2D {
   DoubleMatrix2D _content;
 
   WrapperDoubleMatrix2D(DoubleMatrix2D newContent) {
-    if (newContent != null) try {
-      _setUp(newContent.rows(), newContent.columns());
-    } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
-      if ("matrix too large" != exc.message) throw exc;
+    if (newContent != null) {
+      try {
+        _setUp(newContent.rows(), newContent.columns());
+      } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
+        if ("matrix too large" != exc.message) throw exc;
+      }
     }
     this._content = newContent;
   }
@@ -73,7 +75,9 @@ class WrapperDoubleMatrix2D extends DoubleMatrix2D {
       final columnList = new List<int>();
       final valueList = new List<double>();
       y.getNonZeros(rowList, columnList, valueList);
-      assignFuncIndex(y, function, rowList, columnList);
+      assignFuncIndex(y, function,
+          new Int32List.fromList(rowList),
+          new Int32List.fromList(columnList));
     } else {
       super.assignFunc(y, function);
     }
@@ -104,7 +108,7 @@ class WrapperDoubleMatrix2D extends DoubleMatrix2D {
       }
       return true;
     } else {
-      return super.equals(value);
+      return super.equalsValue(value);
     }
   }
 
@@ -149,8 +153,8 @@ class WrapperDoubleMatrix2D extends DoubleMatrix2D {
 
   DoubleMatrix1D vectorize() {
     final DenseDoubleMatrix1D v = new DenseDoubleMatrix1D(size());
-    int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    /*if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _columns);
       List<Future> futures = new List<Future>(nthreads);
       int k = _columns ~/ nthreads;

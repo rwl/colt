@@ -1,7 +1,9 @@
 part of cern.colt.matrix.complex.test;
 
 testDComplexMatrix1D(String name, DComplexMatrix1DTest t) {
-  group('DComplexMatrix1D ($name)', () {
+  group(name, () {
+    setUp(t.setUp);
+    tearDown(t.tearDown);
     test('aggregate', t.testAggregate);
     test('aggregateMatrix', t.testAggregateMatrix);
     test('assign', t.testAssign);
@@ -142,7 +144,7 @@ abstract class DComplexMatrix1DTest {
       }
     }
     DComplexMatrix1D Acopy = A.copy();
-    Float64List value = new Float64List.fromList([-1, -1]);
+    Float64List value = new Float64List.fromList([-1.0, -1.0]);
     A.assignProcValue(procedure, value);
     for (int i = 0; i < A.size(); i++) {
       if (DComplex.abs(Acopy.getQuick(i)) > 0.1) {
@@ -216,11 +218,11 @@ abstract class DComplexMatrix1DTest {
   }
 
   void testEqualsValue() {
-    Float64List value = new Float64List.fromList([1, 2]);
+    Float64List value = new Float64List.fromList([1.0, 2.0]);
     A.assignValue(value[0], value[1]);
     bool eq = A.equalsValue(value);
     expect(eq, isTrue);
-    eq = A.equals(new Float64List.fromList([2, 2]));
+    eq = A.equalsValue(new Float64List.fromList([2.0, 2.0]));
     expect(eq, isFalse);
   }
 
@@ -344,7 +346,7 @@ abstract class DComplexMatrix1DTest {
   }
 
   void testViewSelection() {
-    Int32List indexes = new Int32List.fromList([A.size() / 6, A.size() / 5, A.size() / 4, A.size() / 3, A.size() / 2]);
+    Int32List indexes = new Int32List.fromList([A.size() ~/ 6, A.size() ~/ 5, A.size() ~/ 4, A.size() ~/ 3, A.size() ~/ 2]);
     DComplexMatrix1D B = A.viewSelection(indexes);
     for (int i = 0; i < indexes.length; i++) {
       assertEquals(A.getQuick(indexes[i]), B.getQuick(i), TOL);
@@ -381,7 +383,8 @@ abstract class DComplexMatrix1DTest {
     List<int> indexList = new List<int>();
     List<Float64List> valueList = new List<Float64List>();
     B.getNonZeros(indexList, valueList);
-    Float64List actual = A.zDotProductIndex(B, indexList, 5, B.size() - 10);
+    Float64List actual = A.zDotProductIndex(B,
+        new Int32List.fromList(indexList), 5, B.size() - 10);
     Float64List expected = new Float64List(2);
     for (int i = 5; i < A.size() - 5; i++) {
       expected = DComplex.plus(expected, DComplex.multiply(A.getQuick(i), DComplex.conj(B.getQuick(i))));

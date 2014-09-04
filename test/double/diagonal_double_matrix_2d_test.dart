@@ -12,7 +12,6 @@ class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
     B = new DiagonalDoubleMatrix2D(NROWS, NCOLUMNS, DINDEX);
     Bt = new DiagonalDoubleMatrix2D(NCOLUMNS, NROWS, -DINDEX);
     DLENGTH = (A as DiagonalDoubleMatrix2D).diagonalLength();
-
   }
 
   void populateMatrices() {
@@ -135,7 +134,9 @@ class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
         columnList.add(r + DINDEX);
       }
       DoubleMatrix2D Acopy = A.copy();
-      A.assignFuncIndex(B, div, rowList, columnList);
+      A.assignFuncIndex(B, div,
+          new Int32List.fromList(rowList),
+          new Int32List.fromList(columnList));
       for (int r = 0; r < DLENGTH; r++) {
         expect(Acopy.getQuick(r, r + DINDEX) / B.getQuick(r, r + DINDEX), closeTo(A.getQuick(r, r + DINDEX), TOL));
       }
@@ -145,7 +146,8 @@ class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
         columnList.add(r);
       }
       DoubleMatrix2D Acopy = A.copy();
-      A.assignFuncIndex(B, div, rowList, columnList);
+      A.assignFuncIndex(B, div, new Int32List.fromList(rowList),
+          new Int32List.fromList(columnList));
       for (int r = 0; r < DLENGTH; r++) {
         expect(Acopy.getQuick(r - DINDEX, r) / B.getQuick(r - DINDEX, r), closeTo(A.getQuick(r - DINDEX, r), TOL));
       }
@@ -162,10 +164,10 @@ class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
     if (DINDEX >= 0) {
       A.setQuick(NROWS ~/ 3, NROWS ~/ 3 + DINDEX, 0.7);
       A.setQuick(NROWS ~/ 2, NROWS ~/ 2 + DINDEX, 0.1);
-      Float64List maxAndLoc = A.getMaxLocation();
+      List<num> maxAndLoc = A.getMaxLocation();
       expect(0.7, closeTo(maxAndLoc[0], TOL));
-      expect(NROWS / 3, equals(maxAndLoc[1]));
-      expect(NROWS / 3 + DINDEX, equals(maxAndLoc[2]));
+      expect(NROWS ~/ 3, equals(maxAndLoc[1]));
+      expect(NROWS ~/ 3 + DINDEX, equals(maxAndLoc[2]));
     } else {
       A.setQuick(NROWS ~/ 3 - DINDEX, NROWS ~/ 3, 0.7);
       A.setQuick(NROWS ~/ 2 - DINDEX, NROWS ~/ 2, 0.1);
@@ -181,10 +183,10 @@ class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
     if (DINDEX >= 0) {
       A.setQuick(NROWS ~/ 3, NROWS ~/ 3 + DINDEX, -0.7);
       A.setQuick(NROWS ~/ 2, NROWS ~/ 2 + DINDEX, -0.1);
-      Float64List minAndLoc = A.getMinLocation();
+      List<num> minAndLoc = A.getMinLocation();
       expect(-0.7, closeTo(minAndLoc[0], TOL));
-      expect(NROWS / 3, equals(minAndLoc[1]));
-      expect(NROWS / 3 + DINDEX, equals(minAndLoc[2]));
+      expect(NROWS ~/ 3, equals(minAndLoc[1]));
+      expect(NROWS ~/ 3 + DINDEX, equals(minAndLoc[2]));
     } else {
       A.setQuick(NROWS ~/ 3 - DINDEX, NROWS ~/ 3, -0.7);
       A.setQuick(NROWS ~/ 2 - DINDEX, NROWS ~/ 2, -0.1);
@@ -207,10 +209,10 @@ class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
       expect(2, equals(rowList.length));
       expect(2, equals(columnList.length));
       expect(2, equals(valueList.length));
-      expect(rowList.contains(NROWS / 3), isTrue);
-      expect(rowList.contains(NROWS / 2), isTrue);
-      expect(columnList.contains(NROWS / 3 + DINDEX), isTrue);
-      expect(columnList.contains(NROWS / 2 + DINDEX), isTrue);
+      expect(rowList.contains(NROWS ~/ 3), isTrue);
+      expect(rowList.contains(NROWS ~/ 2), isTrue);
+      expect(columnList.contains(NROWS ~/ 3 + DINDEX), isTrue);
+      expect(columnList.contains(NROWS ~/ 2 + DINDEX), isTrue);
       expect(valueList.contains(-0.7), isTrue);
       expect(valueList.contains(-0.1), isTrue);
     } else {
@@ -223,10 +225,10 @@ class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
       expect(2, equals(rowList.length));
       expect(2, equals(columnList.length));
       expect(2, equals(valueList.length));
-      expect(rowList.contains(NROWS / 3 - DINDEX), isTrue);
-      expect(rowList.contains(NROWS / 2 - DINDEX), isTrue);
-      expect(columnList.contains(NROWS / 3), isTrue);
-      expect(columnList.contains(NROWS / 2), isTrue);
+      expect(rowList.contains(NROWS ~/ 3 - DINDEX), isTrue);
+      expect(rowList.contains(NROWS ~/ 2 - DINDEX), isTrue);
+      expect(columnList.contains(NROWS ~/ 3), isTrue);
+      expect(columnList.contains(NROWS ~/ 2), isTrue);
       expect(valueList.contains(-0.7), isTrue);
       expect(valueList.contains(-0.1), isTrue);
     }
@@ -244,10 +246,10 @@ class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
       expect(2, equals(rowList.length));
       expect(2, equals(columnList.length));
       expect(2, equals(valueList.length));
-      expect(rowList.contains(NROWS / 3), isTrue);
-      expect(rowList.contains(NROWS / 2), isTrue);
-      expect(columnList.contains(NROWS / 3 + DINDEX), isTrue);
-      expect(columnList.contains(NROWS / 2 + DINDEX), isTrue);
+      expect(rowList.contains(NROWS ~/ 3), isTrue);
+      expect(rowList.contains(NROWS ~/ 2), isTrue);
+      expect(columnList.contains(NROWS ~/ 3 + DINDEX), isTrue);
+      expect(columnList.contains(NROWS ~/ 2 + DINDEX), isTrue);
       expect(valueList.contains(0.7), isTrue);
       expect(valueList.contains(0.1), isTrue);
     } else {
@@ -260,10 +262,10 @@ class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
       expect(2, equals(rowList.length));
       expect(2, equals(columnList.length));
       expect(2, equals(valueList.length));
-      expect(rowList.contains(NROWS / 3 - DINDEX), isTrue);
-      expect(rowList.contains(NROWS / 2 - DINDEX), isTrue);
-      expect(columnList.contains(NROWS / 3), isTrue);
-      expect(columnList.contains(NROWS / 2), isTrue);
+      expect(rowList.contains(NROWS ~/ 3 - DINDEX), isTrue);
+      expect(rowList.contains(NROWS ~/ 2 - DINDEX), isTrue);
+      expect(columnList.contains(NROWS ~/ 3), isTrue);
+      expect(columnList.contains(NROWS ~/ 2), isTrue);
       expect(valueList.contains(0.7), isTrue);
       expect(valueList.contains(0.1), isTrue);
     }
@@ -281,10 +283,10 @@ class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
       expect(2, equals(rowList.length));
       expect(2, equals(columnList.length));
       expect(2, equals(valueList.length));
-      expect(rowList.contains(NROWS / 3), isTrue);
-      expect(rowList.contains(NROWS / 2), isTrue);
-      expect(columnList.contains(NROWS / 3 + DINDEX), isTrue);
-      expect(columnList.contains(NROWS / 2 + DINDEX), isTrue);
+      expect(rowList.contains(NROWS ~/ 3), isTrue);
+      expect(rowList.contains(NROWS ~/ 2), isTrue);
+      expect(columnList.contains(NROWS ~/ 3 + DINDEX), isTrue);
+      expect(columnList.contains(NROWS ~/ 2 + DINDEX), isTrue);
       expect(valueList.contains(0.7), isTrue);
       expect(valueList.contains(0.1), isTrue);
     } else {
@@ -297,10 +299,10 @@ class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
       expect(2, equals(rowList.length));
       expect(2, equals(columnList.length));
       expect(2, equals(valueList.length));
-      expect(rowList.contains(NROWS / 3 - DINDEX), isTrue);
-      expect(rowList.contains(NROWS / 2 - DINDEX), isTrue);
-      expect(columnList.contains(NROWS / 3), isTrue);
-      expect(columnList.contains(NROWS / 2), isTrue);
+      expect(rowList.contains(NROWS ~/ 3 - DINDEX), isTrue);
+      expect(rowList.contains(NROWS ~/ 2 - DINDEX), isTrue);
+      expect(columnList.contains(NROWS ~/ 3), isTrue);
+      expect(columnList.contains(NROWS ~/ 2), isTrue);
       expect(valueList.contains(0.7), isTrue);
       expect(valueList.contains(0.1), isTrue);
     }
@@ -418,8 +420,8 @@ class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
   }
 
   void testViewSelection() {
-    final rowIndexes = new Int32List.fromList([NROWS / 6, NROWS / 5, NROWS / 4, NROWS / 3, NROWS / 2]);
-    final colIndexes = new Int32List.fromList([NROWS / 6, NROWS / 5, NROWS / 4, NROWS / 3, NROWS / 2, NROWS - 1]);
+    final rowIndexes = new Int32List.fromList([NROWS ~/ 6, NROWS ~/ 5, NROWS ~/ 4, NROWS ~/ 3, NROWS ~/ 2]);
+    final colIndexes = new Int32List.fromList([NROWS ~/ 6, NROWS ~/ 5, NROWS ~/ 4, NROWS ~/ 3, NROWS ~/ 2, NROWS - 1]);
     DoubleMatrix2D B = A.viewSelection(rowIndexes, colIndexes);
     expect(rowIndexes.length, equals(B.rows()));
     expect(colIndexes.length, equals(B.columns()));
@@ -475,9 +477,9 @@ class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
     //---
     C = null;
     C = A.zMult2D(Bt, C, alpha, beta, false, false);
-    expected = new List<Float64List>(NROWS);//[NROWS];
+    expected = new List<Float64List>.generate(NROWS,
+        (_) => new Float64List(NROWS));
     for (int j = 0; j < NROWS; j++) {
-      expected[j] = new Float64List(NROWS);
       for (int i = 0; i < NROWS; i++) {
         double s = 0.0;
         for (int k = 0; k < NCOLUMNS; k++) {
@@ -516,9 +518,9 @@ class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
     //---
     C = null;
     C = A.zMult2D(B, C, alpha, beta, true, false);
-    expected = new List<Float64List>(NCOLUMNS);//[NCOLUMNS];
+    expected = new List<Float64List>.generate(NCOLUMNS, 
+        (_) => new Float64List(NCOLUMNS));
     for (int j = 0; j < NCOLUMNS; j++) {
-      expected[j] = new Float64List(NCOLUMNS);
       for (int i = 0; i < NCOLUMNS; i++) {
         double s = 0.0;
         for (int k = 0; k < NROWS; k++) {
@@ -557,9 +559,9 @@ class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
     //---
     C = null;
     C = A.zMult2D(B, C, alpha, beta, false, true);
-    expected = new List<Float64List>(NROWS);//[NROWS];
+    expected = new List<Float64List>.generate(NROWS, 
+        (_) => new Float64List(NROWS));
     for (int j = 0; j < NROWS; j++) {
-      expected[j] = new Float64List(NROWS);
       for (int i = 0; i < NROWS; i++) {
         double s = 0.0;
         for (int k = 0; k < NCOLUMNS; k++) {
@@ -597,9 +599,9 @@ class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
     //---
     C = null;
     C = A.zMult2D(Bt, C, alpha, beta, true, true);
-    expected = new List<Float64List>(NCOLUMNS);//[NCOLUMNS];
+    expected = new List<Float64List>.generate(NCOLUMNS, 
+        (_) => new Float64List(NCOLUMNS));
     for (int j = 0; j < NCOLUMNS; j++) {
-      expected[j] = new Float64List(NCOLUMNS);
       for (int i = 0; i < NCOLUMNS; i++) {
         double s = 0.0;
         for (int k = 0; k < NROWS; k++) {
@@ -622,6 +624,7 @@ class DiagonalDoubleMatrix2DViewTest extends DiagonalDoubleMatrix2DTest {
   void createMatrices() {
     DINDEX = 3;
     A = new DiagonalDoubleMatrix2D(NCOLUMNS, NROWS, -DINDEX);
+    DLENGTH = (A as DiagonalDoubleMatrix2D).diagonalLength();
     A = A.viewDice();
     B = new DiagonalDoubleMatrix2D(NCOLUMNS, NROWS, -DINDEX).viewDice();
     Bt = new DiagonalDoubleMatrix2D(NROWS, NCOLUMNS, DINDEX).viewDice();

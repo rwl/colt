@@ -22,7 +22,9 @@ class WrapperDComplexMatrix2D extends DComplexMatrix2D {
   DComplexMatrix2D _content;
 
   WrapperDComplexMatrix2D(DComplexMatrix2D newContent) {
-    if (newContent != null) _setUp(newContent.rows(), newContent.columns());
+    if (newContent != null) {
+      _setUp(newContent.rows(), newContent.columns());
+    }
     this._content = newContent;
   }
 
@@ -87,7 +89,7 @@ class WrapperDComplexMatrix2D extends DComplexMatrix2D {
       }
       return true;
     } else {
-      return super.equals(value);
+      return super.equalsValue(value);
     }
   }
 
@@ -251,13 +253,18 @@ class WrapperDComplexMatrix2D extends DComplexMatrix2D {
     return view;
   }
 
-  DComplexMatrix2D viewStrides(final int _rowStride, final int _columnStride) {
-    if (_rowStride <= 0 || _columnStride <= 0) {
+  DComplexMatrix2D viewStrides(final int rowStride, final int columnStride) {
+    if (rowStride <= 0 || columnStride <= 0) {
       throw new RangeError("illegal stride");
     }
-    WrapperDComplexMatrix2D view = new ViewStridesWrapperDComplexMatrix2D(this);
-    if (_rows != 0) view._rows = (_rows - 1) ~/ _rowStride + 1;
-    if (_columns != 0) view._columns = (_columns - 1) ~/ _columnStride + 1;
+    WrapperDComplexMatrix2D view = new ViewStridesWrapperDComplexMatrix2D(this,
+        rowStride, columnStride);
+    if (_rows != 0) {
+      view._rows = (_rows - 1) ~/ rowStride + 1;
+    }
+    if (_columns != 0) {
+      view._columns = (_columns - 1) ~/ columnStride + 1;
+    }
     view._isNoView = false;
 
     return view;
@@ -331,6 +338,10 @@ class WrapperDComplexMatrix2D extends DComplexMatrix2D {
     }
     //}
     return Re;
+  }
+  
+  Object clone() {
+    return new WrapperDComplexMatrix2D(_content);
   }
 }
 
@@ -511,7 +522,11 @@ class ViewSelectionWrapperDComplexMatrix2D extends WrapperDComplexMatrix2D {
 
 class ViewStridesWrapperDComplexMatrix2D extends WrapperDComplexMatrix2D {
 
-  ViewStridesWrapperDComplexMatrix2D(DComplexMatrix2D newContent) : super(newContent);
+  ViewStridesWrapperDComplexMatrix2D(DComplexMatrix2D newContent, int rowStride,
+      int columnStride) : super(newContent) {
+    _rowStride = rowStride;
+    _columnStride = columnStride;
+  }
 
   Float64List getQuick(int row, int column) {
     return _content.getQuick(_rowStride * row, _columnStride * column);
@@ -538,6 +553,6 @@ class ViewStridesWrapperDComplexMatrix2D extends WrapperDComplexMatrix2D {
   }
 
   Object clone() {
-    return new ViewStridesWrapperDComplexMatrix2D(_content);
+    return new ViewStridesWrapperDComplexMatrix2D(_content, _rowStride, _columnStride);
   }
 }

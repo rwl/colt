@@ -419,7 +419,9 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    *         otherwise.
    */
   bool equalsMatrix2DValue(final DoubleMatrix2D A, final double value) {
-    if (A == null) return false;
+    if (A == null) {
+      return false;
+    }
     final int rows = A.rows();
     final int columns = A.columns();
     bool result = false;
