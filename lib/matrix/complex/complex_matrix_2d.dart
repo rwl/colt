@@ -49,7 +49,7 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
    */
   Float64List aggregate(final cfunc.DComplexDComplexDComplexFunction aggr, final cfunc.DComplexDComplexFunction f) {
     Float64List b = new Float64List(2);
-    if (size() == 0) {
+    if (length == 0) {
       b[0] = double.NAN;
       b[1] = double.NAN;
       return b;
@@ -108,7 +108,7 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
   Float64List aggregateMatrix(final DComplexMatrix2D other, final cfunc.DComplexDComplexDComplexFunction aggr, final cfunc.DComplexDComplexDComplexFunction f) {
     checkShape(other);
     Float64List b = new Float64List(2);
-    if (size() == 0) {
+    if (length == 0) {
       b[0] = double.NAN;
       b[1] = double.NAN;
       return b;
@@ -516,7 +516,7 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
    */
   DComplexMatrix2D assignValues(final Float64List values) {
     if (values.length != _rows * 2 * _columns) {
-      throw new ArgumentError("Must have same length: length=${values.length} rows()*2*columns()=${rows() * 2 * columns()}");
+      throw new ArgumentError("Must have same length: length=${values.length} rows()*2*columns()=${rows * 2 * columns}");
     }
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -568,7 +568,7 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
    */
   DComplexMatrix2D assignList(final List<Float64List> values) {
     if (values.length != _rows) {
-      throw new ArgumentError("Must have same number of rows: rows=${values.length} rows()=${rows()}");
+      throw new ArgumentError("Must have same number of rows: rows=${values.length} rows()=${rows}");
     }
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -592,7 +592,7 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
     } else {*/
     for (int r = 0; r < _rows; r++) {
       Float64List currentRow = values[r];
-      if (currentRow.length != 2 * _columns) throw new ArgumentError("Must have same number of columns in every row: columns=${currentRow.length} 2*columns()=${2 * columns()}");
+      if (currentRow.length != 2 * _columns) throw new ArgumentError("Must have same number of columns in every row: columns=${currentRow.length} 2*columns()=${2 * columns}");
       for (int c = 0; c < _columns; c++) {
         setPartsQuick(r, c, currentRow[2 * c], currentRow[2 * c + 1]);
       }
@@ -638,7 +638,7 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
     for (int r = 0; r < _rows; r++) {
       for (int c = 0; c < _columns; c++) {
         double re = getQuick(r, c)[0];
-        double im = other.getQuick(r, c);
+        double im = other.get(r, c);
         setPartsQuick(r, c, re, im);
       }
     }
@@ -681,7 +681,7 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
     } else {*/
     for (int r = 0; r < _rows; r++) {
       for (int c = 0; c < _columns; c++) {
-        double re = other.getQuick(r, c);
+        double re = other.get(r, c);
         double im = getQuick(r, c)[1];
         setPartsQuick(r, c, re, im);
       }
@@ -1486,7 +1486,7 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
     } else {
       zz = z;
     }
-    if (_columns != y.size() || _rows > zz.size()) {
+    if (_columns != y.length || _rows > zz.length) {
       throw new ArgumentError("Incompatible args: " + toStringShort() + ", " + y.toStringShort() + ", " + zz.toStringShort());
     }
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -1637,7 +1637,7 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
    * @return the sum.
    */
   Float64List zSum() {
-    if (size() == 0) {
+    if (length == 0) {
       return new Float64List.fromList([0.0, 0.0]);
     }
     return aggregate(cfunc.plus, cfunc.identity);

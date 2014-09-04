@@ -248,7 +248,7 @@ class SparseDComplexMatrix1D extends DComplexMatrix1D {
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
     for (int i = 0; i < _size; i++) {
-      Im.setQuick(i, getQuick(i)[1]);
+      Im.set(i, getQuick(i)[1]);
     }
     //}
     return Im;
@@ -273,7 +273,7 @@ class SparseDComplexMatrix1D extends DComplexMatrix1D {
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
     for (int i = 0; i < _size; i++) {
-      Re.setQuick(i, getQuick(i)[0]);
+      Re.set(i, getQuick(i)[0]);
     }
     //}
     return Re;

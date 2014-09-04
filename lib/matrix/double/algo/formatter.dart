@@ -323,9 +323,9 @@ class DoubleFormatter extends AbstractFormatter {
    * Returns a string representations of all cells; no alignment considered.
    */
   List<List<String>> format(DoubleMatrix2D matrix) {
-    List<List<String>> strings = new List<List<String>>(matrix.rows());//[matrix.columns()];
-    for (int row = matrix.rows(); --row >= 0; ) {
-      strings[row] = _formatRow(matrix.viewRow(row));
+    List<List<String>> strings = new List<List<String>>(matrix.rows);//[matrix.columns()];
+    for (int row = matrix.rows; --row >= 0; ) {
+      strings[row] = _formatRow(matrix.row(row));
     }
     return strings;
   }
@@ -417,8 +417,8 @@ class DoubleFormatter extends AbstractFormatter {
    *            the matrix to convert.
    */
   String toStringDouble1D(DoubleMatrix1D matrix) {
-    DoubleMatrix2D easy = matrix.like2D(1, matrix.size());
-    easy.viewRow(0).assignMatrix(matrix);
+    DoubleMatrix2D easy = matrix.like2D(1, matrix.length);
+    easy.row(0).setAll(matrix);
     return toString2D(easy);
   }
 

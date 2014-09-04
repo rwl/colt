@@ -46,12 +46,12 @@ class DenseLargeDoubleMatrix2D extends WrapperDoubleMatrix2D {
     _content = this;
   }
 
-  double getQuick(int row, int column) {
+  double get(int row, int column) {
     return _elements[row][column];
   }
 
 
-  void setQuick(int row, int column, double value) {
+  void set(int row, int column, double value) {
     _elements[row][column] = value;
   }
 

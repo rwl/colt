@@ -72,7 +72,7 @@ class SparseDoubleMatrix1D extends DoubleMatrix1D {
    *            The values to be filled into the new matrix.
    */
   factory SparseDoubleMatrix1D.from(Float64List values) {
-    return new SparseDoubleMatrix1D(values.length)..assignValues(values);
+    return new SparseDoubleMatrix1D(values.length)..setValues(values);
   }
 
   /**
@@ -147,12 +147,12 @@ class SparseDoubleMatrix1D extends DoubleMatrix1D {
    *            the value to be filled into the cells.
    * @return <tt>this</tt> (for convenience only).
    */
-  DoubleMatrix1D assignValue(double value) {
+  DoubleMatrix1D fill(double value) {
     // overriden for performance only
     if (this._isNoView && value == 0) {
       this._elements.clear();
     } else {
-      super.assignValue(value);
+      super.fill(value);
     }
     return this;
   }
@@ -160,11 +160,11 @@ class SparseDoubleMatrix1D extends DoubleMatrix1D {
   /**
    * Returns the number of cells having non-zero values.
    */
-  int cardinality() {
+  int get cardinality {
     if (this._isNoView) {
       return this._elements.length;
     } else {
-      return super.cardinality();
+      return super.cardinality;
     }
   }
 
@@ -208,7 +208,7 @@ class SparseDoubleMatrix1D extends DoubleMatrix1D {
    *            the index of the cell.
    * @return the value of the specified cell.
    */
-  double getQuick(int index) {
+  double get(int index) {
     // if (debug) if (index<0 || index>=size) checkIndex(index);
     // return this.elements.get(index(index));
     // manually inlined:
@@ -276,9 +276,9 @@ class SparseDoubleMatrix1D extends DoubleMatrix1D {
     int idx = 0;
     for (int c = 0; c < columns; c++) {
       for (int r = 0; r < rows; r++) {
-        double elem = getQuick(idx++);
+        double elem = get(idx++);
         if (elem != 0) {
-          M.setQuick(r, c, elem);
+          M.set(r, c, elem);
         }
       }
     }
@@ -318,7 +318,7 @@ class SparseDoubleMatrix1D extends DoubleMatrix1D {
    * @param value
    *            the value to be filled into the specified cell.
    */
-  void setQuick(int index, double value) {
+  void set(int index, double value) {
     // if (debug) if (index<0 || index>=size) checkIndex(index);
     // int i = index(index);
     // manually inlined:
@@ -336,10 +336,10 @@ class SparseDoubleMatrix1D extends DoubleMatrix1D {
         ..write("1 x ")
         ..write(_size)
         ..write(" sparse matrix, nnz = ")
-        ..write(cardinality())
+        ..write(cardinality)
         ..write('\n');
     for (int i = 0; i < _size; i++) {
-      double elem = getQuick(i);
+      double elem = get(i);
       if (elem != 0) {
         builder
             ..write('(')
@@ -377,7 +377,7 @@ class SparseDoubleMatrix1D extends DoubleMatrix1D {
    * @return a new view.
    */
   DoubleMatrix1D _viewSelectionLike(Int32List offsets) {
-    return new SelectedSparseDoubleMatrix1D.from(this._elements, offsets);
+    return new SelectedSparseDoubleMatrix1D(this._elements, offsets);
   }
 
   Object clone() {
@@ -448,9 +448,9 @@ class SelectedSparseDoubleMatrix1D extends DoubleMatrix1D {
    * @param indexes
    *            The indexes of the cells that shall be visible.
    */
-  factory SelectedSparseDoubleMatrix1D.from(Map<int, double> elements, Int32List offsets) {
-    return new SelectedSparseDoubleMatrix1D(offsets.length, elements, 0, 1, offsets, 0);
-  }
+  /*SelectedSparseDoubleMatrix1D(Map<int, double> elements, Int32List offsets) {
+    return new SelectedSparseDoubleMatrix1D._internal(offsets.length, elements, 0, 1, offsets, 0);
+  }*/
 
   /**
    * Constructs a matrix view with the given parameters.
@@ -468,7 +468,10 @@ class SelectedSparseDoubleMatrix1D extends DoubleMatrix1D {
    *            the offsets of the cells that shall be visible.
    * @param offset
    */
-  SelectedSparseDoubleMatrix1D(int size, Map<int, double> elements, int zero, int stride, Int32List offsets, int offset) {
+  SelectedSparseDoubleMatrix1D(Map<int, double> elements, Int32List offsets, [int size = null, int zero = 0, int stride = 1, int offset = 0]) {
+    if (size == null) {
+      size = offsets.length;
+    }
     _setUp(size, zero, stride);
 
     this._elements = elements;
@@ -494,7 +497,7 @@ class SelectedSparseDoubleMatrix1D extends DoubleMatrix1D {
    *            the index of the cell.
    * @return the value of the specified cell.
    */
-  double getQuick(int index) {
+  double get(int index) {
     // if (debug) if (index<0 || index>=size) checkIndex(index);
     // return elements.get(index(index));
     // manually inlined:
@@ -558,7 +561,7 @@ class SelectedSparseDoubleMatrix1D extends DoubleMatrix1D {
     int idx = 0;
     for (int c = 0; c < columns; c++) {
       for (int r = 0; r < rows; r++) {
-        M.setQuick(r, c, getQuick(idx++));
+        M.set(r, c, get(idx++));
       }
     }
     return M;
@@ -594,7 +597,7 @@ class SelectedSparseDoubleMatrix1D extends DoubleMatrix1D {
    * @param value
    *            the value to be filled into the specified cell.
    */
-  void setQuick(int index, double value) {
+  void set(int index, double value) {
     // if (debug) if (index<0 || index>=size) checkIndex(index);
     // int i = index(index);
     // manually inlined:
@@ -651,10 +654,10 @@ class SelectedSparseDoubleMatrix1D extends DoubleMatrix1D {
    * @return a new view.
    */
   DoubleMatrix1D _viewSelectionLike(Int32List offsets) {
-    return new SelectedSparseDoubleMatrix1D.from(this._elements, offsets);
+    return new SelectedSparseDoubleMatrix1D(this._elements, offsets);
   }
 
   Object clone() {
-    return new SelectedSparseDoubleMatrix1D(_size, _elements, _zero, _stride, _offsets, __offset);
+    return new SelectedSparseDoubleMatrix1D(_elements, _offsets, _size, _zero, _stride, __offset);
   }
 }

@@ -55,7 +55,7 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
    */
   factory DenseDoubleMatrix1D.from(Float64List values) {
     final m = new DenseDoubleMatrix1D(values.length);
-    m.assignValues(values);
+    m.setValues(values);
     return m;
   }
 
@@ -99,7 +99,7 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
     this._isNoView = !isView;
   }
 
-  double aggregate(final DoubleDoubleFunction aggr, final DoubleFunction f) {
+  double reduce(final DoubleDoubleFunction aggr, final DoubleFunction f) {
     if (_size == 0) return double.NAN;
     double a = 0.0;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -130,8 +130,8 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
     return a;
   }
 
-  double aggregateIndex(final DoubleDoubleFunction aggr, final DoubleFunction f, final /*IntArrayList*/List<int> indexList) {
-    if (this.size() == 0) return double.NAN;
+  double reduceRange(final DoubleDoubleFunction aggr, final DoubleFunction f, final /*IntArrayList*/List<int> indexList) {
+    if (this.length == 0) return double.NAN;
     final int size = indexList.length;
     final List<int> indexElements = indexList;//.elements();
     double a = 0.0;
@@ -169,9 +169,9 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
     return a;
   }
 
-  double aggregateMatrix(final DoubleMatrix1D other, final DoubleDoubleFunction aggr, final DoubleDoubleFunction f) {
+  double reduceVector(final DoubleMatrix1D other, final DoubleDoubleFunction aggr, final DoubleDoubleFunction f) {
     if (!(other is DenseDoubleMatrix1D)) {
-      return super.aggregateMatrix(other, aggr, f);
+      return super.reduceVector(other, aggr, f);
     }
     checkSize(other);
     if (_size == 0) return double.NAN;
@@ -213,7 +213,7 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
     return a;
   }
 
-  DoubleMatrix1D assign(final DoubleFunction function) {
+  DoubleMatrix1D forEach(final DoubleFunction function) {
     double multiplicator;
     if (function is DoubleMult) {
       // x[i] = mult*x[i]
@@ -269,7 +269,7 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
     return this;
   }
 
-  DoubleMatrix1D assignProc(final DoubleProcedure cond, final DoubleFunction function) {
+  DoubleMatrix1D forEachWhere(final DoubleProcedure cond, final DoubleFunction function) {
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
@@ -301,7 +301,7 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
     return this;
   }
 
-  DoubleMatrix1D assignProcValue(final DoubleProcedure cond, final double value) {
+  DoubleMatrix1D fillWhere(final DoubleProcedure cond, final double value) {
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
@@ -333,7 +333,7 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
     return this;
   }
 
-  DoubleMatrix1D assignValue(final double value) {
+  DoubleMatrix1D fill(final double value) {
     final Float64List elems = this._elements;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
@@ -362,9 +362,9 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
     return this;
   }
 
-  DoubleMatrix1D assignValues(final Float64List values) {
+  DoubleMatrix1D setValues(final Float64List values) {
     if (values.length != _size) {
-      throw new ArgumentError("Must have same number of cells: length=${values.length} size()=${size()}");
+      throw new ArgumentError("Must have same number of cells: length=${values.length} size()=${length}");
     }
     //int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if (_isNoView) {
@@ -398,10 +398,10 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
     return this;
   }
 
-  DoubleMatrix1D assignMatrix(DoubleMatrix1D source) {
+  DoubleMatrix1D setAll(DoubleMatrix1D source) {
     // overriden for performance only
     if (!(source is DenseDoubleMatrix1D)) {
-      super.assignMatrix(source);
+      super.setAll(source);
       return this;
     }
     DenseDoubleMatrix1D other = source as DenseDoubleMatrix1D;
@@ -417,7 +417,7 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
       DoubleMatrix1D c = other.copy();
       if (!(c is DenseDoubleMatrix1D)) {
         // should not happen
-        super.assignMatrix(source);
+        super.setAll(source);
         return this;
       }
       other = c as DenseDoubleMatrix1D;
@@ -460,10 +460,10 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
     return this;
   }
 
-  DoubleMatrix1D assignFunc(final DoubleMatrix1D y, final DoubleDoubleFunction function) {
+  DoubleMatrix1D forEachVector(final DoubleMatrix1D y, final DoubleDoubleFunction function) {
     // overriden for performance only
     if (!(y is DenseDoubleMatrix1D)) {
-      super.assignFunc(y, function);
+      super.forEachVector(y, function);
       return this;
     }
     checkSize(y);
@@ -624,7 +624,7 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
     return this;
   }
 
-  int cardinality() {
+  int get cardinality {
     int cardinality = 0;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
@@ -672,7 +672,7 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
     return _elements;
   }
 
-  void getNonZeros(final /*IntArrayList*/List<int> indexList, final /*DoubleArrayList*/List<double> valueList) {
+  void nonZeros(final /*IntArrayList*/List<int> indexList, final /*DoubleArrayList*/List<double> valueList) {
     bool fillIndexList = indexList != null;
     bool fillValueList = valueList != null;
     if (fillIndexList) indexList.clear();
@@ -716,7 +716,7 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
     }
   }
 
-  void getPositiveValues(final /*IntArrayList*/List<int> indexList, final /*DoubleArrayList*/List<double> valueList) {
+  void positiveValues(final /*IntArrayList*/List<int> indexList, final /*DoubleArrayList*/List<double> valueList) {
     bool fillIndexList = indexList != null;
     bool fillValueList = valueList != null;
     if (fillIndexList) indexList.clear();
@@ -760,7 +760,7 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
     }
   }
 
-  void getNegativeValues(final /*IntArrayList*/List<int> indexList, final /*DoubleArrayList*/List<double> valueList) {
+  void negativeValues(final /*IntArrayList*/List<int> indexList, final /*DoubleArrayList*/List<double> valueList) {
     bool fillIndexList = indexList != null;
     bool fillValueList = valueList != null;
     if (fillIndexList) indexList.clear();
@@ -804,7 +804,7 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
     }
   }
 
-  Float64List getMaxLocation() {
+  DoubleVectorLocation max() {
     int location = 0;
     double maxValue = 0.0;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -859,10 +859,10 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
       }
     }
     //}
-    return new Float64List.fromList([maxValue, location.toDouble()]);
+    return new DoubleVectorLocation(maxValue, location);
   }
 
-  Float64List getMinLocation() {
+  DoubleVectorLocation min() {
     int location = 0;
     double minValue = 0.0;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -917,10 +917,10 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
       }
     }
     //}
-    return new Float64List.fromList([minValue, location.toDouble()]);
+    return new DoubleVectorLocation(minValue, location);
   }
 
-  double getQuick(int index) {
+  double get(int index) {
     return _elements[_zero + index * _stride];
   }
 
@@ -939,8 +939,8 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
     DoubleMatrix2D M = new DenseDoubleMatrix2D(rows, columns);
     final Float64List elementsOther = M.elements() as Float64List;
     final int zeroOther = M.index(0, 0);
-    final int rowStrideOther = M.rowStride();
-    final int columnStrideOther = M.columnStride();
+    final int rowStrideOther = M.rowStride;
+    final int columnStrideOther = M.columnStride;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
@@ -1030,7 +1030,7 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
     return M;
   }*/
 
-  void setQuick(int index, double value) {
+  void set(int index, double value) {
     _elements[_zero + index * _stride] = value;
   }
 
@@ -1080,26 +1080,29 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
     //}
   }
 
-  void toArrayValues(Float64List values) {
+  void fillList(Float64List values) {
     if (values.length < _size) throw new ArgumentError("values too small");
     if (this._isNoView) {
       values.setAll(0, this._elements);
       //System.arraycopy(this._elements, 0, values, 0, this._elements.length);
     } else {
-      super.toArrayValues(values);
+      super.fillList(values);
     }
   }
 
-  double zDotProductRange(DoubleMatrix1D y, int from, int length) {
+  double dot(DoubleMatrix1D y, [final int from = 0, int length = null]) {
+    if (length == null) {
+      length = _size;
+    }
     if (!(y is DenseDoubleMatrix1D)) {
-      return super.zDotProductRange(y, from, length);
+      return super.dot(y, from, length);
     }
     DenseDoubleMatrix1D yy = y as DenseDoubleMatrix1D;
 
     int tail = from + length;
     if (from < 0 || length < 0) return 0.0;
     if (_size < tail) tail = _size;
-    if (y.size() < tail) tail = y.size();
+    if (y.length < tail) tail = y.length;
     final Float64List elementsOther = yy._elements;
     int zeroThis = index(from);
     int zeroOther = yy.index(from);
@@ -1161,7 +1164,7 @@ class DenseDoubleMatrix1D extends DoubleMatrix1D {
     return sum;
   }
 
-  double zSum() {
+  double sum() {
     double sum = 0.0;
     final Float64List elems = this._elements;
     if (elems == null) throw new Error();
@@ -1353,7 +1356,7 @@ class SelectedDenseDoubleMatrix1D extends DoubleMatrix1D {
    *            the index of the cell.
    * @return the value of the specified cell.
    */
-  double getQuick(int index) {
+  double get(int index) {
     // if (debug) if (index<0 || index>=size) checkIndex(index);
     // return elements[index(index)];
     // manually inlined:
@@ -1416,14 +1419,14 @@ class SelectedDenseDoubleMatrix1D extends DoubleMatrix1D {
     DoubleMatrix2D M = new DenseDoubleMatrix2D(rows, columns);
     final Float64List elementsOther = M.elements() as Float64List;
     final int zeroOther = M.index(0, 0);
-    final int rowStrideOther = M.rowStride();
-    final int colStrideOther = M.columnStride();
+    final int rowStrideOther = M.rowStride;
+    final int colStrideOther = M.columnStride;
     int idxOther;
     int idx = 0;
     for (int c = 0; c < columns; c++) {
       idxOther = zeroOther + c * colStrideOther;
       for (int r = 0; r < rows; r++) {
-        elementsOther[idxOther] = getQuick(idx++);
+        elementsOther[idxOther] = get(idx++);
         idxOther += rowStrideOther;
       }
     }
@@ -1468,7 +1471,7 @@ class SelectedDenseDoubleMatrix1D extends DoubleMatrix1D {
    * @param value
    *            the value to be filled into the specified cell.
    */
-  void setQuick(int index, double value) {
+  void set(int index, double value) {
     // if (debug) if (index<0 || index>=size) checkIndex(index);
     // elements[index(index)] = value;
     // manually inlined:

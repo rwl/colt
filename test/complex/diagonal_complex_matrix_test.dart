@@ -78,35 +78,35 @@ class DiagonalDComplexMatrix2DTest extends DComplexMatrix2DTest {
   }
 
   void testAssignImaginary() {
-    DoubleMatrix2D Im = DoubleFactory2D.dense.random(A.rows(), A.columns());
+    DoubleMatrix2D Im = DoubleFactory2D.dense.random(A.rows, A.columns);
     DComplexMatrix2D Acopy = A.copy();
     A.assignImaginary(Im);
     if (DINDEX >= 0) {
       for (int r = 0; r < DLENGTH; r++) {
         expect(Acopy.getQuick(r, r + DINDEX)[0], closeTo(A.getQuick(r, r + DINDEX)[0], TOL));
-        expect(Im.getQuick(r, r + DINDEX), closeTo(A.getQuick(r, r + DINDEX)[1], TOL));
+        expect(Im.get(r, r + DINDEX), closeTo(A.getQuick(r, r + DINDEX)[1], TOL));
       }
     } else {
       for (int r = 0; r < DLENGTH; r++) {
         expect(Acopy.getQuick(r - DINDEX, r)[0], closeTo(A.getQuick(r - DINDEX, r)[0], TOL));
-        expect(Im.getQuick(r - DINDEX, r), closeTo(A.getQuick(r - DINDEX, r)[1], TOL));
+        expect(Im.get(r - DINDEX, r), closeTo(A.getQuick(r - DINDEX, r)[1], TOL));
       }
     }
   }
 
   void testAssignReal() {
-    DoubleMatrix2D Re = DoubleFactory2D.dense.random(A.rows(), A.columns());
+    DoubleMatrix2D Re = DoubleFactory2D.dense.random(A.rows, A.columns);
     DComplexMatrix2D Acopy = A.copy();
     A.assignReal(Re);
     if (DINDEX >= 0) {
       for (int r = 0; r < DLENGTH; r++) {
         expect(Acopy.getQuick(r, r + DINDEX)[1], closeTo(A.getQuick(r, r + DINDEX)[1], TOL));
-        expect(Re.getQuick(r, r + DINDEX), closeTo(A.getQuick(r, r + DINDEX)[0], TOL));
+        expect(Re.get(r, r + DINDEX), closeTo(A.getQuick(r, r + DINDEX)[0], TOL));
       }
     } else {
       for (int r = 0; r < DLENGTH; r++) {
         expect(Acopy.getQuick(r - DINDEX, r)[1], closeTo(A.getQuick(r - DINDEX, r)[1], TOL));
-        expect(Re.getQuick(r - DINDEX, r), closeTo(A.getQuick(r - DINDEX, r)[0], TOL));
+        expect(Re.get(r - DINDEX, r), closeTo(A.getQuick(r - DINDEX, r)[0], TOL));
       }
     }
   }
@@ -264,7 +264,7 @@ class DiagonalDComplexMatrix2DTest extends DComplexMatrix2DTest {
 
   void testViewColumn() {
     DComplexMatrix1D col = A.viewColumn(NCOLUMNS ~/ 2);
-    expect(NROWS, equals(col.size()));
+    expect(NROWS, equals(col.length));
     for (int r = 0; r < NROWS; r++) {
       assertEquals(A.getQuick(r, NCOLUMNS ~/ 2), col.getQuick(r), TOL);
     }
@@ -272,7 +272,7 @@ class DiagonalDComplexMatrix2DTest extends DComplexMatrix2DTest {
 
   void testViewColumnFlip() {
     DComplexMatrix2D B = A.viewColumnFlip();
-    expect(A.size(), equals(B.size()));
+    expect(A.length, equals(B.length));
     for (int r = 0; r < NROWS; r++) {
       for (int c = 0; c < NCOLUMNS; c++) {
         assertEquals(A.getQuick(r, NCOLUMNS - 1 - c), B.getQuick(r, c), TOL);
@@ -282,8 +282,8 @@ class DiagonalDComplexMatrix2DTest extends DComplexMatrix2DTest {
 
   void testViewDice() {
     DComplexMatrix2D B = A.viewDice();
-    expect(NROWS, equals(B.columns()));
-    expect(NCOLUMNS, equals(B.rows()));
+    expect(NROWS, equals(B.columns));
+    expect(NCOLUMNS, equals(B.rows));
     for (int r = 0; r < NROWS; r++) {
       for (int c = 0; c < NCOLUMNS; c++) {
         assertEquals(A.getQuick(r, c), B.getQuick(c, r), TOL);
@@ -293,8 +293,8 @@ class DiagonalDComplexMatrix2DTest extends DComplexMatrix2DTest {
 
   void testViewPart() {
     DComplexMatrix2D B = A.viewPart(NROWS ~/ 2, NCOLUMNS ~/ 2, NROWS ~/ 3, NCOLUMNS ~/ 3);
-    expect(NROWS ~/ 3, equals(B.rows()));
-    expect(NCOLUMNS ~/ 3, equals(B.columns()));
+    expect(NROWS ~/ 3, equals(B.rows));
+    expect(NCOLUMNS ~/ 3, equals(B.columns));
     for (int r = 0; r < NROWS ~/ 3; r++) {
       for (int c = 0; c < NCOLUMNS ~/ 3; c++) {
         assertEquals(A.getQuick(NROWS ~/ 2 + r, NCOLUMNS ~/ 2 + c), B.getQuick(r, c), TOL);
@@ -304,7 +304,7 @@ class DiagonalDComplexMatrix2DTest extends DComplexMatrix2DTest {
 
   void testViewRow() {
     DComplexMatrix1D B = A.viewRow(NROWS ~/ 2);
-    expect(NCOLUMNS, equals(B.size()));
+    expect(NCOLUMNS, equals(B.length));
     for (int r = 0; r < NCOLUMNS; r++) {
       assertEquals(A.getQuick(NROWS ~/ 2, r), B.getQuick(r), TOL);
     }
@@ -312,7 +312,7 @@ class DiagonalDComplexMatrix2DTest extends DComplexMatrix2DTest {
 
   void testViewRowFlip() {
     DComplexMatrix2D B = A.viewRowFlip();
-    expect(A.size(), equals(B.size()));
+    expect(A.length, equals(B.length));
     for (int r = 0; r < NROWS; r++) {
       for (int c = 0; c < NCOLUMNS; c++) {
         assertEquals(A.getQuick(NROWS - 1 - r, c), B.getQuick(r, c), TOL);
@@ -333,8 +333,8 @@ class DiagonalDComplexMatrix2DTest extends DComplexMatrix2DTest {
           return false;
         }
       });
-      expect(1, equals(B.rows()));
-      expect(NCOLUMNS, equals(B.columns()));
+      expect(1, equals(B.rows));
+      expect(NCOLUMNS, equals(B.columns));
       assertEquals(A.getQuick(NROWS ~/ 4, NROWS ~/ 4 + DINDEX), B.getQuick(0, NROWS ~/ 4 + DINDEX), TOL);
     } else {
       A.setQuick(NROWS ~/ 4 - DINDEX, NROWS ~/ 4, value);
@@ -346,8 +346,8 @@ class DiagonalDComplexMatrix2DTest extends DComplexMatrix2DTest {
           return false;
         }
       });
-      expect(1, equals(B.rows()));
-      expect(NCOLUMNS, equals(B.columns()));
+      expect(1, equals(B.rows));
+      expect(NCOLUMNS, equals(B.columns));
       assertEquals(A.getQuick(NROWS ~/ 4 - DINDEX, NROWS ~/ 4), B.getQuick(0, NROWS ~/ 4), TOL);
     }
   }
@@ -356,8 +356,8 @@ class DiagonalDComplexMatrix2DTest extends DComplexMatrix2DTest {
     Int32List rowIndexes = new Int32List.fromList([NROWS ~/ 6, NROWS ~/ 5, NROWS ~/ 4, NROWS ~/ 3, NROWS ~/ 2]);
     Int32List colIndexes = new Int32List.fromList([NROWS ~/ 6, NROWS ~/ 5, NROWS ~/ 4, NROWS ~/ 3, NROWS ~/ 2, NROWS - 1]);
     DComplexMatrix2D B = A.viewSelection(rowIndexes, colIndexes);
-    expect(rowIndexes.length, equals(B.rows()));
-    expect(colIndexes.length, equals(B.columns()));
+    expect(rowIndexes.length, equals(B.rows));
+    expect(colIndexes.length, equals(B.columns));
     for (int r = 0; r < rowIndexes.length; r++) {
       for (int c = 0; c < colIndexes.length; c++) {
         assertEquals(A.getQuick(rowIndexes[r], colIndexes[c]), B.getQuick(r, c), TOL);
@@ -369,8 +369,8 @@ class DiagonalDComplexMatrix2DTest extends DComplexMatrix2DTest {
     int rowStride = 3;
     int colStride = 5;
     DComplexMatrix2D B = A.viewStrides(rowStride, colStride);
-    for (int r = 0; r < B.rows(); r++) {
-      for (int c = 0; c < B.columns(); c++) {
+    for (int r = 0; r < B.rows; r++) {
+      for (int c = 0; c < B.columns; c++) {
         assertEquals(A.getQuick(r * rowStride, c * colStride), B.getQuick(r, c), TOL);
       }
     }

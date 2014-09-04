@@ -184,7 +184,7 @@ class SparseDComplexMatrix2D extends DComplexMatrix2D {
   }
 
   DComplexMatrix1D vectorize() {
-    final SparseDComplexMatrix1D v = new SparseDComplexMatrix1D(size());
+    final SparseDComplexMatrix1D v = new SparseDComplexMatrix1D(length);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_rows * _columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _columns);
@@ -256,7 +256,7 @@ class SparseDComplexMatrix2D extends DComplexMatrix2D {
     } else {*/
     for (int r = 0; r < _rows; r++) {
       for (int c = 0; c < _columns; c++) {
-        Im.setQuick(r, c, getQuick(r, c)[1]);
+        Im.set(r, c, getQuick(r, c)[1]);
       }
     }
     //}
@@ -286,7 +286,7 @@ class SparseDComplexMatrix2D extends DComplexMatrix2D {
     } else {*/
     for (int r = 0; r < _rows; r++) {
       for (int c = 0; c < _columns; c++) {
-        Re.setQuick(r, c, getQuick(r, c)[0]);
+        Re.set(r, c, getQuick(r, c)[0]);
       }
     }
     //}

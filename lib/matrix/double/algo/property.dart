@@ -209,7 +209,7 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    *             if <tt>A.rows() < A.columns()</tt>.
    */
   void checkRectangular(DoubleMatrix2D A) {
-    if (A.rows() < A.columns()) {
+    if (A.rows < A.columns) {
       throw new ArgumentError("Matrix must be rectangular: " + AbstractFormatter.shape2D(A));
     }
   }
@@ -221,7 +221,7 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    *             if <tt>A.rows() != A.columns()</tt>.
    */
   void checkSquare(DoubleMatrix2D A) {
-    if (A.rows() != A.columns()) {
+    if (A.rows != A.columns) {
       throw new ArgumentError("Matrix must be square: " + AbstractFormatter.shape2D(A));
     }
   }
@@ -257,7 +257,7 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    * <tt>A.cardinality() / A.size()</tt>.
    */
   double density(DoubleMatrix2D A) {
-    return A.cardinality() / (A.size() as double);
+    return A.cardinality / (A.length as double);
   }
 
   /**
@@ -274,8 +274,10 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    *         otherwise.
    */
   bool equals(final DoubleMatrix1D A, final double value) {
-    if (A == null) return false;
-    int size = A.size();
+    if (A == null) {
+      return false;
+    }
+    int size = A.length;
     final double epsilon = tolerance();
     bool result = false;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -315,7 +317,7 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
       return result;
     } else {*/
       for (int i = 0; i < size; i++) {
-        double x = A.getQuick(i);
+        double x = A.get(i);
         double diff = (value - x).abs();
         if ((diff != diff) && ((value != value && x != x) || value == x)) {
           diff = 0.0;
@@ -343,10 +345,16 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    *         otherwise.
    */
   bool equalsMatrix1D(final DoubleMatrix1D A, final DoubleMatrix1D B) {
-    if (A == B) return true;
-    if (!(A != null && B != null)) return false;
-    int size = A.size();
-    if (size != B.size()) return false;
+    if (identical(A, B)) {
+      return true;
+    }
+    if (!(A != null && B != null)) {
+      return false;
+    }
+    int size = A.length;
+    if (size != B.length) {
+      return false;
+    }
 
     final double epsilon = tolerance();
     bool result = false;
@@ -390,8 +398,8 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
       return result;
     } else {*/
       for (int i = 0; i < size; i++) {
-        double x = A.getQuick(i);
-        double value = B.getQuick(i);
+        double x = A.get(i);
+        double value = B.get(i);
         double diff = (value - x).abs();
         if ((diff != diff) && ((value != value && x != x) || value == x)) {
           diff = 0.0;
@@ -422,8 +430,8 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
     if (A == null) {
       return false;
     }
-    final int rows = A.rows();
-    final int columns = A.columns();
+    final int rows = A.rows;
+    final int columns = A.columns;
     bool result = false;
     final double epsilon = tolerance();
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -466,7 +474,7 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
     } else {*/
       for (int r = 0; r < rows; r++) {
         for (int c = 0; c < columns; c++) {
-          double x = A.getQuick(r, c);
+          double x = A.get(r, c);
           double diff = (value - x).abs();
           if ((diff != diff) && ((value != value && x != x) || value == x)) {
             diff = 0.0;
@@ -496,11 +504,17 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    *         otherwise.
    */
   bool equalsMatrix2D(final DoubleMatrix2D A, final DoubleMatrix2D B) {
-    if (A == B) return true;
-    if (!(A != null && B != null)) return false;
-    final int rows = A.rows();
-    final int columns = A.columns();
-    if (columns != B.columns() || rows != B.rows()) return false;
+    if (identical(A, B)) {
+      return true;
+    }
+    if (!(A != null && B != null)) {
+      return false;
+    }
+    final int rows = A.rows;
+    final int columns = A.columns;
+    if (columns != B.columns || rows != B.rows) {
+      return false;
+    }
     bool result = false;
     final double epsilon = tolerance();
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -544,8 +558,8 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
     } else {*/
       for (int r = 0; r < rows; r++) {
         for (int c = 0; c < columns; c++) {
-          double x = A.getQuick(r, c);
-          double value = B.getQuick(r, c);
+          double x = A.get(r, c);
+          double value = B.get(r, c);
           double diff = (value - x).abs();
           if ((diff != diff) && ((value != value && x != x) || value == x)) diff = 0.0;
           if (!(diff <= epsilon)) {
@@ -729,14 +743,14 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
   void generateNonSingular(DoubleMatrix2D A) {
     checkSquare(A);
     //cern.jet.math.tdouble.DoubleFunctions F = cern.jet.math.tdouble.DoubleFunctions.functions;
-    int min = Math.min(A.rows(), A.columns());
+    int min = Math.min(A.rows, A.columns);
     for (int i = min; --i >= 0; ) {
-      A.setQuick(i, i, 0.0);
+      A.set(i, i, 0.0);
     }
     for (int i = min; --i >= 0; ) {
-      double rowSum = A.viewRow(i).aggregate(plus, abs);
-      double colSum = A.viewColumn(i).aggregate(plus, abs);
-      A.setQuick(i, i, Math.max(rowSum, colSum) + i + 1);
+      double rowSum = A.row(i).reduce(plus, abs);
+      double colSum = A.column(i).reduce(plus, abs);
+      A.set(i, i, Math.max(rowSum, colSum) + i + 1);
     }
   }
 
@@ -750,11 +764,11 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    */
   bool isDiagonal(DoubleMatrix2D A) {
     double epsilon = tolerance();
-    int rows = A.rows();
-    int columns = A.columns();
+    int rows = A.rows;
+    int columns = A.columns;
     for (int row = rows; --row >= 0; ) {
       for (int column = columns; --column >= 0; ) {
-        if (row != column && !((A.getQuick(row, column)).abs() <= epsilon)) return false;
+        if (row != column && !((A.get(row, column)).abs() <= epsilon)) return false;
       }
     }
     return true;
@@ -772,11 +786,11 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    */
   bool isDiagonallyDominantByColumn(DoubleMatrix2D A) {
     //cern.jet.math.tdouble.DoubleFunctions F = cern.jet.math.tdouble.DoubleFunctions.functions;
-    int min = Math.min(A.rows(), A.columns());
+    int min = Math.min(A.rows, A.columns);
     for (int i = min; --i >= 0; ) {
-      double diag = (A.getQuick(i, i)).abs();
+      double diag = (A.get(i, i)).abs();
       diag += diag;
-      if (diag <= A.viewColumn(i).aggregate(plus, abs)) return false;
+      if (diag <= A.column(i).reduce(plus, abs)) return false;
     }
     return true;
   }
@@ -792,11 +806,11 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    */
   bool isDiagonallyDominantByRow(DoubleMatrix2D A) {
     //cern.jet.math.tdouble.DoubleFunctions F = cern.jet.math.tdouble.DoubleFunctions.functions;
-    int min = Math.min(A.rows(), A.columns());
+    int min = Math.min(A.rows, A.columns);
     for (int i = min; --i >= 0; ) {
-      double diag = (A.getQuick(i, i)).abs();
+      double diag = (A.get(i, i)).abs();
       diag += diag;
-      if (diag <= A.viewRow(i).aggregate(plus, abs)) return false;
+      if (diag <= A.row(i).reduce(plus, abs)) return false;
     }
     return true;
   }
@@ -807,11 +821,11 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    */
   bool isIdentity(DoubleMatrix2D A) {
     double epsilon = tolerance();
-    int rows = A.rows();
-    int columns = A.columns();
+    int rows = A.rows;
+    int columns = A.columns;
     for (int row = rows; --row >= 0; ) {
       for (int column = columns; --column >= 0; ) {
-        double v = A.getQuick(row, column);
+        double v = A.get(row, column);
         if (row == column) {
           if (!((1 - v).abs() < epsilon)) return false;
         } else if (!(v.abs() <= epsilon)) return false;
@@ -826,12 +840,12 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    */
   bool isLowerBidiagonal(DoubleMatrix2D A) {
     double epsilon = tolerance();
-    int rows = A.rows();
-    int columns = A.columns();
+    int rows = A.rows;
+    int columns = A.columns;
     for (int row = rows; --row >= 0; ) {
       for (int column = columns; --column >= 0; ) {
         if (!(row == column || row == column + 1)) {
-          if (!((A.getQuick(row, column)).abs() <= epsilon)) return false;
+          if (!((A.get(row, column)).abs() <= epsilon)) return false;
         }
       }
     }
@@ -844,11 +858,11 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    */
   bool isLowerTriangular(DoubleMatrix2D A) {
     double epsilon = tolerance();
-    int rows = A.rows();
-    int columns = A.columns();
+    int rows = A.rows;
+    int columns = A.columns;
     for (int column = columns; --column >= 0; ) {
       for (int row = Math.min(column, rows); --row >= 0; ) {
-        if (!((A.getQuick(row, column)).abs() <= epsilon)) return false;
+        if (!((A.get(row, column)).abs() <= epsilon)) return false;
       }
     }
     return true;
@@ -861,11 +875,11 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    * Note: Ignores tolerance.
    */
   bool isNonNegative(DoubleMatrix2D A) {
-    int rows = A.rows();
-    int columns = A.columns();
+    int rows = A.rows;
+    int columns = A.columns;
     for (int row = rows; --row >= 0; ) {
       for (int column = columns; --column >= 0; ) {
-        if (!(A.getQuick(row, column) >= 0)) return false;
+        if (!(A.get(row, column) >= 0)) return false;
       }
     }
     return true;
@@ -880,7 +894,7 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    */
   bool isOrthogonal(DoubleMatrix2D A) {
     checkSquare(A);
-    return equalsMatrix2D(A.zMult2D(A, null, 1.0, 0.0, false, true), DoubleFactory2D.dense.identity(A.rows()));
+    return equalsMatrix2D(A.multiply(A, null, 1.0, 0.0, false, true), DoubleFactory2D.dense.identity(A.rows));
   }
 
   /**
@@ -890,11 +904,11 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    * Note: Ignores tolerance.
    */
   bool isPositive(DoubleMatrix2D A) {
-    int rows = A.rows();
-    int columns = A.columns();
+    int rows = A.rows;
+    int columns = A.columns;
     for (int row = rows; --row >= 0; ) {
       for (int column = columns; --column >= 0; ) {
-        if (!(A.getQuick(row, column) > 0)) return false;
+        if (!(A.get(row, column) > 0)) return false;
       }
     }
     return true;
@@ -918,10 +932,10 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
   bool isSkewSymmetric(DoubleMatrix2D A) {
     checkSquare(A);
     double epsilon = tolerance();
-    int rows = A.rows();
+    int rows = A.rows;
     for (int row = rows; --row >= 0; ) {
       for (int column = rows; --column >= 0; ) {
-        if (!((A.getQuick(row, column) + A.getQuick(column, row)).abs() <= epsilon)) return false;
+        if (!((A.get(row, column) + A.get(column, row)).abs() <= epsilon)) return false;
       }
     }
     return true;
@@ -932,7 +946,7 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    * and columns.
    */
   bool isSquare(DoubleMatrix2D A) {
-    return A.rows() == A.columns();
+    return A.rows == A.columns;
   }
 
   /**
@@ -942,11 +956,11 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    */
   bool isStrictlyLowerTriangular(DoubleMatrix2D A) {
     double epsilon = tolerance();
-    int rows = A.rows();
-    int columns = A.columns();
+    int rows = A.rows;
+    int columns = A.columns;
     for (int column = columns; --column >= 0; ) {
       for (int row = Math.min(rows, column + 1); --row >= 0; ) {
-        if (!(A.getQuick(row, column).abs() <= epsilon)) return false;
+        if (!(A.get(row, column).abs() <= epsilon)) return false;
       }
     }
     return true;
@@ -960,8 +974,8 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
     if (!isTriangular(A)) return false;
 
     double epsilon = tolerance();
-    for (int i = Math.min(A.rows(), A.columns()); --i >= 0; ) {
-      if (!(A.getQuick(i, i).abs() <= epsilon)) return false;
+    for (int i = Math.min(A.rows, A.columns); --i >= 0; ) {
+      if (!(A.get(i, i).abs() <= epsilon)) return false;
     }
     return true;
   }
@@ -973,11 +987,11 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    */
   bool isStrictlyUpperTriangular(DoubleMatrix2D A) {
     double epsilon = tolerance();
-    int rows = A.rows();
-    int columns = A.columns();
+    int rows = A.rows;
+    int columns = A.columns;
     for (int column = columns; --column >= 0; ) {
       for (int row = rows; --row >= column; ) {
-        if (!(A.getQuick(row, column).abs() <= epsilon)) return false;
+        if (!(A.get(row, column).abs() <= epsilon)) return false;
       }
     }
     return true;
@@ -992,7 +1006,7 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    */
   bool isSymmetric(DoubleMatrix2D A) {
     checkSquare(A);
-    return equalsMatrix2D(A, A.viewDice());
+    return equalsMatrix2D(A, A.dice());
   }
 
   /**
@@ -1009,12 +1023,12 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    */
   bool isTridiagonal(DoubleMatrix2D A) {
     double epsilon = tolerance();
-    int rows = A.rows();
-    int columns = A.columns();
+    int rows = A.rows;
+    int columns = A.columns;
     for (int row = rows; --row >= 0; ) {
       for (int column = columns; --column >= 0; ) {
         if ((row - column).abs() > 1) {
-          if (!(A.getQuick(row, column).abs() <= epsilon)) return false;
+          if (!(A.get(row, column).abs() <= epsilon)) return false;
         }
       }
     }
@@ -1029,8 +1043,8 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
     if (!isTriangular(A)) return false;
 
     double epsilon = tolerance();
-    for (int i = Math.min(A.rows(), A.columns()); --i >= 0; ) {
-      if (!((1 - A.getQuick(i, i)).abs() <= epsilon)) return false;
+    for (int i = Math.min(A.rows, A.columns); --i >= 0; ) {
+      if (!((1 - A.get(i, i)).abs() <= epsilon)) return false;
     }
     return true;
   }
@@ -1041,12 +1055,12 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    */
   bool isUpperBidiagonal(DoubleMatrix2D A) {
     double epsilon = tolerance();
-    int rows = A.rows();
-    int columns = A.columns();
+    int rows = A.rows;
+    int columns = A.columns;
     for (int row = rows; --row >= 0; ) {
       for (int column = columns; --column >= 0; ) {
         if (!(row == column || row == column - 1)) {
-          if (!(A.getQuick(row, column).abs() <= epsilon)) return false;
+          if (!(A.get(row, column).abs() <= epsilon)) return false;
         }
       }
     }
@@ -1059,11 +1073,11 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    */
   bool isUpperTriangular(DoubleMatrix2D A) {
     double epsilon = tolerance();
-    int rows = A.rows();
-    int columns = A.columns();
+    int rows = A.rows;
+    int columns = A.columns;
     for (int column = columns; --column >= 0; ) {
       for (int row = rows; --row > column; ) {
-        if (!(A.getQuick(row, column).abs() <= epsilon)) return false;
+        if (!(A.get(row, column).abs() <= epsilon)) return false;
       }
     }
     return true;
@@ -1093,12 +1107,12 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
   int lowerBandwidth(DoubleMatrix2D A) {
     checkSquare(A);
     double epsilon = tolerance();
-    int rows = A.rows();
+    int rows = A.rows;
 
     for (int k = rows; --k >= 0; ) {
       for (int i = rows - k; --i >= 0; ) {
         int j = i + k;
-        if (!(A.getQuick(j, i).abs() <= epsilon)) return k;
+        if (!(A.get(j, i).abs() <= epsilon)) return k;
       }
     }
     return 0;
@@ -1216,13 +1230,13 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
   int semiBandwidth(DoubleMatrix2D A) {
     checkSquare(A);
     double epsilon = tolerance();
-    int rows = A.rows();
+    int rows = A.rows;
 
     for (int k = rows; --k >= 0; ) {
       for (int i = rows - k; --i >= 0; ) {
         int j = i + k;
-        if (!(A.getQuick(j, i).abs() <= epsilon)) return k + 1;
-        if (!(A.getQuick(i, j).abs() <= epsilon)) return k + 1;
+        if (!(A.get(j, i).abs() <= epsilon)) return k + 1;
+        if (!(A.get(i, j).abs() <= epsilon)) return k + 1;
       }
     }
     return 1;
@@ -1527,12 +1541,12 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
   int upperBandwidth(DoubleMatrix2D A) {
     checkSquare(A);
     double epsilon = tolerance();
-    int rows = A.rows();
+    int rows = A.rows;
 
     for (int k = rows; --k >= 0; ) {
       for (int i = rows - k; --i >= 0; ) {
         int j = i + k;
-        if (!(A.getQuick(i, j).abs() <= epsilon)) return k;
+        if (!(A.get(i, j).abs() <= epsilon)) return k;
       }
     }
     return 0;

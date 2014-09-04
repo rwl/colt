@@ -23,7 +23,7 @@ class WrapperDComplexMatrix2D extends DComplexMatrix2D {
 
   WrapperDComplexMatrix2D(DComplexMatrix2D newContent) {
     if (newContent != null) {
-      _setUp(newContent.rows(), newContent.columns());
+      _setUp(newContent.rows, newContent.columns);
     }
     this._content = newContent;
   }
@@ -106,7 +106,7 @@ class WrapperDComplexMatrix2D extends DComplexMatrix2D {
       }
       DiagonalDComplexMatrix2D A = _content as DiagonalDComplexMatrix2D;
       DiagonalDComplexMatrix2D B = obj;
-      if (A.columns() != B.columns() || A.rows() != B.rows() || A.diagonalIndex() != B.diagonalIndex() || A.diagonalLength() != B.diagonalLength()) {
+      if (A.columns != B.columns || A.rows != B.rows || A.diagonalIndex() != B.diagonalIndex() || A.diagonalLength() != B.diagonalLength()) {
         return false;
       }
       Float64List otherElements = other._elements;
@@ -156,7 +156,7 @@ class WrapperDComplexMatrix2D extends DComplexMatrix2D {
   }
 
   DComplexMatrix1D vectorize() {
-    final DenseDComplexMatrix1D v = new DenseDComplexMatrix1D(this.size());
+    final DenseDComplexMatrix1D v = new DenseDComplexMatrix1D(this.length);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _columns);
@@ -304,7 +304,7 @@ class WrapperDComplexMatrix2D extends DComplexMatrix2D {
     } else {*/
     for (int r = 0; r < _rows; r++) {
       for (int c = 0; c < _columns; c++) {
-        Im.setQuick(r, c, getQuick(r, c)[1]);
+        Im.set(r, c, getQuick(r, c)[1]);
       }
     }
     //}
@@ -333,7 +333,7 @@ class WrapperDComplexMatrix2D extends DComplexMatrix2D {
     } else {*/
     for (int r = 0; r < _rows; r++) {
       for (int c = 0; c < _columns; c++) {
-        Re.setQuick(r, c, getQuick(r, c)[0]);
+        Re.set(r, c, getQuick(r, c)[0]);
       }
     }
     //}

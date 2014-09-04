@@ -54,7 +54,7 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
    *             if <tt>size<0</tt>.
    */
   factory DenseDComplexMatrix1D.fromRealPart(DoubleMatrix1D realPart) {
-    return new DenseDComplexMatrix1D(realPart.size())..assignReal(realPart);
+    return new DenseDComplexMatrix1D(realPart.length)..assignReal(realPart);
   }
 
   /**
@@ -72,7 +72,7 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
    *             if <tt>size<0</tt>.
    */
   factory DenseDComplexMatrix1D.fromParts(DoubleMatrix1D realPart, DoubleMatrix1D imaginaryPart) {
-    return new DenseDComplexMatrix1D(realPart.size())
+    return new DenseDComplexMatrix1D(realPart.length)
         ..assignReal(realPart)
         ..assignImaginary(imaginaryPart);
   }
@@ -701,7 +701,7 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
   DComplexMatrix1D assignValues(Float64List values) {
     if (_isNoView) {
       if (values.length != 2 * _size) {
-        throw new ArgumentError("The length of values[] must be equal to 2*size()=${2 * size()}");
+        throw new ArgumentError("The length of values[] must be equal to 2*size()=${2 * length}");
       }
       //System.arraycopy(values, 0, this._elements, 0, values.length);
       this._elements.setAll(0, values);
@@ -832,7 +832,7 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
   void getNonZeros(final List<int> indexList, final List<Float64List> valueList) {
     indexList.clear();
     valueList.clear();
-    int s = size();
+    int s = length;
 
     int idx = _zero;
     for (int k = 0; k < s; k++) {
@@ -903,8 +903,8 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
     DComplexMatrix2D M = new DenseDComplexMatrix2D(rows, columns);
     final Float64List elemsOther = M.elements() as Float64List;
     final int zeroOther = M.index(0, 0);
-    final int rowStrideOther = M.rowStride();
-    final int columnStrideOther = M.columnStride();
+    final int rowStrideOther = M.rowStride;
+    final int columnStrideOther = M.columnStride;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
@@ -1084,9 +1084,9 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
 
   Float64List zDotProduct(final DComplexMatrix1D y, [final int from = 0, int length = null]) {
     if (length == null) {
-      length = this.size();
+      length = this.length;
     }
-    int size = this.size();
+    int size = this.length;
     if (from < 0 || length <= 0) {
       return new Float64List.fromList([0, 0]);
     }
@@ -1095,8 +1095,8 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
     if (size < tail) {
       tail = size;
     }
-    if (y.size() < tail) {
-      tail = y.size();
+    if (y.length < tail) {
+      tail = y.length;
     }
     length = tail - from;
     final Float64List elemsOther = y.elements() as Float64List;
@@ -1345,7 +1345,7 @@ class SelectedDenseDComplexMatrix1D extends DComplexMatrix1D {
     } else {*/
     for (int i = 0; i < _size; i++) {
       final tmp = getQuick(i);
-      R.setQuick(i, tmp[0]);
+      R.set(i, tmp[0]);
     }
     //}
     return R;
@@ -1372,7 +1372,7 @@ class SelectedDenseDComplexMatrix1D extends DComplexMatrix1D {
     } else {*/
     for (int i = 0; i < _size; i++) {
       final tmp = getQuick(i);
-      Im.setQuick(i, tmp[1]);
+      Im.set(i, tmp[1]);
     }
     //}
 

@@ -43,7 +43,7 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
    */
   Float64List aggregate(final cfunc.DComplexDComplexDComplexFunction aggr, final cfunc.DComplexDComplexFunction f) {
     Float64List b = new Float64List(2);
-    int size = this.size();
+    int size = this.length;
     if (size == 0) {
       b[0] = double.NAN;
       b[1] = double.NAN;
@@ -95,7 +95,7 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
    */
   Float64List aggregateMatrix(final DComplexMatrix1D other, final cfunc.DComplexDComplexDComplexFunction aggr, final cfunc.DComplexDComplexDComplexFunction f) {
     checkSize(other);
-    int size = this.size();
+    int size = this.length;
     if (size == 0) {
       Float64List b = new Float64List(2);
       b[0] = double.NAN;
@@ -137,7 +137,7 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
    * @see cern.jet.math.tdcomplex.DComplexFunctions
    */
   DComplexMatrix1D assign(final cfunc.DComplexDComplexFunction f) {
-    int size = this.size();
+    int size = this.length;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, size);
@@ -255,7 +255,7 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
    * @see cern.jet.math.tdcomplex.DComplexFunctions
    */
   DComplexMatrix1D assignRealFunc(final cfunc.DComplexRealFunction f) {
-    int size = this.size();
+    int size = this.length;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, size);
@@ -340,7 +340,7 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
    * @see cern.jet.math.tdcomplex.DComplexFunctions
    */
   DComplexMatrix1D assignMatrixFunc(final DComplexMatrix1D y, final cfunc.DComplexDComplexDComplexFunction f) {
-    int size = this.size();
+    int size = this.length;
     checkSize(y);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
@@ -376,7 +376,7 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
    * @return <tt>this</tt> (for convenience only).
    */
   DComplexMatrix1D assignValue(final double re, final double im) {
-    int size = this.size();
+    int size = this.length;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, size);
@@ -416,7 +416,7 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
    *             if <tt>values.length != 2*size()</tt>.
    */
   DComplexMatrix1D assignValues(final Float64List values) {
-    int size = this.size();
+    int size = this.length;
     if (values.length != 2 * size) {
       throw new ArgumentError("The length of values[] must be equal to 2*size()=$size");
     }
@@ -476,7 +476,7 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
     } else {*/
       for (int i = 0; i < _size; i++) {
         double re = getQuick(i)[0];
-        double im = other.getQuick(i);
+        double im = other.get(i);
         setPartsQuick(i, re, im);
       }
     //}
@@ -515,7 +515,7 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
       for (int i = 0; i < _size; i++) {
-        double re = other.getQuick(i);
+        double re = other.get(i);
         double im = getQuick(i)[1];
         setPartsQuick(i, re, im);
       }
@@ -529,7 +529,7 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
    * @return the number of cells having non-zero values.
    */
   int cardinality() {
-    int size = this.size();
+    int size = this.length;
     int cardinality = 0;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
@@ -632,7 +632,7 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
    *             if <tt>index&lt;0 || index&gt;=size()</tt>.
    */
   Float64List get(int index) {
-    int size = this.size();
+    int size = this.length;
     if (index < 0 || index >= size) _checkIndex(index);
     return getQuick(index);
   }
@@ -671,7 +671,7 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
   void getNonZeros(final List<int> indexList, final List<Float64List> valueList) {
     indexList.clear();
     valueList.clear();
-    int s = size();
+    int s = length;
     for (int i = 0; i < s; i++) {
       Float64List value = getQuick(i);
       if (value[0] != 0 || value[1] != 0) {
@@ -714,7 +714,7 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
    * @return a new empty matrix of the same dynamic type.
    */
   DComplexMatrix1D like() {
-    int size = this.size();
+    int size = this.length;
     return like1D(size);
   }
 
@@ -785,7 +785,7 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
    *             if <tt>index&lt;0 || index&gt;=size()</tt>.
    */
   void setParts(int index, double re, double im) {
-    int size = this.size();
+    int size = this.length;
     if (index < 0 || index >= size) _checkIndex(index);
     setPartsQuick(index, re, im);
   }
@@ -803,7 +803,7 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
    *             if <tt>index&lt;0 || index&gt;=size()</tt>.
    */
   void set(int index, Float64List value) {
-    int size = this.size();
+    int size = this.length;
     if (index < 0 || index >= size) _checkIndex(index);
     setQuick(index, value);
   }
@@ -852,7 +852,7 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
    *             if <tt>size() != other.size()</tt>.
    */
   void swap(final DComplexMatrix1D other) {
-    int size = this.size();
+    int size = this.length;
     checkSize(other);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
@@ -896,7 +896,7 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
    * @return an array filled with the values of the cells.
    */
   Float64List toArray() {
-    int size = this.size();
+    int size = this.length;
     Float64List values = new Float64List(2 * size);
     toArrayFill(values);
     return values;
@@ -917,7 +917,7 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
    *             if <tt>values.length < 2*size()</tt>.
    */
   void toArrayFill(final Float64List values) {
-    int size = this.size();
+    int size = this.length;
     if (values.length < 2 * size) throw new ArgumentError("values too small");
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
@@ -965,9 +965,9 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
    */
   String toStringFormat(String format) {
     final f = new NumberFormat(format);
-    StringBuffer s = new StringBuffer("ComplexMatrix1D: ${size()} elements\n\n");
+    StringBuffer s = new StringBuffer("ComplexMatrix1D: ${length} elements\n\n");
     Float64List elem = new Float64List(2);
-    for (int i = 0; i < size(); i++) {
+    for (int i = 0; i < length; i++) {
       elem = getQuick(i);
       if (elem[1] == 0) {
         s.write(f.format(elem[0]) + "\n");
@@ -1045,7 +1045,7 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
    * @return the new view.
    */
   DComplexMatrix1D viewSelectionProc(cfunc.DComplexProcedure condition) {
-    int size = this.size();
+    int size = this.length;
     List<int> matches = new List<int>();
     for (int i = 0; i < size; i++) {
       if (condition(getQuick(i))) {
@@ -1079,7 +1079,7 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
    */
   DComplexMatrix1D viewSelection(Int32List indexes) {
     // check for "all"
-    int size = this.size();
+    int size = this.length;
     if (indexes == null) {
       indexes = new Int32List(size);
       for (int i = size - 1; --i >= 0; ) indexes[i] = i;
@@ -1137,9 +1137,9 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
    */
   Float64List zDotProduct(final DComplexMatrix1D y, [final int from = 0, int length = null]) {
     if (length == null) {
-      length = this.size();
+      length = this.length;
     }
-    int size = this.size();
+    int size = this.length;
     if (from < 0 || length <= 0) return new Float64List.fromList([0.0, 0.0]);
 
     int tail = from + length;
@@ -1207,9 +1207,9 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
    */
   Float64List zDotProductIndex(DComplexMatrix1D y, Int32List nonZeroIndexes, [int from = 0, int length = null]) {
     if (length == null) {
-      length = this.size();
+      length = this.length;
     }
-    int size = this.size();
+    int size = this.length;
     if (from < 0 || length <= 0) {
       return new Float64List.fromList([0.0, 0.0]);
     }
@@ -1306,7 +1306,7 @@ abstract class DComplexMatrix1D extends AbstractMatrix1D {
    *         maxCardinality.
    */
   int _cardinality(int maxCardinality) {
-    int size = this.size();
+    int size = this.length;
     int cardinality = 0;
     int i = 0;
     Float64List tmp = new Float64List(2);

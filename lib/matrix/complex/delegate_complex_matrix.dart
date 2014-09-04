@@ -35,10 +35,10 @@ class DelegateDComplexMatrix1D extends DComplexMatrix1D {
    *            the row this view is bound to
    */
   DelegateDComplexMatrix1D(DComplexMatrix2D newContent, int row) {
-    if (row < 0 || row >= newContent.rows()) {
+    if (row < 0 || row >= newContent.rows) {
       throw new ArgumentError();
     }
-    _setUp(newContent.columns());
+    _setUp(newContent.columns);
     this._row = row;
     this._content = newContent;
   }

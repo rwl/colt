@@ -89,7 +89,7 @@ class DenseDComplexMatrix2D extends DComplexMatrix2D {
    *             .
    */
   factory DenseDComplexMatrix2D.fromRealPart(DoubleMatrix2D realPart) {
-    return new DenseDComplexMatrix2D(realPart.rows(), realPart.columns())..assignReal(realPart);
+    return new DenseDComplexMatrix2D(realPart.rows, realPart.columns)..assignReal(realPart);
   }
 
   /**
@@ -151,7 +151,7 @@ class DenseDComplexMatrix2D extends DComplexMatrix2D {
 
   Float64List aggregate(final cfunc.DComplexDComplexDComplexFunction aggr, final cfunc.DComplexDComplexFunction f) {
     Float64List b = new Float64List(2);
-    if (size() == 0) {
+    if (length == 0) {
       b[0] = double.NAN;
       b[1] = double.NAN;
       return b;
@@ -202,15 +202,15 @@ class DenseDComplexMatrix2D extends DComplexMatrix2D {
     }
     checkShape(other);
     Float64List b = new Float64List(2);
-    if (size() == 0) {
+    if (length == 0) {
       b[0] = double.NAN;
       b[1] = double.NAN;
       return b;
     }
     final int zero = index(0, 0);
     final int zeroOther = other.index(0, 0);
-    final int rowStrideOther = other.rowStride();
-    final int columnStrideOther = other.columnStride();
+    final int rowStrideOther = other.rowStride;
+    final int columnStrideOther = other.columnStride;
     final Float64List elemsOther = other.elements() as Float64List;
     Float64List a = null;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -617,8 +617,8 @@ class DenseDComplexMatrix2D extends DComplexMatrix2D {
     if (_elements == null || elemsOther == null) {
       throw new Error();
     }
-    final int columnStrideOther = y.columnStride();
-    final int rowStrideOther = y.rowStride();
+    final int columnStrideOther = y.columnStride;
+    final int rowStrideOther = y.rowStride;
     final int zeroOther = y.index(0, 0);
     final int zero = index(0, 0);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -829,7 +829,7 @@ class DenseDComplexMatrix2D extends DComplexMatrix2D {
 
   DComplexMatrix2D assignValues(final Float64List values) {
     if (values.length != _rows * 2 * _columns) {
-      throw new ArgumentError("Must have same length: length=${values.length} rows()*2*columns()=${rows() * 2 * columns()}");
+      throw new ArgumentError("Must have same length: length=${values.length} rows()*2*columns()=${rows * 2 * columns}");
     }
     if (this._isNoView) {
       //System.arraycopy(values, 0, this._elements, 0, values.length);
@@ -878,7 +878,7 @@ class DenseDComplexMatrix2D extends DComplexMatrix2D {
 
   DComplexMatrix2D assignList(final List<Float64List> values) {
     if (values.length != _rows) {
-      throw new ArgumentError("Must have same number of rows: rows=${values.length} rows()=${rows()}");
+      throw new ArgumentError("Must have same number of rows: rows=${values.length} rows()=${rows}");
     }
     //int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if (this._isNoView) {
@@ -944,7 +944,7 @@ class DenseDComplexMatrix2D extends DComplexMatrix2D {
       for (int r = 0; r < _rows; r++) {
         Float64List currentRow = values[r];
         if (currentRow.length != 2 * _columns) {
-          throw new ArgumentError("Must have same number of columns in every row: columns=${currentRow.length} 2*columns()=${2 * columns()}");
+          throw new ArgumentError("Must have same number of columns in every row: columns=${currentRow.length} 2*columns()=${2 * columns}");
         }
         for (int i = idx,
             c = 0; c < _columns; c++) {
@@ -961,8 +961,8 @@ class DenseDComplexMatrix2D extends DComplexMatrix2D {
 
   DComplexMatrix2D assignImaginary(final DoubleMatrix2D other) {
     checkShape(other);
-    final int columnStrideOther = other.columnStride();
-    final int rowStrideOther = other.rowStride();
+    final int columnStrideOther = other.columnStride;
+    final int rowStrideOther = other.rowStride;
     final int zeroOther = other.index(0, 0);
     final int zero = index(0, 0);
     final Float64List elemsOther = (other as DenseDoubleMatrix2D).elements();
@@ -1011,8 +1011,8 @@ class DenseDComplexMatrix2D extends DComplexMatrix2D {
 
   DComplexMatrix2D assignReal(final DoubleMatrix2D other) {
     checkShape(other);
-    final int columnStrideOther = other.columnStride();
-    final int rowStrideOther = other.rowStride();
+    final int columnStrideOther = other.columnStride;
+    final int rowStrideOther = other.rowStride;
     final int zeroOther = other.index(0, 0);
     final int zero = index(0, 0);
     final Float64List elemsOther = (other as DenseDoubleMatrix2D).elements();
@@ -1169,10 +1169,10 @@ class DenseDComplexMatrix2D extends DComplexMatrix2D {
     DComplexMatrix2D transpose = this.viewDice().copy();
     final Float64List elemsOther = (transpose as DenseDComplexMatrix2D)._elements;
     final int zeroOther = transpose.index(0, 0);
-    final int columnStrideOther = transpose.columnStride();
-    final int rowStrideOther = transpose.rowStride();
-    final int columnsOther = transpose.columns();
-    final int rowsOther = transpose.rows();
+    final int columnStrideOther = transpose.columnStride;
+    final int rowStrideOther = transpose.rowStride;
+    final int columnsOther = transpose.columns;
+    final int rowsOther = transpose.rows;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, rowsOther);
@@ -1211,8 +1211,8 @@ class DenseDComplexMatrix2D extends DComplexMatrix2D {
   DoubleMatrix2D getImaginaryPart() {
     final DenseDoubleMatrix2D Im = new DenseDoubleMatrix2D(_rows, _columns);
     final Float64List elemsOther = Im.elements();
-    final int columnStrideOther = Im.columnStride();
-    final int rowStrideOther = Im.rowStride();
+    final int columnStrideOther = Im.columnStride;
+    final int rowStrideOther = Im.rowStride;
     final int zeroOther = Im.index(0, 0);
     final int zero = index(0, 0);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -1289,8 +1289,8 @@ class DenseDComplexMatrix2D extends DComplexMatrix2D {
   DoubleMatrix2D getRealPart() {
     final DenseDoubleMatrix2D R = new DenseDoubleMatrix2D(_rows, _columns);
     final Float64List elemsOther = R.elements();
-    final int columnStrideOther = R.columnStride();
-    final int rowStrideOther = R.rowStride();
+    final int columnStrideOther = R.columnStride;
+    final int rowStrideOther = R.rowStride;
     final int zeroOther = R.index(0, 0);
     final int zero = index(0, 0);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -1398,7 +1398,7 @@ class DenseDComplexMatrix2D extends DComplexMatrix2D {
   }
 
   DComplexMatrix1D vectorize() {
-    final DComplexMatrix1D v = new DenseDComplexMatrix1D(this.size());
+    final DComplexMatrix1D v = new DenseDComplexMatrix1D(this.length);
     final int zero = index(0, 0);
     final int zeroOther = v.index(0);
     final int strideOther = v.stride();
@@ -1459,7 +1459,7 @@ class DenseDComplexMatrix2D extends DComplexMatrix2D {
     } else {
       zz = z;
     }
-    if (_columns != y.size() || _rows > zz.size()) {
+    if (_columns != y.length || _rows > zz.length) {
       throw new ArgumentError("Incompatible args: " + toStringShort() + ", " + y.toStringShort() + ", " + zz.toStringShort());
     }
     final Float64List elemsY = y.elements() as Float64List;
@@ -1563,8 +1563,8 @@ class DenseDComplexMatrix2D extends DComplexMatrix2D {
     }
     final int rowsA = _rows;
     final int columnsA = _columns;
-    final int rowsB = B.rows();
-    final int columnsB = B.columns();
+    final int rowsB = B.rows;
+    final int columnsB = B.columns;
     final int rowsC = transposeA ? columnsA : rowsA;
     final int columnsC = transposeB ? rowsB : columnsB;
 
@@ -1578,10 +1578,10 @@ class DenseDComplexMatrix2D extends DComplexMatrix2D {
     if (transposeB) {
       return this.zMult2D(B.getConjugateTranspose(), C, alpha, beta, transposeA, false);
     }
-    if (B.rows() != columnsA) {
+    if (B.rows != columnsA) {
       throw new ArgumentError("Matrix2D inner dimensions must agree:" + toStringShort() + ", " + B.toStringShort());
     }
-    if (C.rows() != rowsA || C.columns() != columnsB) {
+    if (C.rows != rowsA || C.columns != columnsB) {
       throw new ArgumentError("Incompatibe result matrix: " + toStringShort() + ", " + B.toStringShort() + ", " + C.toStringShort());
     }
     if (this == C || B == C) {
@@ -1635,17 +1635,17 @@ class DenseDComplexMatrix2D extends DComplexMatrix2D {
     }
     int m = _rows;
     int n = _columns;
-    int p = B.columns();
+    int p = B.columns;
     if (C == null) {
       C = new DenseDComplexMatrix2D(m, p);
     }
     if (!(C is DenseDComplexMatrix2D)) {
       return super.zMult2D(B, C, alpha, beta, transposeA, transposeB);
     }
-    if (B.rows() != n) {
+    if (B.rows != n) {
       throw new ArgumentError("Matrix2D inner dimensions must agree:" + toStringShort() + ", " + B.toStringShort());
     }
-    if (C.rows() != m || C.columns() != p) {
+    if (C.rows != m || C.columns != p) {
       throw new ArgumentError("Incompatibel result matrix: " + toStringShort() + ", " + B.toStringShort() + ", " + C.toStringShort());
     }
     if (this == C || B == C) {
@@ -2075,7 +2075,7 @@ class SelectedDenseDComplexMatrix2D extends DComplexMatrix2D {
     for (int r = 0; r < _rows; r++) {
       for (int c = 0; c < _columns; c++) {
         final tmp = getQuick(r, c);
-        R.setQuick(r, c, tmp[0]);
+        R.set(r, c, tmp[0]);
       }
     }
     //}
@@ -2107,7 +2107,7 @@ class SelectedDenseDComplexMatrix2D extends DComplexMatrix2D {
     for (int r = 0; r < _rows; r++) {
       for (int c = 0; c < _columns; c++) {
         final tmp = getQuick(r, c);
-        Im.setQuick(r, c, tmp[1]);
+        Im.set(r, c, tmp[1]);
       }
     }
     //}

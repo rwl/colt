@@ -65,7 +65,7 @@ class SparseDComplexLUDecomposition {
     } else {
       dcs = A.elements() as DZcs;
     }
-    n = A.rows();
+    n = A.rows;
 
     S = cs_sqr(order, dcs, false);
     if (S == null) {
@@ -192,7 +192,7 @@ class SparseDComplexLUDecomposition {
    *                if <tt>b.size() != A.rows()</tt> or if A is singular.
    */
   void solve(DComplexMatrix1D b) {
-    if (b.size() != n) {
+    if (b.length != n) {
       throw new ArgumentError("b.size() != A.rows()");
     }
     if (!isNonsingular()) {
@@ -201,7 +201,7 @@ class SparseDComplexLUDecomposition {
     DComplexProperty.DEFAULT.checkDense(b);
     DZcsa y = new DZcsa(n);
     DZcsa x;
-    if (b.isView()) {
+    if (b.isView) {
       x = new DZcsa(b.copy().elements() as Float64List);
     } else {
       x = new DZcsa(b.elements() as Float64List);
@@ -215,7 +215,7 @@ class SparseDComplexLUDecomposition {
     cs_ipvec(S.q, y, x, n);
     /* b(q) = x */
 
-    if (b.isView()) {
+    if (b.isView) {
       b.assignValues(x.x);
     }
   }

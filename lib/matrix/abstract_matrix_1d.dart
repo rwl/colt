@@ -151,7 +151,7 @@ abstract class AbstractMatrix1D extends AbstractMatrix {
   /**
    * Returns the number of cells.
    */
-  int size() {
+  int get length {
     return _size;
   }
 
@@ -183,7 +183,7 @@ abstract class AbstractMatrix1D extends AbstractMatrix {
    */
   AbstractMatrix1D _vFlip() {
     if (_size > 0) {
-      this._zero += (this.size() - 1) * this._stride;
+      this._zero += (this.length - 1) * this._stride;
       this._stride = -this._stride;
       this._isNoView = false;
     }

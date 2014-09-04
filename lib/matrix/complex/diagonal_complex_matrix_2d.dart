@@ -189,7 +189,7 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
 
   DComplexMatrix2D assignList(final List<Float64List> values) {
     if (values.length != _rows) {
-      throw new ArgumentError("Must have same number of rows: rows=${values.length} rows()=${rows()}");
+      throw new ArgumentError("Must have same number of rows: rows=${values.length} rows()=${rows}");
     }
     int r, c;
     if (_dindex >= 0) {
@@ -201,7 +201,7 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
     }
     for (int i = 0; i < _dlength; i++) {
       if (values[i].length != 2 * _columns) {
-        throw new ArgumentError("Must have same number of columns in every row: columns=${values[r].length} 2 * columns()=${2 * columns()}");
+        throw new ArgumentError("Must have same number of columns in every row: columns=${values[r].length} 2 * columns()=${2 * columns}");
       }
       _elements[2 * i] = values[r][2 * c];
       _elements[2 * i + 1] = values[r][2 * c + 1];
@@ -444,9 +444,9 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
       double epsilon = DComplexProperty.DEFAULT.tolerance();
       if (this == obj) return true;
       if (!(this != null && obj != null)) return false;
-      final int rows = this.rows();
-      final int columns = this.columns();
-      if (columns != other.columns() || rows != other.rows()) return false;
+      final int rows = this.rows;
+      final int columns = this.columns;
+      if (columns != other.columns || rows != other.rows) return false;
       if ((_dindex != other._dindex) || (_dlength != other._dlength)) {
         return false;
       }
@@ -612,7 +612,7 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
       return super.zMult(y, z, alpha, beta, transposeA);
     }
 
-    if (columnsA != y.size() || rowsA > z.size()) {
+    if (columnsA != y.length || rowsA > z.length) {
       throw new ArgumentError("Incompatible args: " + ((transposeA ? viewDice() : this).toStringShort()) + ", " + y.toStringShort() + ", " + z.toStringShort());
     }
 

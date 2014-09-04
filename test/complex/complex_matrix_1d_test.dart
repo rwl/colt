@@ -60,11 +60,11 @@ abstract class DComplexMatrix1DTest {
   void populateMatrices() {
     //ConcurrencyUtils.setThreadsBeginN_1D(1);
 
-    for (int i = 0; i < A.size(); i++) {
+    for (int i = 0; i < A.length; i++) {
       A.setQuick(i, new Float64List.fromList([random.nextDouble(), random.nextDouble()]));
     }
 
-    for (int i = 0; i < A.size(); i++) {
+    for (int i = 0; i < A.length; i++) {
       B.setQuick(i, new Float64List.fromList([random.nextDouble(), random.nextDouble()]));
     }
   }
@@ -75,7 +75,7 @@ abstract class DComplexMatrix1DTest {
 
   void testAggregate() {
     Float64List expected = new Float64List(2);
-    for (int i = 0; i < A.size(); i++) {
+    for (int i = 0; i < A.length; i++) {
       expected = DComplex.plus(expected, DComplex.square(A.getQuick(i)));
     }
     Float64List result = A.aggregate(plus, square);
@@ -85,7 +85,7 @@ abstract class DComplexMatrix1DTest {
   void testAggregateMatrix() {
     Float64List actual = A.aggregateMatrix(B, plus, mult);
     Float64List expected = new Float64List(2);
-    for (int i = 0; i < A.size(); i++) {
+    for (int i = 0; i < A.length; i++) {
       expected = DComplex.plus(expected, DComplex.multiply(A.getQuick(i), B.getQuick(i)));
     }
     assertEquals(expected, actual, TOL);
@@ -94,7 +94,7 @@ abstract class DComplexMatrix1DTest {
   void testAssign() {
     DComplexMatrix1D Acopy = A.copy();
     A.assign(acos);
-    for (int i = 0; i < A.size(); i++) {
+    for (int i = 0; i < A.length; i++) {
       Float64List expected = DComplex.acos(Acopy.getQuick(i));
       assertEquals(expected, A.getQuick(i), TOL);
     }
@@ -102,8 +102,8 @@ abstract class DComplexMatrix1DTest {
 
   void testAssignMatrix() {
     A.assignMatrix(B);
-    expect(A.size() == B.size(), isTrue);
-    for (int i = 0; i < A.size(); i++) {
+    expect(A.length == B.length, isTrue);
+    for (int i = 0; i < A.length; i++) {
       assertEquals(B.getQuick(i), A.getQuick(i), TOL);
     }
   }
@@ -111,7 +111,7 @@ abstract class DComplexMatrix1DTest {
   void testAssignMatrixFunc() {
     DComplexMatrix1D Acopy = A.copy();
     A.assignMatrixFunc(B, div);
-    for (int i = 0; i < A.size(); i++) {
+    for (int i = 0; i < A.length; i++) {
       assertEquals(DComplex.div_(Acopy.getQuick(i), B.getQuick(i)), A.getQuick(i), TOL);
     }
   }
@@ -126,7 +126,7 @@ abstract class DComplexMatrix1DTest {
     }
     DComplexMatrix1D Acopy = A.copy();
     A.assignProc(procedure, tan);
-    for (int i = 0; i < A.size(); i++) {
+    for (int i = 0; i < A.length; i++) {
       if (DComplex.abs(Acopy.getQuick(i)) > 0.1) {
         assertEquals(DComplex.tan(Acopy.getQuick(i)), A.getQuick(i), TOL);
       } else {
@@ -146,7 +146,7 @@ abstract class DComplexMatrix1DTest {
     DComplexMatrix1D Acopy = A.copy();
     Float64List value = new Float64List.fromList([-1.0, -1.0]);
     A.assignProcValue(procedure, value);
-    for (int i = 0; i < A.size(); i++) {
+    for (int i = 0; i < A.length; i++) {
       if (DComplex.abs(Acopy.getQuick(i)) > 0.1) {
         assertEquals(value, A.getQuick(i), TOL);
       } else {
@@ -158,7 +158,7 @@ abstract class DComplexMatrix1DTest {
   void testAssignRealFunc() {
     DComplexMatrix1D Acopy = A.copy();
     A.assignRealFunc(abs);
-    for (int i = 0; i < A.size(); i++) {
+    for (int i = 0; i < A.length; i++) {
       Float64List elem = A.getQuick(i);
       expect(DComplex.abs(Acopy.getQuick(i)), closeTo(elem[0], TOL));
       expect(0, closeTo(elem[1], TOL));
@@ -166,12 +166,12 @@ abstract class DComplexMatrix1DTest {
   }
 
   void testAssignValues() {
-    Float64List expected = new Float64List(2 * A.size());
-    for (int i = 0; i < 2 * A.size(); i++) {
+    Float64List expected = new Float64List(2 * A.length);
+    for (int i = 0; i < 2 * A.length; i++) {
       expected[i] = random.nextDouble();
     }
     A.assignValues(expected);
-    for (int i = 0; i < A.size(); i++) {
+    for (int i = 0; i < A.length; i++) {
       Float64List elem = A.getQuick(i);
       expect(expected[2 * i], closeTo(elem[0], TOL));
       expect(expected[2 * i + 1], closeTo(elem[1], TOL));
@@ -183,7 +183,7 @@ abstract class DComplexMatrix1DTest {
     double re = random.nextDouble();
     double im = random.nextDouble();
     A.assignValue(re, im);
-    for (int i = 0; i < A.size(); i++) {
+    for (int i = 0; i < A.length; i++) {
       Float64List elem = A.getQuick(i);
       expect(re, closeTo(elem[0], TOL));
       expect(im, closeTo(elem[1], TOL));
@@ -192,29 +192,29 @@ abstract class DComplexMatrix1DTest {
 
   void testAssignImaginary() {
     DComplexMatrix1D Acopy = A.copy();
-    DoubleMatrix1D Im = DoubleFactory1D.dense.random(A.size());
+    DoubleMatrix1D Im = DoubleFactory1D.dense.random(A.length);
     A.assignImaginary(Im);
-    for (int i = 0; i < A.size(); i++) {
+    for (int i = 0; i < A.length; i++) {
       Float64List elem = A.getQuick(i);
       expect(Acopy.getQuick(i)[0], closeTo(elem[0], TOL));
-      expect(Im.getQuick(i), closeTo(elem[1], TOL));
+      expect(Im.get(i), closeTo(elem[1], TOL));
     }
   }
 
   void testAssignReal() {
     DComplexMatrix1D Acopy = A.copy();
-    DoubleMatrix1D Re = DoubleFactory1D.dense.random(A.size());
+    DoubleMatrix1D Re = DoubleFactory1D.dense.random(A.length);
     A.assignReal(Re);
-    for (int i = 0; i < A.size(); i++) {
+    for (int i = 0; i < A.length; i++) {
       Float64List elem = A.getQuick(i);
       expect(Acopy.getQuick(i)[1], closeTo(elem[1], TOL));
-      expect(Re.getQuick(i), closeTo(elem[0], TOL));
+      expect(Re.get(i), closeTo(elem[0], TOL));
     }
   }
 
   void testCardinality() {
     int card = A.cardinality();
-    expect(A.size(), equals(card));
+    expect(A.length, equals(card));
   }
 
   void testEqualsValue() {
@@ -235,15 +235,15 @@ abstract class DComplexMatrix1DTest {
 
   void testGetImaginaryPart() {
     DoubleMatrix1D Im = A.getImaginaryPart();
-    for (int i = 0; i < A.size(); i++) {
-      expect(A.getQuick(i)[1], closeTo(Im.getQuick(i), TOL));
+    for (int i = 0; i < A.length; i++) {
+      expect(A.getQuick(i)[1], closeTo(Im.get(i), TOL));
     }
   }
 
   void testGetRealPart() {
     DoubleMatrix1D Re = A.getRealPart();
-    for (int i = 0; i < A.size(); i++) {
-      expect(A.getQuick(i)[0], closeTo(Re.getQuick(i), TOL));
+    for (int i = 0; i < A.length; i++) {
+      expect(A.getQuick(i)[0], closeTo(Re.get(i), TOL));
     }
   }
 
@@ -251,9 +251,9 @@ abstract class DComplexMatrix1DTest {
     List<int> indexList = new List<int>();
     List<Float64List> valueList = new List<Float64List>();
     A.getNonZeros(indexList, valueList);
-    expect(A.size(), equals(indexList.length));
-    expect(A.size(), equals(valueList.length));
-    for (int i = 0; i < A.size(); i++) {
+    expect(A.length, equals(indexList.length));
+    expect(A.length, equals(valueList.length));
+    for (int i = 0; i < A.length; i++) {
       assertEquals(A.getQuick(indexList[i]), valueList[i], TOL);
       expect(valueList[i][0] != 0 || valueList[i][1] != 0, isTrue);
     }
@@ -290,7 +290,7 @@ abstract class DComplexMatrix1DTest {
     DComplexMatrix1D Acopy = A.copy();
     DComplexMatrix1D Bcopy = B.copy();
     A.swap(B);
-    for (int i = 0; i < A.size(); i++) {
+    for (int i = 0; i < A.length; i++) {
       assertEquals(Bcopy.getQuick(i), A.getQuick(i), TOL);
       assertEquals(Acopy.getQuick(i), B.getQuick(i), TOL);
     }
@@ -298,7 +298,7 @@ abstract class DComplexMatrix1DTest {
 
   void testToArray() {
     Float64List array = A.toArray();
-    for (int i = 0; i < A.size(); i++) {
+    for (int i = 0; i < A.length; i++) {
       Float64List elem = A.getQuick(i);
       expect(elem[0], closeTo(array[2 * i], TOL));
       expect(elem[1], closeTo(array[2 * i + 1], TOL));
@@ -306,9 +306,9 @@ abstract class DComplexMatrix1DTest {
   }
 
   void testToArrayFill() {
-    Float64List array = new Float64List(2 * A.size());
+    Float64List array = new Float64List(2 * A.length);
     A.toArrayFill(array);
-    for (int i = 0; i < A.size(); i++) {
+    for (int i = 0; i < A.length; i++) {
       Float64List elem = A.getQuick(i);
       expect(elem[0], closeTo(array[2 * i], TOL));
       expect(elem[1], closeTo(array[2 * i + 1], TOL));
@@ -317,15 +317,15 @@ abstract class DComplexMatrix1DTest {
 
   void testViewFlip() {
     DComplexMatrix1D B = A.viewFlip();
-    for (int i = 0; i < A.size(); i++) {
-      assertEquals(A.getQuick(A.size() - 1 - i), B.getQuick(i), TOL);
+    for (int i = 0; i < A.length; i++) {
+      assertEquals(A.getQuick(A.length - 1 - i), B.getQuick(i), TOL);
     }
   }
 
   void testViewPart() {
-    DComplexMatrix1D B = A.viewPart(A.size() ~/ 2, A.size() ~/ 3);
-    for (int i = 0; i < A.size() / 3; i++) {
-      assertEquals(A.getQuick(A.size() ~/ 2 + i), B.getQuick(i), TOL);
+    DComplexMatrix1D B = A.viewPart(A.length ~/ 2, A.length ~/ 3);
+    for (int i = 0; i < A.length / 3; i++) {
+      assertEquals(A.getQuick(A.length ~/ 2 + i), B.getQuick(i), TOL);
     }
   }
 
@@ -337,7 +337,7 @@ abstract class DComplexMatrix1DTest {
         return false;
       }
     });
-    for (int i = 0; i < B.size(); i++) {
+    for (int i = 0; i < B.length; i++) {
       Float64List el = B.getQuick(i);
       if (el[0] >= el[1]) {
         fail('viewSelectionProc');
@@ -346,7 +346,7 @@ abstract class DComplexMatrix1DTest {
   }
 
   void testViewSelection() {
-    Int32List indexes = new Int32List.fromList([A.size() ~/ 6, A.size() ~/ 5, A.size() ~/ 4, A.size() ~/ 3, A.size() ~/ 2]);
+    Int32List indexes = new Int32List.fromList([A.length ~/ 6, A.length ~/ 5, A.length ~/ 4, A.length ~/ 3, A.length ~/ 2]);
     DComplexMatrix1D B = A.viewSelection(indexes);
     for (int i = 0; i < indexes.length; i++) {
       assertEquals(A.getQuick(indexes[i]), B.getQuick(i), TOL);
@@ -356,7 +356,7 @@ abstract class DComplexMatrix1DTest {
   void testViewStrides() {
     int stride = 3;
     DComplexMatrix1D B = A.viewStrides(stride);
-    for (int i = 0; i < B.size(); i++) {
+    for (int i = 0; i < B.length; i++) {
       assertEquals(A.getQuick(i * stride), B.getQuick(i), TOL);
     }
   }
@@ -364,16 +364,16 @@ abstract class DComplexMatrix1DTest {
   void testZDotProduct() {
     Float64List actual = A.zDotProduct(B);
     Float64List expected = new Float64List(2);
-    for (int i = 0; i < A.size(); i++) {
+    for (int i = 0; i < A.length; i++) {
       expected = DComplex.plus(expected, DComplex.multiply(DComplex.conj(B.getQuick(i)), A.getQuick(i)));
     }
     assertEquals(expected, actual, TOL);
   }
 
   void testZDotProductRange() {
-    Float64List actual = A.zDotProduct(B, 5, B.size() - 10);
+    Float64List actual = A.zDotProduct(B, 5, B.length - 10);
     Float64List expected = new Float64List(2);
-    for (int i = 5; i < A.size() - 5; i++) {
+    for (int i = 5; i < A.length - 5; i++) {
       expected = DComplex.plus(expected, DComplex.multiply(DComplex.conj(B.getQuick(i)), A.getQuick(i)));
     }
     assertEquals(expected, actual, TOL);
@@ -384,9 +384,9 @@ abstract class DComplexMatrix1DTest {
     List<Float64List> valueList = new List<Float64List>();
     B.getNonZeros(indexList, valueList);
     Float64List actual = A.zDotProductIndex(B,
-        new Int32List.fromList(indexList), 5, B.size() - 10);
+        new Int32List.fromList(indexList), 5, B.length - 10);
     Float64List expected = new Float64List(2);
-    for (int i = 5; i < A.size() - 5; i++) {
+    for (int i = 5; i < A.length - 5; i++) {
       expected = DComplex.plus(expected, DComplex.multiply(A.getQuick(i), DComplex.conj(B.getQuick(i))));
     }
     assertEquals(expected, actual, TOL);
@@ -395,7 +395,7 @@ abstract class DComplexMatrix1DTest {
   void testZSum() {
     Float64List actual = A.zSum();
     Float64List expected = new Float64List(2);
-    for (int i = 0; i < A.size(); i++) {
+    for (int i = 0; i < A.length; i++) {
       expected = DComplex.plus(expected, A.getQuick(i));
     }
     assertEquals(expected, actual, TOL);

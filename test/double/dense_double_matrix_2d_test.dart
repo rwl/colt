@@ -18,15 +18,15 @@ class DenseDoubleMatrix2DTest extends DoubleMatrix2DTest {
   }
 
   void testAssignValues() {
-    Float64List expected = new Float64List(A.size());
-    for (int i = 0; i < A.size(); i++) {
+    Float64List expected = new Float64List(A.length);
+    for (int i = 0; i < A.length; i++) {
       expected[i] = random.nextDouble();
     }
-    A.assignValues(expected);
+    A.setAll(expected);
     int idx = 0;
-    for (int r = 0; r < A.rows(); r++) {
-      for (int c = 0; c < A.columns(); c++) {
-        expect(0, closeTo((expected[idx++] - A.getQuick(r, c)).abs(), TOL));
+    for (int r = 0; r < A.rows; r++) {
+      for (int c = 0; c < A.columns; c++) {
+        expect(0, closeTo((expected[idx++] - A.get(r, c)).abs(), TOL));
       }
     }
   }
@@ -36,9 +36,9 @@ class DenseDoubleMatrix2DTest extends DoubleMatrix2DTest {
 class DenseDoubleMatrix2DViewTest extends DenseDoubleMatrix2DTest {
 
   void createMatrices() {
-    A = new DenseDoubleMatrix2D(NCOLUMNS, NROWS).viewDice();
-    B = new DenseDoubleMatrix2D(NCOLUMNS, NROWS).viewDice();
-    Bt = new DenseDoubleMatrix2D(NROWS, NCOLUMNS).viewDice();
+    A = new DenseDoubleMatrix2D(NCOLUMNS, NROWS).dice();
+    B = new DenseDoubleMatrix2D(NCOLUMNS, NROWS).dice();
+    Bt = new DenseDoubleMatrix2D(NROWS, NCOLUMNS).dice();
   }
 
 }

@@ -27,7 +27,7 @@ class WrapperDoubleMatrix2D extends DoubleMatrix2D {
   WrapperDoubleMatrix2D(DoubleMatrix2D newContent) {
     if (newContent != null) {
       try {
-        _setUp(newContent.rows(), newContent.columns());
+        _setUp(newContent.rows, newContent.columns);
       } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
         if ("matrix too large" != exc.message) throw exc;
       }
@@ -35,7 +35,7 @@ class WrapperDoubleMatrix2D extends DoubleMatrix2D {
     this._content = newContent;
   }
 
-  DoubleMatrix2D assignValues(final Float64List values) {
+  DoubleMatrix2D setAll(final Float64List values) {
     if (_content is DiagonalDoubleMatrix2D) {
       int dlength = (_content as DiagonalDoubleMatrix2D)._dlength;
       final Float64List elems = (_content as DiagonalDoubleMatrix2D)._elements;
@@ -64,22 +64,22 @@ class WrapperDoubleMatrix2D extends DoubleMatrix2D {
       //}
       return this;
     } else {
-      return super.assignValues(values);
+      return super.setAll(values);
     }
   }
 
-  DoubleMatrix2D assignFunc(final DoubleMatrix2D y, final func.DoubleDoubleFunction function) {
+  DoubleMatrix2D forEachMatrix(final DoubleMatrix2D y, final func.DoubleDoubleFunction function) {
     checkShape(y);
     if (y is WrapperDoubleMatrix2D) {
       final rowList = new List<int>();
       final columnList = new List<int>();
       final valueList = new List<double>();
-      y.getNonZeros(rowList, columnList, valueList);
-      assignFuncIndex(y, function,
+      y.nonZeros(rowList, columnList, valueList);
+      forEachMatrixRange(y, function,
           new Int32List.fromList(rowList),
           new Int32List.fromList(columnList));
     } else {
-      super.assignFunc(y, function);
+      super.forEachMatrix(y, function);
     }
     return this;
   }
@@ -88,11 +88,11 @@ class WrapperDoubleMatrix2D extends DoubleMatrix2D {
     return _content.elements();
   }
 
-  double getQuick(int row, int column) {
-    return _content.getQuick(row, column);
+  double get(int row, int column) {
+    return _content.get(row, column);
   }
 
-  bool equalsValue(double value) {
+  /*bool equalsValue(double value) {
     if (_content is DiagonalDoubleMatrix2D) {
       double epsilon = DoubleProperty.DEFAULT.tolerance();
       Float64List elements = _content.elements() as Float64List;
@@ -108,18 +108,44 @@ class WrapperDoubleMatrix2D extends DoubleMatrix2D {
       }
       return true;
     } else {
-      return super.equalsValue(value);
+      return super.==(value);
     }
-  }
+  }*/
 
-  bool equals(Object obj) {
+  bool operator ==(var obj) {
+    if (obj is num) {
+      final value = obj;
+      if (_content is DiagonalDoubleMatrix2D) {
+        double epsilon = DoubleProperty.DEFAULT.tolerance();
+        Float64List elements = _content.elements() as Float64List;
+        for (int r = 0; r < elements.length; r++) {
+          double x = elements[r];
+          double diff = (value - x).abs();
+          if ((diff != diff) && ((value != value && x != x) || value == x)) {
+            diff = 0.0;
+          }
+          if (!(diff <= epsilon)) {
+            return false;
+          }
+        }
+        return true;
+      } 
+      return super ==(value);
+    }
+    
     if (_content is DiagonalDoubleMatrix2D && obj is DiagonalDoubleMatrix2D) {
       double epsilon = DoubleProperty.DEFAULT.tolerance();
-      if (this == obj) return true;
-      if (!(this != null && obj != null)) return false;
+      if (identical(this, obj)) {
+        return true;
+      }
+      if (!(this != null && obj != null)) {
+        return false;
+      }
       DiagonalDoubleMatrix2D A = _content as DiagonalDoubleMatrix2D;
       DiagonalDoubleMatrix2D B = obj;
-      if (A.columns() != B.columns() || A.rows() != B.rows() || A.diagonalIndex() != B.diagonalIndex() || A.diagonalLength() != B.diagonalLength()) return false;
+      if (A.columns != B.columns || A.rows != B.rows || A.diagonalIndex() != B.diagonalIndex() || A.diagonalLength() != B.diagonalLength()) {
+        return false;
+      }
       Float64List AElements = A.elements();
       Float64List BElements = B.elements();
       for (int r = 0; r < AElements.length; r++) {
@@ -135,7 +161,7 @@ class WrapperDoubleMatrix2D extends DoubleMatrix2D {
       }
       return true;
     } else {
-      return super.equals(obj);
+      return super ==(obj);
     }
   }
 
@@ -147,12 +173,12 @@ class WrapperDoubleMatrix2D extends DoubleMatrix2D {
     return _content.like1D(size);
   }
 
-  void setQuick(int row, int column, double value) {
-    _content.setQuick(row, column, value);
+  void set(int row, int column, double value) {
+    _content.set(row, column, value);
   }
 
   DoubleMatrix1D vectorize() {
-    final DenseDoubleMatrix1D v = new DenseDoubleMatrix1D(size());
+    final DenseDoubleMatrix1D v = new DenseDoubleMatrix1D(length);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _columns);
@@ -176,18 +202,18 @@ class WrapperDoubleMatrix2D extends DoubleMatrix2D {
       int idx = 0;
       for (int c = 0; c < _columns; c++) {
         for (int r = 0; r < _rows; r++) {
-          v.setQuick(idx++, getQuick(r, c));
+          v.set(idx++, get(r, c));
         }
       }
     //}
     return v;
   }
 
-  DoubleMatrix1D viewColumn(int column) {
-    return viewDice().viewRow(column);
+  DoubleMatrix1D column(int column) {
+    return dice().row(column);
   }
 
-  DoubleMatrix2D viewColumnFlip() {
+  DoubleMatrix2D columnFlip() {
     if (_columns == 0) return this;
     WrapperDoubleMatrix2D view = new ViewColumnFlipWrapperDoubleMatrix2D(this);
     view._isNoView = false;
@@ -195,7 +221,7 @@ class WrapperDoubleMatrix2D extends DoubleMatrix2D {
     return view;
   }
 
-  DoubleMatrix2D viewDice() {
+  DoubleMatrix2D dice() {
     WrapperDoubleMatrix2D view = new ViewDiceWrapperDoubleMatrix2D(this);
     view._rows = _columns;
     view._columns = _rows;
@@ -204,7 +230,7 @@ class WrapperDoubleMatrix2D extends DoubleMatrix2D {
     return view;
   }
 
-  DoubleMatrix2D viewPart(final int row, final int column, int height, int width) {
+  DoubleMatrix2D part(final int row, final int column, int height, int width) {
     _checkBox(row, column, height, width);
     WrapperDoubleMatrix2D view = new ViewPartWrapperDoubleMatrix2D(this, row, column);
     view._rows = height;
@@ -214,19 +240,19 @@ class WrapperDoubleMatrix2D extends DoubleMatrix2D {
     return view;
   }
 
-  DoubleMatrix1D viewRow(int row) {
+  DoubleMatrix1D row(int row) {
     _checkRow(row);
     return new DelegateDoubleMatrix1D(this, row);
   }
 
-  DoubleMatrix2D viewRowFlip() {
+  DoubleMatrix2D rowFlip() {
     if (_rows == 0) return this;
     WrapperDoubleMatrix2D view = new ViewRowFlipWrapperDoubleMatrix2D(this);
     view._isNoView = false;
     return view;
   }
 
-  DoubleMatrix2D viewSelection(Int32List rowIndexes, Int32List columnIndexes) {
+  DoubleMatrix2D select(Int32List rowIndexes, Int32List columnIndexes) {
     // check for "all"
     if (rowIndexes == null) {
       rowIndexes = new Int32List(_rows);
@@ -250,7 +276,7 @@ class WrapperDoubleMatrix2D extends DoubleMatrix2D {
     return view;
   }
 
-  DoubleMatrix2D viewStrides(final int _rowStride, final int _columnStride) {
+  DoubleMatrix2D strides(final int _rowStride, final int _columnStride) {
     if (_rowStride <= 0 || _columnStride <= 0) {
       throw new RangeError("illegal stride");
     }
@@ -287,20 +313,20 @@ class ViewColumnFlipWrapperDoubleMatrix2D extends WrapperDoubleMatrix2D {
 
   ViewColumnFlipWrapperDoubleMatrix2D(DoubleMatrix2D newContent) : super(newContent);
 
-  double getQuick(int row, int column) {
-      return _content.getQuick(row, _columns - 1 - column);
-  }
-
-  void setQuick(int row, int column, double value) {
-      _content.setQuick(row, _columns - 1 - column, value);
-  }
-
   double get(int row, int column) {
       return _content.get(row, _columns - 1 - column);
   }
 
   void set(int row, int column, double value) {
       _content.set(row, _columns - 1 - column, value);
+  }
+
+  double at(int row, int column) {
+      return _content.at(row, _columns - 1 - column);
+  }
+
+  void put(int row, int column, double value) {
+      _content.put(row, _columns - 1 - column, value);
   }
 
   Object clone() {
@@ -312,20 +338,20 @@ class ViewDiceWrapperDoubleMatrix2D extends WrapperDoubleMatrix2D {
 
   ViewDiceWrapperDoubleMatrix2D(DoubleMatrix2D newContent) : super(newContent);
 
-  double getQuick(int row, int column) {
-      return _content.getQuick(column, row);
-  }
-
-  void setQuick(int row, int column, double value) {
-      _content.setQuick(column, row, value);
-  }
-
   double get(int row, int column) {
       return _content.get(column, row);
   }
 
   void set(int row, int column, double value) {
       _content.set(column, row, value);
+  }
+
+  double at(int row, int column) {
+      return _content.at(column, row);
+  }
+
+  void put(int row, int column, double value) {
+      _content.put(column, row, value);
   }
 
   Object clone() {
@@ -340,20 +366,20 @@ class ViewPartWrapperDoubleMatrix2D extends WrapperDoubleMatrix2D {
 
   ViewPartWrapperDoubleMatrix2D(DoubleMatrix2D newContent, this._row, this._column) : super(newContent);
 
-  double getQuick(int i, int j) {
-      return _content.getQuick(_row + i, _column + j);
-  }
-
-  void setQuick(int i, int j, double value) {
-      _content.setQuick(_row + i, _column + j, value);
-  }
-
   double get(int i, int j) {
       return _content.get(_row + i, _column + j);
   }
 
   void set(int i, int j, double value) {
       _content.set(_row + i, _column + j, value);
+  }
+
+  double at(int i, int j) {
+      return _content.at(_row + i, _column + j);
+  }
+
+  void put(int i, int j, double value) {
+      _content.put(_row + i, _column + j, value);
   }
 
   Object clone() {
@@ -365,20 +391,20 @@ class ViewRowFlipWrapperDoubleMatrix2D extends WrapperDoubleMatrix2D {
 
   ViewRowFlipWrapperDoubleMatrix2D(DoubleMatrix2D newContent) : super(newContent);
 
-  double getQuick(int row, int column) {
-      return _content.getQuick(_rows - 1 - row, column);
-  }
-
-  void setQuick(int row, int column, double value) {
-      _content.setQuick(_rows - 1 - row, column, value);
-  }
-
   double get(int row, int column) {
       return _content.get(_rows - 1 - row, column);
   }
 
   void set(int row, int column, double value) {
       _content.set(_rows - 1 - row, column, value);
+  }
+
+  double at(int row, int column) {
+      return _content.at(_rows - 1 - row, column);
+  }
+
+  void put(int row, int column, double value) {
+      _content.put(_rows - 1 - row, column, value);
   }
 
   Object clone() {
@@ -393,20 +419,20 @@ class ViewSelectionWrapperDoubleMatrix2D extends WrapperDoubleMatrix2D {
 
   ViewSelectionWrapperDoubleMatrix2D(DoubleMatrix2D newContent, this._cix, this._rix) : super(newContent);
 
-  double getQuick(int i, int j) {
-      return _content.getQuick(_rix[i], _cix[j]);
-  }
-
-  void setQuick(int i, int j, double value) {
-      _content.setQuick(_rix[i], _cix[j], value);
-  }
-
   double get(int i, int j) {
       return _content.get(_rix[i], _cix[j]);
   }
 
   void set(int i, int j, double value) {
       _content.set(_rix[i], _cix[j], value);
+  }
+
+  double at(int i, int j) {
+      return _content.at(_rix[i], _cix[j]);
+  }
+
+  void put(int i, int j, double value) {
+      _content.put(_rix[i], _cix[j], value);
   }
 
   Object clone() {
@@ -421,20 +447,20 @@ class ViewStridesWrapperDoubleMatrix2D extends WrapperDoubleMatrix2D {
 
   ViewStridesWrapperDoubleMatrix2D(DoubleMatrix2D newContent, this._rowStride, this._columnStride) : super(newContent);
 
-  double getQuick(int row, int column) {
-      return _content.getQuick(_rowStride * row, _columnStride * column);
-  }
-
-  void setQuick(int row, int column, double value) {
-      _content.setQuick(_rowStride * row, _columnStride * column, value);
-  }
-
   double get(int row, int column) {
       return _content.get(_rowStride * row, _columnStride * column);
   }
 
   void set(int row, int column, double value) {
       _content.set(_rowStride * row, _columnStride * column, value);
+  }
+
+  double at(int row, int column) {
+      return _content.at(_rowStride * row, _columnStride * column);
+  }
+
+  void put(int row, int column, double value) {
+      _content.put(_rowStride * row, _columnStride * column, value);
   }
 
   Object clone() {

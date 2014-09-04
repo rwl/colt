@@ -18,27 +18,27 @@ class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
     //ConcurrencyUtils.setThreadsBeginN_2D(1);
     if (DINDEX >= 0) {
       for (int r = 0; r < DLENGTH; r++) {
-        A.setQuick(r, r + DINDEX, random.nextDouble());
+        A.set(r, r + DINDEX, random.nextDouble());
       }
 
       for (int r = 0; r < DLENGTH; r++) {
-        B.setQuick(r, r + DINDEX, random.nextDouble());
+        B.set(r, r + DINDEX, random.nextDouble());
       }
 
       for (int r = 0; r < DLENGTH; r++) {
-        Bt.setQuick(r - DINDEX, r, random.nextDouble());
+        Bt.set(r - DINDEX, r, random.nextDouble());
       }
 
     } else {
       for (int r = 0; r < DLENGTH; r++) {
-        A.setQuick(r - DINDEX, r, random.nextDouble());
+        A.set(r - DINDEX, r, random.nextDouble());
       }
 
       for (int r = 0; r < DLENGTH; r++) {
-        B.setQuick(r - DINDEX, r, random.nextDouble());
+        B.set(r - DINDEX, r, random.nextDouble());
       }
       for (int r = 0; r < DLENGTH; r++) {
-        Bt.setQuick(r, r + DINDEX, random.nextDouble());
+        Bt.set(r, r + DINDEX, random.nextDouble());
       }
 
     }
@@ -46,14 +46,14 @@ class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
 
   void testAssignValue() {
     double value = random.nextDouble();
-    A.assignValue(value);
+    A.fill(value);
     if (DINDEX >= 0) {
       for (int r = 0; r < DLENGTH; r++) {
-        expect(value, closeTo(A.getQuick(r, r + DINDEX), TOL));
+        expect(value, closeTo(A.get(r, r + DINDEX), TOL));
       }
     } else {
       for (int r = 0; r < DLENGTH; r++) {
-        expect(value, closeTo(A.getQuick(r - DINDEX, r), TOL));
+        expect(value, closeTo(A.get(r - DINDEX, r), TOL));
       }
     }
   }
@@ -63,14 +63,14 @@ class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
     for (int i = 0; i < DLENGTH; i++) {
       expected[i] = random.nextDouble();
     }
-    A.assignValues(expected);
+    A.setAll(expected);
     if (DINDEX >= 0) {
       for (int r = 0; r < DLENGTH; r++) {
-        expect(expected[r], closeTo(A.getQuick(r, r + DINDEX), TOL));
+        expect(expected[r], closeTo(A.get(r, r + DINDEX), TOL));
       }
     } else {
       for (int r = 0; r < DLENGTH; r++) {
-        expect(expected[r], closeTo(A.getQuick(r - DINDEX, r), TOL));
+        expect(expected[r], closeTo(A.get(r - DINDEX, r), TOL));
       }
     }
   }
@@ -83,44 +83,44 @@ class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
         expected[r][c] = random.nextDouble();
       }
     }
-    A.assignValues2D(expected);
+    A.setAll2D(expected);
     if (DINDEX >= 0) {
       for (int r = 0; r < DLENGTH; r++) {
-        expect(expected[r][r + DINDEX], closeTo(A.getQuick(r, r + DINDEX), TOL));
+        expect(expected[r][r + DINDEX], closeTo(A.get(r, r + DINDEX), TOL));
       }
     } else {
       for (int r = 0; r < DLENGTH; r++) {
-        expect(expected[r - DINDEX][r], closeTo(A.getQuick(r - DINDEX, r), TOL));
+        expect(expected[r - DINDEX][r], closeTo(A.get(r - DINDEX, r), TOL));
       }
     }
   }
 
   void testAssign() {
     DoubleMatrix2D Acopy = A.copy();
-    A.assign(acos);
+    A.forEach(acos);
     if (DINDEX >= 0) {
       for (int r = 0; r < DLENGTH; r++) {
-        double expected = math.acos(Acopy.getQuick(r, r + DINDEX));
-        expect(expected, closeTo(A.getQuick(r, r + DINDEX), TOL));
+        double expected = math.acos(Acopy.get(r, r + DINDEX));
+        expect(expected, closeTo(A.get(r, r + DINDEX), TOL));
       }
     } else {
       for (int r = 0; r < DLENGTH; r++) {
-        double expected = math.acos(Acopy.getQuick(r - DINDEX, r));
-        expect(expected, closeTo(A.getQuick(r - DINDEX, r), TOL));
+        double expected = math.acos(Acopy.get(r - DINDEX, r));
+        expect(expected, closeTo(A.get(r - DINDEX, r), TOL));
       }
     }
   }
 
   void testAssignFunc() {
     DoubleMatrix2D Acopy = A.copy();
-    A.assignFunc(B, div);
+    A.forEachMatrix(B, div);
     if (DINDEX >= 0) {
       for (int r = 0; r < DLENGTH; r++) {
-        expect(Acopy.getQuick(r, r + DINDEX) / B.getQuick(r, r + DINDEX), closeTo(A.getQuick(r, r + DINDEX), TOL));
+        expect(Acopy.get(r, r + DINDEX) / B.get(r, r + DINDEX), closeTo(A.get(r, r + DINDEX), TOL));
       }
     } else {
       for (int r = 0; r < DLENGTH; r++) {
-        expect(Acopy.getQuick(r - DINDEX, r) / B.getQuick(r - DINDEX, r), closeTo(A.getQuick(r - DINDEX, r), TOL));
+        expect(Acopy.get(r - DINDEX, r) / B.get(r - DINDEX, r), closeTo(A.get(r - DINDEX, r), TOL));
       }
     }
   }
@@ -134,11 +134,11 @@ class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
         columnList.add(r + DINDEX);
       }
       DoubleMatrix2D Acopy = A.copy();
-      A.assignFuncIndex(B, div,
+      A.forEachMatrixRange(B, div,
           new Int32List.fromList(rowList),
           new Int32List.fromList(columnList));
       for (int r = 0; r < DLENGTH; r++) {
-        expect(Acopy.getQuick(r, r + DINDEX) / B.getQuick(r, r + DINDEX), closeTo(A.getQuick(r, r + DINDEX), TOL));
+        expect(Acopy.get(r, r + DINDEX) / B.get(r, r + DINDEX), closeTo(A.get(r, r + DINDEX), TOL));
       }
     } else {
       for (int r = 0; r < DLENGTH; r++) {
@@ -146,66 +146,66 @@ class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
         columnList.add(r);
       }
       DoubleMatrix2D Acopy = A.copy();
-      A.assignFuncIndex(B, div, new Int32List.fromList(rowList),
+      A.forEachMatrixRange(B, div, new Int32List.fromList(rowList),
           new Int32List.fromList(columnList));
       for (int r = 0; r < DLENGTH; r++) {
-        expect(Acopy.getQuick(r - DINDEX, r) / B.getQuick(r - DINDEX, r), closeTo(A.getQuick(r - DINDEX, r), TOL));
+        expect(Acopy.get(r - DINDEX, r) / B.get(r - DINDEX, r), closeTo(A.get(r - DINDEX, r), TOL));
       }
     }
   }
 
   void testCardinality() {
-    int card = A.cardinality();
+    int card = A.cardinality;
     expect(DLENGTH, equals(card));
   }
 
   void testMaxLocation() {
-    A.assignValue(0.0);
+    A.fill(0.0);
     if (DINDEX >= 0) {
-      A.setQuick(NROWS ~/ 3, NROWS ~/ 3 + DINDEX, 0.7);
-      A.setQuick(NROWS ~/ 2, NROWS ~/ 2 + DINDEX, 0.1);
-      List<num> maxAndLoc = A.getMaxLocation();
-      expect(0.7, closeTo(maxAndLoc[0], TOL));
-      expect(NROWS ~/ 3, equals(maxAndLoc[1]));
-      expect(NROWS ~/ 3 + DINDEX, equals(maxAndLoc[2]));
+      A.set(NROWS ~/ 3, NROWS ~/ 3 + DINDEX, 0.7);
+      A.set(NROWS ~/ 2, NROWS ~/ 2 + DINDEX, 0.1);
+      final maxAndLoc = A.max();
+      expect(0.7, closeTo(maxAndLoc.value, TOL));
+      expect(NROWS ~/ 3, equals(maxAndLoc.row));
+      expect(NROWS ~/ 3 + DINDEX, equals(maxAndLoc.column));
     } else {
-      A.setQuick(NROWS ~/ 3 - DINDEX, NROWS ~/ 3, 0.7);
-      A.setQuick(NROWS ~/ 2 - DINDEX, NROWS ~/ 2, 0.1);
-      Float64List maxAndLoc = A.getMaxLocation();
-      expect(0.7, closeTo(maxAndLoc[0], TOL));
-      expect(NROWS ~/ 3 - DINDEX, equals(maxAndLoc[1]));
-      expect(NROWS ~/ 3, equals(maxAndLoc[2]));
+      A.set(NROWS ~/ 3 - DINDEX, NROWS ~/ 3, 0.7);
+      A.set(NROWS ~/ 2 - DINDEX, NROWS ~/ 2, 0.1);
+      final maxAndLoc = A.max();
+      expect(0.7, closeTo(maxAndLoc.value, TOL));
+      expect(NROWS ~/ 3 - DINDEX, equals(maxAndLoc.row));
+      expect(NROWS ~/ 3, equals(maxAndLoc.column));
     }
   }
 
   void testMinLocation() {
-    A.assignValue(0.0);
+    A.fill(0.0);
     if (DINDEX >= 0) {
-      A.setQuick(NROWS ~/ 3, NROWS ~/ 3 + DINDEX, -0.7);
-      A.setQuick(NROWS ~/ 2, NROWS ~/ 2 + DINDEX, -0.1);
-      List<num> minAndLoc = A.getMinLocation();
-      expect(-0.7, closeTo(minAndLoc[0], TOL));
-      expect(NROWS ~/ 3, equals(minAndLoc[1]));
-      expect(NROWS ~/ 3 + DINDEX, equals(minAndLoc[2]));
+      A.set(NROWS ~/ 3, NROWS ~/ 3 + DINDEX, -0.7);
+      A.set(NROWS ~/ 2, NROWS ~/ 2 + DINDEX, -0.1);
+      final minAndLoc = A.min();
+      expect(-0.7, closeTo(minAndLoc.value, TOL));
+      expect(NROWS ~/ 3, equals(minAndLoc.row));
+      expect(NROWS ~/ 3 + DINDEX, equals(minAndLoc.column));
     } else {
-      A.setQuick(NROWS ~/ 3 - DINDEX, NROWS ~/ 3, -0.7);
-      A.setQuick(NROWS ~/ 2 - DINDEX, NROWS ~/ 2, -0.1);
-      Float64List minAndLoc = A.getMinLocation();
-      expect(-0.7, closeTo(minAndLoc[0], TOL));
-      expect(NROWS ~/ 3 - DINDEX, equals(minAndLoc[1]));
-      expect(NROWS ~/ 3, equals(minAndLoc[2]));
+      A.set(NROWS ~/ 3 - DINDEX, NROWS ~/ 3, -0.7);
+      A.set(NROWS ~/ 2 - DINDEX, NROWS ~/ 2, -0.1);
+      final minAndLoc = A.min();
+      expect(-0.7, closeTo(minAndLoc.value, TOL));
+      expect(NROWS ~/ 3 - DINDEX, equals(minAndLoc.row));
+      expect(NROWS ~/ 3, equals(minAndLoc.column));
     }
   }
 
   void testGetNegativeValues() {
-    A.assignValue(0.0);
+    A.fill(0.0);
     if (DINDEX >= 0) {
-      A.setQuick(NROWS ~/ 3, NROWS ~/ 3 + DINDEX, -0.7);
-      A.setQuick(NROWS ~/ 2, NROWS ~/ 2 + DINDEX, -0.1);
+      A.set(NROWS ~/ 3, NROWS ~/ 3 + DINDEX, -0.7);
+      A.set(NROWS ~/ 2, NROWS ~/ 2 + DINDEX, -0.1);
       List<int> rowList = new List<int>();
       List<int> columnList = new List<int>();
       List<double> valueList = new List<double>();
-      A.getNegativeValues(rowList, columnList, valueList);
+      A.negativeValues(rowList, columnList, valueList);
       expect(2, equals(rowList.length));
       expect(2, equals(columnList.length));
       expect(2, equals(valueList.length));
@@ -216,12 +216,12 @@ class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
       expect(valueList.contains(-0.7), isTrue);
       expect(valueList.contains(-0.1), isTrue);
     } else {
-      A.setQuick(NROWS ~/ 3 - DINDEX, NROWS ~/ 3, -0.7);
-      A.setQuick(NROWS ~/ 2 - DINDEX, NROWS ~/ 2, -0.1);
+      A.set(NROWS ~/ 3 - DINDEX, NROWS ~/ 3, -0.7);
+      A.set(NROWS ~/ 2 - DINDEX, NROWS ~/ 2, -0.1);
       List<int> rowList = new List<int>();
       List<int> columnList = new List<int>();
       List<double> valueList = new List<double>();
-      A.getNegativeValues(rowList, columnList, valueList);
+      A.negativeValues(rowList, columnList, valueList);
       expect(2, equals(rowList.length));
       expect(2, equals(columnList.length));
       expect(2, equals(valueList.length));
@@ -235,14 +235,14 @@ class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
   }
 
   void testGetNonZeros() {
-    A.assignValue(0.0);
+    A.fill(0.0);
     if (DINDEX >= 0) {
-      A.setQuick(NROWS ~/ 3, NROWS ~/ 3 + DINDEX, 0.7);
-      A.setQuick(NROWS ~/ 2, NROWS ~/ 2 + DINDEX, 0.1);
+      A.set(NROWS ~/ 3, NROWS ~/ 3 + DINDEX, 0.7);
+      A.set(NROWS ~/ 2, NROWS ~/ 2 + DINDEX, 0.1);
       List<int> rowList = new List<int>();
       List<int> columnList = new List<int>();
       List<double> valueList = new List<double>();
-      A.getNonZeros(rowList, columnList, valueList);
+      A.nonZeros(rowList, columnList, valueList);
       expect(2, equals(rowList.length));
       expect(2, equals(columnList.length));
       expect(2, equals(valueList.length));
@@ -253,12 +253,12 @@ class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
       expect(valueList.contains(0.7), isTrue);
       expect(valueList.contains(0.1), isTrue);
     } else {
-      A.setQuick(NROWS ~/ 3 - DINDEX, NROWS ~/ 3, 0.7);
-      A.setQuick(NROWS ~/ 2 - DINDEX, NROWS ~/ 2, 0.1);
+      A.set(NROWS ~/ 3 - DINDEX, NROWS ~/ 3, 0.7);
+      A.set(NROWS ~/ 2 - DINDEX, NROWS ~/ 2, 0.1);
       List<int> rowList = new List<int>();
       List<int> columnList = new List<int>();
       List<double> valueList = new List<double>();
-      A.getNonZeros(rowList, columnList, valueList);
+      A.nonZeros(rowList, columnList, valueList);
       expect(2, equals(rowList.length));
       expect(2, equals(columnList.length));
       expect(2, equals(valueList.length));
@@ -272,14 +272,14 @@ class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
   }
 
   void testGetPositiveValues() {
-    A.assignValue(0.0);
+    A.fill(0.0);
     if (DINDEX >= 0) {
-      A.setQuick(NROWS ~/ 3, NROWS ~/ 3 + DINDEX, 0.7);
-      A.setQuick(NROWS ~/ 2, NROWS ~/ 2 + DINDEX, 0.1);
+      A.set(NROWS ~/ 3, NROWS ~/ 3 + DINDEX, 0.7);
+      A.set(NROWS ~/ 2, NROWS ~/ 2 + DINDEX, 0.1);
       List<int> rowList = new List<int>();
       List<int> columnList = new List<int>();
       List<double> valueList = new List<double>();
-      A.getPositiveValues(rowList, columnList, valueList);
+      A.positiveValues(rowList, columnList, valueList);
       expect(2, equals(rowList.length));
       expect(2, equals(columnList.length));
       expect(2, equals(valueList.length));
@@ -290,12 +290,12 @@ class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
       expect(valueList.contains(0.7), isTrue);
       expect(valueList.contains(0.1), isTrue);
     } else {
-      A.setQuick(NROWS ~/ 3 - DINDEX, NROWS ~/ 3, 0.7);
-      A.setQuick(NROWS ~/ 2 - DINDEX, NROWS ~/ 2, 0.1);
+      A.set(NROWS ~/ 3 - DINDEX, NROWS ~/ 3, 0.7);
+      A.set(NROWS ~/ 2 - DINDEX, NROWS ~/ 2, 0.1);
       List<int> rowList = new List<int>();
       List<int> columnList = new List<int>();
       List<double> valueList = new List<double>();
-      A.getPositiveValues(rowList, columnList, valueList);
+      A.positiveValues(rowList, columnList, valueList);
       expect(2, equals(rowList.length));
       expect(2, equals(columnList.length));
       expect(2, equals(valueList.length));
@@ -309,12 +309,12 @@ class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
   }
 
   void testToArray() {
-    List<Float64List> array = A.toArray();
+    List<Float64List> array = A.toList();
     expect(NROWS == array.length, isTrue);
     for (int r = 0; r < NROWS; r++) {
       expect(NCOLUMNS == array[r].length, isTrue);
       for (int c = 0; c < NCOLUMNS; c++) {
-        expect(array[r][c], closeTo(A.getQuick(r, c), TOL));
+        expect(array[r][c], closeTo(A.get(r, c), TOL));
       }
     }
   }
@@ -324,110 +324,110 @@ class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
     int idx = 0;
     for (int c = 0; c < NCOLUMNS; c++) {
       for (int r = 0; r < NROWS; r++) {
-        expect(A.getQuick(r, c), closeTo(Avec.getQuick(idx++), TOL));
+        expect(A.get(r, c), closeTo(Avec.get(idx++), TOL));
       }
     }
   }
 
   void testViewColumn() {
-    DoubleMatrix1D col = A.viewColumn(NCOLUMNS ~/ 2);
-    expect(NROWS, equals(col.size()));
+    DoubleMatrix1D col = A.column(NCOLUMNS ~/ 2);
+    expect(NROWS, equals(col.length));
     for (int r = 0; r < NROWS; r++) {
-      expect(A.getQuick(r, NCOLUMNS ~/ 2), closeTo(col.getQuick(r), TOL));
+      expect(A.get(r, NCOLUMNS ~/ 2), closeTo(col.get(r), TOL));
     }
   }
 
   void testViewColumnFlip() {
-    DoubleMatrix2D B = A.viewColumnFlip();
-    expect(A.size(), equals(B.size()));
+    DoubleMatrix2D B = A.columnFlip();
+    expect(A.length, equals(B.length));
     for (int r = 0; r < NROWS; r++) {
       for (int c = 0; c < NCOLUMNS; c++) {
-        expect(A.getQuick(r, NCOLUMNS - 1 - c), closeTo(B.getQuick(r, c), TOL));
+        expect(A.get(r, NCOLUMNS - 1 - c), closeTo(B.get(r, c), TOL));
       }
     }
   }
 
   void testViewDice() {
-    DoubleMatrix2D B = A.viewDice();
-    expect(NROWS, equals(B.columns()));
-    expect(NCOLUMNS, equals(B.rows()));
+    DoubleMatrix2D B = A.dice();
+    expect(NROWS, equals(B.columns));
+    expect(NCOLUMNS, equals(B.rows));
     for (int r = 0; r < NROWS; r++) {
       for (int c = 0; c < NCOLUMNS; c++) {
-        expect(A.getQuick(r, c), closeTo(B.getQuick(c, r), TOL));
+        expect(A.get(r, c), closeTo(B.get(c, r), TOL));
       }
     }
   }
 
   void testViewPart() {
-    DoubleMatrix2D B = A.viewPart(NROWS ~/ 2, NCOLUMNS ~/ 2, NROWS ~/ 3, NCOLUMNS ~/ 3);
-    expect(NROWS ~/ 3, equals(B.rows()));
-    expect(NCOLUMNS ~/ 3, equals(B.columns()));
+    DoubleMatrix2D B = A.part(NROWS ~/ 2, NCOLUMNS ~/ 2, NROWS ~/ 3, NCOLUMNS ~/ 3);
+    expect(NROWS ~/ 3, equals(B.rows));
+    expect(NCOLUMNS ~/ 3, equals(B.columns));
     for (int r = 0; r < NROWS ~/ 3; r++) {
       for (int c = 0; c < NCOLUMNS ~/ 3; c++) {
-        expect(A.getQuick(NROWS ~/ 2 + r, NCOLUMNS ~/ 2 + c), closeTo(B.getQuick(r, c), TOL));
+        expect(A.get(NROWS ~/ 2 + r, NCOLUMNS ~/ 2 + c), closeTo(B.get(r, c), TOL));
       }
     }
   }
 
   void testViewRow() {
-    DoubleMatrix1D B = A.viewRow(NROWS ~/ 2);
-    expect(NCOLUMNS, equals(B.size()));
+    DoubleMatrix1D B = A.row(NROWS ~/ 2);
+    expect(NCOLUMNS, equals(B.length));
     for (int r = 0; r < NCOLUMNS; r++) {
-      expect(A.getQuick(NROWS ~/ 2, r), closeTo(B.getQuick(r), TOL));
+      expect(A.get(NROWS ~/ 2, r), closeTo(B.get(r), TOL));
     }
   }
 
   void testViewRowFlip() {
-    DoubleMatrix2D B = A.viewRowFlip();
-    expect(A.size(), equals(B.size()));
+    DoubleMatrix2D B = A.rowFlip();
+    expect(A.length, equals(B.length));
     for (int r = 0; r < NROWS; r++) {
       for (int c = 0; c < NCOLUMNS; c++) {
-        expect(A.getQuick(NROWS - 1 - r, c), closeTo(B.getQuick(r, c), TOL));
+        expect(A.get(NROWS - 1 - r, c), closeTo(B.get(r, c), TOL));
       }
     }
   }
 
   void testViewSelectionProc() {
     final double value = 2.0;
-    A.assignValue(0.0);
+    A.fill(0.0);
     if (DINDEX >= 0) {
-      A.setQuick(NROWS ~/ 4, NROWS ~/ 4 + DINDEX, value);
-      A.setQuick(NROWS ~/ 2, NROWS ~/ 2 + DINDEX, value);
-      DoubleMatrix2D B = A.viewSelectionProc((DoubleMatrix1D element) {
-        if ((element.getQuick(NROWS ~/ 4 + DINDEX) - value).abs() < TOL) {
+      A.set(NROWS ~/ 4, NROWS ~/ 4 + DINDEX, value);
+      A.set(NROWS ~/ 2, NROWS ~/ 2 + DINDEX, value);
+      DoubleMatrix2D B = A.where((DoubleMatrix1D element) {
+        if ((element.get(NROWS ~/ 4 + DINDEX) - value).abs() < TOL) {
           return true;
         } else {
           return false;
         }
       });
-      expect(1, equals(B.rows()));
-      expect(NCOLUMNS, equals(B.columns()));
-      expect(A.getQuick(NROWS ~/ 4, NROWS ~/ 4 + DINDEX), closeTo(B.getQuick(0, NROWS ~/ 4 + DINDEX), TOL));
+      expect(1, equals(B.rows));
+      expect(NCOLUMNS, equals(B.columns));
+      expect(A.get(NROWS ~/ 4, NROWS ~/ 4 + DINDEX), closeTo(B.get(0, NROWS ~/ 4 + DINDEX), TOL));
     } else {
-      A.setQuick(NROWS ~/ 4 - DINDEX, NROWS ~/ 4, value);
-      A.setQuick(NROWS ~/ 2 - DINDEX, NROWS ~/ 2, value);
-      DoubleMatrix2D B = A.viewSelectionProc((DoubleMatrix1D element) {
-        if ((element.getQuick(NROWS ~/ 4) - value).abs() < TOL) {
+      A.set(NROWS ~/ 4 - DINDEX, NROWS ~/ 4, value);
+      A.set(NROWS ~/ 2 - DINDEX, NROWS ~/ 2, value);
+      DoubleMatrix2D B = A.where((DoubleMatrix1D element) {
+        if ((element.get(NROWS ~/ 4) - value).abs() < TOL) {
           return true;
         } else {
           return false;
         }
       });
-      expect(1, equals(B.rows()));
-      expect(NCOLUMNS, equals(B.columns()));
-      expect(A.getQuick(NROWS ~/ 4 - DINDEX, NROWS ~/ 4), closeTo(B.getQuick(0, NROWS ~/ 4), TOL));
+      expect(1, equals(B.rows));
+      expect(NCOLUMNS, equals(B.columns));
+      expect(A.get(NROWS ~/ 4 - DINDEX, NROWS ~/ 4), closeTo(B.get(0, NROWS ~/ 4), TOL));
     }
   }
 
   void testViewSelection() {
     final rowIndexes = new Int32List.fromList([NROWS ~/ 6, NROWS ~/ 5, NROWS ~/ 4, NROWS ~/ 3, NROWS ~/ 2]);
     final colIndexes = new Int32List.fromList([NROWS ~/ 6, NROWS ~/ 5, NROWS ~/ 4, NROWS ~/ 3, NROWS ~/ 2, NROWS - 1]);
-    DoubleMatrix2D B = A.viewSelection(rowIndexes, colIndexes);
-    expect(rowIndexes.length, equals(B.rows()));
-    expect(colIndexes.length, equals(B.columns()));
+    DoubleMatrix2D B = A.select(rowIndexes, colIndexes);
+    expect(rowIndexes.length, equals(B.rows));
+    expect(colIndexes.length, equals(B.columns));
     for (int r = 0; r < rowIndexes.length; r++) {
       for (int c = 0; c < colIndexes.length; c++) {
-        expect(A.getQuick(rowIndexes[r], colIndexes[c]), closeTo(B.getQuick(r, c), TOL));
+        expect(A.get(rowIndexes[r], colIndexes[c]), closeTo(B.get(r, c), TOL));
       }
     }
   }
@@ -442,10 +442,10 @@ class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
   void testViewStrides() {
     int rowStride = 3;
     int colStride = 5;
-    DoubleMatrix2D B = A.viewStrides(rowStride, colStride);
-    for (int r = 0; r < B.rows(); r++) {
-      for (int c = 0; c < B.columns(); c++) {
-        expect(A.getQuick(r * rowStride, c * colStride), closeTo(B.getQuick(r, c), TOL));
+    DoubleMatrix2D B = A.strides(rowStride, colStride);
+    for (int r = 0; r < B.rows; r++) {
+      for (int c = 0; c < B.columns; c++) {
+        expect(A.get(r * rowStride, c * colStride), closeTo(B.get(r, c), TOL));
       }
     }
   }
@@ -455,164 +455,164 @@ class DiagonalDoubleMatrix2DTest extends DoubleMatrix2DTest {
     double beta = 5.0;
     DoubleMatrix2D C = new DiagonalDoubleMatrix2D(NROWS, NROWS, 0);
     for (int i = 0; i < DLENGTH; i++) {
-      C.setQuick(i, i, random.nextDouble());
+      C.set(i, i, random.nextDouble());
     }
-    List<Float64List> expected = C.toArray();
-    C = A.zMult2D(Bt, C, alpha, beta, false, false);
+    List<Float64List> expected = C.toList();
+    C = A.multiply(Bt, C, alpha, beta, false, false);
     for (int j = 0; j < NROWS; j++) {
       for (int i = 0; i < NROWS; i++) {
         double s = 0.0;
         for (int k = 0; k < NCOLUMNS; k++) {
-          s += A.getQuick(i, k) * Bt.getQuick(k, j);
+          s += A.get(i, k) * Bt.get(k, j);
         }
         expected[i][j] = s * alpha + expected[i][j] * beta;
       }
     }
     for (int r = 0; r < NROWS; r++) {
       for (int c = 0; c < NROWS; c++) {
-        expect(expected[r][c], closeTo(C.getQuick(r, c), TOL));
+        expect(expected[r][c], closeTo(C.get(r, c), TOL));
       }
     }
 
     //---
     C = null;
-    C = A.zMult2D(Bt, C, alpha, beta, false, false);
+    C = A.multiply(Bt, C, alpha, beta, false, false);
     expected = new List<Float64List>.generate(NROWS,
         (_) => new Float64List(NROWS));
     for (int j = 0; j < NROWS; j++) {
       for (int i = 0; i < NROWS; i++) {
         double s = 0.0;
         for (int k = 0; k < NCOLUMNS; k++) {
-          s += A.getQuick(i, k) * Bt.getQuick(k, j);
+          s += A.get(i, k) * Bt.get(k, j);
         }
         expected[i][j] = s * alpha;
       }
     }
     for (int r = 0; r < NROWS; r++) {
       for (int c = 0; c < NROWS; c++) {
-        expect(expected[r][c], closeTo(C.getQuick(r, c), TOL));
+        expect(expected[r][c], closeTo(C.get(r, c), TOL));
       }
     }
 
     //transposeA
     C = new DiagonalDoubleMatrix2D(NCOLUMNS, NCOLUMNS, 0);
     for (int i = 0; i < DLENGTH; i++) {
-      C.setQuick(i, i, random.nextDouble());
+      C.set(i, i, random.nextDouble());
     }
-    expected = C.toArray();
-    C = A.zMult2D(B, C, alpha, beta, true, false);
+    expected = C.toList();
+    C = A.multiply(B, C, alpha, beta, true, false);
     for (int j = 0; j < NCOLUMNS; j++) {
       for (int i = 0; i < NCOLUMNS; i++) {
         double s = 0.0;
         for (int k = 0; k < NROWS; k++) {
-          s += A.getQuick(k, i) * B.getQuick(k, j);
+          s += A.get(k, i) * B.get(k, j);
         }
         expected[i][j] = s * alpha + expected[i][j] * beta;
       }
     }
     for (int r = 0; r < NCOLUMNS; r++) {
       for (int c = 0; c < NCOLUMNS; c++) {
-        expect(expected[r][c], closeTo(C.getQuick(r, c), TOL));
+        expect(expected[r][c], closeTo(C.get(r, c), TOL));
       }
     }
     //---
     C = null;
-    C = A.zMult2D(B, C, alpha, beta, true, false);
+    C = A.multiply(B, C, alpha, beta, true, false);
     expected = new List<Float64List>.generate(NCOLUMNS, 
         (_) => new Float64List(NCOLUMNS));
     for (int j = 0; j < NCOLUMNS; j++) {
       for (int i = 0; i < NCOLUMNS; i++) {
         double s = 0.0;
         for (int k = 0; k < NROWS; k++) {
-          s += A.getQuick(k, i) * B.getQuick(k, j);
+          s += A.get(k, i) * B.get(k, j);
         }
         expected[i][j] = s * alpha;
       }
     }
     for (int r = 0; r < NCOLUMNS; r++) {
       for (int c = 0; c < NCOLUMNS; c++) {
-        expect(expected[r][c], closeTo(C.getQuick(r, c), TOL));
+        expect(expected[r][c], closeTo(C.get(r, c), TOL));
       }
     }
 
     //transposeB
     C = new DiagonalDoubleMatrix2D(NROWS, NROWS, 0);
     for (int i = 0; i < DLENGTH; i++) {
-      C.setQuick(i, i, random.nextDouble());
+      C.set(i, i, random.nextDouble());
     }
-    expected = C.toArray();
-    C = A.zMult2D(B, C, alpha, beta, false, true);
+    expected = C.toList();
+    C = A.multiply(B, C, alpha, beta, false, true);
     for (int j = 0; j < NROWS; j++) {
       for (int i = 0; i < NROWS; i++) {
         double s = 0.0;
         for (int k = 0; k < NCOLUMNS; k++) {
-          s += A.getQuick(i, k) * B.getQuick(j, k);
+          s += A.get(i, k) * B.get(j, k);
         }
         expected[i][j] = s * alpha + expected[i][j] * beta;
       }
     }
     for (int r = 0; r < NROWS; r++) {
       for (int c = 0; c < NROWS; c++) {
-        expect(expected[r][c], closeTo(C.getQuick(r, c), TOL));
+        expect(expected[r][c], closeTo(C.get(r, c), TOL));
       }
     }
     //---
     C = null;
-    C = A.zMult2D(B, C, alpha, beta, false, true);
+    C = A.multiply(B, C, alpha, beta, false, true);
     expected = new List<Float64List>.generate(NROWS, 
         (_) => new Float64List(NROWS));
     for (int j = 0; j < NROWS; j++) {
       for (int i = 0; i < NROWS; i++) {
         double s = 0.0;
         for (int k = 0; k < NCOLUMNS; k++) {
-          s += A.getQuick(i, k) * B.getQuick(j, k);
+          s += A.get(i, k) * B.get(j, k);
         }
         expected[i][j] = s * alpha;
       }
     }
     for (int r = 0; r < NROWS; r++) {
       for (int c = 0; c < NROWS; c++) {
-        expect(expected[r][c], closeTo(C.getQuick(r, c), TOL));
+        expect(expected[r][c], closeTo(C.get(r, c), TOL));
       }
     }
     //transposeA and transposeB
     C = new DiagonalDoubleMatrix2D(NCOLUMNS, NCOLUMNS, 0);
     for (int i = 0; i < DLENGTH; i++) {
-      C.setQuick(i, i, random.nextDouble());
+      C.set(i, i, random.nextDouble());
     }
-    expected = C.toArray();
-    C = A.zMult2D(Bt, C, alpha, beta, true, true);
+    expected = C.toList();
+    C = A.multiply(Bt, C, alpha, beta, true, true);
     for (int j = 0; j < NCOLUMNS; j++) {
       for (int i = 0; i < NCOLUMNS; i++) {
         double s = 0.0;
         for (int k = 0; k < NROWS; k++) {
-          s += A.getQuick(k, i) * Bt.getQuick(j, k);
+          s += A.get(k, i) * Bt.get(j, k);
         }
         expected[i][j] = s * alpha + expected[i][j] * beta;
       }
     }
     for (int r = 0; r < NCOLUMNS; r++) {
       for (int c = 0; c < NCOLUMNS; c++) {
-        expect(expected[r][c], closeTo(C.getQuick(r, c), TOL));
+        expect(expected[r][c], closeTo(C.get(r, c), TOL));
       }
     }
     //---
     C = null;
-    C = A.zMult2D(Bt, C, alpha, beta, true, true);
+    C = A.multiply(Bt, C, alpha, beta, true, true);
     expected = new List<Float64List>.generate(NCOLUMNS, 
         (_) => new Float64List(NCOLUMNS));
     for (int j = 0; j < NCOLUMNS; j++) {
       for (int i = 0; i < NCOLUMNS; i++) {
         double s = 0.0;
         for (int k = 0; k < NROWS; k++) {
-          s += A.getQuick(k, i) * Bt.getQuick(j, k);
+          s += A.get(k, i) * Bt.get(j, k);
         }
         expected[i][j] = s * alpha;
       }
     }
     for (int r = 0; r < NCOLUMNS; r++) {
       for (int c = 0; c < NCOLUMNS; c++) {
-        expect(expected[r][c], closeTo(C.getQuick(r, c), TOL));
+        expect(expected[r][c], closeTo(C.get(r, c), TOL));
       }
     }
 
@@ -625,9 +625,9 @@ class DiagonalDoubleMatrix2DViewTest extends DiagonalDoubleMatrix2DTest {
     DINDEX = 3;
     A = new DiagonalDoubleMatrix2D(NCOLUMNS, NROWS, -DINDEX);
     DLENGTH = (A as DiagonalDoubleMatrix2D).diagonalLength();
-    A = A.viewDice();
-    B = new DiagonalDoubleMatrix2D(NCOLUMNS, NROWS, -DINDEX).viewDice();
-    Bt = new DiagonalDoubleMatrix2D(NROWS, NCOLUMNS, DINDEX).viewDice();
+    A = A.dice();
+    B = new DiagonalDoubleMatrix2D(NCOLUMNS, NROWS, -DINDEX).dice();
+    Bt = new DiagonalDoubleMatrix2D(NROWS, NCOLUMNS, DINDEX).dice();
   }
 
 }

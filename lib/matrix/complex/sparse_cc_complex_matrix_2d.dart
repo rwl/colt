@@ -784,7 +784,7 @@ class SparseCCDComplexMatrix2D extends WrapperDComplexMatrix2D {
       return super.zMult(y, z, alpha, beta, transposeA);
     }
 
-    if (columnsA != y.size() || rowsA > z.size()) throw new ArgumentError("Incompatible args: " + ((transposeA ? viewDice() : this).toStringShort()) + ", " + y.toStringShort() + ", " + z.toStringShort());
+    if (columnsA != y.length || rowsA > z.length) throw new ArgumentError("Incompatible args: " + ((transposeA ? viewDice() : this).toStringShort()) + ", " + y.toStringShort() + ", " + z.toStringShort());
 
     DenseDComplexMatrix1D zz = z as DenseDComplexMatrix1D;
     final Float64List elementsZ = zz._elements;
@@ -948,11 +948,11 @@ class SparseCCDComplexMatrix2D extends WrapperDComplexMatrix2D {
       rowsA = _columns;
       columnsA = _rows;
     }
-    int rowsB = B.rows();
-    int columnsB = B.columns();
+    int rowsB = B.rows;
+    int columnsB = B.columns;
     if (transposeB) {
-      rowsB = B.columns();
-      columnsB = B.rows();
+      rowsB = B.columns;
+      columnsB = B.rows;
     }
     int p = columnsB;
     bool ignore = (C == null);
@@ -967,7 +967,7 @@ class SparseCCDComplexMatrix2D extends WrapperDComplexMatrix2D {
     if (rowsB != columnsA) {
       throw new ArgumentError("Matrix2D inner dimensions must agree:" + toStringShort() + ", " + (transposeB ? B.viewDice() : B).toStringShort());
     }
-    if (C.rows() != rowsA || C.columns() != p) {
+    if (C.rows != rowsA || C.columns != p) {
       throw new ArgumentError("Incompatible result matrix: " + toStringShort() + ", " + (transposeB ? B.viewDice() : B).toStringShort() + ", " + C.toStringShort());
     }
     if (this == C || B == C) {
@@ -997,13 +997,13 @@ class SparseCCDComplexMatrix2D extends WrapperDComplexMatrix2D {
       Float64List valuesA = AA._values;
 
       int zeroB = BB.index(0, 0);
-      int rowStrideB = BB.rowStride();
-      int columnStrideB = BB.columnStride();
+      int rowStrideB = BB.rowStride;
+      int columnStrideB = BB.columnStride;
       Float64List elementsB = BB._elements;
 
       int zeroC = CC.index(0, 0);
-      int rowStrideC = CC.rowStride();
-      int columnStrideC = CC.columnStride();
+      int rowStrideC = CC.rowStride;
+      int columnStrideC = CC.columnStride;
       Float64List elementsC = CC._elements;
       Float64List valA = new Float64List(2);
       Float64List valB = new Float64List(2);

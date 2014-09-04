@@ -176,14 +176,14 @@ abstract class AbstractMatrix2D extends AbstractMatrix {
   /**
    * Returns the number of columns.
    */
-  int columns() {
+  int get columns {
     return _columns;
   }
 
   /**
    * Returns the column stride.
    */
-  int columnStride() {
+  int get columnStride {
     return _columnStride;
   }
 
@@ -203,14 +203,14 @@ abstract class AbstractMatrix2D extends AbstractMatrix {
   /**
    * Returns the number of rows.
    */
-  int rows() {
+  int get rows {
     return _rows;
   }
 
   /**
    * Returns the row stride.
    */
-  int rowStride() {
+  int get rowStride {
     return _rowStride;
   }
 
@@ -263,7 +263,7 @@ abstract class AbstractMatrix2D extends AbstractMatrix {
   /**
    * Returns the number of cells which is <tt>rows()*columns()</tt>.
    */
-  int size() {
+  int get length {
     return _rows * _columns;
   }
 

@@ -160,7 +160,7 @@ class SparseRCDoubleMatrix2D extends WrapperDoubleMatrix2D {
    *             .
    */
   factory SparseRCDoubleMatrix2D.fromList(List<Float64List> values) {
-    return new SparseRCDoubleMatrix2D.sized(values.length, values.length == 0 ? 0 : values[0].length)..assignValues2D(values);
+    return new SparseRCDoubleMatrix2D.sized(values.length, values.length == 0 ? 0 : values[0].length)..setAll2D(values);
   }
 
   /**
@@ -229,7 +229,7 @@ class SparseRCDoubleMatrix2D extends WrapperDoubleMatrix2D {
    * @param sortColumnIndexes
    *            if true, then column indexes are sorted
    */
-  factory SparseRCDoubleMatrix2D.value(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, double value, bool removeDuplicates, bool sortColumnIndexes) {
+  factory SparseRCDoubleMatrix2D.withValue(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, double value, bool removeDuplicates, bool sortColumnIndexes) {
     /*try {
       _setUp(rows, columns);
     } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
@@ -287,7 +287,7 @@ class SparseRCDoubleMatrix2D extends WrapperDoubleMatrix2D {
    * @param sortColumnIndexes
    *            if true, then column indexes are sorted
    */
-  factory SparseRCDoubleMatrix2D.values(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, Float64List values, bool removeDuplicates, bool removeZeroes, bool sortColumnIndexes) {
+  factory SparseRCDoubleMatrix2D.withValues(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, Float64List values, bool removeDuplicates, bool removeZeroes, bool sortColumnIndexes) {
     /*try {
       _setUp(rows, columns);
     } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
@@ -353,20 +353,20 @@ class SparseRCDoubleMatrix2D extends WrapperDoubleMatrix2D {
     this._values = values;
   }
 
-  DoubleMatrix2D assign(final func.DoubleFunction function) {
+  DoubleMatrix2D forEach(final func.DoubleFunction function) {
     if (function is DoubleMult) { // x[i] = mult*x[i]
       final double alpha = (function as DoubleMult).multiplicator;
       if (alpha == 1) {
         return this;
       }
       if (alpha == 0.0) {
-        return assignValue(0.0);
+        return fill(0.0);
       }
       if (alpha != alpha) {
-        return assignValue(alpha); // the funny definition of isNaN(). This should better not happen.
+        return fill(alpha); // the funny definition of isNaN(). This should better not happen.
       }
 
-      int nz = cardinality();
+      int nz = cardinality;
       for (int j = 0; j < nz; j++) {
         _values[j] *= alpha;
       }
@@ -378,13 +378,13 @@ class SparseRCDoubleMatrix2D extends WrapperDoubleMatrix2D {
     return this;
   }
 
-  DoubleMatrix2D assignValue(double value) {
+  DoubleMatrix2D fill(double value) {
     if (value == 0.0) {
       _rowPointers.fillRange(0, _rowPointers.length, 0);
       _columnIndexes.fillRange(0, _columnIndexes.length, 0);
       _values.fillRange(0, _values.length, 0.0);
     } else {
-      int nnz = cardinality();
+      int nnz = cardinality;
       for (int i = 0; i < nnz; i++) {
         _values[i] = value;
       }
@@ -392,7 +392,7 @@ class SparseRCDoubleMatrix2D extends WrapperDoubleMatrix2D {
     return this;
   }
 
-  DoubleMatrix2D assignMatrix(DoubleMatrix2D source) {
+  DoubleMatrix2D copyFrom(DoubleMatrix2D source) {
     if (source == this) return this; // nothing to do
     checkShape(source);
 
@@ -411,22 +411,22 @@ class SparseRCDoubleMatrix2D extends WrapperDoubleMatrix2D {
       //System.arraycopy(other._values, 0, _values, 0, nzmax);
       _columnIndexesSorted = other._columnIndexesSorted;
     } else if (source is SparseCCDoubleMatrix2D) {
-      SparseCCDoubleMatrix2D other = source.getTranspose();
-      _rowPointers = other.getColumnPointers();
-      _columnIndexes = other.getRowIndexes();
-      _values = other.getValues();
+      SparseCCDoubleMatrix2D other = source.transpose();
+      _rowPointers = other.columnPointers;
+      _columnIndexes = other.rowIndexes;
+      _values = other.values();
       _columnIndexesSorted = true;
     } else {
-      assignValue(0.0);
+      fill(0.0);
       source.forEachNonZero((int i, int j, double value) {
-        setQuick(i, j, value);
+        set(i, j, value);
         return value;
       });
     }
     return this;
   }
 
-  DoubleMatrix2D assignFunc(final DoubleMatrix2D y, func.DoubleDoubleFunction function) {
+  DoubleMatrix2D forEachMatrix(final DoubleMatrix2D y, func.DoubleDoubleFunction function) {
     checkShape(y);
     if ((y is SparseRCDoubleMatrix2D) && (function == func.plus)) { // x[i] = x[i] + y[i]
       SparseRCDoubleMatrix2D yy = y;
@@ -496,7 +496,7 @@ class SparseRCDoubleMatrix2D extends WrapperDoubleMatrix2D {
       final double alpha = (function as DoublePlusMultSecond).multiplicator;
       if (alpha == 0) return this; // nothing to do
       y.forEachNonZero((int i, int j, double value) {
-        setQuick(i, j, getQuick(i, j) + alpha * value);
+        set(i, j, get(i, j) + alpha * value);
         return value;
       });
       return this;
@@ -505,10 +505,10 @@ class SparseRCDoubleMatrix2D extends WrapperDoubleMatrix2D {
     if (function is DoublePlusMultFirst) { // x[i] = alpha*x[i] + y[i]
       final double alpha = (function as DoublePlusMultFirst).multiplicator;
       if (alpha == 0) {
-        return assignMatrix(y);
+        return copyFrom(y);
       }
       y.forEachNonZero((int i, int j, double value) {
-        setQuick(i, j, alpha * getQuick(i, j) + value);
+        set(i, j, alpha * get(i, j) + value);
         return value;
       });
       return this;
@@ -519,7 +519,7 @@ class SparseRCDoubleMatrix2D extends WrapperDoubleMatrix2D {
         int low = _rowPointers[i];
         for (int k = _rowPointers[i + 1]; --k >= low; ) {
           int j = _columnIndexes[k];
-          _values[k] *= y.getQuick(i, j);
+          _values[k] *= y.get(i, j);
           if (_values[k] == 0) _remove(i, j);
         }
       }
@@ -532,17 +532,17 @@ class SparseRCDoubleMatrix2D extends WrapperDoubleMatrix2D {
         int low = _rowPointers[i];
         for (int k = _rowPointers[i + 1]; --k >= low; ) {
           int j = _columnIndexes[k];
-          _values[k] /= y.getQuick(i, j);
+          _values[k] /= y.get(i, j);
           if (_values[k] == 0) _remove(i, j);
         }
       }
       return this;
     }
-    return super.assignFunc(y, function);
+    return super.forEachMatrix(y, function);
 
   }
 
-  int cardinality() {
+  int get cardinality {
     return _rowPointers[_rows];
   }
 
@@ -571,7 +571,7 @@ class SparseRCDoubleMatrix2D extends WrapperDoubleMatrix2D {
    */
   SparseCCDoubleMatrix2D getColumnCompressed() {
     SparseRCDoubleMatrix2D tr = getTranspose();
-    SparseCCDoubleMatrix2D cc = new SparseCCDoubleMatrix2D.sized(_rows, _columns);
+    SparseCCDoubleMatrix2D cc = new SparseCCDoubleMatrix2D(_rows, _columns);
     cc._dcs.i = tr._columnIndexes;
     cc._dcs.p = tr._rowPointers;
     cc._dcs.x = tr._values;
@@ -599,13 +599,13 @@ class SparseRCDoubleMatrix2D extends WrapperDoubleMatrix2D {
   DenseDoubleMatrix2D getDense() {
     final DenseDoubleMatrix2D dense = new DenseDoubleMatrix2D(_rows, _columns);
     forEachNonZero((int i, int j, double value) {
-      dense.setQuick(i, j, getQuick(i, j));
+      dense.set(i, j, get(i, j));
       return value;
     });
     return dense;
   }
 
-  double getQuick(int row, int column) {
+  double get(int row, int column) {
     //        int k = cern.colt.Sorting.binarySearchFromTo(columnIndexes, column, rowPointers[row], rowPointers[row + 1] - 1);
     int k = _searchFromTo(_columnIndexes, column, _rowPointers[row], _rowPointers[row + 1] - 1);
 
@@ -739,7 +739,7 @@ class SparseRCDoubleMatrix2D extends WrapperDoubleMatrix2D {
     /* finalize A */
   }
 
-  void setQuick(int row, int column, double value) {
+  void set(int row, int column, double value) {
     //        int k = cern.colt.Sorting.binarySearchFromTo(columnIndexes, column, rowPointers[row], rowPointers[row + 1] - 1);
     int k = _searchFromTo(_columnIndexes, column, _rowPointers[row], _rowPointers[row + 1] - 1);
 
@@ -785,7 +785,7 @@ class SparseRCDoubleMatrix2D extends WrapperDoubleMatrix2D {
       ..write(" x ")
       ..write(_columns)
       ..write(" sparse matrix, nnz = ")
-      ..write(cardinality())
+      ..write(cardinality)
       ..write('\n');
     for (int i = 0; i < _rows; i++) {
       int high = _rowPointers[i + 1];
@@ -808,7 +808,7 @@ class SparseRCDoubleMatrix2D extends WrapperDoubleMatrix2D {
     _realloc(0);
   }
 
-  DoubleMatrix1D zMult(DoubleMatrix1D y, DoubleMatrix1D z, [final double alpha = 1.0, final double beta = 0.0, final bool transposeA = false]) {
+  DoubleMatrix1D mult(DoubleMatrix1D y, DoubleMatrix1D z, [final double alpha = 1.0, final double beta = 0.0, final bool transposeA = false]) {
     final int rowsA = transposeA ? _columns : _rows;
     final int columnsA = transposeA ? _rows : _columns;
 
@@ -816,10 +816,10 @@ class SparseRCDoubleMatrix2D extends WrapperDoubleMatrix2D {
     if (z == null) z = new DenseDoubleMatrix1D(rowsA);
 
     if (!(y is DenseDoubleMatrix1D && z is DenseDoubleMatrix1D)) {
-      return super.zMult(y, z, alpha, beta, transposeA);
+      return super.mult(y, z, alpha, beta, transposeA);
     }
 
-    if (columnsA != y.size() || rowsA > z.size()) throw new ArgumentError("Incompatible args: " + ((transposeA ? viewDice() : this).toStringShort()) + ", " + y.toStringShort() + ", " + z.toStringShort());
+    if (columnsA != y.length || rowsA > z.length) throw new ArgumentError("Incompatible args: " + ((transposeA ? dice() : this).toStringShort()) + ", " + y.toStringShort() + ", " + z.toStringShort());
 
     DenseDoubleMatrix1D zz = z as DenseDoubleMatrix1D;
     final Float64List elementsZ = zz._elements;
@@ -834,7 +834,7 @@ class SparseRCDoubleMatrix2D extends WrapperDoubleMatrix2D {
 
     if (transposeA) {
       if ((!ignore) && (beta != 1.0)) {
-        z.assign(func.multiply(beta));
+        z.forEach(func.multiply(beta));
       }
 
       /*if ((nthreads > 1) && (cardinality() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -977,18 +977,18 @@ class SparseRCDoubleMatrix2D extends WrapperDoubleMatrix2D {
     return z;
   }
 
-  DoubleMatrix2D zMult2D(DoubleMatrix2D B, DoubleMatrix2D C, [final double alpha=1.0, double beta=0.0, final bool transposeA=false, bool transposeB=false]) {
+  DoubleMatrix2D multiply(DoubleMatrix2D B, DoubleMatrix2D C, [final double alpha=1.0, double beta=0.0, final bool transposeA=false, bool transposeB=false]) {
     int rowsA = _rows;
     int columnsA = _columns;
     if (transposeA) {
       rowsA = _columns;
       columnsA = _rows;
     }
-    int rowsB = B.rows();
-    int columnsB = B.columns();
+    int rowsB = B.rows;
+    int columnsB = B.columns;
     if (transposeB) {
-      rowsB = B.columns();
-      columnsB = B.rows();
+      rowsB = B.columns;
+      columnsB = B.rows;
     }
     int p = columnsB;
     bool ignore = (C == null);
@@ -1000,12 +1000,12 @@ class SparseRCDoubleMatrix2D extends WrapperDoubleMatrix2D {
       }
     }
 
-    if (rowsB != columnsA) throw new ArgumentError("Matrix2D inner dimensions must agree:" + toStringShort() + ", " + (transposeB ? B.viewDice() : B).toStringShort());
-    if (C.rows() != rowsA || C.columns() != p) throw new ArgumentError("Incompatible result matrix: " + toStringShort() + ", " + (transposeB ? B.viewDice() : B).toStringShort() + ", " + C.toStringShort());
+    if (rowsB != columnsA) throw new ArgumentError("Matrix2D inner dimensions must agree:" + toStringShort() + ", " + (transposeB ? B.dice() : B).toStringShort());
+    if (C.rows != rowsA || C.columns != p) throw new ArgumentError("Incompatible result matrix: " + toStringShort() + ", " + (transposeB ? B.dice() : B).toStringShort() + ", " + C.toStringShort());
     if (this == C || B == C) throw new ArgumentError("Matrices must not be identical");
 
     if (!ignore && beta != 1.0) {
-      C.assign(func.multiply(beta));
+      C.forEach(func.multiply(beta));
     }
 
     if ((B is DenseDoubleMatrix2D) && (C is DenseDoubleMatrix2D)) {
@@ -1017,7 +1017,7 @@ class SparseRCDoubleMatrix2D extends WrapperDoubleMatrix2D {
       }
       DenseDoubleMatrix2D BB;
       if (transposeB) {
-        BB = B.viewDice() as DenseDoubleMatrix2D;
+        BB = B.dice() as DenseDoubleMatrix2D;
       } else {
         BB = B;
       }
@@ -1032,7 +1032,7 @@ class SparseRCDoubleMatrix2D extends WrapperDoubleMatrix2D {
         for (int ka = rowPointersA[ii]; ka < highA; ka++) {
           double scal = valuesA[ka] * alpha;
           int jj = columnIndexesA[ka];
-          CC.viewRow(ii).assignFunc(BB.viewRow(jj), func.plusMultSecond(scal));
+          CC.row(ii).forEachVector(BB.row(jj), func.plusMultSecond(scal));
         }
       }
     } else if ((B is SparseRCDoubleMatrix2D) && (C is SparseRCDoubleMatrix2D)) {
@@ -1108,13 +1108,13 @@ class SparseRCDoubleMatrix2D extends WrapperDoubleMatrix2D {
       //            CC.values.setSize(columnIndexesSize);
     } else {
       if (transposeB) {
-        B = B.viewDice();
+        B = B.dice();
       }
       // cache views
       final List<DoubleMatrix1D> Brows = new List<DoubleMatrix1D>(columnsA);
-      for (int i = columnsA; --i >= 0; ) Brows[i] = B.viewRow(i);
+      for (int i = columnsA; --i >= 0; ) Brows[i] = B.row(i);
       final List<DoubleMatrix1D> Crows = new List<DoubleMatrix1D>(rowsA);
-      for (int i = rowsA; --i >= 0; ) Crows[i] = C.viewRow(i);
+      for (int i = rowsA; --i >= 0; ) Crows[i] = C.row(i);
 
       final DoublePlusMultSecond fun = new DoublePlusMultSecond.plusMult(0.0);
 
@@ -1126,9 +1126,9 @@ class SparseRCDoubleMatrix2D extends WrapperDoubleMatrix2D {
           int j = columnIndexesA[k];
           fun.multiplicator = valuesA[k] * alpha;
           if (!transposeA) {
-            Crows[i].assignFunc(Brows[j], fun);
+            Crows[i].forEachVector(Brows[j], fun);
           } else {
-            Crows[j].assignFunc(Brows[i], fun);
+            Crows[j].forEachVector(Brows[i], fun);
           }
         }
       }

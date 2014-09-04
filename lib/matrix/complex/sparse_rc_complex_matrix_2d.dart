@@ -786,7 +786,7 @@ class SparseRCDComplexMatrix2D extends WrapperDComplexMatrix2D {
       return super.zMult(y, z, alpha, beta, transposeA);
     }
 
-    if (columnsA != y.size() || rowsA > z.size()) throw new ArgumentError("Incompatible args: " + ((transposeA ? viewDice() : this).toStringShort()) + ", " + y.toStringShort() + ", " + z.toStringShort());
+    if (columnsA != y.length || rowsA > z.length) throw new ArgumentError("Incompatible args: " + ((transposeA ? viewDice() : this).toStringShort()) + ", " + y.toStringShort() + ", " + z.toStringShort());
 
     DenseDComplexMatrix1D zz = z as DenseDComplexMatrix1D;
     final Float64List elementsZ = zz._elements;
@@ -986,11 +986,11 @@ class SparseRCDComplexMatrix2D extends WrapperDComplexMatrix2D {
       rowsA = _columns;
       columnsA = _rows;
     }
-    int rowsB = B.rows();
-    int columnsB = B.columns();
+    int rowsB = B.rows;
+    int columnsB = B.columns;
     if (transposeB) {
-      rowsB = B.columns();
-      columnsB = B.rows();
+      rowsB = B.columns;
+      columnsB = B.rows;
     }
     int p = columnsB;
     bool ignore = (C == null);
@@ -1005,7 +1005,7 @@ class SparseRCDComplexMatrix2D extends WrapperDComplexMatrix2D {
     if (rowsB != columnsA) {
       throw new ArgumentError("Matrix2D inner dimensions must agree:" + toStringShort() + ", " + (transposeB ? B.viewDice() : B).toStringShort());
     }
-    if (C.rows() != rowsA || C.columns() != p) {
+    if (C.rows != rowsA || C.columns != p) {
       throw new ArgumentError("Incompatible result matrix: " + toStringShort() + ", " + (transposeB ? B.viewDice() : B).toStringShort() + ", " + C.toStringShort());
     }
     if (this == C || B == C) {

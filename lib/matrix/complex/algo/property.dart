@@ -95,7 +95,7 @@ class DComplexProperty {
    *             if <tt>A.rows() != A.columns()</tt>.
    */
   void checkSquare(DComplexMatrix2D A) {
-    if (A.rows() != A.columns()) {
+    if (A.rows != A.columns) {
       throw new ArgumentError("Matrix must be square: " + AbstractFormatter.shape2D(A));
     }
   }
@@ -121,7 +121,7 @@ class DComplexProperty {
     if (A == null) return false;
     final double epsilon = tolerance();
     bool result = false;
-    int size = A.size();
+    int size = A.length;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, size);
@@ -164,7 +164,7 @@ class DComplexProperty {
       return result;
     } else {*/
       Float64List diff = new Float64List(2);
-      for (int i = 0; i < A.size(); i++) {
+      for (int i = 0; i < A.length; i++) {
         Float64List x = A.getQuick(i);
         diff[0] = (value[0] - x[0]).abs();
         diff[1] = (value[1] - x[1]).abs();
@@ -193,8 +193,8 @@ class DComplexProperty {
   bool equalsMatrix1D(final DComplexMatrix1D A, final DComplexMatrix1D B) {
     if (A == B) return true;
     if (!(A != null && B != null)) return false;
-    int size = A.size();
-    if (size != B.size()) return false;
+    int size = A.length;
+    if (size != B.length) return false;
 
     final double epsilon = tolerance();
     bool result = false;
@@ -271,8 +271,8 @@ class DComplexProperty {
    */
   bool equalsValue2D(final DComplexMatrix2D A, final Float64List value) {
     if (A == null) return false;
-    int rows = A.rows();
-    int columns = A.columns();
+    int rows = A.rows;
+    int columns = A.columns;
     bool result = false;
     final double epsilon = tolerance();
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -350,9 +350,9 @@ class DComplexProperty {
   bool equalsMatrix2D(final DComplexMatrix2D A, final DComplexMatrix2D B) {
     if (A == B) return true;
     if (!(A != null && B != null)) return false;
-    int rows = A.rows();
-    int columns = A.columns();
-    if (columns != B.columns() || rows != B.rows()) return false;
+    int rows = A.rows;
+    int columns = A.columns;
+    if (columns != B.columns || rows != B.rows) return false;
     bool result = false;
     final double epsilon = tolerance();
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
