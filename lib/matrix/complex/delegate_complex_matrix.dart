@@ -43,8 +43,8 @@ class DelegateDComplexMatrix1D extends DComplexMatrix1D {
     this._content = newContent;
   }
 
-  Float64List getQuick(int index) {
-    return _content.getQuick(_row, index);
+  Float64List get(int index) {
+    return _content.get(_row, index);
   }
 
   DComplexMatrix1D like1D(int size) {
@@ -55,12 +55,12 @@ class DelegateDComplexMatrix1D extends DComplexMatrix1D {
     return _content.like2D(rows, columns);
   }
 
-  void setQuick(int index, Float64List value) {
-    _content.setQuick(_row, index, value);
+  void set(int index, Float64List value) {
+    _content.set(_row, index, value);
   }
 
-  void setPartsQuick(int index, double re, double im) {
-    _content.setPartsQuick(_row, index, re, im);
+  void setParts(int index, double re, double im) {
+    _content.setParts(_row, index, re, im);
   }
 
   Object elements() {
@@ -79,14 +79,14 @@ class DelegateDComplexMatrix1D extends DComplexMatrix1D {
     throw new ArgumentError("This method is not supported.");
   }
 
-  DoubleMatrix1D getImaginaryPart() {
-    return _content.viewRow(_row).getImaginaryPart();
+  DoubleMatrix1D imaginary() {
+    return _content.row(_row).imaginary();
   }
 
-  DoubleMatrix1D getRealPart() {
-    return _content.viewRow(_row).getRealPart();
+  DoubleMatrix1D real() {
+    return _content.row(_row).real();
   }
-  
+
   Object clone() {
     return new DelegateDComplexMatrix1D(_content, _row);
   }

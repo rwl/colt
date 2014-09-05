@@ -28,7 +28,7 @@ class WrapperDComplexMatrix2D extends DComplexMatrix2D {
     this._content = newContent;
   }
 
-  DComplexMatrix2D assignValues(final Float64List values) {
+  DComplexMatrix2D setAll(final Float64List values) {
     if (_content is DiagonalDComplexMatrix2D) {
       int dlength = (_content as DiagonalDComplexMatrix2D)._dlength;
       final Float64List elems = (_content as DiagonalDComplexMatrix2D)._elements;
@@ -59,7 +59,7 @@ class WrapperDComplexMatrix2D extends DComplexMatrix2D {
       //}
       return this;
     } else {
-      return super.assignValues(values);
+      return super.setAll(values);
     }
   }
 
@@ -67,7 +67,7 @@ class WrapperDComplexMatrix2D extends DComplexMatrix2D {
     return _content.elements();
   }
 
-  bool equalsValue(Float64List value) {
+  /*bool equalsValue(Float64List value) {
     if (_content is DiagonalDComplexMatrix2D) {
       double epsilon = DComplexProperty.DEFAULT.tolerance();
       Float64List elements = _content.elements() as Float64List;
@@ -89,16 +89,42 @@ class WrapperDComplexMatrix2D extends DComplexMatrix2D {
       }
       return true;
     } else {
-      return super.equalsValue(value);
+      return super ==(value);
     }
-  }
+  }*/
 
-  bool equals(Object obj) {
+  bool operator ==(var obj) {
+    if (obj is Float64List) {
+      final value = obj;
+      if (_content is DiagonalDComplexMatrix2D) {
+        double epsilon = DComplexProperty.DEFAULT.tolerance();
+        Float64List elements = _content.elements() as Float64List;
+        int dlength = (_content as DiagonalDComplexMatrix2D)._dlength;
+        Float64List x = new Float64List(2);
+        Float64List diff = new Float64List(2);
+        for (int i = 0; i < dlength; i++) {
+          x[0] = elements[2 * i];
+          x[1] = elements[2 * i + 1];
+          diff[0] = (value[0] - x[0]).abs();
+          diff[1] = (value[1] - x[1]).abs();
+          if (((diff[0] != diff[0]) || (diff[1] != diff[1])) && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1])))) || (DComplex.isEqual(value, x, epsilon))) {
+            diff[0] = 0.0;
+            diff[1] = 0.0;
+          }
+          if ((diff[0] > epsilon) || (diff[1] > epsilon)) {
+            return false;
+          }
+        }
+        return true;
+      } else {
+        return super ==(value);
+      }
+    }
     if (_content is DiagonalDComplexMatrix2D && obj is DiagonalDComplexMatrix2D) {
       DiagonalDComplexMatrix2D other = obj;
       int dlength = (_content as DiagonalDComplexMatrix2D)._dlength;
       double epsilon = DComplexProperty.DEFAULT.tolerance();
-      if (this == obj) {
+      if (identical(this, obj)) {
         return true;
       }
       if (!(this != null && obj != null)) {
@@ -106,7 +132,7 @@ class WrapperDComplexMatrix2D extends DComplexMatrix2D {
       }
       DiagonalDComplexMatrix2D A = _content as DiagonalDComplexMatrix2D;
       DiagonalDComplexMatrix2D B = obj;
-      if (A.columns != B.columns || A.rows != B.rows || A.diagonalIndex() != B.diagonalIndex() || A.diagonalLength() != B.diagonalLength()) {
+      if (A.columns != B.columns || A.rows != B.rows || A.diagonalIndex != B.diagonalIndex || A.diagonalLength != B.diagonalLength) {
         return false;
       }
       Float64List otherElements = other._elements;
@@ -131,12 +157,12 @@ class WrapperDComplexMatrix2D extends DComplexMatrix2D {
       }
       return true;
     } else {
-      return super.equals(obj);
+      return super ==(obj);
     }
   }
 
-  Float64List getQuick(int row, int column) {
-    return _content.getQuick(row, column);
+  Float64List get(int row, int column) {
+    return _content.get(row, column);
   }
 
   DComplexMatrix2D like2D(int rows, int columns) {
@@ -147,12 +173,12 @@ class WrapperDComplexMatrix2D extends DComplexMatrix2D {
     return _content.like1D(size);
   }
 
-  void setQuick(int row, int column, Float64List value) {
-    _content.setQuick(row, column, value);
+  void set(int row, int column, Float64List value) {
+    _content.set(row, column, value);
   }
 
-  void setPartsQuick(int row, int column, double re, double im) {
-    _content.setPartsQuick(row, column, re, im);
+  void setParts(int row, int column, double re, double im) {
+    _content.setParts(row, column, re, im);
   }
 
   DComplexMatrix1D vectorize() {
@@ -179,25 +205,25 @@ class WrapperDComplexMatrix2D extends DComplexMatrix2D {
     int idx = 0;
     for (int c = 0; c < _columns; c++) {
       for (int r = 0; r < _rows; r++) {
-        v.setQuick(idx++, getQuick(r, c));
+        v.set(idx++, get(r, c));
       }
     }
     //}
     return v;
   }
 
-  DComplexMatrix1D viewColumn(int column) {
-    return viewDice().viewRow(column);
+  DComplexMatrix1D column(int column) {
+    return dice().row(column);
   }
 
-  DComplexMatrix2D viewColumnFlip() {
+  DComplexMatrix2D columnFlip() {
     if (_columns == 0) return this;
     WrapperDComplexMatrix2D view = new ViewColumnFlipWrapperDComplexMatrix2D(this);
     view._isNoView = false;
     return view;
   }
 
-  DComplexMatrix2D viewDice() {
+  DComplexMatrix2D dice() {
     WrapperDComplexMatrix2D view = new ViewDiceWrapperDComplexMatrix2D(this);
     view._rows = _columns;
     view._columns = _rows;
@@ -206,7 +232,7 @@ class WrapperDComplexMatrix2D extends DComplexMatrix2D {
     return view;
   }
 
-  DComplexMatrix2D viewPart(final int row, final int column, int height, int width) {
+  DComplexMatrix2D part(final int row, final int column, int height, int width) {
     _checkBox(row, column, height, width);
     WrapperDComplexMatrix2D view = new ViewPartWrapperDComplexMatrix2D(this, row, column);
     view._rows = height;
@@ -216,12 +242,12 @@ class WrapperDComplexMatrix2D extends DComplexMatrix2D {
     return view;
   }
 
-  DComplexMatrix1D viewRow(int row) {
+  DComplexMatrix1D row(int row) {
     _checkRow(row);
     return new DelegateDComplexMatrix1D(this, row);
   }
 
-  DComplexMatrix2D viewRowFlip() {
+  DComplexMatrix2D rowFlip() {
     if (_rows == 0) return this;
     WrapperDComplexMatrix2D view = new ViewRowWrapperDComplexMatrix2D(this);
     view._isNoView = false;
@@ -229,7 +255,7 @@ class WrapperDComplexMatrix2D extends DComplexMatrix2D {
     return view;
   }
 
-  DComplexMatrix2D viewSelection(Int32List rowIndexes, Int32List columnIndexes) {
+  DComplexMatrix2D select(Int32List rowIndexes, Int32List columnIndexes) {
     // check for "all"
     if (rowIndexes == null) {
       rowIndexes = new Int32List(_rows);
@@ -253,7 +279,7 @@ class WrapperDComplexMatrix2D extends DComplexMatrix2D {
     return view;
   }
 
-  DComplexMatrix2D viewStrides(final int rowStride, final int columnStride) {
+  DComplexMatrix2D strides(final int rowStride, final int columnStride) {
     if (rowStride <= 0 || columnStride <= 0) {
       throw new RangeError("illegal stride");
     }
@@ -282,7 +308,7 @@ class WrapperDComplexMatrix2D extends DComplexMatrix2D {
     throw new Error(); // should never be called
   }
 
-  DoubleMatrix2D getImaginaryPart() {
+  DoubleMatrix2D imaginary() {
     final DenseLargeDoubleMatrix2D Im = new DenseLargeDoubleMatrix2D(_rows, _columns);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -304,14 +330,14 @@ class WrapperDComplexMatrix2D extends DComplexMatrix2D {
     } else {*/
     for (int r = 0; r < _rows; r++) {
       for (int c = 0; c < _columns; c++) {
-        Im.set(r, c, getQuick(r, c)[1]);
+        Im.set(r, c, get(r, c)[1]);
       }
     }
     //}
     return Im;
   }
 
-  DoubleMatrix2D getRealPart() {
+  DoubleMatrix2D real() {
     final DenseLargeDoubleMatrix2D Re = new DenseLargeDoubleMatrix2D(_rows, _columns);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -333,13 +359,13 @@ class WrapperDComplexMatrix2D extends DComplexMatrix2D {
     } else {*/
     for (int r = 0; r < _rows; r++) {
       for (int c = 0; c < _columns; c++) {
-        Re.set(r, c, getQuick(r, c)[0]);
+        Re.set(r, c, get(r, c)[0]);
       }
     }
     //}
     return Re;
   }
-  
+
   Object clone() {
     return new WrapperDComplexMatrix2D(_content);
   }
@@ -348,18 +374,6 @@ class WrapperDComplexMatrix2D extends DComplexMatrix2D {
 class ViewColumnFlipWrapperDComplexMatrix2D extends WrapperDComplexMatrix2D {
 
   ViewColumnFlipWrapperDComplexMatrix2D(DComplexMatrix2D newContent) : super(newContent);
-
-  Float64List getQuick(int row, int column) {
-    return _content.getQuick(row, _columns - 1 - column);
-  }
-
-  void setQuick(int row, int column, Float64List value) {
-    _content.setQuick(row, _columns - 1 - column, value);
-  }
-
-  void setPartsQuick(int row, int column, double re, double im) {
-    _content.setPartsQuick(row, _columns - 1 - column, re, im);
-  }
 
   Float64List get(int row, int column) {
     return _content.get(row, _columns - 1 - column);
@@ -373,6 +387,18 @@ class ViewColumnFlipWrapperDComplexMatrix2D extends WrapperDComplexMatrix2D {
     _content.setParts(row, _columns - 1 - column, re, im);
   }
 
+  Float64List at(int row, int column) {
+    return _content.at(row, _columns - 1 - column);
+  }
+
+  void put(int row, int column, Float64List value) {
+    _content.put(row, _columns - 1 - column, value);
+  }
+
+  void putParts(int row, int column, double re, double im) {
+    _content.putParts(row, _columns - 1 - column, re, im);
+  }
+
   Object clone() {
     return new ViewColumnFlipWrapperDComplexMatrix2D(_content);
   }
@@ -381,18 +407,6 @@ class ViewColumnFlipWrapperDComplexMatrix2D extends WrapperDComplexMatrix2D {
 class ViewDiceWrapperDComplexMatrix2D extends WrapperDComplexMatrix2D {
 
   ViewDiceWrapperDComplexMatrix2D(DComplexMatrix2D newContent) : super(newContent);
-
-  Float64List getQuick(int row, int column) {
-    return _content.getQuick(column, row);
-  }
-
-  void setQuick(int row, int column, Float64List value) {
-    _content.setQuick(column, row, value);
-  }
-
-  void setPartsQuick(int row, int column, double re, double im) {
-    _content.setPartsQuick(column, row, re, im);
-  }
 
   Float64List get(int row, int column) {
     return _content.get(column, row);
@@ -406,64 +420,64 @@ class ViewDiceWrapperDComplexMatrix2D extends WrapperDComplexMatrix2D {
     _content.setParts(column, row, re, im);
   }
 
+  Float64List at(int row, int column) {
+    return _content.at(column, row);
+  }
+
+  void put(int row, int column, Float64List value) {
+    _content.put(column, row, value);
+  }
+
+  void putParts(int row, int column, double re, double im) {
+    _content.putParts(column, row, re, im);
+  }
+
   Object clone() {
     return new ViewDiceWrapperDComplexMatrix2D(_content);
   }
 }
 
 class ViewPartWrapperDComplexMatrix2D extends WrapperDComplexMatrix2D {
-  final int row;
-  final int column;
+  final int _row;
+  final int _column;
 
   ViewPartWrapperDComplexMatrix2D(DComplexMatrix2D newContent, int row, int column)
       : super(newContent),
-        row = row,
-        column = column;
-
-  Float64List getQuick(int i, int j) {
-    return _content.getQuick(row + i, column + j);
-  }
-
-  void setQuick(int i, int j, Float64List value) {
-    _content.setQuick(row + i, column + j, value);
-  }
-
-  void setPartsQuick(int i, int j, double re, double im) {
-    _content.setPartsQuick(row + i, column + j, re, im);
-  }
+        _row = row,
+        _column = column;
 
   Float64List get(int i, int j) {
-    return _content.get(row + i, column + j);
+    return _content.get(_row + i, _column + j);
   }
 
   void set(int i, int j, Float64List value) {
-    _content.set(row + i, column + j, value);
+    _content.set(_row + i, _column + j, value);
   }
 
   void setParts(int i, int j, double re, double im) {
-    _content.setParts(row + i, column + j, re, im);
+    _content.setParts(_row + i, _column + j, re, im);
+  }
+
+  Float64List at(int i, int j) {
+    return _content.at(_row + i, _column + j);
+  }
+
+  void put(int i, int j, Float64List value) {
+    _content.put(_row + i, _column + j, value);
+  }
+
+  void putParts(int i, int j, double re, double im) {
+    _content.putParts(_row + i, _column + j, re, im);
   }
 
   Object clone() {
-    return new ViewPartWrapperDComplexMatrix2D(_content, row, column);
+    return new ViewPartWrapperDComplexMatrix2D(_content, _row, _column);
   }
 }
 
 class ViewRowWrapperDComplexMatrix2D extends WrapperDComplexMatrix2D {
 
   ViewRowWrapperDComplexMatrix2D(DComplexMatrix2D newContent) : super(newContent);
-
-  Float64List getQuick(int row, int column) {
-    return _content.getQuick(_rows - 1 - row, column);
-  }
-
-  void setQuick(int row, int column, Float64List value) {
-    _content.setQuick(_rows - 1 - row, column, value);
-  }
-
-  void setPartsQuick(int row, int column, double re, double im) {
-    _content.setPartsQuick(_rows - 1 - row, column, re, im);
-  }
 
   Float64List get(int row, int column) {
     return _content.get(_rows - 1 - row, column);
@@ -475,6 +489,18 @@ class ViewRowWrapperDComplexMatrix2D extends WrapperDComplexMatrix2D {
 
   void setParts(int row, int column, double re, double im) {
     _content.setParts(_rows - 1 - row, column, re, im);
+  }
+
+  Float64List at(int row, int column) {
+    return _content.at(_rows - 1 - row, column);
+  }
+
+  void put(int row, int column, Float64List value) {
+    _content.put(_rows - 1 - row, column, value);
+  }
+
+  void putParts(int row, int column, double re, double im) {
+    _content.putParts(_rows - 1 - row, column, re, im);
   }
 
   Object clone() {
@@ -491,18 +517,6 @@ class ViewSelectionWrapperDComplexMatrix2D extends WrapperDComplexMatrix2D {
         cix = cix,
         rix = rix;
 
-  Float64List getQuick(int i, int j) {
-    return _content.getQuick(rix[i], cix[j]);
-  }
-
-  void setQuick(int i, int j, Float64List value) {
-    _content.setQuick(rix[i], cix[j], value);
-  }
-
-  void setPartsQuick(int i, int j, double re, double im) {
-    _content.setPartsQuick(rix[i], cix[j], re, im);
-  }
-
   Float64List get(int i, int j) {
     return _content.get(rix[i], cix[j]);
   }
@@ -513,6 +527,18 @@ class ViewSelectionWrapperDComplexMatrix2D extends WrapperDComplexMatrix2D {
 
   void setParts(int i, int j, double re, double im) {
     _content.setParts(rix[i], cix[j], re, im);
+  }
+
+  Float64List at(int i, int j) {
+    return _content.at(rix[i], cix[j]);
+  }
+
+  void put(int i, int j, Float64List value) {
+    _content.put(rix[i], cix[j], value);
+  }
+
+  void putParts(int i, int j, double re, double im) {
+    _content.putParts(rix[i], cix[j], re, im);
   }
 
   Object clone() {
@@ -528,18 +554,6 @@ class ViewStridesWrapperDComplexMatrix2D extends WrapperDComplexMatrix2D {
     _columnStride = columnStride;
   }
 
-  Float64List getQuick(int row, int column) {
-    return _content.getQuick(_rowStride * row, _columnStride * column);
-  }
-
-  void setQuick(int row, int column, Float64List value) {
-    _content.setQuick(_rowStride * row, _columnStride * column, value);
-  }
-
-  void setPartsQuick(int row, int column, double re, double im) {
-    _content.setPartsQuick(_rowStride * row, _columnStride * column, re, im);
-  }
-
   Float64List get(int row, int column) {
     return _content.get(_rowStride * row, _columnStride * column);
   }
@@ -550,6 +564,18 @@ class ViewStridesWrapperDComplexMatrix2D extends WrapperDComplexMatrix2D {
 
   void setParts(int row, int column, double re, double im) {
     _content.setParts(_rowStride * row, _columnStride * column, re, im);
+  }
+
+  Float64List at(int row, int column) {
+    return _content.at(_rowStride * row, _columnStride * column);
+  }
+
+  void put(int row, int column, Float64List value) {
+    _content.put(_rowStride * row, _columnStride * column, value);
+  }
+
+  void putParts(int row, int column, double re, double im) {
+    _content.putParts(_rowStride * row, _columnStride * column, re, im);
   }
 
   Object clone() {

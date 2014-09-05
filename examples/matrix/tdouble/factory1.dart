@@ -14,8 +14,8 @@ void main() {
    * stdout.writeln("\n"+make(parts2));
    */
 
-  List<List<DoubleMatrix2D>> parts3 = [[identity(3), null,], [null, identity(3).viewColumnFlip()],
-                                       [identity(3).viewRowFlip(), null]];
+  List<List<DoubleMatrix2D>> parts3 = [[identity(3), null,], [null, identity(3).columnFlip()],
+                                       [identity(3).rowFlip(), null]];
   stdout.writeln("\n" + DoubleFactory2D.compose(parts3));
   // stdout.writeln("\n"+matrixpattern.Converting.toHTML(make(parts3).toString()));
 

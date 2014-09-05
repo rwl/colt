@@ -118,7 +118,9 @@ class DComplexProperty {
    *         otherwise.
    */
   bool equalsValue1D(final DComplexMatrix1D A, final Float64List value) {
-    if (A == null) return false;
+    if (A == null) {
+      return false;
+    }
     final double epsilon = tolerance();
     bool result = false;
     int size = A.length;
@@ -165,7 +167,7 @@ class DComplexProperty {
     } else {*/
       Float64List diff = new Float64List(2);
       for (int i = 0; i < A.length; i++) {
-        Float64List x = A.getQuick(i);
+        Float64List x = A.get(i);
         diff[0] = (value[0] - x[0]).abs();
         diff[1] = (value[1] - x[1]).abs();
         if (((diff[0] != diff[0]) || (diff[1] != diff[1])) && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1])))) || (DComplex.isEqual(value, x, epsilon))) {
@@ -191,10 +193,16 @@ class DComplexProperty {
    *         otherwise.
    */
   bool equalsMatrix1D(final DComplexMatrix1D A, final DComplexMatrix1D B) {
-    if (A == B) return true;
-    if (!(A != null && B != null)) return false;
+    if (identical(A, B)) {
+      return true;
+    }
+    if (!(A != null && B != null)) {
+      return false;
+    }
     int size = A.length;
-    if (size != B.length) return false;
+    if (size != B.length) {
+      return false;
+    }
 
     final double epsilon = tolerance();
     bool result = false;
@@ -242,8 +250,8 @@ class DComplexProperty {
     } else {*/
       Float64List diff = new Float64List(2);
       for (int i = 0; i < size; i++) {
-        Float64List x = A.getQuick(i);
-        Float64List value = B.getQuick(i);
+        Float64List x = A.get(i);
+        Float64List value = B.get(i);
         diff[0] = (value[0] - x[0]).abs();
         diff[1] = (value[1] - x[1]).abs();
         if (((diff[0] != diff[0]) || (diff[1] != diff[1])) && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1])))) || (DComplex.isEqual(value, x, epsilon))) {
@@ -270,7 +278,9 @@ class DComplexProperty {
    *         otherwise.
    */
   bool equalsValue2D(final DComplexMatrix2D A, final Float64List value) {
-    if (A == null) return false;
+    if (A == null) {
+      return false;
+    }
     int rows = A.rows;
     int columns = A.columns;
     bool result = false;
@@ -321,7 +331,7 @@ class DComplexProperty {
       Float64List diff = new Float64List(2);
       for (int r = 0; r < rows; r++) {
         for (int c = 0; c < columns; c++) {
-          Float64List x = A.getQuick(r, c);
+          Float64List x = A.get(r, c);
           diff[0] = (value[0] - x[0]).abs();
           diff[1] = (value[1] - x[1]).abs();
           if (((diff[0] != diff[0]) || (diff[1] != diff[1])) && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1])))) || (DComplex.isEqual(value, x, epsilon))) {
@@ -348,11 +358,17 @@ class DComplexProperty {
    *         otherwise.
    */
   bool equalsMatrix2D(final DComplexMatrix2D A, final DComplexMatrix2D B) {
-    if (A == B) return true;
-    if (!(A != null && B != null)) return false;
+    if (identical(A, B)) {
+      return true;
+    }
+    if (!(A != null && B != null)) {
+      return false;
+    }
     int rows = A.rows;
     int columns = A.columns;
-    if (columns != B.columns || rows != B.rows) return false;
+    if (columns != B.columns || rows != B.rows) {
+      return false;
+    }
     bool result = false;
     final double epsilon = tolerance();
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -402,8 +418,8 @@ class DComplexProperty {
       Float64List diff = new Float64List(2);
       for (int r = 0; r < rows; r++) {
         for (int c = 0; c < columns; c++) {
-          Float64List x = A.getQuick(r, c);
-          Float64List value = B.getQuick(r, c);
+          Float64List x = A.get(r, c);
+          Float64List value = B.get(r, c);
           diff[0] = (value[0] - x[0]).abs();
           diff[1] = (value[1] - x[1]).abs();
           if (((diff[0] != diff[0]) || (diff[1] != diff[1])) && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1])))) || (DComplex.isEqual(value, x, epsilon))) {

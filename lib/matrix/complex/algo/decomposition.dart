@@ -99,12 +99,12 @@ class SparseDComplexLUDecomposition {
     if (U == null) {
       U = new SparseCCDComplexMatrix2D(N.U);
       if (rcMatrix) {
-        U = (U as SparseCCDComplexMatrix2D).getRowCompressed();
+        U = (U as SparseCCDComplexMatrix2D).rowCompressed();
       }
     }
     Float64List det = new Float64List.fromList([pivsign, 0]);
     for (int j = 0; j < n; j++) {
-      det = multiply(det)(U.getQuick(j, j));
+      det = multiply(det)(U.get(j, j));
     }
     return det;
   }
@@ -118,7 +118,7 @@ class SparseDComplexLUDecomposition {
     if (L == null) {
       L = new SparseCCDComplexMatrix2D(N.L);
       if (rcMatrix) {
-        L = (L as SparseCCDComplexMatrix2D).getRowCompressed();
+        L = (L as SparseCCDComplexMatrix2D).rowCompressed();
       }
     }
     return L.copy();
@@ -148,7 +148,7 @@ class SparseDComplexLUDecomposition {
     if (U == null) {
       U = new SparseCCDComplexMatrix2D(N.U);
       if (rcMatrix) {
-        U = (U as SparseCCDComplexMatrix2D).getRowCompressed();
+        U = (U as SparseCCDComplexMatrix2D).rowCompressed();
       }
     }
     return U.copy();
@@ -216,7 +216,7 @@ class SparseDComplexLUDecomposition {
     /* b(q) = x */
 
     if (b.isView) {
-      b.assignValues(x.x);
+      b.setAll(x.x);
     }
   }
 }

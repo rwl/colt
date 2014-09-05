@@ -40,7 +40,8 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
    *            The values to be filled into the new matrix.
    */
   factory DenseDComplexMatrix1D.fromValues(Float64List values) {
-    return new DenseDComplexMatrix1D(values.length ~/ 2)..assignValues(values);
+    return new DenseDComplexMatrix1D(values.length ~/ 2)
+      ..setAll(values);
   }
 
   /**
@@ -54,7 +55,7 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
    *             if <tt>size<0</tt>.
    */
   factory DenseDComplexMatrix1D.fromRealPart(DoubleMatrix1D realPart) {
-    return new DenseDComplexMatrix1D(realPart.length)..assignReal(realPart);
+    return new DenseDComplexMatrix1D(realPart.length)..setReal(realPart);
   }
 
   /**
@@ -73,8 +74,8 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
    */
   factory DenseDComplexMatrix1D.fromParts(DoubleMatrix1D realPart, DoubleMatrix1D imaginaryPart) {
     return new DenseDComplexMatrix1D(realPart.length)
-        ..assignReal(realPart)
-        ..assignImaginary(imaginaryPart);
+        ..setReal(realPart)
+        ..setImaginary(imaginaryPart);
   }
 
   /**
@@ -103,7 +104,7 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
     this._isNoView = isNoView;
   }
 
-  Float64List aggregate(final cfunc.DComplexDComplexDComplexFunction aggr, final cfunc.DComplexDComplexFunction f) {
+  Float64List reduce(final cfunc.DComplexDComplexDComplexFunction aggr, final cfunc.DComplexDComplexFunction f) {
     Float64List b = new Float64List(2);
     if (_size == 0) {
       b[0] = double.NAN;
@@ -142,9 +143,9 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
     return a;
   }
 
-  Float64List aggregateMatrix(final DComplexMatrix1D other, final cfunc.DComplexDComplexDComplexFunction aggr, final cfunc.DComplexDComplexDComplexFunction f) {
+  Float64List reduceVector(final DComplexMatrix1D other, final cfunc.DComplexDComplexDComplexFunction aggr, final cfunc.DComplexDComplexDComplexFunction f) {
     if (!(other is DenseDComplexMatrix1D)) {
-      return super.aggregateMatrix(other, aggr, f);
+      return super.reduceVector(other, aggr, f);
     }
     checkSize(other);
     if (_size == 0) {
@@ -193,7 +194,7 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
     return a;
   }
 
-  DComplexMatrix1D assign(final cfunc.DComplexDComplexFunction function) {
+  DComplexMatrix1D forEach(final cfunc.DComplexDComplexFunction function) {
     if (this._elements == null) {
       throw new Error();
     }
@@ -258,7 +259,7 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
     return this;
   }
 
-  DComplexMatrix1D assignProc(final cfunc.DComplexProcedure cond, final cfunc.DComplexDComplexFunction function) {
+  DComplexMatrix1D forEachWhere(final cfunc.DComplexProcedure cond, final cfunc.DComplexDComplexFunction function) {
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
@@ -300,7 +301,7 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
     return this;
   }
 
-  DComplexMatrix1D assignProcValue(final cfunc.DComplexProcedure cond, final Float64List value) {
+  DComplexMatrix1D fillWhere(final cfunc.DComplexProcedure cond, final Float64List value) {
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
@@ -340,7 +341,7 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
     return this;
   }
 
-  DComplexMatrix1D assignRealFunc(final cfunc.DComplexRealFunction function) {
+  DComplexMatrix1D forEachReal(final cfunc.DComplexRealFunction function) {
     if (this._elements == null) {
       throw new Error();
     }
@@ -417,9 +418,9 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
     return this;
   }
 
-  DComplexMatrix1D assignMatrix(DComplexMatrix1D source) {
+  DComplexMatrix1D copyFrom(DComplexMatrix1D source) {
     if (!(source is DenseDComplexMatrix1D)) {
-      return super.assignMatrix(source);
+      return super.copyFrom(source);
     }
     DenseDComplexMatrix1D other = source as DenseDComplexMatrix1D;
     if (other == this) return this;
@@ -432,7 +433,7 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
     if (_haveSharedCells(other)) {
       DComplexMatrix1D c = other.copy();
       if (!(c is DenseDComplexMatrix1D)) { // should not happen
-        return super.assignMatrix(source);
+        return super.copyFrom(source);
       }
       other = c as DenseDComplexMatrix1D;
     }
@@ -477,9 +478,9 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
     return this;
   }
 
-  DComplexMatrix1D assignFunc(DComplexMatrix1D y, final cfunc.DComplexDComplexDComplexFunction function) {
+  DComplexMatrix1D forEachVector(DComplexMatrix1D y, final cfunc.DComplexDComplexDComplexFunction function) {
     if (!(y is DenseDComplexMatrix1D)) {
-      return super.assignMatrixFunc(y, function);
+      return super.forEachVector(y, function);
     }
     checkSize(y);
     final Float64List elemsOther = y.elements() as Float64List;
@@ -668,7 +669,7 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
     return this;
   }
 
-  DComplexMatrix1D assignValue(final double re, final double im) {
+  DComplexMatrix1D fill(final double re, final double im) {
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
@@ -698,7 +699,7 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
     return this;
   }
 
-  DComplexMatrix1D assignValues(Float64List values) {
+  DComplexMatrix1D setAll(Float64List values) {
     if (_isNoView) {
       if (values.length != 2 * _size) {
         throw new ArgumentError("The length of values[] must be equal to 2*size()=${2 * length}");
@@ -706,14 +707,14 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
       //System.arraycopy(values, 0, this._elements, 0, values.length);
       this._elements.setAll(0, values);
     } else {
-      super.assignValues(values);
+      super.setAll(values);
     }
     return this;
   }
 
-  DComplexMatrix1D assignImaginary(final DoubleMatrix1D other) {
+  DComplexMatrix1D setImaginary(final DoubleMatrix1D other) {
     if (!(other is DenseDoubleMatrix1D)) {
-      return super.assignImaginary(other);
+      return super.setImaginary(other);
     }
     checkSize(other);
     final int zeroOther = other.index(0);
@@ -750,9 +751,9 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
     return this;
   }
 
-  DComplexMatrix1D assignReal(final DoubleMatrix1D other) {
+  DComplexMatrix1D setReal(final DoubleMatrix1D other) {
     if (!(other is DenseDoubleMatrix1D)) {
-      return super.assignReal(other);
+      return super.setReal(other);
     }
     checkSize(other);
     final int zeroOther = other.index(0);
@@ -793,7 +794,7 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
     return _elements;
   }
 
-  DoubleMatrix1D getImaginaryPart() {
+  DoubleMatrix1D imaginary() {
     final DenseDoubleMatrix1D Im = new DenseDoubleMatrix1D(_size);
     final Float64List elemsOther = Im.elements();
     final int zeroOther = Im.index(0);
@@ -829,7 +830,7 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
     return Im;
   }
 
-  void getNonZeros(final List<int> indexList, final List<Float64List> valueList) {
+  void nonZeros(final List<int> indexList, final List<Float64List> valueList) {
     indexList.clear();
     valueList.clear();
     int s = length;
@@ -847,12 +848,12 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
     }
   }
 
-  Float64List getQuick(int index) {
+  Float64List get(int index) {
     int idx = _zero + index * _stride;
     return new Float64List.fromList([_elements[idx], _elements[idx + 1]]);
   }
 
-  DoubleMatrix1D getRealPart() {
+  DoubleMatrix1D real() {
     final DenseDoubleMatrix1D R = new DenseDoubleMatrix1D(_size);
     final Float64List elemsOther = R.elements();
     final int zeroOther = R.index(0);
@@ -999,13 +1000,13 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
     return M;
   }*/
 
-  void setPartsQuick(int index, double re, double im) {
+  void setParts(int index, double re, double im) {
     int idx = _zero + index * _stride;
     this._elements[idx] = re;
     this._elements[idx + 1] = im;
   }
 
-  void setQuick(int index, Float64List value) {
+  void set(int index, Float64List value) {
     int idx = _zero + index * _stride;
     this._elements[idx] = value[0];
     this._elements[idx + 1] = value[1];
@@ -1070,7 +1071,7 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
     //}
   }
 
-  void toArrayFill(Float64List values) {
+  void fillList(Float64List values) {
     if (values.length < 2 * _size) {
       throw new ArgumentError("values too small");
     }
@@ -1078,11 +1079,11 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
       //System.arraycopy(this._elements, 0, values, 0, this._elements.length);
       values.setAll(0, this._elements);
     } else {
-      super.toArrayFill(values);
+      super.fillList(values);
     }
   }
 
-  Float64List zDotProduct(final DComplexMatrix1D y, [final int from = 0, int length = null]) {
+  Float64List dot(final DComplexMatrix1D y, [final int from = 0, int length = null]) {
     if (length == null) {
       length = this.length;
     }
@@ -1156,7 +1157,7 @@ class DenseDComplexMatrix1D extends DComplexMatrix1D {
     return sum;
   }
 
-  Float64List zSum() {
+  Float64List sum() {
     Float64List sum = new Float64List(2);
     if (this._elements == null) {
       throw new Error();
@@ -1319,12 +1320,12 @@ class SelectedDenseDComplexMatrix1D extends DComplexMatrix1D {
     return _offsets[absRank];
   }
 
-  Float64List getQuick(int index) {
+  Float64List get(int index) {
     int idx = _zero + index * _stride;
     return new Float64List.fromList([_elements[__offset + _offsets[idx]], _elements[__offset + _offsets[idx] + 1]]);
   }
 
-  DoubleMatrix1D getRealPart() {
+  DoubleMatrix1D real() {
     final DenseDoubleMatrix1D R = new DenseDoubleMatrix1D(_size);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
@@ -1344,14 +1345,14 @@ class SelectedDenseDComplexMatrix1D extends DComplexMatrix1D {
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
     for (int i = 0; i < _size; i++) {
-      final tmp = getQuick(i);
+      final tmp = get(i);
       R.set(i, tmp[0]);
     }
     //}
     return R;
   }
 
-  DoubleMatrix1D getImaginaryPart() {
+  DoubleMatrix1D imaginary() {
     final DenseDoubleMatrix1D Im = new DenseDoubleMatrix1D(_size);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
@@ -1371,7 +1372,7 @@ class SelectedDenseDComplexMatrix1D extends DComplexMatrix1D {
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
     for (int i = 0; i < _size; i++) {
-      final tmp = getQuick(i);
+      final tmp = get(i);
       Im.set(i, tmp[1]);
     }
     //}
@@ -1420,13 +1421,13 @@ class SelectedDenseDComplexMatrix1D extends DComplexMatrix1D {
     throw new UnsupportedError("This method is not supported.");
   }*/
 
-  void setQuick(int index, Float64List value) {
+  void set(int index, Float64List value) {
     int idx = _zero + index * _stride;
     _elements[__offset + _offsets[idx]] = value[0];
     _elements[__offset + _offsets[idx] + 1] = value[1];
   }
 
-  void setPartsQuick(int index, double re, double im) {
+  void setParts(int index, double re, double im) {
     int idx = _zero + index * _stride;
     _elements[__offset + _offsets[idx]] = re;
     _elements[__offset + _offsets[idx] + 1] = im;
