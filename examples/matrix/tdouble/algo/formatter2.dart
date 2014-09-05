@@ -28,7 +28,7 @@ main() {
   for (int i = 0; i < size; i++) {
     String format = formats[i];
     strings[i] = new DoubleFormatter(format).toString(matrix);
-    for (int j = 0; j < matrix.size(); j++) {
+    for (int j = 0; j < matrix.length; j++) {
       stdout.writeln(matrix.get(j).toString());
     }
   }

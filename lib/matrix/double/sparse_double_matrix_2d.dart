@@ -101,7 +101,7 @@ class SparseDoubleMatrix2D extends DoubleMatrix2D {
    *             .
    */
   factory SparseDoubleMatrix2D.fromList(List<Float64List> values) {
-    return new SparseDoubleMatrix2D(values.length, values.length == 0 ? 0 : values[0].length)..assignValues2D(values);
+    return new SparseDoubleMatrix2D(values.length, values.length == 0 ? 0 : values[0].length)..setAll2D(values);
   }
 
   /**
@@ -303,20 +303,20 @@ class SparseDoubleMatrix2D extends DoubleMatrix2D {
     return this;
   }*/
 
-  DoubleMatrix2D assignValue(double value) {
+  DoubleMatrix2D fill(double value) {
     // overriden for performance only
     if (this._isNoView && value == 0) {
       this._elements.clear();
     } else {
-      super.assignValue(value);
+      super.fill(value);
     }
     return this;
   }
 
-  DoubleMatrix2D assignMatrix(DoubleMatrix2D source) {
+  DoubleMatrix2D copyFrom(DoubleMatrix2D source) {
     // overriden for performance only
     if (!(source is SparseDoubleMatrix2D)) {
-      return super.assignMatrix(source);
+      return super.copyFrom(source);
     }
     SparseDoubleMatrix2D other = source as SparseDoubleMatrix2D;
     if (other == this) return this; // nothing to do
@@ -326,12 +326,12 @@ class SparseDoubleMatrix2D extends DoubleMatrix2D {
       this._elements.assign(other._elements);
       return this;
     }*/
-    return super.assignMatrix(source);
+    return super.copyFrom(source);
   }
 
-  DoubleMatrix2D assignFunc(final DoubleMatrix2D y, func.DoubleDoubleFunction function) {
+  DoubleMatrix2D forEachMatrix(final DoubleMatrix2D y, func.DoubleDoubleFunction function) {
     if (!this._isNoView) {
-      return super.assignFunc(y, function);
+      return super.forEachMatrix(y, function);
     }
 
     checkShape(y);
@@ -340,14 +340,14 @@ class SparseDoubleMatrix2D extends DoubleMatrix2D {
       final double alpha = (function as DoublePlusMultSecond).multiplicator;
       if (alpha == 0) return this; // nothing to do
       y.forEachNonZero((int i, int j, double value) {
-        setQuick(i, j, getQuick(i, j) + alpha * value);
+        set(i, j, get(i, j) + alpha * value);
         return value;
       });
     } else if (function == func.mult) { // x[i] = x[i] * y[i]
       this._elements.forEach((int key, double value) {
         int i = key ~/ _columns;
         int j = key % _columns;
-        double r = value * y.getQuick(i, j);
+        double r = value * y.get(i, j);
         if (r != value) _elements[key] = r;
         return true;
       });
@@ -355,12 +355,12 @@ class SparseDoubleMatrix2D extends DoubleMatrix2D {
       this._elements.forEach((int key, double value) {
         int i = key ~/ _columns;
         int j = key % _columns;
-        double r = value / y.getQuick(i, j);
+        double r = value / y.get(i, j);
         if (r != value) _elements[key] = r;
         return true;
       });
     } else {
-      super.assignFunc(y, function);
+      super.forEachMatrix(y, function);
     }
     return this;
 
@@ -478,11 +478,11 @@ class SparseDoubleMatrix2D extends DoubleMatrix2D {
     return this;
   }
 
-  int cardinality() {
+  int get cardinality {
     if (this._isNoView) {
       return this._elements.length;
     } else {
-      return super.cardinality();
+      return super.cardinality;
     }
   }
 
@@ -498,7 +498,7 @@ class SparseDoubleMatrix2D extends DoubleMatrix2D {
    * @return this matrix in a column-compressed form
    */
   SparseCCDoubleMatrix2D getColumnCompressed(bool sortRowIndexes) {
-    int nnz = cardinality();
+    int nnz = cardinality;
     final keys = _elements.keys;
     final values = _elements.values;
     Int32List rowIndexes = new Int32List(nnz);
@@ -509,7 +509,7 @@ class SparseDoubleMatrix2D extends DoubleMatrix2D {
       rowIndexes[k] = key ~/ _columns;
       columnIndexes[k] = key % _columns;
     }
-    return new SparseCCDoubleMatrix2D.values(_rows, _columns, rowIndexes, columnIndexes, values, false, false, sortRowIndexes);
+    return new SparseCCDoubleMatrix2D.withValues(_rows, _columns, rowIndexes, columnIndexes, values, false, false, sortRowIndexes);
   }
 
   /**
@@ -545,7 +545,7 @@ class SparseDoubleMatrix2D extends DoubleMatrix2D {
    * @return this matrix in a row-compressed form
    */
   SparseRCDoubleMatrix2D getRowCompressed(bool sortColumnIndexes) {
-    int nnz = cardinality();
+    int nnz = cardinality;
     final keys = _elements.keys;
     final values = _elements.values;
     final Int32List rowIndexes = new Int32List(nnz);
@@ -555,7 +555,7 @@ class SparseDoubleMatrix2D extends DoubleMatrix2D {
       rowIndexes[k] = key ~/ _columns;
       columnIndexes[k] = key % _columns;
     }
-    return new SparseRCDoubleMatrix2D.values(_rows, _columns, rowIndexes, columnIndexes, values, false, false, sortColumnIndexes);
+    return new SparseRCDoubleMatrix2D.withValues(_rows, _columns, rowIndexes, columnIndexes, values, false, false, sortColumnIndexes);
   }
 
   /**
@@ -602,7 +602,7 @@ class SparseDoubleMatrix2D extends DoubleMatrix2D {
     return this;
   }
 
-  double getQuick(int row, int column) {
+  double get(int row, int column) {
     final i = _rowZero + row * _rowStride + _columnZero + column * _columnStride;
     if (_elements.containsKey(i)) {
       return _elements[i];
@@ -622,7 +622,7 @@ class SparseDoubleMatrix2D extends DoubleMatrix2D {
     return new SparseDoubleMatrix1D(size);
   }
 
-  void setQuick(int row, int column, double value) {
+  void set(int row, int column, double value) {
     int index = _rowZero + row * _rowStride + _columnZero + column * _columnStride;
     if (value == 0.0) {
       this._elements.remove(index);
@@ -638,11 +638,11 @@ class SparseDoubleMatrix2D extends DoubleMatrix2D {
         ..write(" x ")
         ..write(_columns)
         ..write(" sparse matrix, nnz = ")
-        ..write(cardinality())
+        ..write(cardinality)
         ..write('\n');
     for (int r = 0; r < _rows; r++) {
       for (int c = 0; c < _columns; c++) {
-        double elem = getQuick(r, c);
+        double elem = get(r, c);
         if (elem != 0) {
           builder
               ..write('(')
@@ -664,18 +664,18 @@ class SparseDoubleMatrix2D extends DoubleMatrix2D {
   }*/
 
   DoubleMatrix1D vectorize() {
-    SparseDoubleMatrix1D v = new SparseDoubleMatrix1D(size());
+    SparseDoubleMatrix1D v = new SparseDoubleMatrix1D(length);
     int idx = 0;
     for (int c = 0; c < _columns; c++) {
       for (int r = 0; r < _rows; r++) {
-        double elem = getQuick(r, c);
-        v.setQuick(idx++, elem);
+        double elem = get(r, c);
+        v.set(idx++, elem);
       }
     }
     return v;
   }
 
-  DoubleMatrix1D zMult(DoubleMatrix1D y, DoubleMatrix1D z, [final double alpha = 1.0, double beta = 0.0, final bool transposeA = false]) {
+  DoubleMatrix1D mult(DoubleMatrix1D y, DoubleMatrix1D z, [final double alpha = 1.0, double beta = 0.0, final bool transposeA = false]) {
     int rowsA = _rows;
     int columnsA = _columns;
     if (transposeA) {
@@ -687,15 +687,15 @@ class SparseDoubleMatrix2D extends DoubleMatrix2D {
     if (z == null) z = new DenseDoubleMatrix1D(rowsA);
 
     if (!(this._isNoView && y is DenseDoubleMatrix1D && z is DenseDoubleMatrix1D)) {
-      return super.zMult(y, z, alpha, beta, transposeA);
+      return super.mult(y, z, alpha, beta, transposeA);
     }
 
-    if (columnsA != y.size() || rowsA > z.size()) {
-      throw new ArgumentError("Incompatible args: " + ((transposeA ? viewDice() : this).toStringShort()) + ", " + y.toStringShort() + ", " + z.toStringShort());
+    if (columnsA != y.length || rowsA > z.length) {
+      throw new ArgumentError("Incompatible args: " + ((transposeA ? dice() : this).toStringShort()) + ", " + y.toStringShort() + ", " + z.toStringShort());
     }
 
     if (!ignore) {
-      z.assign(func.multiply(beta));
+      z.forEach(func.multiply(beta));
     }
 
     DenseDoubleMatrix1D zz = z as DenseDoubleMatrix1D;
@@ -727,40 +727,40 @@ class SparseDoubleMatrix2D extends DoubleMatrix2D {
     return z;
   }
 
-  DoubleMatrix2D zMult2D(DoubleMatrix2D B, DoubleMatrix2D C, [final double alpha = 1.0, double beta = 0.0, final bool transposeA = false, bool transposeB = false]) {
+  DoubleMatrix2D multiply(DoubleMatrix2D B, DoubleMatrix2D C, [final double alpha = 1.0, double beta = 0.0, final bool transposeA = false, bool transposeB = false]) {
     if (!(this._isNoView)) {
-      return super.zMult2D(B, C, alpha, beta, transposeA, transposeB);
+      return super.multiply(B, C, alpha, beta, transposeA, transposeB);
     }
-    if (transposeB) B = B.viewDice();
+    if (transposeB) B = B.dice();
     int rowsA = _rows;
     int columnsA = _columns;
     if (transposeA) {
       rowsA = _columns;
       columnsA = _rows;
     }
-    int p = B.columns();
+    int p = B.columns;
     bool ignore = (C == null);
     if (C == null) C = new DenseDoubleMatrix2D(rowsA, p);
 
-    if (B.rows() != columnsA) {
-      throw new ArgumentError("Matrix2D inner dimensions must agree:" + toStringShort() + ", " + (transposeB ? B.viewDice() : B).toStringShort());
+    if (B.rows != columnsA) {
+      throw new ArgumentError("Matrix2D inner dimensions must agree:" + toStringShort() + ", " + (transposeB ? B.dice() : B).toStringShort());
     }
-    if (C.rows() != rowsA || C.columns() != p) {
-      throw new ArgumentError("Incompatibel result matrix: " + toStringShort() + ", " + (transposeB ? B.viewDice() : B).toStringShort() + ", " + C.toStringShort());
+    if (C.rows != rowsA || C.columns != p) {
+      throw new ArgumentError("Incompatibel result matrix: " + toStringShort() + ", " + (transposeB ? B.dice() : B).toStringShort() + ", " + C.toStringShort());
     }
     if (this == C || B == C) {
       throw new ArgumentError("Matrices must not be identical");
     }
 
     if (!ignore) {
-      C.assign(func.multiply(beta));
+      C.forEach(func.multiply(beta));
     }
 
     // cache views
     final List<DoubleMatrix1D> Brows = new List<DoubleMatrix1D>(columnsA);
-    for (int i = columnsA; --i >= 0; ) Brows[i] = B.viewRow(i);
+    for (int i = columnsA; --i >= 0; ) Brows[i] = B.row(i);
     final List<DoubleMatrix1D> Crows = new List<DoubleMatrix1D>(rowsA);
-    for (int i = rowsA; --i >= 0; ) Crows[i] = C.viewRow(i);
+    for (int i = rowsA; --i >= 0; ) Crows[i] = C.row(i);
 
     final DoublePlusMultSecond fun = new DoublePlusMultSecond.plusMult(0.0);
 
@@ -769,9 +769,9 @@ class SparseDoubleMatrix2D extends DoubleMatrix2D {
       int j = key % _columns;
       fun.multiplicator = value * alpha;
       if (!transposeA) {
-        Crows[i].assignFunc(Brows[j], fun);
+        Crows[i].forEachVector(Brows[j], fun);
       } else {
-        Crows[j].assignFunc(Brows[i], fun);
+        Crows[j].forEachVector(Brows[i], fun);
       }
       return true;
     });
@@ -985,7 +985,7 @@ class SelectedSparseDoubleMatrix2D extends DoubleMatrix2D {
    * @return the value at the specified coordinate.
    */
 
-  double getQuick(int row, int column) {
+  double get(int row, int column) {
     // if (debug) if (column<0 || column>=columns || row<0 || row>=rows)
     // throw new IndexOutOfBoundsException("row:"+row+", column:"+column);
     // return elements.get(index(row,column));
@@ -1066,7 +1066,7 @@ class SelectedSparseDoubleMatrix2D extends DoubleMatrix2D {
    *            the value to be filled into the specified cell.
    */
 
-  void setQuick(int row, int column, double value) {
+  void set(int row, int column, double value) {
     // if (debug) if (column<0 || column>=columns || row<0 || row>=rows)
     // throw new IndexOutOfBoundsException("row:"+row+", column:"+column);
     // int index = index(row,column);
@@ -1084,11 +1084,11 @@ class SelectedSparseDoubleMatrix2D extends DoubleMatrix2D {
    */
 
   DoubleMatrix1D vectorize() {
-    SparseDoubleMatrix1D v = new SparseDoubleMatrix1D(size());
+    SparseDoubleMatrix1D v = new SparseDoubleMatrix1D(length);
     int idx = 0;
     for (int c = 0; c < _columns; c++) {
       for (int r = 0; r < _rows; r++) {
-        v.setQuick(idx++, getQuick(c, r));
+        v.set(idx++, get(c, r));
       }
     }
     return v;
@@ -1121,14 +1121,14 @@ class SelectedSparseDoubleMatrix2D extends DoubleMatrix2D {
    * @see #viewRow(int)
    */
 
-  DoubleMatrix1D viewColumn(int column) {
+  DoubleMatrix1D column(int column) {
     _checkColumn(column);
     int viewSize = this._rows;
     int viewZero = this._rowZero;
     int viewStride = this._rowStride;
     Int32List viewOffsets = this._rowOffsets;
     int viewOffset = this._offset + _columnOffset(_columnRank(column));
-    return new SelectedSparseDoubleMatrix1D(viewSize, this._elements, viewZero, viewStride, viewOffsets, viewOffset);
+    return new SelectedSparseDoubleMatrix1D(this._elements, viewOffsets, viewSize, viewZero, viewStride, viewOffset);
   }
 
   /**
@@ -1158,14 +1158,14 @@ class SelectedSparseDoubleMatrix2D extends DoubleMatrix2D {
    * @see #viewColumn(int)
    */
 
-  DoubleMatrix1D viewRow(int row) {
+  DoubleMatrix1D row(int row) {
     _checkRow(row);
     int viewSize = this._columns;
     int viewZero = _columnZero;
     int viewStride = this._columnStride;
     Int32List viewOffsets = this._columnOffsets;
     int viewOffset = this._offset + _rowOffset(_rowRank(row));
-    return new SelectedSparseDoubleMatrix1D(viewSize, this._elements, viewZero, viewStride, viewOffsets, viewOffset);
+    return new SelectedSparseDoubleMatrix1D(this._elements, viewOffsets, viewSize, viewZero, viewStride, viewOffset);
   }
 
   /**

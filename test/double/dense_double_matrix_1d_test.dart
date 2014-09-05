@@ -12,8 +12,8 @@ class DenseDoubleMatrix1DTest extends DoubleMatrix1DTest {
 class DenseDoubleMatrix1DViewTest extends DenseDoubleMatrix1DTest {
 
   void createMatrices() {
-    A = new DenseDoubleMatrix1D(SIZE).viewFlip();
-    B = new DenseDoubleMatrix1D(SIZE).viewFlip();
+    A = new DenseDoubleMatrix1D(SIZE).flip();
+    B = new DenseDoubleMatrix1D(SIZE).flip();
   }
 
 }

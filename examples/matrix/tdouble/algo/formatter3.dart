@@ -14,7 +14,7 @@ main(int size, double value) {
   buf = new StringBuffer();
   for (int i = size; --i >= 0; ) {
     for (int j = size; --j >= 0; ) {
-      buf.append(matrix.getQuick(i, j));
+      buf.append(matrix.get(i, j));
     }
   }
   buf = null;
@@ -25,7 +25,7 @@ main(int size, double value) {
   buf = new StringBuffer();
   for (int i = size; --i >= 0; ) {
     for (int j = size; --j >= 0; ) {
-      buf.append(format.form(matrix.getQuick(i, j)));
+      buf.append(format.form(matrix.get(i, j)));
     }
   }
   buf = null;

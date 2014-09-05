@@ -37,16 +37,16 @@ class DelegateDoubleMatrix1D extends DoubleMatrix1D {
    *            the row this view is bound to
    */
   DelegateDoubleMatrix1D(DoubleMatrix2D newContent, int row) {
-    if (row < 0 || row >= newContent.rows()) {
+    if (row < 0 || row >= newContent.rows) {
       throw new ArgumentError();
     }
-    _setUp(newContent.columns());
+    _setUp(newContent.columns);
     this._row = row;
     this._content = newContent;
   }
 
-  double getQuick(int index) {
-    return _content.getQuick(_row, index);
+  double get(int index) {
+    return _content.get(_row, index);
   }
 
   DoubleMatrix1D like1D(int size) {
@@ -57,8 +57,8 @@ class DelegateDoubleMatrix1D extends DoubleMatrix1D {
     return _content.like2D(rows, columns);
   }
 
-  void setQuick(int index, double value) {
-    _content.setQuick(_row, index, value);
+  void set(int index, double value) {
+    _content.set(_row, index, value);
   }
 
   Object elements() {

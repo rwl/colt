@@ -47,9 +47,9 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
    * @return the aggregated measure.
    * @see cern.jet.math.tdcomplex.DComplexFunctions
    */
-  Float64List aggregate(final cfunc.DComplexDComplexDComplexFunction aggr, final cfunc.DComplexDComplexFunction f) {
+  Float64List reduce(final cfunc.DComplexDComplexDComplexFunction aggr, final cfunc.DComplexDComplexFunction f) {
     Float64List b = new Float64List(2);
-    if (size() == 0) {
+    if (length == 0) {
       b[0] = double.NAN;
       b[1] = double.NAN;
       return b;
@@ -64,11 +64,11 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
         final int firstRow = j * k;
         final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
         futures[j] = ConcurrencyUtils.submit(() {
-          Float64List a = f(getQuick(firstRow, 0));
+          Float64List a = f(get(firstRow, 0));
           int d = 1;
           for (int r = firstRow; r < lastRow; r++) {
             for (int c = d; c < _columns; c++) {
-              a = aggr(a, f(getQuick(r, c)));
+              a = aggr(a, f(get(r, c)));
             }
             d = 0;
           }
@@ -77,11 +77,11 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
       }
       a = ConcurrencyUtils.waitForCompletion(futures, aggr);
     } else {*/
-    a = f(getQuick(0, 0));
+    a = f(get(0, 0));
     int d = 1; // first cell already done
     for (int r = 0; r < _rows; r++) {
       for (int c = d; c < _columns; c++) {
-        a = aggr(a, f(getQuick(r, c)));
+        a = aggr(a, f(get(r, c)));
       }
       d = 0;
     }
@@ -105,10 +105,10 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
    *             <tt>columns() != other.columns() || rows() != other.rows()</tt>
    * @see cern.jet.math.tdcomplex.DComplexFunctions
    */
-  Float64List aggregateMatrix(final DComplexMatrix2D other, final cfunc.DComplexDComplexDComplexFunction aggr, final cfunc.DComplexDComplexDComplexFunction f) {
+  Float64List reduceMatrix(final DComplexMatrix2D other, final cfunc.DComplexDComplexDComplexFunction aggr, final cfunc.DComplexDComplexDComplexFunction f) {
     checkShape(other);
     Float64List b = new Float64List(2);
-    if (size() == 0) {
+    if (length == 0) {
       b[0] = double.NAN;
       b[1] = double.NAN;
       return b;
@@ -123,11 +123,11 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
         final int firstRow = j * k;
         final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
         futures[j] = ConcurrencyUtils.submit(() {
-          Float64List a = f(getQuick(firstRow, 0), other.getQuick(firstRow, 0));
+          Float64List a = f(get(firstRow, 0), other.get(firstRow, 0));
           int d = 1;
           for (int r = firstRow; r < lastRow; r++) {
             for (int c = d; c < _columns; c++) {
-              a = aggr(a, f(getQuick(r, c), other.getQuick(r, c)));
+              a = aggr(a, f(get(r, c), other.get(r, c)));
             }
             d = 0;
           }
@@ -136,11 +136,11 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
       }
       a = ConcurrencyUtils.waitForCompletion(futures, aggr);
     } else {*/
-    a = f(getQuick(0, 0), other.getQuick(0, 0));
+    a = f(get(0, 0), other.get(0, 0));
     int d = 1; // first cell already done
     for (int r = 0; r < _rows; r++) {
       for (int c = d; c < _columns; c++) {
-        a = aggr(a, f(getQuick(r, c), other.getQuick(r, c)));
+        a = aggr(a, f(get(r, c), other.get(r, c)));
       }
       d = 0;
     }
@@ -156,7 +156,7 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
    * @return <tt>this</tt> (for convenience only).
    * @see cern.jet.math.tdcomplex.DComplexFunctions
    */
-  DComplexMatrix2D assign(final cfunc.DComplexDComplexFunction f) {
+  DComplexMatrix2D forEach(final cfunc.DComplexDComplexFunction f) {
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
@@ -168,7 +168,7 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
         futures[j] = ConcurrencyUtils.submit(() {
           for (int r = firstRow; r < lastRow; r++) {
             for (int c = 0; c < _columns; c++) {
-              setQuick(r, c, f(getQuick(r, c)));
+              set(r, c, f(get(r, c)));
             }
           }
         });
@@ -177,7 +177,7 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
     } else {*/
     for (int r = 0; r < _rows; r++) {
       for (int c = 0; c < _columns; c++) {
-        setQuick(r, c, f(getQuick(r, c)));
+        set(r, c, f(get(r, c)));
       }
     }
     //}
@@ -195,7 +195,7 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
    * @return <tt>this</tt> (for convenience only).
    * @see cern.jet.math.tdcomplex.DComplexFunctions
    */
-  DComplexMatrix2D assignProc(final cfunc.DComplexProcedure cond, final cfunc.DComplexDComplexFunction f) {
+  DComplexMatrix2D forEachWhere(final cfunc.DComplexProcedure cond, final cfunc.DComplexDComplexFunction f) {
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
@@ -208,9 +208,9 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
           Float64List elem;
           for (int r = firstRow; r < lastRow; r++) {
             for (int c = 0; c < _columns; c++) {
-              elem = getQuick(r, c);
+              elem = get(r, c);
               if (cond(elem) == true) {
-                setQuick(r, c, f(elem));
+                set(r, c, f(elem));
               }
             }
           }
@@ -221,9 +221,9 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
     Float64List elem;
     for (int r = 0; r < _rows; r++) {
       for (int c = 0; c < _columns; c++) {
-        elem = getQuick(r, c);
+        elem = get(r, c);
         if (cond(elem) == true) {
-          setQuick(r, c, f(elem));
+          set(r, c, f(elem));
         }
       }
     }
@@ -242,7 +242,7 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
    * @return <tt>this</tt> (for convenience only).
    *
    */
-  DComplexMatrix2D assignProcValue(final cfunc.DComplexProcedure cond, final Float64List value) {
+  DComplexMatrix2D fillWhere(final cfunc.DComplexProcedure cond, final Float64List value) {
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
@@ -255,9 +255,9 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
           Float64List elem;
           for (int r = firstRow; r < lastRow; r++) {
             for (int c = 0; c < _columns; c++) {
-              elem = getQuick(r, c);
+              elem = get(r, c);
               if (cond(elem) == true) {
-                setQuick(r, c, value);
+                set(r, c, value);
               }
             }
           }
@@ -268,9 +268,9 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
     Float64List elem;
     for (int r = 0; r < _rows; r++) {
       for (int c = 0; c < _columns; c++) {
-        elem = getQuick(r, c);
+        elem = get(r, c);
         if (cond(elem) == true) {
-          setQuick(r, c, value);
+          set(r, c, value);
         }
       }
     }
@@ -287,7 +287,7 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
    * @return <tt>this</tt> (for convenience only).
    * @see cern.jet.math.tdcomplex.DComplexFunctions
    */
-  DComplexMatrix2D assignRealFunc(final cfunc.DComplexRealFunction f) {
+  DComplexMatrix2D forEachReal(final cfunc.DComplexRealFunction f) {
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
@@ -299,8 +299,8 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
         futures[j] = ConcurrencyUtils.submit(() {
           for (int r = firstRow; r < lastRow; r++) {
             for (int c = 0; c < _columns; c++) {
-              double re = f(getQuick(r, c));
-              setQuick(r, c, re, 0);
+              double re = f(get(r, c));
+              set(r, c, re, 0);
             }
           }
         });
@@ -309,8 +309,8 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
     } else {*/
     for (int r = 0; r < _rows; r++) {
       for (int c = 0; c < _columns; c++) {
-        double re = f(getQuick(r, c));
-        setPartsQuick(r, c, re, 0.0);
+        double re = f(get(r, c));
+        setParts(r, c, re, 0.0);
       }
     }
     //}
@@ -333,7 +333,7 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
    *             if
    *             <tt>columns() != other.columns() || rows() != other.rows()</tt>
    */
-  DComplexMatrix2D assignMatrix(DComplexMatrix2D other) {
+  DComplexMatrix2D copyFrom(DComplexMatrix2D other) {
     if (other == this) return this;
     checkShape(other);
     DComplexMatrix2D otherLoc;
@@ -353,7 +353,7 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
         futures[j] = ConcurrencyUtils.submit(() {
           for (int r = firstRow; r < lastRow; r++) {
             for (int c = 0; c < _columns; c++) {
-              setQuick(r, c, otherLoc.getQuick(r, c));
+              set(r, c, otherLoc.get(r, c));
             }
           }
         });
@@ -362,7 +362,7 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
     } else {*/
     for (int r = 0; r < _rows; r++) {
       for (int c = 0; c < _columns; c++) {
-        setQuick(r, c, otherLoc.getQuick(r, c));
+        set(r, c, otherLoc.get(r, c));
       }
     }
     //}
@@ -384,7 +384,7 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
    *             <tt>columns() != other.columns() || rows() != other.rows()</tt>
    * @see cern.jet.math.tdcomplex.DComplexFunctions
    */
-  DComplexMatrix2D assignFunc(final DComplexMatrix2D y, final cfunc.DComplexDComplexDComplexFunction f) {
+  DComplexMatrix2D forEachMatrix(final DComplexMatrix2D y, final cfunc.DComplexDComplexDComplexFunction f) {
     checkShape(y);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -397,7 +397,7 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
         futures[j] = ConcurrencyUtils.submit(() {
           for (int r = firstRow; r < lastRow; r++) {
             for (int c = 0; c < _columns; c++) {
-              setQuick(r, c, f(getQuick(r, c), y.getQuick(r, c)));
+              set(r, c, f(get(r, c), y.get(r, c)));
             }
           }
         });
@@ -406,7 +406,7 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
     } else {*/
     for (int r = 0; r < _rows; r++) {
       for (int c = 0; c < _columns; c++) {
-        setQuick(r, c, f(getQuick(r, c), y.getQuick(r, c)));
+        set(r, c, f(get(r, c), y.get(r, c)));
       }
     }
     //}
@@ -433,7 +433,7 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
    *             <tt>columns() != other.columns() || rows() != other.rows()</tt>
    * @see cern.jet.math.tdouble.DoubleFunctions
    */
-  DComplexMatrix2D assignFuncIndex(final DComplexMatrix2D y, final cfunc.DComplexDComplexDComplexFunction function, Int32List rowList, Int32List columnList) {
+  DComplexMatrix2D forEachMatrixRange(final DComplexMatrix2D y, final cfunc.DComplexDComplexDComplexFunction function, Int32List rowList, Int32List columnList) {
     checkShape(y);
     final int size = rowList.length;
     final Int32List rowElements = rowList;
@@ -448,14 +448,14 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
         final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
         futures[j] = ConcurrencyUtils.submit(() {
           for (int i = firstIdx; i < lastIdx; i++) {
-            setQuick(rowElements[i], columnElements[i], function(getQuick(rowElements[i], columnElements[i]), y.getQuick(rowElements[i], columnElements[i])));
+            set(rowElements[i], columnElements[i], function(get(rowElements[i], columnElements[i]), y.get(rowElements[i], columnElements[i])));
           }
         });
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
     for (int i = 0; i < size; i++) {
-      setQuick(rowElements[i], columnElements[i], function(getQuick(rowElements[i], columnElements[i]), y.getQuick(rowElements[i], columnElements[i])));
+      set(rowElements[i], columnElements[i], function(get(rowElements[i], columnElements[i]), y.get(rowElements[i], columnElements[i])));
     }
     //}
     return this;
@@ -471,7 +471,7 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
    *
    * @return <tt>this</tt> (for convenience only).
    */
-  DComplexMatrix2D assignValue(final double re, final double im) {
+  DComplexMatrix2D fill(/*Float64List value*/final double re, final double im) {
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
@@ -483,7 +483,7 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
         futures[j] = ConcurrencyUtils.submit(() {
           for (int r = firstRow; r < lastRow; r++) {
             for (int c = 0; c < _columns; c++) {
-              setQuick(r, c, re, im);
+              set(r, c, re, im);
             }
           }
         });
@@ -492,7 +492,8 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
     } else {*/
     for (int r = 0; r < _rows; r++) {
       for (int c = 0; c < _columns; c++) {
-        setPartsQuick(r, c, re, im);
+        setParts(r, c, re, im);
+        //set(r, c, value);
       }
     }
     //}
@@ -514,9 +515,9 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
    * @throws ArgumentError
    *             if <tt>values.length != rows()*2*columns()</tt>.
    */
-  DComplexMatrix2D assignValues(final Float64List values) {
+  DComplexMatrix2D setAll(final Float64List values) {
     if (values.length != _rows * 2 * _columns) {
-      throw new ArgumentError("Must have same length: length=${values.length} rows()*2*columns()=${rows() * 2 * columns()}");
+      throw new ArgumentError("Must have same length: length=${values.length} rows()*2*columns()=${rows * 2 * columns}");
     }
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -530,7 +531,7 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
           int idx = firstRow * _columns * 2;
           for (int r = firstRow; r < lastRow; r++) {
             for (int c = 0; c < _columns; c++) {
-              setPartsQuick(r, c, values[idx], values[idx + 1]);
+              setParts(r, c, values[idx], values[idx + 1]);
               idx += 2;
             }
           }
@@ -541,7 +542,7 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
     int idx = 0;
     for (int r = 0; r < _rows; r++) {
       for (int c = 0; c < _columns; c++) {
-        setPartsQuick(r, c, values[idx], values[idx + 1]);
+        setParts(r, c, values[idx], values[idx + 1]);
         idx += 2;
       }
     }
@@ -566,9 +567,9 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
    *             <tt>values.length != rows() || for any 0 &lt;= row &lt; rows(): values[row].length != 2*columns()</tt>
    *             .
    */
-  DComplexMatrix2D assignList(final List<Float64List> values) {
+  DComplexMatrix2D setAll2D(final List<Float64List> values) {
     if (values.length != _rows) {
-      throw new ArgumentError("Must have same number of rows: rows=${values.length} rows()=${rows()}");
+      throw new ArgumentError("Must have same number of rows: rows=${values.length} rows()=${rows}");
     }
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -583,7 +584,7 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
             Float64List currentRow = values[r];
             if (currentRow.length != 2 * _columns) throw new ArgumentError("Must have same number of columns in every row: columns=" + currentRow.length + "2*columns()=" + 2 * columns());
             for (int c = 0; c < _columns; c++) {
-              setQuick(r, c, currentRow[2 * c], currentRow[2 * c + 1]);
+              set(r, c, currentRow[2 * c], currentRow[2 * c + 1]);
             }
           }
         });
@@ -592,9 +593,9 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
     } else {*/
     for (int r = 0; r < _rows; r++) {
       Float64List currentRow = values[r];
-      if (currentRow.length != 2 * _columns) throw new ArgumentError("Must have same number of columns in every row: columns=${currentRow.length} 2*columns()=${2 * columns()}");
+      if (currentRow.length != 2 * _columns) throw new ArgumentError("Must have same number of columns in every row: columns=${currentRow.length} 2*columns()=${2 * columns}");
       for (int c = 0; c < _columns; c++) {
-        setPartsQuick(r, c, currentRow[2 * c], currentRow[2 * c + 1]);
+        setParts(r, c, currentRow[2 * c], currentRow[2 * c + 1]);
       }
     }
     //}
@@ -613,7 +614,7 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
    * @throws ArgumentError
    *             if <tt>size() != other.size()</tt>.
    */
-  DComplexMatrix2D assignImaginary(final DoubleMatrix2D other) {
+  DComplexMatrix2D setImaginary(final DoubleMatrix2D other) {
     checkShape(other);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -626,9 +627,9 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
         futures[j] = ConcurrencyUtils.submit(() {
           for (int r = firstRow; r < lastRow; r++) {
             for (int c = 0; c < _columns; c++) {
-              double re = getQuick(r, c)[0];
-              double im = other.getQuick(r, c);
-              setQuick(r, c, re, im);
+              double re = get(r, c)[0];
+              double im = other.get(r, c);
+              set(r, c, re, im);
             }
           }
         });
@@ -637,9 +638,9 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
     } else {*/
     for (int r = 0; r < _rows; r++) {
       for (int c = 0; c < _columns; c++) {
-        double re = getQuick(r, c)[0];
-        double im = other.getQuick(r, c);
-        setPartsQuick(r, c, re, im);
+        double re = get(r, c)[0];
+        double im = other.get(r, c);
+        setParts(r, c, re, im);
       }
     }
     //}
@@ -657,7 +658,7 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
    * @throws ArgumentError
    *             if <tt>size() != other.size()</tt>.
    */
-  DComplexMatrix2D assignReal(final DoubleMatrix2D other) {
+  DComplexMatrix2D setReal(final DoubleMatrix2D other) {
     checkShape(other);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -670,9 +671,9 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
         futures[j] = ConcurrencyUtils.submit(() {
           for (int r = firstRow; r < lastRow; r++) {
             for (int c = 0; c < _columns; c++) {
-              double re = other.getQuick(r, c);
-              double im = getQuick(r, c)[1];
-              setQuick(r, c, re, im);
+              double re = other.get(r, c);
+              double im = get(r, c)[1];
+              set(r, c, re, im);
             }
           }
         });
@@ -681,9 +682,9 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
     } else {*/
     for (int r = 0; r < _rows; r++) {
       for (int c = 0; c < _columns; c++) {
-        double re = other.getQuick(r, c);
-        double im = getQuick(r, c)[1];
-        setPartsQuick(r, c, re, im);
+        double re = other.get(r, c);
+        double im = get(r, c)[1];
+        setParts(r, c, re, im);
       }
     }
     //}
@@ -695,7 +696,7 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
    *
    * @return the number of cells having non-zero values.
    */
-  int cardinality() {
+  int get cardinality {
     int cardinality = 0;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -711,7 +712,7 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
           Float64List tmp = new Float64List(2);
           for (int r = firstRow; r < lastRow; r++) {
             for (int c = 0; c < _columns; c++) {
-              tmp = getQuick(r, c);
+              tmp = get(r, c);
               if ((tmp[0] != 0.0) || (tmp[1] != 0.0)) cardinality++;
             }
           }
@@ -735,7 +736,7 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
     Float64List tmp = new Float64List(2);
     for (int r = 0; r < _rows; r++) {
       for (int c = 0; c < _columns; c++) {
-        tmp = getQuick(r, c);
+        tmp = get(r, c);
         if (tmp[0] != 0 || tmp[1] != 0) {
           cardinality++;
         }
@@ -755,7 +756,7 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
    * @return a deep copy of the receiver.
    */
   DComplexMatrix2D copy() {
-    return like().assignMatrix(this);
+    return like().copyFrom(this);
   }
 
   /**
@@ -766,9 +767,9 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
    * @return <tt>true</tt> if all cells are equal to the given value,
    *         <tt>false</tt> otherwise.
    */
-  bool equalsValue(Float64List value) {
+  /*bool equalsValue(Float64List value) {
     return DComplexProperty.DEFAULT.equalsValue2D(this, value);
-  }
+  }*/
 
   /**
    * Compares this object against the specified object. The result is
@@ -782,10 +783,23 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
    * @return <code>true</code> if the objects are the same; <code>false</code>
    *         otherwise.
    */
-  bool equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (!(obj is DComplexMatrix2D)) return false;
+  bool operator ==(var obj) {
+    if (obj is num) {
+      final c = new Float64List.fromList([obj.toDouble(), 0.0]);
+      return DComplexProperty.DEFAULT.equalsValue2D(this, c);
+    }
+    if (obj is Float64List) {
+      return DComplexProperty.DEFAULT.equalsValue2D(this, obj);
+    }
+    if (identical(this, obj)) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (obj is! DComplexMatrix2D) {
+      return false;
+    }
 
     return DComplexProperty.DEFAULT.equalsMatrix2D(this, obj as DComplexMatrix2D);
   }
@@ -816,10 +830,10 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
         futures[j] = ConcurrencyUtils.submit(() {
           for (int r = firstRow; r < lastRow; r++) {
             for (int c = 0; c < _columns; c++) {
-              Float64List value = getQuick(r, c);
+              Float64List value = get(r, c);
               if (value[0] != 0 || value[1] != 0) {
                 Float64List v = function(r, c, value);
-                setQuick(r, c, v);
+                set(r, c, v);
               }
             }
           }
@@ -829,10 +843,10 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
     } else {*/
     for (int r = 0; r < _rows; r++) {
       for (int c = 0; c < _columns; c++) {
-        Float64List value = getQuick(r, c);
+        Float64List value = get(r, c);
         if (value[0] != 0 || value[1] != 0) {
           Float64List v = function(r, c, value);
-          setQuick(r, c, v);
+          set(r, c, v);
         }
       }
     }
@@ -852,11 +866,11 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
    *             if
    *             <tt>column&lt;0 || column&gt;=columns() || row&lt;0 || row&gt;=rows()</tt>
    */
-  Float64List get(int row, int column) {
+  Float64List at(int row, int column) {
     if (column < 0 || column >= _columns || row < 0 || row >= _rows) {
       throw new RangeError("row:$row, column:$column");
     }
-    return getQuick(row, column);
+    return get(row, column);
   }
 
   /**
@@ -867,8 +881,8 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
    *
    * @return a complex conjugate matrix
    */
-  DComplexMatrix2D getConjugateTranspose() {
-    final DComplexMatrix2D transpose = this.viewDice().copy();
+  DComplexMatrix2D conjugateTranspose() {
+    final DComplexMatrix2D transpose = this.dice().copy();
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _columns);
@@ -881,9 +895,9 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
           Float64List tmp = new Float64List(2);
           for (int r = firstRow; r < lastRow; r++) {
             for (int c = 0; c < _rows; c++) {
-              tmp = transpose.getQuick(r, c);
+              tmp = transpose.get(r, c);
               tmp[1] = -tmp[1];
-              transpose.setQuick(r, c, tmp);
+              transpose.set(r, c, tmp);
             }
           }
         });
@@ -893,9 +907,9 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
     Float64List tmp = new Float64List(2);
     for (int r = 0; r < _columns; r++) {
       for (int c = 0; c < _rows; c++) {
-        tmp = transpose.getQuick(r, c);
+        tmp = transpose.get(r, c);
         tmp[1] = -tmp[1];
-        transpose.setQuick(r, c, tmp);
+        transpose.set(r, c, tmp);
       }
     }
     //}
@@ -914,7 +928,7 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
    *
    * @return the imaginary part
    */
-  DoubleMatrix2D getImaginaryPart();
+  DoubleMatrix2D imaginary();
 
   /**
    * Fills the coordinates and values of cells having non-zero values into the
@@ -935,13 +949,13 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
    * @param valueList
    *            the list to be filled with values, can have any size.
    */
-  void getNonZeros(final List<int> rowList, final List<int> columnList, final List<Float64List> valueList) {
+  void nonZeros(final List<int> rowList, final List<int> columnList, final List<Float64List> valueList) {
     rowList.clear();
     columnList.clear();
     valueList.clear();
     for (int r = 0; r < _rows; r++) {
       for (int c = 0; c < _columns; c++) {
-        Float64List value = getQuick(r, c);
+        Float64List value = get(r, c);
         if (value[0] != 0 || value[1] != 0) {
           rowList.add(r);
           columnList.add(c);
@@ -968,14 +982,14 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
    *            the index of the column-coordinate.
    * @return the value at the specified coordinate.
    */
-  Float64List getQuick(int row, int column);
+  Float64List get(int row, int column);
 
   /**
    * Returns the real part of this matrix
    *
    * @return the real part
    */
-  DoubleMatrix2D getRealPart();
+  DoubleMatrix2D real();
 
   /**
    * Construct and returns a new empty matrix <i>of the same dynamic type</i>
@@ -1033,11 +1047,11 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
    *             if
    *             <tt>column&lt;0 || column&gt;=columns() || row&lt;0 || row&gt;=rows()</tt>
    */
-  void set(int row, int column, Float64List value) {
+  void put(int row, int column, Float64List value) {
     if (column < 0 || column >= _columns || row < 0 || row >= _rows) {
       throw new RangeError("row:$row, column:$column");
     }
-    setQuick(row, column, value);
+    set(row, column, value);
   }
 
   /**
@@ -1058,11 +1072,11 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
    *             if
    *             <tt>column&lt;0 || column&gt;=columns() || row&lt;0 || row&gt;=rows()</tt>
    */
-  void setParts(int row, int column, double re, double im) {
+  void putParts(int row, int column, double re, double im) {
     if (column < 0 || column >= _columns || row < 0 || row >= _rows) {
       throw new RangeError("row:$row, column:$column");
     }
-    setPartsQuick(row, column, re, im);
+    setParts(row, column, re, im);
   }
 
   /**
@@ -1088,7 +1102,7 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
    *            specified cell.
    *
    */
-  void setPartsQuick(int row, int column, double re, double im);
+  void setParts(int row, int column, double re, double im);
 
   /**
    * Sets the matrix cell at coordinate <tt>[row,column]</tt> to the specified
@@ -1108,7 +1122,7 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
    * @param value
    *            the value to be filled into the specified cell.
    */
-  void setQuick(int row, int column, Float64List value);
+  void set(int row, int column, Float64List value);
 
   /**
    * Constructs and returns a 2-dimensional array containing the cell values.
@@ -1121,7 +1135,7 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
    *
    * @return an array filled with the values of the cells.
    */
-  List<Float64List> toArray() {
+  List<Float64List> toList() {
     final List<Float64List> values = new List<Float64List>.generate(_rows,
         (_) => new Float64List(2 * _columns));
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -1136,7 +1150,7 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
           Float64List tmp;
           for (int r = firstRow; r < lastRow; r++) {
             for (int c = 0; c < _columns; c++) {
-              tmp = getQuick(r, c);
+              tmp = get(r, c);
               values[r][2 * c] = tmp[0];
               values[r][2 * c + 1] = tmp[1];
             }
@@ -1148,7 +1162,7 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
     Float64List tmp;
     for (int r = 0; r < _rows; r++) {
       for (int c = 0; c < _columns; c++) {
-        tmp = getQuick(r, c);
+        tmp = get(r, c);
         values[r][2 * c] = tmp[0];
         values[r][2 * c + 1] = tmp[1];
       }
@@ -1180,7 +1194,7 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
     Float64List elem = new Float64List(2);
     for (int r = 0; r < _rows; r++) {
       for (int c = 0; c < _columns; c++) {
-        elem = getQuick(r, c);
+        elem = get(r, c);
         if (elem[1] == 0) {
           s.write(f.format(elem[0]) + "\t");
           continue;
@@ -1222,7 +1236,7 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
    *             if <tt>column < 0 || column >= columns()</tt>.
    * @see #viewRow(int)
    */
-  DComplexMatrix1D viewColumn(int column) {
+  DComplexMatrix1D column(int column) {
     _checkColumn(column);
     int viewSize = this._rows;
     int viewZero = index(0, column);
@@ -1240,7 +1254,7 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
    * @return a new flip view.
    * @see #viewRowFlip()
    */
-  DComplexMatrix2D viewColumnFlip() {
+  DComplexMatrix2D columnFlip() {
     return _view()._vColumnFlip() as DComplexMatrix2D;
   }
 
@@ -1256,7 +1270,7 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
    *
    * @return a new dice view.
    */
-  DComplexMatrix2D viewDice() {
+  DComplexMatrix2D dice() {
     return _view()._vDice() as DComplexMatrix2D;
   }
 
@@ -1296,7 +1310,7 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
    * @return the new view.
    *
    */
-  DComplexMatrix2D viewPart(int row, int column, int height, int width) {
+  DComplexMatrix2D part(int row, int column, int height, int width) {
     return _view()._vPart(row, column, height, width) as DComplexMatrix2D;
   }
 
@@ -1314,7 +1328,7 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
    *             if <tt>row < 0 || row >= rows()</tt>.
    * @see #viewColumn(int)
    */
-  DComplexMatrix1D viewRow(int row) {
+  DComplexMatrix1D row(int row) {
     _checkRow(row);
     int viewSize = this._columns;
     int viewZero = index(row, 0);
@@ -1332,7 +1346,7 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
    * @return a new flip view.
    * @see #viewColumnFlip()
    */
-  DComplexMatrix2D viewRowFlip() {
+  DComplexMatrix2D rowFlip() {
     return _view()._vRowFlip() as DComplexMatrix2D;
   }
 
@@ -1347,15 +1361,15 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
    *            The condition to be matched.
    * @return the new view.
    */
-  DComplexMatrix2D viewSelectionProc(DComplexMatrix1DProcedure condition) {
+  DComplexMatrix2D where(DComplexMatrix1DProcedure condition) {
     List<int> matches = new List<int>();
     for (int i = 0; i < _rows; i++) {
-      if (condition(viewRow(i))) {
+      if (condition(row(i))) {
         matches.add(i);
       }
     }
     //matches.trimToSize();
-    return viewSelection(new Int32List.fromList(matches), null); // take all columns
+    return select(new Int32List.fromList(matches), null); // take all columns
   }
 
   /**
@@ -1389,7 +1403,7 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
    *             if <tt>!(0 <= columnIndexes[i] < columns())</tt> for any
    *             <tt>i=0..columnIndexes.length()-1</tt>.
    */
-  DComplexMatrix2D viewSelection(Int32List rowIndexes, Int32List columnIndexes) {
+  DComplexMatrix2D select(Int32List rowIndexes, Int32List columnIndexes) {
     // check for "all"
     if (rowIndexes == null) {
       rowIndexes = new Int32List(_rows);
@@ -1435,7 +1449,7 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
    * @throws IndexOutOfBoundsException
    *             if <tt>rowStride<=0 || columnStride<=0</tt>.
    */
-  DComplexMatrix2D viewStrides(int rowStride, int columnStride) {
+  DComplexMatrix2D strides(int rowStride, int columnStride) {
     return _view()._vStrides(rowStride, columnStride) as DComplexMatrix2D;
   }
 
@@ -1472,21 +1486,23 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
    * @throws ArgumentError
    *             if <tt>A.columns() != y.size() || A.rows() > z.size())</tt>.
    */
-  DComplexMatrix1D zMult(final DComplexMatrix1D y, DComplexMatrix1D z, [Float64List alpha = null, Float64List beta = null, bool transposeA = false]) {
+  DComplexMatrix1D mult(final DComplexMatrix1D y, DComplexMatrix1D z, [Float64List alpha = null, Float64List beta = null, bool transposeA = false]) {
     if (alpha == null) {
       alpha = new Float64List.fromList([1.0, 0.0]);
     }
     if (beta == null) {
       beta = (z == null ? new Float64List.fromList([1.0, 0.0]) : new Float64List.fromList([0.0, 0.0]));
     }
-    if (transposeA) return getConjugateTranspose().zMult(y, z, alpha, beta, false);
+    if (transposeA) {
+      return conjugateTranspose().mult(y, z, alpha, beta, false);
+    }
     DComplexMatrix1D zz;
     if (z == null) {
       zz = y.like1D(this._rows);
     } else {
       zz = z;
     }
-    if (_columns != y.size() || _rows > zz.size()) {
+    if (_columns != y.length || _rows > zz.length) {
       throw new ArgumentError("Incompatible args: " + toStringShort() + ", " + y.toStringShort() + ", " + zz.toStringShort());
     }
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -1503,9 +1519,9 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
             s[0] = 0.0;
             s[1] = 0.0;
             for (int c = 0; c < _columns; c++) {
-              s = DComplex.plus(s, DComplex.multiply(getQuick(r, c), y.getQuick(c)));
+              s = DComplex.plus(s, DComplex.multiply(get(r, c), y.get(c)));
             }
-            zz.setQuick(r, DComplex.plus(DComplex.multiply(s, alpha), DComplex.multiply(zz.getQuick(r), beta)));
+            zz.set(r, DComplex.plus(DComplex.multiply(s, alpha), DComplex.multiply(zz.get(r), beta)));
           }
         });
       }
@@ -1516,9 +1532,9 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
       s[0] = 0.0;
       s[1] = 0.0;
       for (int c = 0; c < _columns; c++) {
-        s = DComplex.plus(s, DComplex.multiply(getQuick(r, c), y.getQuick(c)));
+        s = DComplex.plus(s, DComplex.multiply(get(r, c), y.get(c)));
       }
-      zz.setQuick(r, DComplex.plus(DComplex.multiply(s, alpha), DComplex.multiply(zz.getQuick(r), beta)));
+      zz.set(r, DComplex.plus(DComplex.multiply(s, alpha), DComplex.multiply(zz.get(r), beta)));
     }
     //}
     return zz;
@@ -1563,7 +1579,7 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
    * @throws ArgumentError
    *             if <tt>A == C || B == C</tt>.
    */
-  DComplexMatrix2D zMult2D(final DComplexMatrix2D B, DComplexMatrix2D C, [Float64List alpha = null, Float64List beta = null, bool transposeA = false, bool transposeB = false]) {
+  DComplexMatrix2D multiply(final DComplexMatrix2D B, DComplexMatrix2D C, [Float64List alpha = null, Float64List beta = null, bool transposeA = false, bool transposeB = false]) {
     if (alpha == null) {
       alpha = new Float64List.fromList([1.0, 0.0]);
     }
@@ -1571,10 +1587,10 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
       beta = (C == null ? new Float64List.fromList([1.0, 0.0]) : new Float64List.fromList([0.0, 0.0]));
     }
     if (transposeA) {
-      return getConjugateTranspose().zMult2D(B, C, alpha, beta, false, transposeB);
+      return conjugateTranspose().multiply(B, C, alpha, beta, false, transposeB);
     }
     if (transposeB) {
-      return this.zMult2D(B.getConjugateTranspose(), C, alpha, beta, transposeA, false);
+      return this.multiply(B.conjugateTranspose(), C, alpha, beta, transposeA, false);
     }
     final int m = _rows;
     final int n = _columns;
@@ -1607,9 +1623,9 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
               s[0] = 0;
               s[1] = 0;
               for (int c = 0; c < n; c++) {
-                s = DComplex.plus(s, DComplex.mult(getQuick(b, c), B.getQuick(c, a)));
+                s = DComplex.plus(s, DComplex.mult(get(b, c), B.get(c, a)));
               }
-              CC.setQuick(b, a, DComplex.plus(DComplex.mult(s, alpha), DComplex.mult(CC.getQuick(b, a), beta)));
+              CC.set(b, a, DComplex.plus(DComplex.mult(s, alpha), DComplex.mult(CC.get(b, a), beta)));
             }
           }
         });
@@ -1622,9 +1638,9 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
         s[0] = 0.0;
         s[1] = 0.0;
         for (int c = 0; c < n; c++) {
-          s = DComplex.plus(s, DComplex.multiply(getQuick(b, c), B.getQuick(c, a)));
+          s = DComplex.plus(s, DComplex.multiply(get(b, c), B.get(c, a)));
         }
-        CC.setQuick(b, a, DComplex.plus(DComplex.multiply(s, alpha), DComplex.multiply(CC.getQuick(b, a), beta)));
+        CC.set(b, a, DComplex.plus(DComplex.multiply(s, alpha), DComplex.multiply(CC.get(b, a), beta)));
       }
     }
     //}
@@ -1636,11 +1652,11 @@ abstract class DComplexMatrix2D extends AbstractMatrix2D {
    *
    * @return the sum.
    */
-  Float64List zSum() {
-    if (size() == 0) {
+  Float64List sum() {
+    if (length == 0) {
       return new Float64List.fromList([0.0, 0.0]);
     }
-    return aggregate(cfunc.plus, cfunc.identity);
+    return reduce(cfunc.plus, cfunc.identity);
   }
 
   /**

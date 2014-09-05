@@ -15,10 +15,10 @@ void main() {
   matrix = DoubleFactory2D.compose(parts1);
   stdout.writeln("\n" + matrix);
 
-  A.assignValue(9);
-  B.assign(9);
-  C.assign(9);
-  D.assign(9);
+  A.fill(9);
+  B.forEach(9);
+  C.forEach(9);
+  D.forEach(9);
   DoubleFactory2D.decompose(parts1, matrix);
   stdout.writeln(A);
   stdout.writeln(B);

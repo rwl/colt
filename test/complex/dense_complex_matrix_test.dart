@@ -9,8 +9,8 @@ class DenseDComplexMatrix1DTest extends DComplexMatrix1DTest {
 
 class DenseDComplexMatrix1DViewTest extends DenseDComplexMatrix1DTest {
     void createMatrices() {
-        A = new DenseDComplexMatrix1D(SIZE).viewFlip();
-        B = new DenseDComplexMatrix1D(SIZE).viewFlip();
+        A = new DenseDComplexMatrix1D(SIZE).flip();
+        B = new DenseDComplexMatrix1D(SIZE).flip();
     }
 }
 
@@ -24,8 +24,8 @@ class DenseDComplexMatrix2DTest extends DComplexMatrix2DTest {
 
 class DenseDComplexMatrix2DViewTest extends DenseDComplexMatrix2DTest {
     void createMatrices() {
-        A = new DenseDComplexMatrix2D(NCOLUMNS, NROWS).viewDice();
-        B = new DenseDComplexMatrix2D(NCOLUMNS, NROWS).viewDice();
-        Bt = new DenseDComplexMatrix2D(NROWS, NCOLUMNS).viewDice();
+        A = new DenseDComplexMatrix2D(NCOLUMNS, NROWS).dice();
+        B = new DenseDComplexMatrix2D(NCOLUMNS, NROWS).dice();
+        Bt = new DenseDComplexMatrix2D(NROWS, NCOLUMNS).dice();
     }
 }

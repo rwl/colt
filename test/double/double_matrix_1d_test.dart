@@ -31,9 +31,9 @@ testDoubleMatrix1D(String name, DoubleMatrix1DTest t) {
     test('viewSelection', t.testViewSelection);
     test('viewSelectionIndex', t.testViewSelectionIndex);
     test('viewStrides', t.testViewStrides);
-    test('zDotProduct', t.testZDotProduct);
-    test('zDotProductRange', t.testZDotProductRange);
-    test('zDotProductIndex', t.testZDotProductIndex);
+    test('zDotProduct', t.testDot);
+    test('zDotProductRange', t.testDotRange);
+    test('zDotProductIndex', t.testDotNonZero);
   });
 }
 
@@ -53,12 +53,12 @@ abstract class DoubleMatrix1DTest {
 
     final r = new math.Random();
 
-    for (int i = 0; i < A.size(); i++) {
-      A.setQuick(i, r.nextDouble());
+    for (int i = 0; i < A.length; i++) {
+      A.set(i, r.nextDouble());
     }
 
-    for (int i = 0; i < B.size(); i++) {
-      B.setQuick(i, r.nextDouble());
+    for (int i = 0; i < B.length; i++) {
+      B.set(i, r.nextDouble());
     }
   }
 
@@ -76,81 +76,81 @@ abstract class DoubleMatrix1DTest {
 
   testAggregate() {
     double expected = 0.0;
-    for (int i = 0; i < A.size(); i++) {
-      double elem = A.getQuick(i);
+    for (int i = 0; i < A.length; i++) {
+      double elem = A.get(i);
       expected += elem * elem;
     }
-    double result = A.aggregate(plus, square);
+    double result = A.reduce(plus, square);
     expect(result, closeTo(expected, TOL));
   }
 
   testAggregateIndex() {
     List<int> indexList = new List<int>();
-    for (int i = 0; i < A.size(); i++) {
+    for (int i = 0; i < A.length; i++) {
       indexList.add(i);
     }
     double expected = 0.0;
-    for (int i = 0; i < A.size(); i++) {
-      double elem = A.getQuick(i);
+    for (int i = 0; i < A.length; i++) {
+      double elem = A.get(i);
       expected += elem * elem;
     }
-    double result = A.aggregateIndex(plus, square,
+    double result = A.reduceRange(plus, square,
         new Int32List.fromList(indexList));
     expect(result, closeTo(expected, TOL));
   }
 
   testAggregateMatrix() {
     double expected = 0.0;
-    for (int i = 0; i < A.size(); i++) {
-      double elemA = A.getQuick(i);
-      double elemB = B.getQuick(i);
+    for (int i = 0; i < A.length; i++) {
+      double elemA = A.get(i);
+      double elemB = B.get(i);
       expected += elemA * elemB;
     }
-    double result = A.aggregateMatrix(B, plus, mult);
+    double result = A.reduceVector(B, plus, mult);
     expect(result, closeTo(expected, TOL));
   }
 
   testAssignValue() {
     double value = random.nextDouble();
-    A.assignValue(value);
-    for (int i = 0; i < A.size(); i++) {
-      expect(value, closeTo(A.getQuick(i), TOL));
+    A.fill(value);
+    for (int i = 0; i < A.length; i++) {
+      expect(value, closeTo(A.get(i), TOL));
     }
   }
 
   testAssignValues() {
-    Float64List expected = new Float64List(A.size());
-    for (int i = 0; i < A.size(); i++) {
+    Float64List expected = new Float64List(A.length);
+    for (int i = 0; i < A.length; i++) {
       expected[i] = random.nextDouble();
     }
-    A.assignValues(expected);
-    for (int i = 0; i < A.size(); i++) {
-      expect(expected[i], closeTo(A.getQuick(i), TOL));
+    A.setValues(expected);
+    for (int i = 0; i < A.length; i++) {
+      expect(expected[i], closeTo(A.get(i), TOL));
     }
   }
 
   testAssign() {
     DoubleMatrix1D Acopy = A.copy();
-    A.assign(acos);
-    for (int i = 0; i < A.size(); i++) {
-      double expected = math.acos(Acopy.getQuick(i));
-      expect(expected, closeTo(A.getQuick(i), TOL));
+    A.forEach(acos);
+    for (int i = 0; i < A.length; i++) {
+      double expected = math.acos(Acopy.get(i));
+      expect(expected, closeTo(A.get(i), TOL));
     }
   }
 
   testAssignMatrix() {
-    A.assignMatrix(B);
-    expect(A.size() == B.size(), isTrue);
-    for (int i = 0; i < A.size(); i++) {
-      expect(B.getQuick(i), closeTo(A.getQuick(i), TOL));
+    A.setAll(B);
+    expect(A.length == B.length, isTrue);
+    for (int i = 0; i < A.length; i++) {
+      expect(B.get(i), closeTo(A.get(i), TOL));
     }
   }
 
   testAssignFunc() {
     DoubleMatrix1D Acopy = A.copy();
-    A.assignFunc(B, div);
-    for (int i = 0; i < A.size(); i++) {
-      expect(Acopy.getQuick(i) / B.getQuick(i), closeTo(A.getQuick(i), TOL));
+    A.forEachVector(B, div);
+    for (int i = 0; i < A.length; i++) {
+      expect(Acopy.get(i) / B.get(i), closeTo(A.get(i), TOL));
     }
   }
 
@@ -163,12 +163,12 @@ abstract class DoubleMatrix1DTest {
       }
     }
     DoubleMatrix1D Acopy = A.copy();
-    A.assignProcValue(procedure, -1.0);
-    for (int i = 0; i < A.size(); i++) {
-      if (Acopy.getQuick(i).abs() > 0.1) {
-        expect(-1.0, closeTo(A.getQuick(i), TOL));
+    A.fillWhere(procedure, -1.0);
+    for (int i = 0; i < A.length; i++) {
+      if (Acopy.get(i).abs() > 0.1) {
+        expect(-1.0, closeTo(A.get(i), TOL));
       } else {
-        expect(Acopy.getQuick(i), closeTo(A.getQuick(i), TOL));
+        expect(Acopy.get(i), closeTo(A.get(i), TOL));
       }
     }
   }
@@ -182,113 +182,109 @@ abstract class DoubleMatrix1DTest {
       }
     }
     DoubleMatrix1D Acopy = A.copy();
-    A.assignProc(procedure, tan);
-    for (int i = 0; i < A.size(); i++) {
-      if (Acopy.getQuick(i).abs() > 0.1) {
-        expect(math.tan(Acopy.getQuick(i)), closeTo(A.getQuick(i), TOL));
+    A.forEachWhere(procedure, tan);
+    for (int i = 0; i < A.length; i++) {
+      if (Acopy.get(i).abs() > 0.1) {
+        expect(math.tan(Acopy.get(i)), closeTo(A.get(i), TOL));
       } else {
-        expect(Acopy.getQuick(i), closeTo(A.getQuick(i), TOL));
+        expect(Acopy.get(i), closeTo(A.get(i), TOL));
       }
     }
   }
 
   testCardinality() {
-    int card = A.cardinality();
-    expect(A.size(), equals(card));
+    int card = A.cardinality;
+    expect(A.length, equals(card));
   }
 
   testEqualsValue() {
     double value = 1.0;
-    A.assignValue(value);
-    bool eq = A.equalsValue(value);
-    expect(eq, isTrue);
-    eq = A.equals(2);
-    expect(eq, isFalse);
+    A.fill(value);
+    expect(A == value, isTrue);
+    expect(A == 2, isFalse);
   }
 
   testEquals() {
-    bool eq = A.equals(A);
-    expect(eq, isTrue);
-    eq = A.equals(B);
-    expect(eq, isFalse);
+    expect(A == A, isTrue);
+    expect(A == B, isFalse);
   }
 
   testMaxLocation() {
-    A.assignValue(0.0);
-    A.setQuick(A.size() ~/ 3, 0.7);
-    A.setQuick(A.size() ~/ 2, 0.1);
-    List<num> maxAndLoc = A.getMaxLocation();
-    expect(0.7, closeTo(maxAndLoc[0], TOL));
-    expect(A.size() ~/ 3, equals(maxAndLoc[1]));
+    A.fill(0.0);
+    A.set(A.length ~/ 3, 0.7);
+    A.set(A.length ~/ 2, 0.1);
+    final maxAndLoc = A.max();
+    expect(0.7, closeTo(maxAndLoc.value, TOL));
+    expect(A.length ~/ 3, equals(maxAndLoc.location));
   }
 
   testMinLocation() {
-    A.assignValue(0.0);
-    A.setQuick(A.size() ~/ 3, -0.7);
-    A.setQuick(A.size() ~/ 2, -0.1);
-    List<num> minAndLoc = A.getMinLocation();
-    expect(-0.7, closeTo(minAndLoc[0], TOL));
-    expect(A.size() ~/ 3, equals(minAndLoc[1]));
+    A.fill(0.0);
+    A.set(A.length ~/ 3, -0.7);
+    A.set(A.length ~/ 2, -0.1);
+    final minAndLoc = A.min();
+    expect(-0.7, closeTo(minAndLoc.value, TOL));
+    expect(A.length ~/ 3, equals(minAndLoc.location));
   }
 
   testGetNegativeValues() {
-    A.assignValue(0.0);
-    A.setQuick(A.size() ~/ 3, -0.7);
-    A.setQuick(A.size() ~/ 2, -0.1);
+    A.fill(0.0);
+    A.set(A.length ~/ 3, -0.7);
+    A.set(A.length ~/ 2, -0.1);
     List<int> indexList = new List<int>();
     List<double> valueList = new List<double>();
-    A.getNegativeValues(indexList, valueList);
+    A.negativeValues(indexList, valueList);
     expect(2, indexList.length);
     expect(2, valueList.length);
-    expect(indexList.contains(A.size() ~/ 3), isTrue);
-    expect(indexList.contains(A.size() ~/ 2), isTrue);
+    expect(indexList.contains(A.length ~/ 3), isTrue);
+    expect(indexList.contains(A.length ~/ 2), isTrue);
     expect(valueList.contains(-0.7), isTrue);
     expect(valueList.contains(-0.1), isTrue);
   }
 
   testGetNonZeros() {
-    A.assignValue(0.0);
-    A.setQuick(A.size() ~/ 3, 0.7);
-    A.setQuick(A.size() ~/ 2, 0.1);
+    A.fill(0.0);
+    A.set(A.length ~/ 3, 0.7);
+    A.set(A.length ~/ 2, 0.1);
     List<int> indexList = new List<int>();
     List<double> valueList = new List<double>();
-    A.getNonZeros(indexList, valueList);
+    A.nonZeros(indexList, valueList);
     expect(2, indexList.length);
     expect(2, valueList.length);
-    expect(indexList.contains(A.size() ~/ 3), isTrue);
-    expect(indexList.contains(A.size() ~/ 2), isTrue);
+    expect(indexList.contains(A.length ~/ 3), isTrue);
+    expect(indexList.contains(A.length ~/ 2), isTrue);
     expect(valueList.contains(0.7), isTrue);
     expect(valueList.contains(0.1), isTrue);
   }
 
   testGetPositiveValues() {
-    A.assignValue(0.0);
-    A.setQuick(A.size() ~/ 3, 0.7);
-    A.setQuick(A.size() ~/ 2, 0.1);
+    A.fill(0.0);
+    A.set(A.length ~/ 3, 0.7);
+    A.set(A.length ~/ 2, 0.1);
     List<int> indexList = new List<int>();
     List<double> valueList = new List<double>();
-    A.getPositiveValues(indexList, valueList);
+    A.positiveValues(indexList, valueList);
     expect(2, indexList.length);
     expect(2, valueList.length);
-    expect(indexList.contains(A.size() ~/ 3), isTrue);
-    expect(indexList.contains(A.size() ~/ 2), isTrue);
+    expect(indexList.contains(A.length ~/ 3), isTrue);
+    expect(indexList.contains(A.length ~/ 2), isTrue);
     expect(valueList.contains(0.7), isTrue);
     expect(valueList.contains(0.1), isTrue);
   }
 
   testToArray() {
-    Float64List array = A.toArray();
-    expect(A.size() == array.length, isTrue);
-    for (int i = 0; i < A.size(); i++) {
-      expect(array[i], closeTo(A.getQuick(i), TOL));
+    Float64List array = A.toList();
+    expect(A.length == array.length, isTrue);
+    for (int i = 0; i < A.length; i++) {
+      expect(array[i], closeTo(A.get(i), TOL));
     }
   }
 
   testToArrayFill() {
-    Float64List array = new Float64List(A.size());
-    A.toArrayValues(array);
-    for (int i = 0; i < A.size(); i++) {
-      expect(A.getQuick(i), closeTo(array[i], TOL));
+    Float64List array = new Float64List(A.length);
+    A.fillList(array);
+    for (int i = 0; i < A.length; i++) {
+      expect(A.get(i), closeTo(array[i], TOL));
     }
   }
 
@@ -299,7 +295,7 @@ abstract class DoubleMatrix1DTest {
     int idx = 0;
     for (int c = 0; c < columns; c++) {
       for (int r = 0; r < rows; r++) {
-        expect(A.getQuick(idx++), closeTo(B.getQuick(r, c), TOL));
+        expect(A.get(idx++), closeTo(B.get(r, c), TOL));
       }
     }
   }
@@ -323,33 +319,33 @@ abstract class DoubleMatrix1DTest {
     DoubleMatrix1D Acopy = A.copy();
     DoubleMatrix1D Bcopy = B.copy();
     A.swap(B);
-    for (int i = 0; i < A.size(); i++) {
-      expect(Bcopy.getQuick(i), closeTo(A.getQuick(i), TOL));
-      expect(Acopy.getQuick(i), closeTo(B.getQuick(i), TOL));
+    for (int i = 0; i < A.length; i++) {
+      expect(Bcopy.get(i), closeTo(A.get(i), TOL));
+      expect(Acopy.get(i), closeTo(B.get(i), TOL));
     }
   }
 
   testViewFlip() {
-    DoubleMatrix1D b = A.viewFlip();
-    expect(A.size(), equals(b.size()));
-    for (int i = 0; i < A.size(); i++) {
-      expect(A.getQuick(i), closeTo(b.getQuick(A.size() - 1 - i), TOL));
+    DoubleMatrix1D b = A.flip();
+    expect(A.length, equals(b.length));
+    for (int i = 0; i < A.length; i++) {
+      expect(A.get(i), closeTo(b.get(A.length - 1 - i), TOL));
     }
   }
 
   testViewPart() {
-    DoubleMatrix1D b = A.viewPart(15, 11);
+    DoubleMatrix1D b = A.part(15, 11);
     for (int i = 0; i < 11; i++) {
-      expect(A.getQuick(15 + i), closeTo(b.getQuick(i), TOL));
+      expect(A.get(15 + i), closeTo(b.get(i), TOL));
     }
   }
 
   testViewSelection() {
-    DoubleMatrix1D b = A.viewSelection((double element) {
+    DoubleMatrix1D b = A.where((double element) {
       return element % 2 == 0;
     });
-    for (int i = 0; i < b.size(); i++) {
-      double el = b.getQuick(i);
+    for (int i = 0; i < b.length; i++) {
+      double el = b.get(i);
       if (el % 2 != 0) {
         fail("viewSelection");
       }
@@ -358,9 +354,9 @@ abstract class DoubleMatrix1DTest {
 
   testViewSelectionIndex() {
     Int32List indexes = new Int32List.fromList([5, 11, 22, 37, 101]);
-    DoubleMatrix1D b = A.viewSelectionIndex(indexes);
+    DoubleMatrix1D b = A.select(indexes);
     for (int i = 0; i < indexes.length; i++) {
-      expect(A.getQuick(indexes[i]), closeTo(b.getQuick(i), TOL));
+      expect(A.get(indexes[i]), closeTo(b.get(i), TOL));
     }
   }
 
@@ -373,48 +369,47 @@ abstract class DoubleMatrix1DTest {
 
   testViewStrides() {
     int stride = 3;
-    DoubleMatrix1D b = A.viewStrides(stride);
-    for (int i = 0; i < b.size(); i++) {
-      expect(A.getQuick(i * stride), closeTo(b.getQuick(i), TOL));
+    DoubleMatrix1D b = A.strides(stride);
+    for (int i = 0; i < b.length; i++) {
+      expect(A.get(i * stride), closeTo(b.get(i), TOL));
     }
   }
 
-  testZDotProduct() {
-    double product = A.zDotProduct(B);
+  testDot() {
+    double product = A.dot(B);
     double expected = 0.0;
-    for (int i = 0; i < A.size(); i++) {
-      expected += A.getQuick(i) * B.getQuick(i);
+    for (int i = 0; i < A.length; i++) {
+      expected += A.get(i) * B.get(i);
     }
     expect(expected, closeTo(product, TOL));
   }
 
-  testZDotProductRange() {
-    double product = A.zDotProductRange(B, 5, B.size() - 10);
+  testDotRange() {
+    double product = A.dot(B, 5, B.length - 10);
     double expected = 0.0;
-    for (int i = 5; i < A.size() - 5; i++) {
-      expected += A.getQuick(i) * B.getQuick(i);
+    for (int i = 5; i < A.length - 5; i++) {
+      expected += A.get(i) * B.get(i);
     }
     expect(expected, closeTo(product, TOL));
   }
 
-  //@Test
-  testZDotProductIndex() {
+  testDotNonZero() {
     List<int> indexList = new List<int>();
     List<double> valueList = new List<double>();
-    B.getNonZeros(indexList, valueList);
-    double product = A.zDotProductIndex(B, 5, B.size() - 10, new Int32List.fromList(indexList));
+    B.nonZeros(indexList, valueList);
+    double product = A.dotNonZero(B, new Int32List.fromList(indexList), 5, B.length - 10);
     double expected = 0.0;
-    for (int i = 5; i < A.size() - 5; i++) {
-      expected += A.getQuick(i) * B.getQuick(i);
+    for (int i = 5; i < A.length - 5; i++) {
+      expected += A.get(i) * B.get(i);
     }
     expect(expected, closeTo(product, TOL));
   }
 
-  testZSum() {
-    double sum = A.zSum();
+  testSum() {
+    double sum = A.sum();
     double expected = 0.0;
-    for (int i = 0; i < A.size(); i++) {
-      expected += A.getQuick(i);
+    for (int i = 0; i < A.length; i++) {
+      expected += A.get(i);
     }
     expect(expected, closeTo(sum, TOL));
   }

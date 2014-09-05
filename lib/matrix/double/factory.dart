@@ -45,9 +45,9 @@ class DoubleFactory1D {
    */
   DoubleMatrix1D append(DoubleMatrix1D A, DoubleMatrix1D B) {
     // concatenate
-    DoubleMatrix1D matrix = make(A.size() + B.size());
-    matrix.viewPart(0, A.size()).assignMatrix(A);
-    matrix.viewPart(A.size(), B.size()).assignMatrix(B);
+    DoubleMatrix1D matrix = make(A.length + B.length);
+    matrix.part(0, A.length).setAll(A);
+    matrix.part(A.length, B.length).setAll(B);
     return matrix;
   }
 
@@ -56,7 +56,7 @@ class DoubleFactory1D {
    * purposes. Example: <tt>0 1 2</tt>
    */
   DoubleMatrix1D ascending(int size) {
-    return descending(size).assign(func.chainGH(func.neg, func.subtract(size)));
+    return descending(size).forEach(func.chainGH(func.neg, func.subtract(size)));
   }
 
   /**
@@ -67,7 +67,7 @@ class DoubleFactory1D {
     DoubleMatrix1D matrix = make(size);
     double v = 0.0;
     for (int i = size; --i >= 0; ) {
-      matrix.setQuick(i, v);
+      matrix.set(i, v);
       v += 1;
     }
     return matrix;
@@ -115,13 +115,13 @@ class DoubleFactory1D {
     if (parts.length == 0) return make(0);
 
     int size = 0;
-    for (int i = 0; i < parts.length; i++) size += parts[i].size();
+    for (int i = 0; i < parts.length; i++) size += parts[i].length;
 
     DoubleMatrix1D vector = make(size);
     size = 0;
     for (int i = 0; i < parts.length; i++) {
-      vector.viewPart(size, parts[i].size()).assignMatrix(parts[i]);
-      size += parts[i].size();
+      vector.part(size, parts[i].length).setAll(parts[i]);
+      size += parts[i].length;
     }
 
     return vector;
@@ -143,7 +143,7 @@ class DoubleFactory1D {
    * given value.
    */
   DoubleMatrix1D makeValue(int size, double initialValue) {
-    return make(size).assignValue(initialValue);
+    return make(size).fill(initialValue);
   }
 
   /**
@@ -151,7 +151,7 @@ class DoubleFactory1D {
    * (exclusive).
    */
   DoubleMatrix1D random(int size) {
-    return make(size).assign(func.random());
+    return make(size).forEach(func.random());
   }
 
   /**
@@ -166,10 +166,10 @@ class DoubleFactory1D {
    * </pre>
    */
   DoubleMatrix1D repeat(DoubleMatrix1D A, int repeat) {
-    int size = A.size();
+    int size = A.length;
     DoubleMatrix1D matrix = make(repeat * size);
     for (int i = repeat; --i >= 0; ) {
-      matrix.viewPart(size * i, size).assignMatrix(A);
+      matrix.part(size * i, size).setAll(A);
     }
     return matrix;
   }
@@ -377,19 +377,19 @@ class DoubleFactory2D {
    */
   DoubleMatrix2D appendColumn(DoubleMatrix2D A, DoubleMatrix1D b) {
     // force both to have maximal shared number of rows.
-    if (b.size() > A.rows()) {
-      b = b.viewPart(0, A.rows());
-    } else if (b.size() < A.rows()) {
-      A = A.viewPart(0, 0, b.size(), A.columns());
+    if (b.length > A.rows) {
+      b = b.part(0, A.rows);
+    } else if (b.length < A.rows) {
+      A = A.part(0, 0, b.length, A.columns);
     }
 
     // concatenate
-    int ac = A.columns();
+    int ac = A.columns;
     int bc = 1;
-    int r = A.rows();
+    int r = A.rows;
     DoubleMatrix2D matrix = make(r, ac + bc);
-    matrix.viewPart(0, 0, r, ac).assignMatrix(A);
-    matrix.viewColumn(ac).assignMatrix(b);
+    matrix.part(0, 0, r, ac).copyFrom(A);
+    matrix.column(ac).setAll(b);
     return matrix;
   }
 
@@ -411,19 +411,19 @@ class DoubleFactory2D {
    */
   DoubleMatrix2D appendColumns(DoubleMatrix2D A, DoubleMatrix2D B) {
     // force both to have maximal shared number of rows.
-    if (B.rows() > A.rows()) {
-      B = B.viewPart(0, 0, A.rows(), B.columns());
-    } else if (B.rows() < A.rows()) {
-      A = A.viewPart(0, 0, B.rows(), A.columns());
+    if (B.rows > A.rows) {
+      B = B.part(0, 0, A.rows, B.columns);
+    } else if (B.rows < A.rows) {
+      A = A.part(0, 0, B.rows, A.columns);
     }
 
     // concatenate
-    int ac = A.columns();
-    int bc = B.columns();
-    int r = A.rows();
+    int ac = A.columns;
+    int bc = B.columns;
+    int r = A.rows;
     DoubleMatrix2D matrix = make(r, ac + bc);
-    matrix.viewPart(0, 0, r, ac).assignMatrix(A);
-    matrix.viewPart(0, ac, r, bc).assignMatrix(B);
+    matrix.part(0, 0, r, ac).copyFrom(A);
+    matrix.part(0, ac, r, bc).copyFrom(B);
     return matrix;
   }
 
@@ -447,19 +447,19 @@ class DoubleFactory2D {
    */
   DoubleMatrix2D appendRow(DoubleMatrix2D A, DoubleMatrix1D b) {
     // force both to have maximal shared number of columns.
-    if (b.size() > A.columns()) {
-      b = b.viewPart(0, A.columns());
-    } else if (b.size() < A.columns()) {
-      A = A.viewPart(0, 0, A.rows(), b.size());
+    if (b.length > A.columns) {
+      b = b.part(0, A.columns);
+    } else if (b.length < A.columns) {
+      A = A.part(0, 0, A.rows, b.length);
     }
 
     // concatenate
-    int ar = A.rows();
+    int ar = A.rows;
     int br = 1;
-    int c = A.columns();
+    int c = A.columns;
     DoubleMatrix2D matrix = make(ar + br, c);
-    matrix.viewPart(0, 0, ar, c).assignMatrix(A);
-    matrix.viewRow(ar).assignMatrix(b);
+    matrix.part(0, 0, ar, c).copyFrom(A);
+    matrix.row(ar).setAll(b);
     return matrix;
   }
 
@@ -485,19 +485,19 @@ class DoubleFactory2D {
    */
   DoubleMatrix2D appendRows(DoubleMatrix2D A, DoubleMatrix2D B) {
     // force both to have maximal shared number of columns.
-    if (B.columns() > A.columns()) {
-      B = B.viewPart(0, 0, B.rows(), A.columns());
-    } else if (B.columns() < A.columns()) {
-      A = A.viewPart(0, 0, A.rows(), B.columns());
+    if (B.columns > A.columns) {
+      B = B.part(0, 0, B.rows, A.columns);
+    } else if (B.columns < A.columns) {
+      A = A.part(0, 0, A.rows, B.columns);
     }
 
     // concatenate
-    int ar = A.rows();
-    int br = B.rows();
-    int c = A.columns();
+    int ar = A.rows;
+    int br = B.rows;
+    int c = A.columns;
     DoubleMatrix2D matrix = make(ar + br, c);
-    matrix.viewPart(0, 0, ar, c).assignMatrix(A);
-    matrix.viewPart(ar, 0, br, c).assignMatrix(B);
+    matrix.part(0, 0, ar, c).copyFrom(A);
+    matrix.part(ar, 0, br, c).copyFrom(B);
     return matrix;
   }
 
@@ -512,7 +512,7 @@ class DoubleFactory2D {
    * </pre>
    */
   DoubleMatrix2D ascending(int rows, int columns) {
-    return descending(rows, columns).assign(func.chainGH(func.neg, func.subtract(columns * rows)));
+    return descending(rows, columns).forEach(func.chainGH(func.neg, func.subtract(columns * rows)));
   }
 
   /**
@@ -625,7 +625,7 @@ class DoubleFactory2D {
       for (int row = rows; --row >= 0; ) {
         DoubleMatrix2D part = parts[row][column];
         if (part != null) {
-          int width = part.columns();
+          int width = part.columns;
           if (maxWidth > 0 && width > 0 && width != maxWidth) {
             throw new ArgumentError("Different number of columns.");
           }
@@ -642,7 +642,7 @@ class DoubleFactory2D {
       for (int column = columns; --column >= 0; ) {
         DoubleMatrix2D part = parts[row][column];
         if (part != null) {
-          int height = part.rows();
+          int height = part.rows;
           if (maxHeight > 0 && height > 0 && height != maxHeight) {
             throw new ArgumentError("Different number of rows.");
           }
@@ -667,7 +667,7 @@ class DoubleFactory2D {
       for (int column = 0; column < columns; column++) {
         DoubleMatrix2D part = parts[row][column];
         if (part != null) {
-          matrix.viewPart(r, c, part.rows(), part.columns()).assignMatrix(part);
+          matrix.part(r, c, part.rows, part.columns).copyFrom(part);
         }
         c += maxWidths[column];
       }
@@ -697,13 +697,13 @@ class DoubleFactory2D {
    * @return bidiagonal matrix
    */
   DoubleMatrix2D composeBidiagonal(DoubleMatrix2D A, DoubleMatrix2D B) {
-    int ar = A.rows();
-    int ac = A.columns();
-    int br = B.rows();
-    int bc = B.columns();
+    int ar = A.rows;
+    int ac = A.columns;
+    int br = B.rows;
+    int bc = B.columns;
     DoubleMatrix2D sum = make(ar + br - 1, ac + bc);
-    sum.viewPart(0, 0, ar, ac).assignMatrix(A);
-    sum.viewPart(ar - 1, ac, br, bc).assignMatrix(B);
+    sum.part(0, 0, ar, ac).copyFrom(A);
+    sum.part(ar - 1, ac, br, bc).copyFrom(B);
     return sum;
   }
 
@@ -723,13 +723,13 @@ class DoubleFactory2D {
    * @return a new matrix which is the direct sum.
    */
   DoubleMatrix2D composeDiagonal(DoubleMatrix2D A, DoubleMatrix2D B) {
-    int ar = A.rows();
-    int ac = A.columns();
-    int br = B.rows();
-    int bc = B.columns();
+    int ar = A.rows;
+    int ac = A.columns;
+    int br = B.rows;
+    int bc = B.columns;
     DoubleMatrix2D sum = make(ar + br, ac + bc);
-    sum.viewPart(0, 0, ar, ac).assignMatrix(A);
-    sum.viewPart(ar, ac, br, bc).assignMatrix(B);
+    sum.part(0, 0, ar, ac).copyFrom(A);
+    sum.part(ar, ac, br, bc).copyFrom(B);
     return sum;
   }
 
@@ -747,10 +747,10 @@ class DoubleFactory2D {
    * from the given parts. Cells are copied.
    */
   DoubleMatrix2D composeDiagonal3(DoubleMatrix2D A, DoubleMatrix2D B, DoubleMatrix2D C) {
-    DoubleMatrix2D diag = make(A.rows() + B.rows() + C.rows(), A.columns() + B.columns() + C.columns());
-    diag.viewPart(0, 0, A.rows(), A.columns()).assignMatrix(A);
-    diag.viewPart(A.rows(), A.columns(), B.rows(), B.columns()).assignMatrix(B);
-    diag.viewPart(A.rows() + B.rows(), A.columns() + B.columns(), C.rows(), C.columns()).assignMatrix(C);
+    DoubleMatrix2D diag = make(A.rows + B.rows + C.rows, A.columns + B.columns + C.columns);
+    diag.part(0, 0, A.rows, A.columns).copyFrom(A);
+    diag.part(A.rows, A.columns, B.rows, B.columns).copyFrom(B);
+    diag.part(A.rows + B.rows, A.columns + B.columns, C.rows, C.columns).copyFrom(C);
     return diag;
   }
 
@@ -850,7 +850,7 @@ class DoubleFactory2D {
       for (int row = rows; --row >= 0; ) {
         DoubleMatrix2D part = parts[row][column];
         if (part != null) {
-          int width = part.columns();
+          int width = part.columns;
           if (maxWidth > 0 && width > 0 && width != maxWidth) {
             throw new ArgumentError("Different number of columns.");
           }
@@ -867,7 +867,7 @@ class DoubleFactory2D {
       for (int column = columns; --column >= 0; ) {
         DoubleMatrix2D part = parts[row][column];
         if (part != null) {
-          int height = part.rows();
+          int height = part.rows;
           if (maxHeight > 0 && height > 0 && height != maxHeight) {
             throw new ArgumentError("Different number of rows.");
           }
@@ -883,7 +883,7 @@ class DoubleFactory2D {
     int resultCols = 0;
     for (int column = columns; --column >= 0; ) resultCols += maxWidths[column];
 
-    if (matrix.rows() < resultRows || matrix.columns() < resultCols) {
+    if (matrix.rows < resultRows || matrix.columns < resultCols) {
       throw new ArgumentError("Parts larger than matrix.");
     }
 
@@ -894,7 +894,7 @@ class DoubleFactory2D {
       for (int column = 0; column < columns; column++) {
         DoubleMatrix2D part = parts[row][column];
         if (part != null) {
-          part.assignMatrix(matrix.viewPart(r, c, part.rows(), part.columns()));
+          part.copyFrom(matrix.part(r, c, part.rows, part.columns));
         }
         c += maxWidths[column];
       }
@@ -918,7 +918,7 @@ class DoubleFactory2D {
     double v = 0.0;
     for (int row = rows; --row >= 0; ) {
       for (int column = columns; --column >= 0; ) {
-        matrix.setQuick(row, column, v);
+        matrix.set(row, column, v);
         v += 1;
       }
     }
@@ -944,7 +944,7 @@ class DoubleFactory2D {
     int size = vector.length;
     DoubleMatrix2D diag = make(size, size);
     for (int i = 0; i < size; i++) {
-      diag.setQuick(i, i, vector[i]);
+      diag.set(i, i, vector[i]);
     }
     return diag;
   }
@@ -965,10 +965,10 @@ class DoubleFactory2D {
    * @return a new matrix.
    */
   DoubleMatrix2D diagonal1D(DoubleMatrix1D vector) {
-    int size = vector.size();
+    int size = vector.length;
     DoubleMatrix2D diag = make(size, size);
     for (int i = size; --i >= 0; ) {
-      diag.setQuick(i, i, vector.getQuick(i));
+      diag.set(i, i, vector.get(i));
     }
     return diag;
   }
@@ -990,10 +990,10 @@ class DoubleFactory2D {
    * @return a new vector.
    */
   DoubleMatrix1D diagonal2D(DoubleMatrix2D A) {
-    int min = Math.min(A.rows(), A.columns());
+    int min = Math.min(A.rows, A.columns);
     DoubleMatrix1D diag = _make1D(min);
     for (int i = min; --i >= 0; ) {
-      diag.setQuick(i, A.getQuick(i, i));
+      diag.set(i, A.get(i, i));
     }
     return diag;
   }
@@ -1005,7 +1005,7 @@ class DoubleFactory2D {
   DoubleMatrix2D identity(int rowsAndColumns) {
     DoubleMatrix2D matrix = make(rowsAndColumns, rowsAndColumns);
     for (int i = rowsAndColumns; --i >= 0; ) {
-      matrix.setQuick(i, i, 1.0);
+      matrix.set(i, i, 1.0);
     }
     return matrix;
   }
@@ -1034,7 +1034,7 @@ class DoubleFactory2D {
     DoubleMatrix2D matrix = make(rows, columns);
     for (int row = 0; row < rows; row++) {
       for (int column = 0; column < columns; column++) {
-        matrix.setQuick(row, column, values[row + column * rows]);
+        matrix.set(row, column, values[row + column * rows]);
       }
     }
     return matrix;
@@ -1081,7 +1081,7 @@ class DoubleFactory2D {
    */
   DoubleMatrix2D makeValue(int rows, int columns, double initialValue) {
     if (initialValue == 0) return make(rows, columns);
-    return make(rows, columns).assignValue(initialValue);
+    return make(rows, columns).fill(initialValue);
   }
 
   /**
@@ -1089,7 +1089,7 @@ class DoubleFactory2D {
    * (exclusive).
    */
   DoubleMatrix2D random(int rows, int columns) {
-    return make(rows, columns).assign(func.random());
+    return make(rows, columns).forEach(func.random());
   }
 
   /**
@@ -1108,12 +1108,12 @@ class DoubleFactory2D {
    * </pre>
    */
   DoubleMatrix2D repeat(DoubleMatrix2D A, int rowRepeat, int columnRepeat) {
-    int r = A.rows();
-    int c = A.columns();
+    int r = A.rows;
+    int c = A.columns;
     DoubleMatrix2D matrix = make(r * rowRepeat, c * columnRepeat);
     for (int i = rowRepeat; --i >= 0; ) {
       for (int j = columnRepeat; --j >= 0; ) {
-        matrix.viewPart(r * i, c * j, r, c).assignMatrix(A);
+        matrix.part(r * i, c * j, r, c).copyFrom(A);
       }
     }
     return matrix;

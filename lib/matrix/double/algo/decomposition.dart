@@ -128,7 +128,7 @@ class CSparseDoubleLUDecomposition implements SparseDoubleLUDecomposition {
     } else {
       dcs = A.elements() as Dcs;
     }
-    _n = A.rows();
+    _n = A.rows;
 
     _S = cs_sqr(order, dcs, false);
     if (_S == null) {
@@ -160,12 +160,12 @@ class CSparseDoubleLUDecomposition implements SparseDoubleLUDecomposition {
     if (_U == null) {
       _U = new SparseCCDoubleMatrix2D(_N.U);
       if (_rcMatrix) {
-        _U = (_U as SparseCCDoubleMatrix2D).getRowCompressed();
+        _U = (_U as SparseCCDoubleMatrix2D).rowCompressed();
       }
     }
     double det = pivsign.toDouble();
     for (int j = 0; j < _n; j++) {
-      det *= _U.getQuick(j, j);
+      det *= _U.get(j, j);
     }
     return det;
   }
@@ -174,7 +174,7 @@ class CSparseDoubleLUDecomposition implements SparseDoubleLUDecomposition {
     if (_L == null) {
       _L = new SparseCCDoubleMatrix2D(_N.L);
       if (_rcMatrix) {
-        _L = (_L as SparseCCDoubleMatrix2D).getRowCompressed();
+        _L = (_L as SparseCCDoubleMatrix2D).rowCompressed();
       }
     }
     return _L.copy();
@@ -194,7 +194,7 @@ class CSparseDoubleLUDecomposition implements SparseDoubleLUDecomposition {
     if (_U == null) {
       _U = new SparseCCDoubleMatrix2D(_N.U);
       if (_rcMatrix) {
-        _U = (_U as SparseCCDoubleMatrix2D).getRowCompressed();
+        _U = (_U as SparseCCDoubleMatrix2D).rowCompressed();
       }
     }
     return _U.copy();
@@ -218,7 +218,7 @@ class CSparseDoubleLUDecomposition implements SparseDoubleLUDecomposition {
   }
 
   void solve(DoubleMatrix1D b) {
-    if (b.size() != _n) {
+    if (b.length != _n) {
       throw new ArgumentError("b.size() != A.rows()");
     }
     if (!isNonsingular()) {
@@ -227,7 +227,7 @@ class CSparseDoubleLUDecomposition implements SparseDoubleLUDecomposition {
     DoubleProperty.DEFAULT.checkDense(b);
     Float64List y = new Float64List(_n);
     Float64List x;
-    if (b.isView()) {
+    if (b.isView) {
       x = b.copy().elements() as Float64List;
     } else {
       x = b.elements() as Float64List;
@@ -241,8 +241,8 @@ class CSparseDoubleLUDecomposition implements SparseDoubleLUDecomposition {
     cs_ipvec(_S.q, y, x, _n);
     /* b(q) = x */
 
-    if (b.isView()) {
-      b.assignValues(x);
+    if (b.isView) {
+      b.setValues(x);
     }
   }
 }
@@ -307,7 +307,7 @@ class SparseDoubleKLUDecomposition implements SparseDoubleLUDecomposition {
     } else {
       dcs = A.elements() as Dcs;
     }
-    _n = A.rows();
+    _n = A.rows;
     Int32List Ap = dcs.p,
         Ai = dcs.i;
     Float64List Ax = dcs.x;
@@ -344,7 +344,7 @@ class SparseDoubleKLUDecomposition implements SparseDoubleLUDecomposition {
     }
     double det = pivsign.toDouble();
     for (int j = 0; j < _n; j++) {
-      det *= _U.getQuick(j, j);
+      det *= _U.get(j, j);
     }
     return det;
   }
@@ -355,9 +355,9 @@ class SparseDoubleKLUDecomposition implements SparseDoubleLUDecomposition {
       Int32List Li = new Int32List(_N.lnz);
       Float64List Lx = new Float64List(_N.lnz);
       klu.extract(_N, _S, Lp, Li, Lx, null, null, null, null, null, null, null, null, null, null, _Common);
-      _L = new SparseCCDoubleMatrix2D.from(_n, _n, Li, Lp, Lx);
+      _L = new SparseCCDoubleMatrix2D.withPointers(_n, _n, Li, Lp, Lx);
       if (_rcMatrix) {
-        _L = (_L as SparseCCDoubleMatrix2D).getRowCompressed();
+        _L = (_L as SparseCCDoubleMatrix2D).rowCompressed();
       }
     }
     return _L.copy();
@@ -377,9 +377,9 @@ class SparseDoubleKLUDecomposition implements SparseDoubleLUDecomposition {
       Int32List Ui = new Int32List(_N.unz);
       Float64List Ux = new Float64List(_N.unz);
       klu.extract(_N, _S, null, null, null, Up, Ui, Ux, null, null, null, null, null, null, null, _Common);
-      _U = new SparseCCDoubleMatrix2D.from(_n, _n, Ui, Up, Ux);
+      _U = new SparseCCDoubleMatrix2D.withPointers(_n, _n, Ui, Up, Ux);
       if (_rcMatrix) {
-        _U = (_U as SparseCCDoubleMatrix2D).getRowCompressed();
+        _U = (_U as SparseCCDoubleMatrix2D).rowCompressed();
       }
     }
     return _U.copy();
@@ -411,7 +411,7 @@ class SparseDoubleKLUDecomposition implements SparseDoubleLUDecomposition {
   }
 
   void solve(DoubleMatrix1D b) {
-    if (b.size() != _n) {
+    if (b.length != _n) {
       throw new ArgumentError("b.size() != A.rows()");
     }
     if (!isNonsingular()) {
@@ -419,15 +419,15 @@ class SparseDoubleKLUDecomposition implements SparseDoubleLUDecomposition {
     }
     DoubleProperty.DEFAULT.checkDense(b);
     Float64List x;
-    if (b.isView()) {
+    if (b.isView) {
       x = b.copy().elements() as Float64List;
     } else {
       x = b.elements() as Float64List;
     }
     klu.solve(_S, _N, _n, 1, x, 0, _Common);
 
-    if (b.isView()) {
-      b.assignValues(x);
+    if (b.isView) {
+      b.setValues(x);
     }
   }
 }

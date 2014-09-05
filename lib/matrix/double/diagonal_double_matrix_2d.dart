@@ -55,7 +55,7 @@ class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
    */
   factory DiagonalDoubleMatrix2D.fromList(List<Float64List> values, int dindex) {
     return new DiagonalDoubleMatrix2D(values.length, values.length == 0 ? 0 : values[0].length, dindex)
-      ..assignValues2D(values);
+      ..setAll2D(values);
   }
 
   /**
@@ -121,17 +121,17 @@ class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
     }    
   }
 
-  DoubleMatrix2D assign(final func.DoubleFunction function) {
+  DoubleMatrix2D forEach(final func.DoubleFunction function) {
     if (function is DoubleMult) { // x[i] = mult*x[i]
       final double alpha = (function as DoubleMult).multiplicator;
       if (alpha == 1) {
         return this;
       }
       if (alpha == 0) {
-        return assignValue(0.0);
+        return fill(0.0);
       }
       if (alpha != alpha) {
-        return assignValue(alpha); // the funny definition of isNaN(). This should better not happen.
+        return fill(alpha); // the funny definition of isNaN(). This should better not happen.
       }
       for (int j = _dlength; --j >= 0; ) {
         _elements[j] *= alpha;
@@ -144,12 +144,12 @@ class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
     return this;
   }
 
-  DoubleMatrix2D assignValue(double value) {
+  DoubleMatrix2D fill(double value) {
     for (int i = _dlength; --i >= 0; ) _elements[i] = value;
     return this;
   }
 
-  DoubleMatrix2D assignValues(final Float64List values) {
+  DoubleMatrix2D setAll(final Float64List values) {
     if (values.length != _dlength) {
       throw new ArgumentError("Must have same length: length=${values.length} dlength=$_dlength");
     }
@@ -176,9 +176,9 @@ class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
     return this;
   }
 
-  DoubleMatrix2D assignValues2D(final List<Float64List> values) {
+  DoubleMatrix2D setAll2D(final List<Float64List> values) {
     if (values.length != _rows) {
-      throw new ArgumentError("Must have same number of rows: rows=${values.length} rows()=${rows()}");
+      throw new ArgumentError("Must have same number of rows: rows=${values.length} rows()=${rows}");
     }
     int r, c;
     if (_dindex >= 0) {
@@ -190,14 +190,14 @@ class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
     }
     for (int i = 0; i < _dlength; i++) {
       if (values[i].length != _columns) {
-        throw new ArgumentError("Must have same number of columns in every row: columns=${values[r].length} columns()=${columns()}");
+        throw new ArgumentError("Must have same number of columns in every row: columns=${values[r].length} columns()=${columns}");
       }
       _elements[i] = values[r++][c++];
     }
     return this;
   }
 
-  DoubleMatrix2D assignMatrix(DoubleMatrix2D source) {
+  DoubleMatrix2D copyFrom(DoubleMatrix2D source) {
     // overriden for performance only
     if (source == this) return this; // nothing to do
     checkShape(source);
@@ -212,11 +212,11 @@ class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
       //System.arraycopy(other._elements, 0, this._elements, 0, this._elements.length);
       return this;
     } else {
-      return super.assignMatrix(source);
+      return super.copyFrom(source);
     }
   }
 
-  DoubleMatrix2D assignFunc(final DoubleMatrix2D y, final func.DoubleDoubleFunction function) {
+  DoubleMatrix2D forEachMatrix(final DoubleMatrix2D y, final func.DoubleDoubleFunction function) {
     checkShape(y);
     if (y is DiagonalDoubleMatrix2D) {
       DiagonalDoubleMatrix2D other = y;
@@ -294,11 +294,11 @@ class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
       //}
       return this;
     } else {
-      return super.assignFunc(y, function);
+      return super.forEachMatrix(y, function);
     }
   }
 
-  int cardinality() {
+  int get cardinality {
     int cardinality = 0;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_dlength >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -342,7 +342,7 @@ class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
     return _elements;
   }
 
-  bool equalsValue(double value) {
+  /*bool equalsValue(double value) {
     double epsilon = DoubleProperty.DEFAULT.tolerance();
     for (int r = 0; r < _dlength; r++) {
       double x = _elements[r];
@@ -355,17 +355,38 @@ class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
       }
     }
     return true;
-  }
+  }*/
 
-  bool equals(Object obj) {
+  bool operator ==(var obj) {
+    if (obj is num) {
+      final value = obj;
+      double epsilon = DoubleProperty.DEFAULT.tolerance();
+      for (int r = 0; r < _dlength; r++) {
+        double x = _elements[r];
+        double diff = (value - x).abs();
+        if ((diff != diff) && ((value != value && x != x) || value == x)) {
+          diff = 0.0;
+        }
+        if (!(diff <= epsilon)) {
+          return false;
+        }
+      }
+      return true;
+    }
     if (obj is DiagonalDoubleMatrix2D) {
       DiagonalDoubleMatrix2D other = obj;
       double epsilon = DoubleProperty.DEFAULT.tolerance();
-      if (this == obj) return true;
-      if (!(this != null && obj != null)) return false;
-      final int rows = this.rows();
-      final int columns = this.columns();
-      if (columns != other.columns() || rows != other.rows()) return false;
+      if (identical(this, obj)) {
+        return true;
+      }
+      if (!(this != null && obj != null)) {
+        return false;
+      }
+      final int rows = this.rows;
+      final int columns = this.columns;
+      if (columns != other.columns || rows != other.rows) {
+        return false;
+      }
       if ((_dindex != other._dindex) || (_dlength != other._dlength)) {
         return false;
       }
@@ -383,7 +404,7 @@ class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
       }
       return true;
     } else {
-      return super.equals(obj);
+      return super ==(obj);
     }
   }
 
@@ -415,7 +436,7 @@ class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
     return _dindex;
   }
 
-  List<num> getMaxLocation() {
+  DoubleMatrixLocation max() {
     int location = 0;
     double maxValue = 0.0;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -481,10 +502,10 @@ class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
       rowLocation = location;
       columnLocation = location;
     }
-    return [maxValue, rowLocation, columnLocation];
+    return new DoubleMatrixLocation(maxValue, rowLocation, columnLocation);
   }
 
-  List<num> getMinLocation() {
+  DoubleMatrixLocation min() {
     int location = 0;
     double minValue = 0.0;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -550,10 +571,10 @@ class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
       rowLocation = location;
       columnLocation = location;
     }
-    return [minValue, rowLocation, columnLocation];
+    return new DoubleMatrixLocation(minValue, rowLocation, columnLocation);
   }
 
-  double getQuick(int row, int column) {
+  double get(int row, int column) {
     if (_dindex >= 0) {
       if (column < _dindex) {
         return 0.0;
@@ -585,7 +606,7 @@ class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
     return new SparseDoubleMatrix1D(size);
   }
 
-  void setQuick(int row, int column, double value) {
+  void set(int row, int column, double value) {
     if (_dindex >= 0) {
       if (column < _dindex) {
         //do nothing
@@ -609,7 +630,7 @@ class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
     }
   }
 
-  DoubleMatrix1D zMult(DoubleMatrix1D y, DoubleMatrix1D z, [double alpha=1.0, double beta=0.0, final bool transposeA=false]) {
+  DoubleMatrix1D mult(DoubleMatrix1D y, DoubleMatrix1D z, [double alpha=1.0, double beta=0.0, final bool transposeA=false]) {
     int rowsA = _rows;
     int columnsA = _columns;
     if (transposeA) {
@@ -621,15 +642,15 @@ class DiagonalDoubleMatrix2D extends WrapperDoubleMatrix2D {
     if (z == null) z = new DenseDoubleMatrix1D(rowsA);
 
     if (!(this._isNoView && y is DenseDoubleMatrix1D && z is DenseDoubleMatrix1D)) {
-      return super.zMult(y, z, alpha, beta, transposeA);
+      return super.mult(y, z, alpha, beta, transposeA);
     }
 
-    if (columnsA != y.size() || rowsA > z.size()) {
-      throw new ArgumentError("Incompatible args: " + ((transposeA ? viewDice() : this).toStringShort()) + ", " + y.toStringShort() + ", " + z.toStringShort());
+    if (columnsA != y.length || rowsA > z.length) {
+      throw new ArgumentError("Incompatible args: " + ((transposeA ? dice() : this).toStringShort()) + ", " + y.toStringShort() + ", " + z.toStringShort());
     }
 
     if ((!ignore) && ((beta) != 1)) {
-      z.assign(func.multiply(beta));
+      z.forEach(func.multiply(beta));
     }
 
     DenseDoubleMatrix1D zz = z as DenseDoubleMatrix1D;

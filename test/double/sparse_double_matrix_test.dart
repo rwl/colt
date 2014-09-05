@@ -11,24 +11,24 @@ class SparseDoubleMatrix1DTest extends DoubleMatrix1DTest {
 
 class SparseDoubleMatrix1DViewTest extends SparseDoubleMatrix1DTest {
   void createMatrices() {
-    A = new SparseDoubleMatrix1D(SIZE).viewFlip();
-    B = new SparseDoubleMatrix1D(SIZE).viewFlip();
+    A = new SparseDoubleMatrix1D(SIZE).flip();
+    B = new SparseDoubleMatrix1D(SIZE).flip();
   }
 }
 
 class SparseCCDoubleMatrix2DTest extends DoubleMatrix2DTest {
   void createMatrices() {
-    A = new SparseCCDoubleMatrix2D.sized(NROWS, NCOLUMNS);
-    B = new SparseCCDoubleMatrix2D.sized(NROWS, NCOLUMNS);
-    Bt = new SparseCCDoubleMatrix2D.sized(NCOLUMNS, NROWS);
+    A = new SparseCCDoubleMatrix2D(NROWS, NCOLUMNS);
+    B = new SparseCCDoubleMatrix2D(NROWS, NCOLUMNS);
+    Bt = new SparseCCDoubleMatrix2D(NCOLUMNS, NROWS);
   }
 }
 
 class SparseCCDoubleMatrix2DViewTest extends SparseCCDoubleMatrix2DTest {
   void createMatrices() {
-    A = new SparseCCDoubleMatrix2D.sized(NCOLUMNS, NROWS).viewDice();
-    B = new SparseCCDoubleMatrix2D.sized(NCOLUMNS, NROWS).viewDice();
-    Bt = new SparseCCDoubleMatrix2D.sized(NROWS, NCOLUMNS).viewDice();
+    A = new SparseCCDoubleMatrix2D(NCOLUMNS, NROWS).dice();
+    B = new SparseCCDoubleMatrix2D(NCOLUMNS, NROWS).dice();
+    Bt = new SparseCCDoubleMatrix2D(NROWS, NCOLUMNS).dice();
   }
 }
 
@@ -52,15 +52,15 @@ class SparseDoubleMatrix2DTest extends DoubleMatrix2DTest {
     }
     SparseDoubleMatrix2D A = new SparseDoubleMatrix2D.values(NROWS, NCOLUMNS, rowindexes, columnindexes, values);
     SparseRCDoubleMatrix2D B = A.getRowCompressed(false);
-    for (int r = 0; r < A.rows(); r++) {
-      for (int c = 0; c < A.columns(); c++) {
-        expect(A.getQuick(r, c), equals(B.getQuick(r, c)));
+    for (int r = 0; r < A.rows; r++) {
+      for (int c = 0; c < A.columns; c++) {
+        expect(A.get(r, c), equals(B.get(r, c)));
       }
     }
     B = A.getRowCompressed(true);
-    for (int r = 0; r < A.rows(); r++) {
-      for (int c = 0; c < A.columns(); c++) {
-        expect(A.getQuick(r, c), equals(B.getQuick(r, c)));
+    for (int r = 0; r < A.rows; r++) {
+      for (int c = 0; c < A.columns; c++) {
+        expect(A.get(r, c), equals(B.get(r, c)));
       }
     }
   }
@@ -85,7 +85,7 @@ class SparseDoubleMatrix2DTest extends DoubleMatrix2DTest {
   }*/
 
   void testGetColumnCompressed() {
-    int SIZE = A.rows() * A.columns();
+    int SIZE = A.rows * A.columns;
     Int32List rowindexes = new Int32List(SIZE);
     Int32List columnindexes = new Int32List(SIZE);
     Float64List values = new Float64List(SIZE);
@@ -94,17 +94,17 @@ class SparseDoubleMatrix2DTest extends DoubleMatrix2DTest {
       columnindexes[i] = (random.nextInt(MAX_INT) % NCOLUMNS).abs();
       values[i] = random.nextDouble();
     }
-    SparseDoubleMatrix2D S = new SparseDoubleMatrix2D.values(A.rows(), A.columns(), rowindexes, columnindexes, values);
+    SparseDoubleMatrix2D S = new SparseDoubleMatrix2D.values(A.rows, A.columns, rowindexes, columnindexes, values);
     SparseCCDoubleMatrix2D B = S.getColumnCompressed(false);
-    for (int r = 0; r < A.rows(); r++) {
-      for (int c = 0; c < A.columns(); c++) {
-        expect(S.getQuick(r, c), equals(B.getQuick(r, c)));
+    for (int r = 0; r < A.rows; r++) {
+      for (int c = 0; c < A.columns; c++) {
+        expect(S.get(r, c), equals(B.get(r, c)));
       }
     }
     B = S.getColumnCompressed(true);
-    for (int r = 0; r < A.rows(); r++) {
-      for (int c = 0; c < A.columns(); c++) {
-        expect(S.getQuick(r, c), equals(B.getQuick(r, c)));
+    for (int r = 0; r < A.rows; r++) {
+      for (int c = 0; c < A.columns; c++) {
+        expect(S.get(r, c), equals(B.get(r, c)));
       }
     }
 
@@ -130,22 +130,22 @@ class SparseDoubleMatrix2DTest extends DoubleMatrix2DTest {
   }*/
 
   void testAssignIntArrayIntArrayDoubleArrayDoubleDoubleFunction() {
-    int SIZE = A.rows() * A.columns();
+    int SIZE = A.rows * A.columns;
     Int32List rowindexes = new Int32List(SIZE);
     Int32List columnindexes = new Int32List(SIZE);
     Float64List values = new Float64List(SIZE);
-    DoubleMatrix2D Adense = new DenseDoubleMatrix2D(A.rows(), A.columns());
+    DoubleMatrix2D Adense = new DenseDoubleMatrix2D(A.rows, A.columns);
     for (int i = 0; i < SIZE; i++) {
-      rowindexes[i] = i % A.rows();
-      columnindexes[i] = i % A.columns();
+      rowindexes[i] = i % A.rows;
+      columnindexes[i] = i % A.columns;
       values[i] = random.nextDouble();
-      Adense.setQuick(rowindexes[i], columnindexes[i], values[i]);
+      Adense.set(rowindexes[i], columnindexes[i], values[i]);
     }
-    SparseDoubleMatrix2D S = new SparseDoubleMatrix2D(A.rows(), A.columns());
+    SparseDoubleMatrix2D S = new SparseDoubleMatrix2D(A.rows, A.columns);
     S.assignIndexValuesFunc(rowindexes, columnindexes, values, multSecond(2.0));
-    for (int r = 0; r < A.rows(); r++) {
-      for (int c = 0; c < A.columns(); c++) {
-        expect(2 * Adense.getQuick(r, c), equals(S.getQuick(r, c)));
+    for (int r = 0; r < A.rows; r++) {
+      for (int c = 0; c < A.columns; c++) {
+        expect(2 * Adense.get(r, c), equals(S.get(r, c)));
       }
     }
   }
@@ -153,9 +153,9 @@ class SparseDoubleMatrix2DTest extends DoubleMatrix2DTest {
 
 class SparseDoubleMatrix2DViewTest extends SparseDoubleMatrix2DTest {
   void createMatrices() {
-    A = new SparseDoubleMatrix2D(NCOLUMNS, NROWS).viewDice();
-    B = new SparseDoubleMatrix2D(NCOLUMNS, NROWS).viewDice();
-    Bt = new SparseDoubleMatrix2D(NROWS, NCOLUMNS).viewDice();
+    A = new SparseDoubleMatrix2D(NCOLUMNS, NROWS).dice();
+    B = new SparseDoubleMatrix2D(NCOLUMNS, NROWS).dice();
+    Bt = new SparseDoubleMatrix2D(NROWS, NCOLUMNS).dice();
   }
 }
 
@@ -169,8 +169,8 @@ class SparseRCDoubleMatrix2DTest extends DoubleMatrix2DTest {
 
 class SparseRCDoubleMatrix2DViewTest extends SparseRCDoubleMatrix2DTest {
   void createMatrices() {
-    A = new SparseRCDoubleMatrix2D.sized(NCOLUMNS, NROWS).viewDice();
-    B = new SparseRCDoubleMatrix2D.sized(NCOLUMNS, NROWS).viewDice();
-    Bt = new SparseRCDoubleMatrix2D.sized(NROWS, NCOLUMNS).viewDice();
+    A = new SparseRCDoubleMatrix2D.sized(NCOLUMNS, NROWS).dice();
+    B = new SparseRCDoubleMatrix2D.sized(NCOLUMNS, NROWS).dice();
+    Bt = new SparseRCDoubleMatrix2D.sized(NROWS, NCOLUMNS).dice();
   }
 }

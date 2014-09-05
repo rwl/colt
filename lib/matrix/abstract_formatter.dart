@@ -244,7 +244,7 @@ abstract class AbstractFormatter {//extends cern.colt.PersistentObject {
   List<String> _formatRow(AbstractMatrix1D vector) {
     Former formatter = null;
     formatter = _factory.create(_format);
-    int s = vector.size();
+    int s = vector.length;
     List<String> strings = new List<String>(s);
     for (int i = 0; i < s; i++) {
       strings[i] = _form(vector, i, formatter);
@@ -374,14 +374,14 @@ abstract class AbstractFormatter {//extends cern.colt.PersistentObject {
     // return "Matrix1D of size="+matrix.size();
     // return matrix.size()+" element matrix";
     // return "matrix("+matrix.size()+")";
-    return "${matrix.size()} matrix";
+    return "${matrix.length} matrix";
   }
 
   /**
    * Returns a short string representation describing the shape of the matrix.
    */
   static String shape2D(AbstractMatrix2D matrix) {
-    return "${matrix.rows()} x ${matrix.columns()} matrix";
+    return "${matrix.rows} x ${matrix.columns} matrix";
   }
 
   /**

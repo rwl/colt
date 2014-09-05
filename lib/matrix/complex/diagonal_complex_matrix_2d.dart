@@ -54,7 +54,8 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
    *             .
    */
   factory DiagonalDComplexMatrix2D.fromValues(List<Float64List> values, int dindex) {
-    return new DiagonalDComplexMatrix2D(values.length, values.length == 0 ? 0 : values[0].length, dindex)..assignList(values);
+    return new DiagonalDComplexMatrix2D(values.length, values.length == 0 ? 0 : values[0].length, dindex)
+      ..setAll2D(values);
   }
 
   /**
@@ -108,7 +109,7 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
     }
     _elements = new Float64List(2 * _dlength);
   }
-  
+
   DiagonalDComplexMatrix2D._internal(int rows, int columns, this._elements, this._dlength, this._dindex) : super(null) {
     try {
       _setUp(rows, columns);
@@ -119,17 +120,17 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
     }
   }
 
-  DComplexMatrix2D assign(final cfunc.DComplexDComplexFunction function) {
+  DComplexMatrix2D forEach(final cfunc.DComplexDComplexFunction function) {
     if (function is cfunc.DComplexMult) { // x[i] = mult*x[i]
       final Float64List alpha = (function as cfunc.DComplexMult).multiplicator;
       if (alpha[0] == 1 && alpha[1] == 0) {
         return this;
       }
       if (alpha[0] == 0 && alpha[1] == 0) {
-        return assignValues(alpha);
+        return fill(alpha[0], alpha[1]);
       }
       if (alpha[0] != alpha[0] || alpha[1] != alpha[1]) {
-        return assignValues(alpha); // the funny definition of isNaN(). This should better not happen.
+        return fill(alpha[0], alpha[1]); // the funny definition of isNaN(). This should better not happen.
       }
       Float64List elem = new Float64List(2);
       for (int j = 0; j < _dlength; j++) {
@@ -152,7 +153,7 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
     return this;
   }
 
-  DComplexMatrix2D assignValue(double re, double im) {
+  DComplexMatrix2D fill(double re, double im) {
     for (int j = 0; j < _dlength; j++) {
       _elements[2 * j] = re;
       _elements[2 * j + 1] = im;
@@ -160,7 +161,7 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
     return this;
   }
 
-  DComplexMatrix2D assignValues(final Float64List values) {
+  DComplexMatrix2D setAll(final Float64List values) {
     if (values.length != 2 * _dlength) throw new ArgumentError("Must have same length: length=${values.length} 2*dlength=${2 * _dlength}");
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_dlength >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -187,9 +188,9 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
     return this;
   }
 
-  DComplexMatrix2D assignList(final List<Float64List> values) {
+  DComplexMatrix2D setAll2D(final List<Float64List> values) {
     if (values.length != _rows) {
-      throw new ArgumentError("Must have same number of rows: rows=${values.length} rows()=${rows()}");
+      throw new ArgumentError("Must have same number of rows: rows=${values.length} rows()=${rows}");
     }
     int r, c;
     if (_dindex >= 0) {
@@ -201,7 +202,7 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
     }
     for (int i = 0; i < _dlength; i++) {
       if (values[i].length != 2 * _columns) {
-        throw new ArgumentError("Must have same number of columns in every row: columns=${values[r].length} 2 * columns()=${2 * columns()}");
+        throw new ArgumentError("Must have same number of columns in every row: columns=${values[r].length} 2 * columns()=${2 * columns}");
       }
       _elements[2 * i] = values[r][2 * c];
       _elements[2 * i + 1] = values[r][2 * c + 1];
@@ -211,7 +212,7 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
     return this;
   }
 
-  DComplexMatrix2D assignMatrix(DComplexMatrix2D source) {
+  DComplexMatrix2D copyFrom(DComplexMatrix2D source) {
     // overriden for performance only
     if (source == this) return this; // nothing to do
     checkShape(source);
@@ -226,11 +227,11 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
       this._elements.setAll(0, other._elements);
       return this;
     } else {
-      return super.assignMatrix(source);
+      return super.copyFrom(source);
     }
   }
 
-  DComplexMatrix2D assignFunc(final DComplexMatrix2D y, final cfunc.DComplexDComplexDComplexFunction function) {
+  DComplexMatrix2D forEachMatrix(final DComplexMatrix2D y, final cfunc.DComplexDComplexDComplexFunction function) {
     checkShape(y);
     if (y is DiagonalDComplexMatrix2D) {
       DiagonalDComplexMatrix2D other = y;
@@ -368,11 +369,11 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
       //}
       return this;
     } else {
-      return super.assignFunc(y, function);
+      return super.forEachMatrix(y, function);
     }
   }
 
-  int cardinality() {
+  int get cardinality {
     int cardinality = 0;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_dlength >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -418,7 +419,7 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
     return _elements;
   }
 
-  bool equalsValue(Float64List value) {
+  /*bool equalsValue(Float64List value) {
     double epsilon = DComplexProperty.DEFAULT.tolerance();
     Float64List x = new Float64List(2);
     Float64List diff = new Float64List(2);
@@ -436,17 +437,43 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
       }
     }
     return true;
-  }
+  }*/
 
-  bool equals(Object obj) {
+  bool operator ==(var obj) {
+    if (obj is Float64List) {
+      final value = obj;
+      double epsilon = DComplexProperty.DEFAULT.tolerance();
+      Float64List x = new Float64List(2);
+      Float64List diff = new Float64List(2);
+      for (int i = 0; i < _dlength; i++) {
+        x[0] = _elements[2 * i];
+        x[1] = _elements[2 * i + 1];
+        diff[0] = (value[0] - x[0]).abs();
+        diff[1] = (value[1] - x[1]).abs();
+        if (((diff[0] != diff[0]) || (diff[1] != diff[1])) && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1])))) || (DComplex.isEqual(value, x, epsilon))) {
+          diff[0] = 0.0;
+          diff[1] = 0.0;
+        }
+        if ((diff[0] > epsilon) || (diff[1] > epsilon)) {
+          return false;
+        }
+      }
+      return true;
+    }
     if (obj is DiagonalDComplexMatrix2D) {
       DiagonalDComplexMatrix2D other = obj;
       double epsilon = DComplexProperty.DEFAULT.tolerance();
-      if (this == obj) return true;
-      if (!(this != null && obj != null)) return false;
-      final int rows = this.rows();
-      final int columns = this.columns();
-      if (columns != other.columns() || rows != other.rows()) return false;
+      if (identical(this, obj)) {
+        return true;
+      }
+      if (!(this != null && obj != null)) {
+        return false;
+      }
+      final int rows = this.rows;
+      final int columns = this.columns;
+      if (columns != other.columns || rows != other.rows) {
+        return false;
+      }
       if ((_dindex != other._dindex) || (_dlength != other._dlength)) {
         return false;
       }
@@ -471,7 +498,7 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
       }
       return true;
     } else {
-      return super.equals(obj);
+      return super ==(obj);
     }
   }
 
@@ -494,7 +521,7 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
    *
    * @return the length of the diagonal
    */
-  int diagonalLength() {
+  int get diagonalLength {
     return _dlength;
   }
 
@@ -503,11 +530,11 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
    *
    * @return the index of the diagonal
    */
-  int diagonalIndex() {
+  int get diagonalIndex {
     return _dindex;
   }
 
-  Float64List getQuick(int row, int column) {
+  Float64List get(int row, int column) {
     if (_dindex >= 0) {
       if (column < _dindex) {
         return new Float64List(2);
@@ -539,7 +566,7 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
     return new SparseDComplexMatrix1D(size);
   }
 
-  void setQuick(int row, int column, Float64List value) {
+  void set(int row, int column, Float64List value) {
     if (_dindex >= 0) {
       if (column < _dindex) {
         //do nothing
@@ -565,7 +592,7 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
     }
   }
 
-  void setPartsQuick(int row, int column, double re, double im) {
+  void setParts(int row, int column, double re, double im) {
     if (_dindex >= 0) {
       if (column < _dindex) {
         //do nothing
@@ -591,7 +618,7 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
     }
   }
 
-  DComplexMatrix1D zMult(DComplexMatrix1D y, DComplexMatrix1D z, [Float64List alpha = null, Float64List beta = null, bool transposeA = false]) {
+  DComplexMatrix1D mult(DComplexMatrix1D y, DComplexMatrix1D z, [Float64List alpha = null, Float64List beta = null, bool transposeA = false]) {
     if (alpha == null) {
       alpha = new Float64List.fromList([1.0, 0.0]);
     }
@@ -609,15 +636,15 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
     if (z == null) z = new DenseDComplexMatrix1D(rowsA);
 
     if (!(this._isNoView && y is DenseDComplexMatrix1D && z is DenseDComplexMatrix1D)) {
-      return super.zMult(y, z, alpha, beta, transposeA);
+      return super.mult(y, z, alpha, beta, transposeA);
     }
 
-    if (columnsA != y.size() || rowsA > z.size()) {
-      throw new ArgumentError("Incompatible args: " + ((transposeA ? viewDice() : this).toStringShort()) + ", " + y.toStringShort() + ", " + z.toStringShort());
+    if (columnsA != y.length || rowsA > z.length) {
+      throw new ArgumentError("Incompatible args: " + ((transposeA ? dice() : this).toStringShort()) + ", " + y.toStringShort() + ", " + z.toStringShort());
     }
 
     if ((!ignore) && !((beta[0] == 1) && (beta[1] == 0))) {
-      z.assign(cfunc.multiply(beta));
+      z.forEach(cfunc.multiply(beta));
     }
 
     DenseDComplexMatrix1D zz = z as DenseDComplexMatrix1D;
@@ -691,7 +718,7 @@ class DiagonalDComplexMatrix2D extends WrapperDComplexMatrix2D {
   DComplexMatrix2D _getContent() {
     return this;
   }
-  
+
   Object clone() {
     return new DiagonalDComplexMatrix2D._internal(_rows, _columns, _elements, _dlength, _dindex);
   }

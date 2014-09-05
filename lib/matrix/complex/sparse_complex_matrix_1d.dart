@@ -30,7 +30,8 @@ class SparseDComplexMatrix1D extends DComplexMatrix1D {
    *            The values to be filled into the new matrix.
    */
   factory SparseDComplexMatrix1D.from(Float64List values) {
-    return new SparseDComplexMatrix1D(values.length)..assignValues(values);
+    return new SparseDComplexMatrix1D(values.length)
+      ..setAll(values);
   }
 
   /**
@@ -70,21 +71,25 @@ class SparseDComplexMatrix1D extends DComplexMatrix1D {
     this._isNoView = isNoView;
   }
 
-  DComplexMatrix1D assignValues(Float64List value) {
+  DComplexMatrix1D setAll(Float64List value) {
     // overriden for performance only
-    if (this._isNoView && value[0] == 0 && value[1] == 0) this._elements.clear(); else super.assignValues(value);
+    if (this._isNoView && value[0] == 0 && value[1] == 0) {
+      this._elements.clear();
+    } else {
+      super.setAll(value);
+    }
     return this;
   }
 
-  int cardinality() {
+  int get cardinality {
     if (this._isNoView) {
       return this._elements.length;
     } else {
-      return super.cardinality();
+      return super.cardinality;
     }
   }
 
-  Float64List getQuick(int index) {
+  Float64List get(int index) {
     Float64List elem = _elements[_zero + index * _stride];
     if (elem != null) {
       return new Float64List.fromList([elem[0], elem[1]]);
@@ -152,9 +157,9 @@ class SparseDComplexMatrix1D extends DComplexMatrix1D {
     int idx = 0;
     for (int c = 0; c < columns; c++) {
       for (int r = 0; r < rows; r++) {
-        Float64List elem = getQuick(idx++);
+        Float64List elem = get(idx++);
         if ((elem[0] != 0) || (elem[1] != 0)) {
-          M.setQuick(r, c, elem);
+          M.set(r, c, elem);
         }
       }
     }
@@ -207,7 +212,7 @@ class SparseDComplexMatrix1D extends DComplexMatrix1D {
     return M;
   }*/
 
-  void setQuick(int index, Float64List value) {
+  void set(int index, Float64List value) {
     int i = _zero + index * _stride;
     if (value[0] == 0 && value[1] == 0) {
       this._elements.remove(i);
@@ -216,7 +221,7 @@ class SparseDComplexMatrix1D extends DComplexMatrix1D {
     }
   }
 
-  void setPartsQuick(int index, double re, double im) {
+  void setParts(int index, double re, double im) {
     int i = _zero + index * _stride;
     if (re == 0 && im == 0) {
       this._elements.remove(i);
@@ -229,7 +234,7 @@ class SparseDComplexMatrix1D extends DComplexMatrix1D {
     return new SelectedSparseDComplexMatrix1D.offsets(this._elements, offsets);
   }
 
-  DoubleMatrix1D getImaginaryPart() {
+  DoubleMatrix1D imaginary() {
     final DoubleMatrix1D Im = new SparseDoubleMatrix1D(_size);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
@@ -248,13 +253,13 @@ class SparseDComplexMatrix1D extends DComplexMatrix1D {
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
     for (int i = 0; i < _size; i++) {
-      Im.setQuick(i, getQuick(i)[1]);
+      Im.set(i, get(i)[1]);
     }
     //}
     return Im;
   }
 
-  DoubleMatrix1D getRealPart() {
+  DoubleMatrix1D real() {
     final DoubleMatrix1D Re = new SparseDoubleMatrix1D(_size);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
@@ -273,12 +278,12 @@ class SparseDComplexMatrix1D extends DComplexMatrix1D {
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
     for (int i = 0; i < _size; i++) {
-      Re.setQuick(i, getQuick(i)[0]);
+      Re.set(i, get(i)[0]);
     }
     //}
     return Re;
   }
-  
+
   Object clone() {
     return new SparseDComplexMatrix1D(_size, _elements, _zero, _stride, _isNoView);
   }
@@ -348,7 +353,7 @@ class SelectedSparseDComplexMatrix1D extends DComplexMatrix1D {
     return _offsets[absRank];
   }
 
-  Float64List getQuick(int index) {
+  Float64List get(int index) {
     return _elements[__offset + _offsets[_zero + index * _stride]];
   }
 
@@ -405,7 +410,7 @@ class SelectedSparseDComplexMatrix1D extends DComplexMatrix1D {
    * @param value
    *            the value to be filled into the specified cell.
    */
-  void setQuick(int index, Float64List value) {
+  void set(int index, Float64List value) {
     int i = __offset + _offsets[_zero + index * _stride];
     if (value[0] == 0 && value[1] == 0) {
       this._elements.remove(i);
@@ -428,7 +433,7 @@ class SelectedSparseDComplexMatrix1D extends DComplexMatrix1D {
    * @param value
    *            the value to be filled into the specified cell.
    */
-  void setPartsQuick(int index, double re, double im) {
+  void setParts(int index, double re, double im) {
     int i = __offset + _offsets[_zero + index * _stride];
     if (re == 0 && im == 0) this._elements.remove(i); else this._elements[i] = new Float64List.fromList([re, im]);
   }
@@ -456,14 +461,14 @@ class SelectedSparseDComplexMatrix1D extends DComplexMatrix1D {
     return new SelectedSparseDComplexMatrix1D.offsets(this._elements, offsets);
   }
 
-  DoubleMatrix1D getImaginaryPart() {
+  DoubleMatrix1D imaginary() {
     throw new UnsupportedError("This method is not supported.");
   }
 
-  DoubleMatrix1D getRealPart() {
+  DoubleMatrix1D real() {
     throw new UnsupportedError("This method is not supported.");
   }
-  
+
   Object clone() {
     return new SelectedSparseDComplexMatrix1D(_size, _elements, _zero, _stride, _offsets, __offset);
   }

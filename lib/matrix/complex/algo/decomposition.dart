@@ -113,7 +113,7 @@ class CSparseDComplexLUDecomposition implements SparseDComplexLUDecomposition {
     } else {
       dcs = A.elements() as DZcs;
     }
-    n = A.rows();
+    n = A.rows;
 
     S = cs_sqr(order, dcs, false);
     if (S == null) {
@@ -140,24 +140,24 @@ class CSparseDComplexLUDecomposition implements SparseDComplexLUDecomposition {
         pivsign = -pivsign;
       }
     }
-    if (_U == null) {
-      _U = new SparseCCDComplexMatrix2D(_N.U);
-      if (_rcMatrix) {
-        _U = (_U as SparseCCDComplexMatrix2D).getRowCompressed();
+    if (U == null) {
+      U = new SparseCCDComplexMatrix2D(N.U);
+      if (rcMatrix) {
+        U = (U as SparseCCDComplexMatrix2D).rowCompressed();
       }
     }
     Float64List det = new Float64List.fromList([pivsign, 0]);
     for (int j = 0; j < n; j++) {
-      det = multiply(det)(_U.getQuick(j, j));
+      det = multiply(det)(U.get(j, j));
     }
     return det;
   }
 
   DComplexMatrix2D getL() {
-    if (_L == null) {
-      _L = new SparseCCDComplexMatrix2D(_N.L);
-      if (_rcMatrix) {
-        _L = (_L as SparseCCDComplexMatrix2D).getRowCompressed();
+    if (L == null) {
+      L = new SparseCCDComplexMatrix2D(N.L);
+      if (rcMatrix) {
+        L = (L as SparseCCDComplexMatrix2D).rowCompressed();
       }
     }
     return _L.copy();
@@ -174,10 +174,10 @@ class CSparseDComplexLUDecomposition implements SparseDComplexLUDecomposition {
   }
 
   DComplexMatrix2D getU() {
-    if (_U == null) {
-      _U = new SparseCCDComplexMatrix2D(_N.U);
-      if (_rcMatrix) {
-        _U = (_U as SparseCCDComplexMatrix2D).getRowCompressed();
+    if (U == null) {
+      U = new SparseCCDComplexMatrix2D(N.U);
+      if (rcMatrix) {
+        U = (U as SparseCCDComplexMatrix2D).rowCompressed();
       }
     }
     return _U.copy();
@@ -201,7 +201,7 @@ class CSparseDComplexLUDecomposition implements SparseDComplexLUDecomposition {
   }
 
   void solve(DComplexMatrix1D b) {
-    if (b.size() != n) {
+    if (b.length != n) {
       throw new ArgumentError("b.size() != A.rows()");
     }
     if (!isNonsingular()) {
@@ -210,7 +210,7 @@ class CSparseDComplexLUDecomposition implements SparseDComplexLUDecomposition {
     DComplexProperty.DEFAULT.checkDense(b);
     DZcsa y = new DZcsa(n);
     DZcsa x;
-    if (b.isView()) {
+    if (b.isView) {
       x = new DZcsa(b.copy().elements() as Float64List);
     } else {
       x = new DZcsa(b.elements() as Float64List);
@@ -224,8 +224,8 @@ class CSparseDComplexLUDecomposition implements SparseDComplexLUDecomposition {
     cs_ipvec(_S.q, y, x, n);
     /* b(q) = x */
 
-    if (b.isView()) {
-      b.assignValues(x.x);
+    if (b.isView) {
+      b.setAll(x.x);
     }
   }
 }

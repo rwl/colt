@@ -49,14 +49,14 @@ abstract class AbstractMatrix {
   /**
    * Returns whether the receiver is a view or not.
    */
-  bool isView() {
+  bool get isView {
     return !this._isNoView;
   }
 
   /**
    * Returns the number of cells.
    */
-  int size();
+  int get length;
 
   /**
    * Releases any superfluous internal memory. An application can use this
