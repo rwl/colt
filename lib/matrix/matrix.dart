@@ -14,6 +14,7 @@ import '../function/double.dart' show DoubleFunction, DoubleDoubleFunction, Doub
   DoubleIntProcedure, DoubleProcedure;
 import '../function/double.dart' as func;
 import '../function/complex.dart' as cfunc;
+import '../function/int.dart' as ifunc;
 import '../math.dart';
 //import '../util.dart';
 import 'double/algo/algo.dart';
@@ -24,6 +25,7 @@ import 'former.dart';
 part 'abstract_matrix_1d.dart';
 part 'abstract_matrix_2d.dart';
 part 'abstract_matrix.dart';
+
 part 'double/dense_double_matrix_1d.dart';
 part 'double/dense_double_matrix_2d.dart';
 part 'double/dense_large_double_matrix_2d.dart';
@@ -51,3 +53,8 @@ part 'complex/diagonal_complex_matrix_2d.dart';
 part 'complex/sparse_cc_complex_matrix_2d.dart';
 part 'complex/sparse_rc_complex_matrix_2d.dart';
 part 'complex/delegate_complex_matrix.dart';
+
+part 'int/int_matrix_1d.dart';
+part 'int/int_matrix_2d.dart';
+part 'int/dense_int_matrix_1d.dart';
+part 'int/dense_int_matrix_2d.dart';
