@@ -872,7 +872,7 @@ abstract class IntMatrix2D extends AbstractMatrix2D {
 
   bool operator ==(var obj) {
     if (obj is int) {
-      return IntProperty.DEFAULT.equalsMatrixValue(this, obj);
+      return iprop.equalsMatrixValue(this, obj);
     }
     if (identical(this, obj)) {
       return true;
@@ -884,7 +884,7 @@ abstract class IntMatrix2D extends AbstractMatrix2D {
       return false;
     }
 
-    return IntProperty.DEFAULT.equalsMatrix(this, obj as IntMatrix2D);
+    return iprop.equalsMatrix(this, obj as IntMatrix2D);
   }
 
   /**
@@ -1964,8 +1964,12 @@ abstract class IntMatrix2D extends AbstractMatrix2D {
     if (beta == null) {
       beta = C == null ? 1 : 0;
     }
-    if (transposeA) return dice().multiply(B, C, alpha, beta, false, transposeB);
-    if (transposeB) return this.multiply(B.dice(), C, alpha, beta, transposeA, false);
+    if (transposeA) {
+      return dice().multiply(B, C, alpha, beta, false, transposeB);
+    }
+    if (transposeB) {
+      return this.multiply(B.dice(), C, alpha, beta, transposeA, false);
+    }
 
     final int m = _rows;
     final int n = _columns;

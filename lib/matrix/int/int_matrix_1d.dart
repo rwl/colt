@@ -710,7 +710,7 @@ abstract class IntMatrix1D extends AbstractMatrix1D {
    */
   bool operator ==(var obj) {
     if (obj is int) {
-      return IntProperty.DEFAULT.equalsVectorValue(this, obj);
+      return iprop.equalsVectorValue(this, obj);
     }
     if (identical(this, obj)) {
       return true;
@@ -722,7 +722,7 @@ abstract class IntMatrix1D extends AbstractMatrix1D {
       return false;
     }
 
-    return IntProperty.DEFAULT.equalsVector(this, obj as IntMatrix1D);
+    return iprop.equalsVector(this, obj as IntMatrix1D);
   }
 
   /**
@@ -1055,7 +1055,7 @@ abstract class IntMatrix1D extends AbstractMatrix1D {
     } else {*/
       maxValue = get(location);
       int elem;
-      for (int i = 1; i < size(); i++) {
+      for (int i = 1; i < length; i++) {
         elem = get(i);
         if (maxValue < elem) {
           maxValue = elem;
@@ -1117,7 +1117,7 @@ abstract class IntMatrix1D extends AbstractMatrix1D {
     } else {*/
       minValue = get(location);
       int elem;
-      for (int i = 1; i < size(); i++) {
+      for (int i = 1; i < length; i++) {
         elem = get(i);
         if (minValue > elem) {
           minValue = elem;

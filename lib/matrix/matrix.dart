@@ -19,6 +19,7 @@ import '../math.dart';
 //import '../util.dart';
 import 'double/algo/algo.dart';
 import 'complex/algo/algo.dart';
+import 'int/algo/algo.dart' as iprop;
 import 'former.dart';
 
 //part 'abstract_formatter.dart';
@@ -58,3 +59,4 @@ part 'int/int_matrix_1d.dart';
 part 'int/int_matrix_2d.dart';
 part 'int/dense_int_matrix_1d.dart';
 part 'int/dense_int_matrix_2d.dart';
+part 'int/factory.dart';
