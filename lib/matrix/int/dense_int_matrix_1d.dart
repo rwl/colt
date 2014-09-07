@@ -772,7 +772,7 @@ class DenseIntMatrix1D extends IntMatrix1D {
     }
   }
 
-  Int32List max() {
+  IntVectorLocation max() {
     int location = 0;
     int maxValue = 0;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -828,10 +828,10 @@ class DenseIntMatrix1D extends IntMatrix1D {
       }
     }
     //}
-    return [maxValue, location];
+    return new IntVectorLocation(maxValue, location);
   }
 
-  Int32List min() {
+  IntVectorLocation min() {
     int location = 0;
     int minValue = 0;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -887,7 +887,7 @@ class DenseIntMatrix1D extends IntMatrix1D {
       }
     }
     //}
-    return [minValue, location];
+    return new IntVectorLocation(minValue, location);
   }
 
   int get(int index) {

@@ -39,7 +39,6 @@ part 'double/wrapper_double_matrix_2d.dart';
 part 'double/delegate_double_matrix.dart';
 part 'double/double_matrix_1d.dart';
 part 'double/double_matrix_2d.dart';
-part 'double/factory.dart';
 //part 'former.dart';
 //part 'former_factory.dart';
 
@@ -59,4 +58,6 @@ part 'int/int_matrix_1d.dart';
 part 'int/int_matrix_2d.dart';
 part 'int/dense_int_matrix_1d.dart';
 part 'int/dense_int_matrix_2d.dart';
+
+part 'double/factory.dart';
 part 'int/factory.dart';

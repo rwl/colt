@@ -1,6 +1,7 @@
 library cern.colt.function.int;
 
 import 'dart:math' as math;
+import '../math.dart' show MAX_INT;
 
 typedef int IntFunction(int argument);
 typedef int IntIntFunction(int x, int y);
@@ -420,25 +421,11 @@ IntIntFunction plusMultFirst(final int constant) {
   return new IntPlusMultFirst(constant);
 }
 
-/**
- * Constructs a function that returns a 32 bit uniformly distributed random
- * number in the closed longerval <tt>[Int.MIN_VALUE,Int.MAX_VALUE]</tt>
- * (including <tt>Int.MIN_VALUE</tt> and <tt>Int.MAX_VALUE</tt>). Currently
- * the engine is
- * {@link cern.jet.random.tdouble.engine.DoubleMersenneTwister} and is
- * seeded with the current time.
- * <p>
- * Note that any random engine derived from
- * {@link cern.jet.random.tdouble.engine.DoubleRandomEngine} and any random
- * distribution derived from
- * {@link cern.jet.random.tdouble.AbstractDoubleDistribution} are function
- * objects, because they implement the proper longerfaces. Thus, if you are
- * not happy with the default, just pass your favourite random generator to
- * function evaluating methods.
- */
-/*IntFunction random() {
-    return new cern.jet.random.tdouble.engine.DoubleMersenneTwister(new java.util.Date());
-}*/
+IntFunction random() {
+  final r = new math.Random();
+  return (_) => r.nextInt(MAX_INT);
+    //return new cern.jet.random.tdouble.engine.DoubleMersenneTwister(new java.util.Date());
+}
 
 /**
  * Constructs a function that returns <tt>a << b</tt>. <tt>a</tt> is a

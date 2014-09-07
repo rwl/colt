@@ -1,5 +1,14 @@
 part of cern.colt.matrix.int.test;
 
+testDenseIntMatrix2D(String name, DenseIntMatrix2DTest t) {
+  testIntMatrix2D(name, t);
+  group('DenseIntMatrix2D', () {
+    setUp(t.setUp);
+    tearDown(t.tearDown);
+    test('setAll', t.testSetAll);
+  });
+}
+
 class DenseIntMatrix2DTest extends IntMatrix2DTest {
 
   void createMatrices() {

@@ -15,7 +15,7 @@ import 'matrix.dart';
 part 'former_factory.dart';
 part 'abstract_formatter.dart';
 part 'double/algo/formatter.dart';
-part 'int/formatter.dart';
+part 'int/algo/formatter.dart';
 
 /**
  * Formats a double or complex (double[]) into a string (like sprintf in C).

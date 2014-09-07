@@ -90,7 +90,8 @@ abstract class IntMatrix1DTest {
       int elem = A.get(i);
       expected += elem * elem;
     }
-    int result = A.reduceRange(ifunc.plus, ifunc.square, indexList);
+    int result = A.reduceRange(ifunc.plus, ifunc.square,
+        new Int32List.fromList(indexList));
     expect(expected, equals(result));
   }
 
@@ -213,8 +214,8 @@ abstract class IntMatrix1DTest {
     A.set(A.length ~/ 3, 7);
     A.set(A.length ~/ 2, 1);
     final maxAndLoc = A.max();
-    expect(7, equals(maxAndLoc[0]));
-    expect(A.length / 3, equals(maxAndLoc[1]));
+    expect(7, equals(maxAndLoc.value));
+    expect(A.length ~/ 3, equals(maxAndLoc.location));
   }
 
   void testMin() {
@@ -222,8 +223,8 @@ abstract class IntMatrix1DTest {
     A.set(A.length ~/ 3, -7);
     A.set(A.length ~/ 2, -1);
     final minAndLoc = A.min();
-    expect(-7, equals(minAndLoc[0]));
-    expect(A.length / 3, equals(minAndLoc[1]));
+    expect(-7, equals(minAndLoc.value));
+    expect(A.length ~/ 3, equals(minAndLoc.location));
   }
 
   void testNegativeValues() {
@@ -235,8 +236,8 @@ abstract class IntMatrix1DTest {
     A.negativeValues(indexList, valueList);
     expect(2, equals(indexList.length));
     expect(2, equals(valueList.length));
-    expect(indexList.contains(A.length / 3), isTrue);
-    expect(indexList.contains(A.length / 2), isTrue);
+    expect(indexList.contains(A.length ~/ 3), isTrue);
+    expect(indexList.contains(A.length ~/ 2), isTrue);
     expect(valueList.contains(-7), isTrue);
     expect(valueList.contains(-1), isTrue);
   }
@@ -250,8 +251,8 @@ abstract class IntMatrix1DTest {
     A.nonZeros(indexList, valueList);
     expect(2, equals(indexList.length));
     expect(2, equals(valueList.length));
-    expect(indexList.contains(A.length / 3), isTrue);
-    expect(indexList.contains(A.length / 2), isTrue);
+    expect(indexList.contains(A.length ~/ 3), isTrue);
+    expect(indexList.contains(A.length ~/ 2), isTrue);
     expect(valueList.contains(7), isTrue);
     expect(valueList.contains(1), isTrue);
   }
@@ -265,8 +266,8 @@ abstract class IntMatrix1DTest {
     A.positiveValues(indexList, valueList);
     expect(2, equals(indexList.length));
     expect(2, equals(valueList.length));
-    expect(indexList.contains(A.length / 3), isTrue);
-    expect(indexList.contains(A.length / 2), isTrue);
+    expect(indexList.contains(A.length ~/ 3), isTrue);
+    expect(indexList.contains(A.length ~/ 2), isTrue);
     expect(valueList.contains(7), isTrue);
     expect(valueList.contains(1), isTrue);
   }

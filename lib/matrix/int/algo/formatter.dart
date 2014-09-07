@@ -296,7 +296,7 @@ class IntFormatter extends AbstractFormatter {
    * Converts a given cell to a String; no alignment considered.
    */
   String _form(IntMatrix1D matrix, int index, Former formatter) {
-    return formatter.form(matrix.at(index));
+    return formatter.formInt(matrix.at(index));
   }
 
   /**
@@ -334,7 +334,7 @@ class IntFormatter extends AbstractFormatter {
     int i = s.lastIndexOf('.');
     if (i < 0) i = s.lastIndexOf('e');
     if (i < 0) i = s.lastIndexOf('E');
-    if (i < 0) i = s.length();
+    if (i < 0) i = s.length;
     return i;
   }
 
@@ -343,7 +343,9 @@ class IntFormatter extends AbstractFormatter {
    */
 
   int _lead(String s) {
-    if (_alignment.equals(DECIMAL)) return _indexOfDecimalPoint(s);
+    if (_alignment == AbstractFormatter.DECIMAL) {
+      return _indexOfDecimalPoint(s);
+    }
     return super._lead(s);
   }
 
@@ -360,7 +362,7 @@ class IntFormatter extends AbstractFormatter {
     copy.setColumnSeparator(", ");
     String lead = "{";
     String trail = "};";
-    return lead + copy.toString(matrix) + trail;
+    return lead + copy.toString1D(matrix) + trail;
   }
 
   /**
@@ -388,7 +390,7 @@ class IntFormatter extends AbstractFormatter {
    * @param matrix
    *            the matrix to format.
    */
-  String toSourceCode3D(IntMatrix3D matrix) {
+  /*String toSourceCode3D(IntMatrix3D matrix) {
     IntFormatter copy = this.clone() as IntFormatter;
     String b3 = _blanks(3);
     String b6 = _blanks(6);
@@ -399,7 +401,7 @@ class IntFormatter extends AbstractFormatter {
     String lead = "{\n" + b3 + "{\n" + b6 + "{";
     String trail = "}\n" + b3 + "}\n}";
     return lead + copy.toString3D(matrix) + trail;
-  }
+  }*/
 
   /**
    * Returns a string representation of the given matrix.
@@ -407,7 +409,7 @@ class IntFormatter extends AbstractFormatter {
    * @param matrix
    *            the matrix to convert.
    */
-  String toString(IntMatrix1D matrix) {
+  String toString1D(IntMatrix1D matrix) {
     IntMatrix2D easy = matrix.like2D(1, matrix.length);
     easy.row(0).copyFrom(matrix);
     return toString2D(easy);
@@ -420,7 +422,7 @@ class IntFormatter extends AbstractFormatter {
    *            the matrix to convert.
    */
   String toString2D(IntMatrix2D matrix) {
-    return super._toString(matrix);
+    return super.toString2D(matrix);
   }
 
   /**
@@ -429,7 +431,7 @@ class IntFormatter extends AbstractFormatter {
    * @param matrix
    *            the matrix to convert.
    */
-  String toString3D(IntMatrix3D matrix) {
+  /*String toString3D(IntMatrix3D matrix) {
     StringBuffer buf = new StringBuffer();
     boolean oldPrintShape = this._printShape;
     this._printShape = false;
@@ -440,7 +442,7 @@ class IntFormatter extends AbstractFormatter {
     this._printShape = oldPrintShape;
     if (_printShape) buf.insert(0, shape(matrix) + "\n");
     return buf.toString();
-  }
+  }*/
 
   /**
    * Returns a string representation of the given matrix.
@@ -449,7 +451,7 @@ class IntFormatter extends AbstractFormatter {
    *            the matrix to convert.
    */
 
-  String _toString(AbstractMatrix2D matrix) {
+  String _toString2D(AbstractMatrix2D matrix) {
     return this.toString2D(matrix as IntMatrix2D);
   }
 
@@ -473,7 +475,7 @@ class IntFormatter extends AbstractFormatter {
    *            The overall title of the matrix to be formatted.
    * @return the matrix converted to a string.
    */
-  String _toTitleString(IntMatrix2D matrix, List<String> rowNames, List<String> columnNames, String rowAxisName, String columnAxisName, String title) {
+  /*String _toTitleString(IntMatrix2D matrix, List<String> rowNames, List<String> columnNames, String rowAxisName, String columnAxisName, String title) {
     if (matrix.length == 0) {
       return "Empty matrix";
     }
@@ -483,7 +485,7 @@ class IntFormatter extends AbstractFormatter {
     _align(s);
     // this.alignment = oldAlignment;
     return new ObjectFormatter().toTitleString(ObjectFactory2D.dense.make(s), rowNames, columnNames, rowAxisName, columnAxisName, title);
-  }
+  }*/
 
   /**
    * Returns a string representation of the given matrix with axis as well as
@@ -522,4 +524,15 @@ class IntFormatter extends AbstractFormatter {
     }
     return buf.toString();
   }*/
+
+  Object clone() {
+    return new IntFormatter()
+      .._alignment = _alignment
+      .._format = _format
+      .._minColumnWidth = _minColumnWidth
+      .._columnSeparator = _columnSeparator
+      .._rowSeparator = _rowSeparator
+      .._sliceSeparator = _sliceSeparator
+      .._printShape = _printShape;
+  }
 }

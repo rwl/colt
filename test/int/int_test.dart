@@ -21,6 +21,6 @@ intMatrix1DTests() {
 }
 
 intMatrix2DTests() {
-  testIntMatrix2D('DenseIntMatrix2D', new DenseIntMatrix2DTest());
-  testIntMatrix2D('DenseIntMatrix2D dice', new DenseIntMatrix2DViewTest());
+  testDenseIntMatrix2D('DenseIntMatrix2D', new DenseIntMatrix2DTest());
+  testDenseIntMatrix2D('DenseIntMatrix2D dice', new DenseIntMatrix2DViewTest());
 }

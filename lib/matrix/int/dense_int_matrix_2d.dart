@@ -130,6 +130,9 @@ class DenseIntMatrix2D extends IntMatrix2D {
    *             or flip's are illegal.
    */
   DenseIntMatrix2D(int rows, int columns, [Int32List elements = null, int rowZero = 0, int columnZero = 0, int rowStride = null, int columnStride = 1, bool isView = false]) {
+    if (elements == null) {
+      elements = new Int32List(rows * columns);
+    }
     _setUp(rows, columns, rowZero, columnZero, rowStride, columnStride);
     this._elements = elements;
     this._isNoView = !isView;
@@ -1188,7 +1191,7 @@ class DenseIntMatrix2D extends IntMatrix2D {
     return new DenseIntMatrix1D(size);
   }
 
-  Int32List max() {
+  IntMatrixLocation max() {
     int rowLocation = 0;
     int columnLocation = 0;
     final int zero = index(0, 0);
@@ -1258,10 +1261,10 @@ class DenseIntMatrix2D extends IntMatrix2D {
       d = 0;
     }
     //}
-    return [maxValue, rowLocation, columnLocation];
+    return new IntMatrixLocation(maxValue, rowLocation, columnLocation);
   }
 
-  Int32List min() {
+  IntMatrixLocation min() {
     int rowLocation = 0;
     int columnLocation = 0;
     final int zero = index(0, 0);
@@ -1331,7 +1334,7 @@ class DenseIntMatrix2D extends IntMatrix2D {
       d = 0;
     }
     //}
-    return [minValue, rowLocation, columnLocation];
+    return new IntMatrixLocation(minValue, rowLocation, columnLocation);
   }
 
   void set(int row, int column, int value) {

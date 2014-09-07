@@ -5,6 +5,40 @@ testIntMatrix2D(String name, IntMatrix2DTest t) {
     setUp(t.setUp);
     tearDown(t.tearDown);
     test('reduce', t.testReduce);
+    test('reduceWhere', t.testReduceWhere);
+    test('reduceRange', t.testReduceRange);
+    test('reduceWith', t.testReduceWith);
+    test('fill', t.testFill);
+    test('setAll2D', t.testSetAll2D);
+    test('forEach', t.testForEach);
+    test('copyFrom', t.testCopyFrom);
+    test('forEachWith', t.testForEachWith);
+    test('forEachWithRange', t.testForEachWithRange);
+    test('fillWhere', t.testFillWhere);
+    test('forEachWhere', t.testForEachWhere);
+    test('cardinality', t.testCardinality);
+    test('==', t.testEqualsInt);
+    test('==', t.testEqualsObject);
+    test('forEachNonZero', t.testForEachNonZero);
+    test('max', t.testMax);
+    test('min', t.testMin);
+    test('negativeValues', t.testNegativeValues);
+    test('nonZeros', t.testNonZeros);
+    test('positiveValues', t.testPositiveValues);
+    test('toList', t.testToList);
+    test('vectorize', t.testVectorize);
+    test('column', t.testColumn);
+    test('columnFlip', t.testColumnFlip);
+    test('dice', t.testDice);
+    test('part', t.testPart);
+    test('row', t.testRow);
+    test('rowFlip', t.testRowFlip);
+    test('where', t.testWhere);
+    test('select', t.testSelect);
+    test('strides', t.testStrides);
+    test('mult', t.testMult);
+    test('multiply', t.testMultiply);
+    test('sum', t.testSum);
   });
 }
 
@@ -104,7 +138,9 @@ abstract class IntMatrix2DTest {
         expected += elem * elem;
       }
     }
-    int result = A.reduceRange(ifunc.plus, ifunc.square, rowList, columnList);
+    int result = A.reduceRange(ifunc.plus, ifunc.square,
+        new Int32List.fromList(rowList),
+        new Int32List.fromList(columnList));
     expect(expected, equals(result));
   }
 
@@ -187,7 +223,9 @@ abstract class IntMatrix2DTest {
       }
     }
     IntMatrix2D Acopy = A.copy();
-    A.forEachWithRange(B, ifunc.plus, rowList, columnList);
+    A.forEachWithRange(B, ifunc.plus,
+        new Int32List.fromList(rowList),
+        new Int32List.fromList(columnList));
     for (int r = 0; r < A.rows; r++) {
       for (int c = 0; c < A.columns; c++) {
         expect(Acopy.get(r, c) + B.get(r, c), equals(A.get(r, c)));
@@ -278,9 +316,9 @@ abstract class IntMatrix2DTest {
     A.set(A.rows ~/ 3, A.columns ~/ 3, 7);
     A.set(A.rows ~/ 2, A.columns ~/ 2, 1);
     final maxAndLoc = A.max();
-    expect(7, equals(maxAndLoc[0]));
-    expect(A.rows / 3, equals(maxAndLoc[1]));
-    expect(A.columns / 3, equals(maxAndLoc[2]));
+    expect(7, equals(maxAndLoc.value));
+    expect(A.rows ~/ 3, equals(maxAndLoc.row));
+    expect(A.columns ~/ 3, equals(maxAndLoc.column));
   }
 
   void testMin() {
@@ -288,9 +326,9 @@ abstract class IntMatrix2DTest {
     A.set(A.rows ~/ 3, A.columns ~/ 3, -7);
     A.set(A.rows ~/ 2, A.columns ~/ 2, -1);
     final minAndLoc = A.min();
-    expect(-7, equals(minAndLoc[0]));
-    expect(A.rows / 3, equals(minAndLoc[1]));
-    expect(A.columns / 3, equals(minAndLoc[2]));
+    expect(-7, equals(minAndLoc.value));
+    expect(A.rows ~/ 3, equals(minAndLoc.row));
+    expect(A.columns ~/ 3, equals(minAndLoc.column));
   }
 
   void testNegativeValues() {
@@ -304,10 +342,10 @@ abstract class IntMatrix2DTest {
     expect(2, equals(rowList.length));
     expect(2, equals(columnList.length));
     expect(2, equals(valueList.length));
-    expect(rowList.contains(A.rows / 3), isTrue);
-    expect(rowList.contains(A.rows / 2), isTrue);
-    expect(columnList.contains(A.columns / 3), isTrue);
-    expect(columnList.contains(A.columns / 2), isTrue);
+    expect(rowList.contains(A.rows ~/ 3), isTrue);
+    expect(rowList.contains(A.rows ~/ 2), isTrue);
+    expect(columnList.contains(A.columns ~/ 3), isTrue);
+    expect(columnList.contains(A.columns ~/ 2), isTrue);
     expect(valueList.contains(-7), isTrue);
     expect(valueList.contains(-1), isTrue);
   }
@@ -323,10 +361,10 @@ abstract class IntMatrix2DTest {
     expect(2, equals(rowList.length));
     expect(2, equals(columnList.length));
     expect(2, equals(valueList.length));
-    expect(rowList.contains(A.rows / 3), isTrue);
-    expect(rowList.contains(A.rows / 2), isTrue);
-    expect(columnList.contains(A.columns / 3), isTrue);
-    expect(columnList.contains(A.columns / 2), isTrue);
+    expect(rowList.contains(A.rows ~/ 3), isTrue);
+    expect(rowList.contains(A.rows ~/ 2), isTrue);
+    expect(columnList.contains(A.columns ~/ 3), isTrue);
+    expect(columnList.contains(A.columns ~/ 2), isTrue);
     expect(valueList.contains(7), isTrue);
     expect(valueList.contains(1), isTrue);
   }
@@ -342,10 +380,10 @@ abstract class IntMatrix2DTest {
     expect(2, equals(rowList.length));
     expect(2, equals(columnList.length));
     expect(2, equals(valueList.length));
-    expect(rowList.contains(A.rows / 3), isTrue);
-    expect(rowList.contains(A.rows / 2), isTrue);
-    expect(columnList.contains(A.columns / 3), isTrue);
-    expect(columnList.contains(A.columns / 2), isTrue);
+    expect(rowList.contains(A.rows ~/ 3), isTrue);
+    expect(rowList.contains(A.rows ~/ 2), isTrue);
+    expect(columnList.contains(A.columns ~/ 3), isTrue);
+    expect(columnList.contains(A.columns ~/ 2), isTrue);
     expect(valueList.contains(7), isTrue);
     expect(valueList.contains(1), isTrue);
   }
@@ -355,7 +393,9 @@ abstract class IntMatrix2DTest {
     expect(A.rows == array.length, isTrue);
     for (int r = 0; r < A.rows; r++) {
       expect(A.columns == array[r].length, isTrue);
-      for (int c = 0; c < A.columns; c++) expect(0, equals((array[r][c] - A.get(r, c)).abs()));
+      for (int c = 0; c < A.columns; c++) {
+        expect(0, equals((array[r][c] - A.get(r, c)).abs()));
+      }
     }
   }
 
@@ -400,8 +440,8 @@ abstract class IntMatrix2DTest {
 
   void testPart() {
     IntMatrix2D B = A.part(A.rows ~/ 2, A.columns ~/ 2, A.rows ~/ 3, A.columns ~/ 3);
-    expect(A.rows / 3, equals(B.rows));
-    expect(A.columns / 3, equals(B.columns));
+    expect(A.rows ~/ 3, equals(B.rows));
+    expect(A.columns ~/ 3, equals(B.columns));
     for (int r = 0; r < A.rows / 3; r++) {
       for (int c = 0; c < A.columns / 3; c++) {
         expect(A.get(A.rows ~/ 2 + r, A.columns ~/ 2 + c), equals(B.get(r, c)));
@@ -448,7 +488,8 @@ abstract class IntMatrix2DTest {
   void testSelect() {
     final rowIndexes = [A.rows ~/ 6, A.rows ~/ 5, A.rows ~/ 4, A.rows ~/ 3, A.rows ~/ 2];
     final colIndexes = [A.columns ~/ 6, A.columns ~/ 5, A.columns ~/ 4, A.columns ~/ 3, A.columns ~/ 2, A.columns - 1];
-    IntMatrix2D B = A.select(rowIndexes, colIndexes);
+    IntMatrix2D B = A.select(new Int32List.fromList(rowIndexes),
+        new Int32List.fromList(colIndexes));
     expect(rowIndexes.length, equals(B.rows));
     expect(colIndexes.length, equals(B.columns));
     for (int r = 0; r < rowIndexes.length; r++) {
@@ -458,12 +499,12 @@ abstract class IntMatrix2DTest {
     }
   }
 
-  void testSorted() {
+  /*void testSorted() {
     IntMatrix2D B = A.sorted(1);
     for (int r = 0; r < A.rows - 1; r++) {
       expect(B.get(r + 1, 1) >= B.get(r, 1), isTrue);
     }
-  }
+  }*/
 
   void testStrides() {
     int rowStride = 3;

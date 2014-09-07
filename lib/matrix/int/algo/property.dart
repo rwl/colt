@@ -106,7 +106,7 @@ bool equalsVectorValue(final IntMatrix1D A, final int value) {
  *         otherwise.
  */
 bool equalsVector(final IntMatrix1D A, final IntMatrix1D B) {
-  if (A == B) {
+  if (identical(A, B)) {
     return true;
   }
   if (!(A != null && B != null)) {
@@ -235,8 +235,12 @@ bool equalsMatrixValue(final IntMatrix2D A, final int value) {
  *         otherwise.
  */
 bool equalsMatrix(final IntMatrix2D A, final IntMatrix2D B) {
-  if (A == B) return true;
-  if (!(A != null && B != null)) return false;
+  if (identical(A, B)) {
+    return true;
+  }
+  if (!(A != null && B != null)) {
+    return false;
+  }
   final int rows = A.rows;
   final int columns = A.columns;
   if (columns != B.columns || rows != B.rows) {

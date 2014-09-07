@@ -10,6 +10,11 @@ part of cern.colt.matrix;
 
 typedef bool IntMatrix1DProcedure(IntMatrix1D element);
 
+class IntMatrixLocation {
+  final int value, row, column;
+  IntMatrixLocation(this.value, this.row, this.column);
+}
+
 /**
  * Abstract base class for 2-d matrices holding <tt>int</tt> elements. First see
  * the <a href="package-summary.html">package summary</a> and javadoc <a
@@ -1179,7 +1184,7 @@ abstract class IntMatrix2D extends AbstractMatrix2D {
    *
    * @return maximum_value, row_location, column_location };
    */
-  Int32List max() {
+  IntMatrixLocation max() {
     int rowLocation = 0;
     int columnLocation = 0;
     int maxValue = 0;
@@ -1248,7 +1253,7 @@ abstract class IntMatrix2D extends AbstractMatrix2D {
         d = 0;
       }
     //}
-    return [maxValue, rowLocation, columnLocation];
+    return new IntMatrixLocation(maxValue, rowLocation, columnLocation);
   }
 
   /**
@@ -1256,7 +1261,7 @@ abstract class IntMatrix2D extends AbstractMatrix2D {
    *
    * @return minimum_value, row_location, column_location};
    */
-  Int32List min() {
+  IntMatrixLocation min() {
     int rowLocation = 0;
     int columnLocation = 0;
     int minValue = 0;
@@ -1325,7 +1330,7 @@ abstract class IntMatrix2D extends AbstractMatrix2D {
         d = 0;
       }
     //}
-    return [minValue, rowLocation, columnLocation];
+    return new IntMatrixLocation(minValue, rowLocation, columnLocation);
   }
 
   /**

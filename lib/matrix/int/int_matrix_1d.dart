@@ -8,6 +8,11 @@ It is provided "as is" without expressed or implied warranty.
  */
 part of cern.colt.matrix;
 
+class IntVectorLocation {
+  final int value, location;
+  IntVectorLocation(this.value, this.location);
+}
+
 /**
  * Abstract base class for 1-d matrices (aka <i>vectors</i>) holding
  * <tt>int</tt> elements. First see the <a href="package-summary.html">package
@@ -946,8 +951,12 @@ abstract class IntMatrix1D extends AbstractMatrix1D {
    * Returns <tt>true</tt> if both matrices share at least one identical cell.
    */
   bool _haveSharedCells(IntMatrix1D other) {
-    if (other == null) return false;
-    if (this == other) return true;
+    if (other == null) {
+      return false;
+    }
+    if (this == other) {
+      return true;
+    }
     return _getContent()._haveSharedCellsRaw(other._getContent());
   }
 
@@ -1009,7 +1018,7 @@ abstract class IntMatrix1D extends AbstractMatrix1D {
    *
    * @return { maximum_value, location };
    */
-  Int32List max() {
+  IntVectorLocation max() {
     int location = 0;
     int maxValue = 0;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -1063,7 +1072,7 @@ abstract class IntMatrix1D extends AbstractMatrix1D {
         }
       }
     //}
-    return [maxValue, location];
+    return new IntVectorLocation(maxValue, location);
   }
 
   /**
@@ -1071,7 +1080,7 @@ abstract class IntMatrix1D extends AbstractMatrix1D {
    *
    * @return { minimum_value, location };
    */
-  Int32List min() {
+  IntVectorLocation min() {
     int location = 0;
     int minValue = 0;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -1125,7 +1134,7 @@ abstract class IntMatrix1D extends AbstractMatrix1D {
         }
       }
     //}
-    return [minValue, location];
+    return new IntVectorLocation(minValue, location);
   }
 
   /**
@@ -1282,7 +1291,7 @@ abstract class IntMatrix1D extends AbstractMatrix1D {
    */
 
   String toString() {
-    return new IntFormatter().toString(this);
+    return new IntFormatter().toString1D(this);
   }
 
   /**
