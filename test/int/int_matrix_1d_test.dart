@@ -1,5 +1,43 @@
 part of cern.colt.matrix.int.test;
 
+testIntMatrix1D(String name, IntMatrix1DTest t) {
+  group(name, () {
+    setUp(t.setUp);
+    tearDown(t.tearDown);
+    test('reduce', t.testReduce);
+    test('reduceRange', t.testReduceRange);
+    test('reduceWith', t.testReduceWith);
+    test('fill', t.testFill);
+    test('setAll', t.testSetAll);
+    test('forEach', t.testForEach);
+    test('copyFrom', t.testCopyFrom);
+    test('forEachWith', t.testForEachWith);
+    test('fillWhere', t.testFillWhere);
+    test('forEachWhere', t.testForEachWhere);
+    test('cardinality', t.testCardinality);
+    test('==', t.testEqualsInt);
+    test('==', t.testEqualsObject);
+    test('max', t.testMax);
+    test('min', t.testMin);
+    test('negativeValues', t.testNegativeValues);
+    test('nonZeros', t.testNonZeros);
+    test('positiveValues', t.testPositiveValues);
+    test('toList', t.testToList);
+    test('fillList', t.testFillList);
+    test('reshape', t.testReshape);
+    test('swap', t.testSwap);
+    test('flip', t.testFlip);
+    test('part', t.testPart);
+    test('where', t.testWhere);
+    test('select', t.testSelect);
+    test('strides', t.testStrides);
+    test('dot', t.testDot);
+    test('dotRange', t.testDotRange);
+    test('dotNonZero', t.testDotNonZero);
+    test('sum', t.testSum);
+  });
+}
+
 abstract class IntMatrix1DTest {
   /** Matrix to test. */
   IntMatrix1D A;
