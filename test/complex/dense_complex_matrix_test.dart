@@ -1,31 +1,31 @@
 part of cern.colt.matrix.complex.test;
 
-class DenseDComplexMatrix1DTest extends DComplexMatrix1DTest {
+class DenseComplexVectorTest extends ComplexVectorTest {
     void createMatrices() {
-        A = new DenseDComplexMatrix1D(SIZE);
-        B = new DenseDComplexMatrix1D(SIZE);
+        A = new DenseComplexVector(SIZE);
+        B = new DenseComplexVector(SIZE);
     }
 }
 
-class DenseDComplexMatrix1DViewTest extends DenseDComplexMatrix1DTest {
+class DenseComplexVectorViewTest extends DenseComplexVectorTest {
     void createMatrices() {
-        A = new DenseDComplexMatrix1D(SIZE).flip();
-        B = new DenseDComplexMatrix1D(SIZE).flip();
+        A = new DenseComplexVector(SIZE).flip();
+        B = new DenseComplexVector(SIZE).flip();
     }
 }
 
-class DenseDComplexMatrix2DTest extends DComplexMatrix2DTest {
+class DenseComplexMatrixTest extends ComplexMatrixTest {
     void createMatrices() {
-        A = new DenseDComplexMatrix2D(NROWS, NCOLUMNS);
-        B = new DenseDComplexMatrix2D(NROWS, NCOLUMNS);
-        Bt = new DenseDComplexMatrix2D(NCOLUMNS, NROWS);
+        A = new DenseComplexMatrix(NROWS, NCOLUMNS);
+        B = new DenseComplexMatrix(NROWS, NCOLUMNS);
+        Bt = new DenseComplexMatrix(NCOLUMNS, NROWS);
     }
 }
 
-class DenseDComplexMatrix2DViewTest extends DenseDComplexMatrix2DTest {
+class DenseComplexMatrixViewTest extends DenseComplexMatrixTest {
     void createMatrices() {
-        A = new DenseDComplexMatrix2D(NCOLUMNS, NROWS).dice();
-        B = new DenseDComplexMatrix2D(NCOLUMNS, NROWS).dice();
-        Bt = new DenseDComplexMatrix2D(NROWS, NCOLUMNS).dice();
+        A = new DenseComplexMatrix(NCOLUMNS, NROWS).dice();
+        B = new DenseComplexMatrix(NCOLUMNS, NROWS).dice();
+        Bt = new DenseComplexMatrix(NROWS, NCOLUMNS).dice();
     }
 }

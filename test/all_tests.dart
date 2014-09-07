@@ -3,12 +3,12 @@ import 'double/double_test.dart';
 import 'complex/complex_test.dart';
 
 main() {
-  intMatrix1DTests();
-  intMatrix2DTests();
+  intVectorTests();
+  intMatrixTests();
 
-  doubleMatrix1DTests();
-  doubleMatrix2DTests();
+  doubleVectorTests();
+  doubleMatrixTests();
 
-  complexMatrix1DTests();
-  complexMatrix2DTests();
+  complexVectorTests();
+  complexMatrixTests();
 }

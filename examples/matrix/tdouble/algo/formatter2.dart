@@ -20,7 +20,7 @@ main() {
 
   // now the processing
   int size = formats.length;
-  DoubleMatrix1D matrix = new DenseDoubleMatrix1D.from(values);
+  DoubleVector matrix = new DenseDoubleVector.DenseDoubleVector(values);
 
   List<String> strings = new List<String>(size);
   // List<String> javaStrings = new String[size];

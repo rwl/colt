@@ -35,7 +35,7 @@ part of cern.colt.matrix.format;
  {-16.3, 0, -3.012345678E-4, -1},<br>
  {1236.3456789, 0, 7, -1.2}<br>
  };<br>
- matrix = new DenseIntMatrix2D(values);</tt>
+ matrix = new DenseIntMatrix(values);</tt>
  * </p>
  * </td>
  * </tr>
@@ -173,7 +173,7 @@ part of cern.colt.matrix.format;
  hep.aida.bin.BinFunctions1D F = hep.aida.bin.BinFunctions1D.functions; // alias<br>
  hep.aida.bin.BinFunction1D[] aggr = {F.mean, F.rms, F.quantile(0.25), F.median, F.quantile(0.75), F.stdDev, F.min, F.max};<br>
  String format = "%1.2G";<br>
- IntMatrix2D matrix = new DenseIntMatrix2D(values); <br>
+ IntMatrix matrix = new DenseIntMatrix(values); <br>
  new Formatter(format).toTitleString(<br>
  &nbsp;&nbsp;&nbsp;matrix,rowNames,columnNames,rowAxisName,columnAxisName,title,aggr); </tt>
  * </p>
@@ -295,7 +295,7 @@ class IntFormatter extends AbstractFormatter {
   /**
    * Converts a given cell to a String; no alignment considered.
    */
-  String _form(IntMatrix1D matrix, int index, Former formatter) {
+  String _form(IntVector matrix, int index, Former formatter) {
     return formatter.formInt(matrix.at(index));
   }
 
@@ -303,14 +303,14 @@ class IntFormatter extends AbstractFormatter {
    * Converts a given cell to a String; no alignment considered.
    */
 
-  String _form1D(AbstractMatrix1D matrix, int index, Former formatter) {
-    return this._form(matrix as IntMatrix1D, index, formatter);
+  String _form1D(AbstractVector matrix, int index, Former formatter) {
+    return this._form(matrix as IntVector, index, formatter);
   }
 
   /**
    * Returns a string representations of all cells; no alignment considered.
    */
-  List<List<String>> format(IntMatrix2D matrix) {
+  List<List<String>> format(IntMatrix matrix) {
     final strings = new List<List<String>>.generate(matrix.rows,
         (_) => new List<String>(matrix.columns));
     for (int row = matrix.rows; --row >= 0; ) {
@@ -323,8 +323,8 @@ class IntFormatter extends AbstractFormatter {
    * Returns a string representations of all cells; no alignment considered.
    */
 
-  List<List<String>> _format2D(AbstractMatrix2D matrix) {
-    return this.format(matrix as IntMatrix2D);
+  List<List<String>> _format2D(AbstractMatrix matrix) {
+    return this.format(matrix as IntMatrix);
   }
 
   /**
@@ -356,7 +356,7 @@ class IntFormatter extends AbstractFormatter {
    * @param matrix
    *            the matrix to format.
    */
-  String toSourceCode(IntMatrix1D matrix) {
+  String toSourceCode(IntVector matrix) {
     IntFormatter copy = this.clone() as IntFormatter;
     copy.setPrintShape(false);
     copy.setColumnSeparator(", ");
@@ -372,7 +372,7 @@ class IntFormatter extends AbstractFormatter {
    * @param matrix
    *            the matrix to format.
    */
-  String toSourceCode2D(IntMatrix2D matrix) {
+  String toSourceCode2D(IntMatrix matrix) {
     IntFormatter copy = this.clone() as IntFormatter;
     String b3 = _blanks(3);
     copy.setPrintShape(false);
@@ -409,8 +409,8 @@ class IntFormatter extends AbstractFormatter {
    * @param matrix
    *            the matrix to convert.
    */
-  String toString1D(IntMatrix1D matrix) {
-    IntMatrix2D easy = matrix.like2D(1, matrix.length);
+  String toString1D(IntVector matrix) {
+    IntMatrix easy = matrix.like2D(1, matrix.length);
     easy.row(0).copyFrom(matrix);
     return toString2D(easy);
   }
@@ -421,7 +421,7 @@ class IntFormatter extends AbstractFormatter {
    * @param matrix
    *            the matrix to convert.
    */
-  String toString2D(IntMatrix2D matrix) {
+  String toString2D(IntMatrix matrix) {
     return super.toString2D(matrix);
   }
 
@@ -451,8 +451,8 @@ class IntFormatter extends AbstractFormatter {
    *            the matrix to convert.
    */
 
-  String _toString2D(AbstractMatrix2D matrix) {
-    return this.toString2D(matrix as IntMatrix2D);
+  String _toString2D(AbstractMatrix matrix) {
+    return this.toString2D(matrix as IntMatrix);
   }
 
   /**
@@ -475,7 +475,7 @@ class IntFormatter extends AbstractFormatter {
    *            The overall title of the matrix to be formatted.
    * @return the matrix converted to a string.
    */
-  /*String _toTitleString(IntMatrix2D matrix, List<String> rowNames, List<String> columnNames, String rowAxisName, String columnAxisName, String title) {
+  /*String _toTitleString(IntMatrix matrix, List<String> rowNames, List<String> columnNames, String rowAxisName, String columnAxisName, String title) {
     if (matrix.length == 0) {
       return "Empty matrix";
     }

@@ -231,17 +231,17 @@ abstract class AbstractFormatter {//extends cern.colt.PersistentObject {
   /**
    * Converts a given cell to a String; no alignment considered.
    */
-  String _form(AbstractMatrix1D matrix, int index, Former formatter);
+  String _form(AbstractVector matrix, int index, Former formatter);
 
   /**
    * Returns a string representations of all cells; no alignment considered.
    */
-  List<List<String>> _format2D(AbstractMatrix2D matrix);
+  List<List<String>> _format2D(AbstractMatrix matrix);
 
   /**
    * Returns a string representations of all cells; no alignment considered.
    */
-  List<String> _formatRow(AbstractMatrix1D vector) {
+  List<String> _formatRow(AbstractVector vector) {
     Former formatter = null;
     formatter = _factory.create(_format);
     int s = vector.length;
@@ -370,8 +370,8 @@ abstract class AbstractFormatter {//extends cern.colt.PersistentObject {
   /**
    * Returns a short string representation describing the shape of the matrix.
    */
-  static String shape(AbstractMatrix1D matrix) {
-    // return "Matrix1D of size="+matrix.size();
+  static String shape(AbstractVector matrix) {
+    // return "Vector of size="+matrix.size();
     // return matrix.size()+" element matrix";
     // return "matrix("+matrix.size()+")";
     return "${matrix.length} matrix";
@@ -380,7 +380,7 @@ abstract class AbstractFormatter {//extends cern.colt.PersistentObject {
   /**
    * Returns a short string representation describing the shape of the matrix.
    */
-  static String shape2D(AbstractMatrix2D matrix) {
+  static String shape2D(AbstractMatrix matrix) {
     return "${matrix.rows} x ${matrix.columns} matrix";
   }
 
@@ -422,7 +422,7 @@ abstract class AbstractFormatter {//extends cern.colt.PersistentObject {
    * @param matrix
    *            the matrix to convert.
    */
-  String toString2D(AbstractMatrix2D matrix) {
+  String toString2D(AbstractMatrix matrix) {
     List<List<String>> strings = this._format2D(matrix);
     _align(strings);
     String total = _toString(strings);

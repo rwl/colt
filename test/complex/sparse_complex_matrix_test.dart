@@ -1,63 +1,63 @@
 part of cern.colt.matrix.complex.test;
 
-class SparseCCDComplexMatrix2DTest extends DComplexMatrix2DTest {
+class SparseCCComplexMatrixTest extends ComplexMatrixTest {
   void createMatrices() {
-    A = new SparseCCDComplexMatrix2D.sized(NROWS, NCOLUMNS);
-    B = new SparseCCDComplexMatrix2D.sized(NROWS, NCOLUMNS);
-    Bt = new SparseCCDComplexMatrix2D.sized(NCOLUMNS, NROWS);
+    A = new SparseCCComplexMatrix.sized(NROWS, NCOLUMNS);
+    B = new SparseCCComplexMatrix.sized(NROWS, NCOLUMNS);
+    Bt = new SparseCCComplexMatrix.sized(NCOLUMNS, NROWS);
   }
 }
 
-class SparseCCDComplexMatrix2DViewTest extends SparseCCDComplexMatrix2DTest {
+class SparseCCComplexMatrixViewTest extends SparseCCComplexMatrixTest {
   void createMatrices() {
-    A = new SparseCCDComplexMatrix2D.sized(NCOLUMNS, NROWS).dice();
-    B = new SparseCCDComplexMatrix2D.sized(NCOLUMNS, NROWS).dice();
-    Bt = new SparseCCDComplexMatrix2D.sized(NROWS, NCOLUMNS).dice();
+    A = new SparseCCComplexMatrix.sized(NCOLUMNS, NROWS).dice();
+    B = new SparseCCComplexMatrix.sized(NCOLUMNS, NROWS).dice();
+    Bt = new SparseCCComplexMatrix.sized(NROWS, NCOLUMNS).dice();
   }
 }
 
-class SparseDComplexMatrix1DTest extends DComplexMatrix1DTest {
+class SparseComplexVectorTest extends ComplexVectorTest {
   void createMatrices() {
-    A = new SparseDComplexMatrix1D(SIZE);
-    B = new SparseDComplexMatrix1D(SIZE);
+    A = new SparseComplexVector(SIZE);
+    B = new SparseComplexVector(SIZE);
   }
 }
 
-class SparseDComplexMatrix1DViewTest extends SparseDComplexMatrix1DTest {
+class SparseComplexVectorViewTest extends SparseComplexVectorTest {
   void createMatrices() {
-    A = new SparseDComplexMatrix1D(SIZE).flip();
-    B = new SparseDComplexMatrix1D(SIZE).flip();
+    A = new SparseComplexVector(SIZE).flip();
+    B = new SparseComplexVector(SIZE).flip();
   }
 }
 
-class SparseDComplexMatrix2DTest extends DComplexMatrix2DTest {
+class SparseComplexMatrixTest extends ComplexMatrixTest {
   void createMatrices() {
-    A = new SparseDComplexMatrix2D(NROWS, NCOLUMNS);
-    B = new SparseDComplexMatrix2D(NROWS, NCOLUMNS);
-    Bt = new SparseDComplexMatrix2D(NCOLUMNS, NROWS);
+    A = new SparseComplexMatrix(NROWS, NCOLUMNS);
+    B = new SparseComplexMatrix(NROWS, NCOLUMNS);
+    Bt = new SparseComplexMatrix(NCOLUMNS, NROWS);
   }
 }
 
-class SparseDComplexMatrix2DViewTest extends SparseDComplexMatrix2DTest {
+class SparseComplexMatrixViewTest extends SparseComplexMatrixTest {
   void createMatrices() {
-    A = new SparseDComplexMatrix2D(NCOLUMNS, NROWS).dice();
-    B = new SparseDComplexMatrix2D(NCOLUMNS, NROWS).dice();
-    Bt = new SparseDComplexMatrix2D(NROWS, NCOLUMNS).dice();
+    A = new SparseComplexMatrix(NCOLUMNS, NROWS).dice();
+    B = new SparseComplexMatrix(NCOLUMNS, NROWS).dice();
+    Bt = new SparseComplexMatrix(NROWS, NCOLUMNS).dice();
   }
 }
 
-class SparseRCDComplexMatrix2DTest extends DComplexMatrix2DTest {
+class SparseRCComplexMatrixTest extends ComplexMatrixTest {
   void createMatrices() {
-    A = new SparseRCDComplexMatrix2D.sized(NROWS, NCOLUMNS);
-    B = new SparseRCDComplexMatrix2D.sized(NROWS, NCOLUMNS);
-    Bt = new SparseRCDComplexMatrix2D.sized(NCOLUMNS, NROWS);
+    A = new SparseRCComplexMatrix.sized(NROWS, NCOLUMNS);
+    B = new SparseRCComplexMatrix.sized(NROWS, NCOLUMNS);
+    Bt = new SparseRCComplexMatrix.sized(NCOLUMNS, NROWS);
   }
 }
 
-class SparseRCDComplexMatrix2DViewTest extends SparseRCDComplexMatrix2DTest {
+class SparseRCComplexMatrixViewTest extends SparseRCComplexMatrixTest {
   void createMatrices() {
-    A = new SparseRCDComplexMatrix2D.sized(NCOLUMNS, NROWS).dice();
-    B = new SparseRCDComplexMatrix2D.sized(NCOLUMNS, NROWS).dice();
-    Bt = new SparseRCDComplexMatrix2D.sized(NROWS, NCOLUMNS).dice();
+    A = new SparseRCComplexMatrix.sized(NCOLUMNS, NROWS).dice();
+    B = new SparseRCComplexMatrix.sized(NCOLUMNS, NROWS).dice();
+    Bt = new SparseRCComplexMatrix.sized(NROWS, NCOLUMNS).dice();
   }
 }

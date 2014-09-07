@@ -35,22 +35,22 @@ part of cern.colt.matrix.complex.algo;
  *
  * @author Piotr Wendykier (piotr.wendykier@gmail.com)
  */
-class DComplexProperty {
+class ComplexProperty {
 
   /**
    * The default Property object; currently has <tt>tolerance()==1.0E-9</tt>.
    */
-  static final DComplexProperty DEFAULT = new DComplexProperty(1.0E-9);
+  static final ComplexProperty DEFAULT = new ComplexProperty(1.0E-9);
 
   /**
    * A Property object with <tt>tolerance()==0.0</tt>.
    */
-  static final DComplexProperty ZERO = new DComplexProperty(0.0);
+  static final ComplexProperty ZERO = new ComplexProperty(0.0);
 
   /**
    * A Property object with <tt>tolerance()==1.0E-12</tt>.
    */
-  static final DComplexProperty TWELVE = new DComplexProperty(1.0E-12);
+  static final ComplexProperty TWELVE = new ComplexProperty(1.0E-12);
 
   double _tolerance;
 
@@ -58,7 +58,7 @@ class DComplexProperty {
    * Constructs an instance with a tolerance of
    * <tt>Math.abs(newTolerance)</tt>.
    */
-  DComplexProperty(double newTolerance) {
+  ComplexProperty(double newTolerance) {
     _tolerance = newTolerance.abs();
   }
 
@@ -82,8 +82,8 @@ class DComplexProperty {
     return _tolerance;
   }
 
-  void checkDense(DComplexMatrix1D A) {
-    if (!(A is DenseDComplexMatrix1D)) {
+  void checkDense(ComplexVector A) {
+    if (!(A is DenseComplexVector)) {
       throw new ArgumentError("Matrix must be dense");
     }
   }
@@ -94,14 +94,14 @@ class DComplexProperty {
    * @throws ArgumentError
    *             if <tt>A.rows() != A.columns()</tt>.
    */
-  void checkSquare(DComplexMatrix2D A) {
+  void checkSquare(ComplexMatrix A) {
     if (A.rows != A.columns) {
       throw new ArgumentError("Matrix must be square: " + AbstractFormatter.shape2D(A));
     }
   }
 
-  void checkSparse(DComplexMatrix2D A) {
-    if (!(A is SparseCCDComplexMatrix2D) && !(A is SparseRCDComplexMatrix2D)) {
+  void checkSparse(ComplexMatrix A) {
+    if (!(A is SparseCCComplexMatrix) && !(A is SparseRCComplexMatrix)) {
       throw new ArgumentError("Matrix must be sparse");
     }
   }
@@ -117,7 +117,7 @@ class DComplexProperty {
    * @return <tt>true</tt> if the matrix is equal to the value; <tt>false</tt>
    *         otherwise.
    */
-  bool equalsValue1D(final DComplexMatrix1D A, final Float64List value) {
+  bool equalsValue1D(final ComplexVector A, final Float64List value) {
     if (A == null) {
       return false;
     }
@@ -139,7 +139,7 @@ class DComplexProperty {
             Float64List x = A.getQuick(i);
             diff[0] = Math.abs(value[0] - x[0]);
             diff[1] = Math.abs(value[1] - x[1]);
-            if (((diff[0] != diff[0]) || (diff[1] != diff[1])) && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1])))) || (DComplex.isEqual(value, x, epsilon))) {
+            if (((diff[0] != diff[0]) || (diff[1] != diff[1])) && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1])))) || (Complex.isEqual(value, x, epsilon))) {
               diff[0] = 0;
               diff[1] = 0;
             }
@@ -170,7 +170,7 @@ class DComplexProperty {
         Float64List x = A.get(i);
         diff[0] = (value[0] - x[0]).abs();
         diff[1] = (value[1] - x[1]).abs();
-        if (((diff[0] != diff[0]) || (diff[1] != diff[1])) && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1])))) || (DComplex.isEqual(value, x, epsilon))) {
+        if (((diff[0] != diff[0]) || (diff[1] != diff[1])) && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1])))) || (Complex.isEqual(value, x, epsilon))) {
           diff[0] = 0.0;
           diff[1] = 0.0;
         }
@@ -192,7 +192,7 @@ class DComplexProperty {
    * @return <tt>true</tt> if both matrices are equal; <tt>false</tt>
    *         otherwise.
    */
-  bool equalsMatrix1D(final DComplexMatrix1D A, final DComplexMatrix1D B) {
+  bool equalsVector(final ComplexVector A, final ComplexVector B) {
     if (identical(A, B)) {
       return true;
     }
@@ -222,7 +222,7 @@ class DComplexProperty {
             Float64List value = B.getQuick(i);
             diff[0] = Math.abs(value[0] - x[0]);
             diff[1] = Math.abs(value[1] - x[1]);
-            if (((diff[0] != diff[0]) || (diff[1] != diff[1])) && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1])))) || (DComplex.isEqual(value, x, epsilon))) {
+            if (((diff[0] != diff[0]) || (diff[1] != diff[1])) && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1])))) || (Complex.isEqual(value, x, epsilon))) {
               diff[0] = 0;
               diff[1] = 0;
             }
@@ -254,7 +254,7 @@ class DComplexProperty {
         Float64List value = B.get(i);
         diff[0] = (value[0] - x[0]).abs();
         diff[1] = (value[1] - x[1]).abs();
-        if (((diff[0] != diff[0]) || (diff[1] != diff[1])) && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1])))) || (DComplex.isEqual(value, x, epsilon))) {
+        if (((diff[0] != diff[0]) || (diff[1] != diff[1])) && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1])))) || (Complex.isEqual(value, x, epsilon))) {
           diff[0] = 0.0;
           diff[1] = 0.0;
         }
@@ -277,7 +277,7 @@ class DComplexProperty {
    * @return <tt>true</tt> if the matrix is equal to the value; <tt>false</tt>
    *         otherwise.
    */
-  bool equalsValue2D(final DComplexMatrix2D A, final Float64List value) {
+  bool equalsValue2D(final ComplexMatrix A, final Float64List value) {
     if (A == null) {
       return false;
     }
@@ -301,7 +301,7 @@ class DComplexProperty {
               Float64List x = A.getQuick(r, c);
               diff[0] = Math.abs(value[0] - x[0]);
               diff[1] = Math.abs(value[1] - x[1]);
-              if (((diff[0] != diff[0]) || (diff[1] != diff[1])) && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1])))) || (DComplex.isEqual(value, x, epsilon))) {
+              if (((diff[0] != diff[0]) || (diff[1] != diff[1])) && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1])))) || (Complex.isEqual(value, x, epsilon))) {
                 diff[0] = 0;
                 diff[1] = 0;
               }
@@ -334,7 +334,7 @@ class DComplexProperty {
           Float64List x = A.get(r, c);
           diff[0] = (value[0] - x[0]).abs();
           diff[1] = (value[1] - x[1]).abs();
-          if (((diff[0] != diff[0]) || (diff[1] != diff[1])) && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1])))) || (DComplex.isEqual(value, x, epsilon))) {
+          if (((diff[0] != diff[0]) || (diff[1] != diff[1])) && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1])))) || (Complex.isEqual(value, x, epsilon))) {
             diff[0] = 0.0;
             diff[1] = 0.0;
           }
@@ -357,7 +357,7 @@ class DComplexProperty {
    * @return <tt>true</tt> if both matrices are equal; <tt>false</tt>
    *         otherwise.
    */
-  bool equalsMatrix2D(final DComplexMatrix2D A, final DComplexMatrix2D B) {
+  bool equalsMatrix(final ComplexMatrix A, final ComplexMatrix B) {
     if (identical(A, B)) {
       return true;
     }
@@ -388,7 +388,7 @@ class DComplexProperty {
               Float64List value = B.getQuick(r, c);
               diff[0] = Math.abs(value[0] - x[0]);
               diff[1] = Math.abs(value[1] - x[1]);
-              if (((diff[0] != diff[0]) || (diff[1] != diff[1])) && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1])))) || (DComplex.isEqual(value, x, epsilon))) {
+              if (((diff[0] != diff[0]) || (diff[1] != diff[1])) && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1])))) || (Complex.isEqual(value, x, epsilon))) {
                 diff[0] = 0;
                 diff[1] = 0;
               }
@@ -422,7 +422,7 @@ class DComplexProperty {
           Float64List value = B.get(r, c);
           diff[0] = (value[0] - x[0]).abs();
           diff[1] = (value[1] - x[1]).abs();
-          if (((diff[0] != diff[0]) || (diff[1] != diff[1])) && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1])))) || (DComplex.isEqual(value, x, epsilon))) {
+          if (((diff[0] != diff[0]) || (diff[1] != diff[1])) && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1])))) || (Complex.isEqual(value, x, epsilon))) {
             diff[0] = 0.0;
             diff[1] = 0.0;
           }
@@ -446,7 +446,7 @@ class DComplexProperty {
    * @return <tt>true</tt> if the matrix is equal to the value; <tt>false</tt>
    *         otherwise.
    */
-  /*bool equalsValue3D(final DComplexMatrix3D A, final Float64List value) {
+  /*bool equalsValue3D(final ComplexMatrix3D A, final Float64List value) {
     if (A == null) return false;
     final int slices = A.slices();
     final int rows = A.rows();
@@ -470,7 +470,7 @@ class DComplexProperty {
                 Float64List x = A.getQuick(s, r, c);
                 diff[0] = Math.abs(value[0] - x[0]);
                 diff[1] = Math.abs(value[1] - x[1]);
-                if (((diff[0] != diff[0]) || (diff[1] != diff[1])) && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1])))) || (DComplex.isEqual(value, x, epsilon))) {
+                if (((diff[0] != diff[0]) || (diff[1] != diff[1])) && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1])))) || (Complex.isEqual(value, x, epsilon))) {
                   diff[0] = 0;
                   diff[1] = 0;
                 }
@@ -505,7 +505,7 @@ class DComplexProperty {
             Float64List x = A.getQuick(s, r, c);
             diff[0] = Math.abs(value[0] - x[0]);
             diff[1] = Math.abs(value[1] - x[1]);
-            if (((diff[0] != diff[0]) || (diff[1] != diff[1])) && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1])))) || (DComplex.isEqual(value, x, epsilon))) {
+            if (((diff[0] != diff[0]) || (diff[1] != diff[1])) && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1])))) || (Complex.isEqual(value, x, epsilon))) {
               diff[0] = 0;
               diff[1] = 0;
             }
@@ -529,7 +529,7 @@ class DComplexProperty {
    * @return <tt>true</tt> if both matrices are equal; <tt>false</tt>
    *         otherwise.
    */
-  /*bool equalsMatrix3D(final DComplexMatrix3D A, final DComplexMatrix3D B) {
+  /*bool equalsMatrix3D(final ComplexMatrix3D A, final ComplexMatrix3D B) {
     if (A == B) return true;
     if (!(A != null && B != null)) return false;
     bool result = false;
@@ -561,7 +561,7 @@ class DComplexProperty {
                 Float64List value = B.getQuick(s, r, c);
                 diff[0] = Math.abs(value[0] - x[0]);
                 diff[1] = Math.abs(value[1] - x[1]);
-                if (((diff[0] != diff[0]) || (diff[1] != diff[1])) && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1])))) || (DComplex.isEqual(value, x, epsilon))) {
+                if (((diff[0] != diff[0]) || (diff[1] != diff[1])) && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1])))) || (Complex.isEqual(value, x, epsilon))) {
                   diff[0] = 0;
                   diff[1] = 0;
                 }
@@ -597,7 +597,7 @@ class DComplexProperty {
             Float64List value = B.getQuick(s, r, c);
             diff[0] = Math.abs(value[0] - x[0]);
             diff[1] = Math.abs(value[1] - x[1]);
-            if (((diff[0] != diff[0]) || (diff[1] != diff[1])) && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1])))) || (DComplex.isEqual(value, x, epsilon))) {
+            if (((diff[0] != diff[0]) || (diff[1] != diff[1])) && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1])))) || (Complex.isEqual(value, x, epsilon))) {
               diff[0] = 0;
               diff[1] = 0;
             }

@@ -21,7 +21,7 @@ import 'algo.dart';
  *
  * @author Piotr Wendykier (piotr.wendykier@gmail.com)
  */
-abstract class SparseDComplexLUDecomposition {
+abstract class SparseComplexLUDecomposition {
 
   /**
    * Returns the determinant, <tt>det(A)</tt>.
@@ -31,7 +31,7 @@ abstract class SparseDComplexLUDecomposition {
   /**
    * Returns the lower triangular factor, <tt>L</tt>.
    */
-  DComplexMatrix2D getL();
+  ComplexMatrix getL();
 
   /**
    * Returns a copy of the pivot permutation vector.
@@ -41,7 +41,7 @@ abstract class SparseDComplexLUDecomposition {
   /**
    * Returns the upper triangular factor, <tt>U</tt>.
    */
-  DComplexMatrix2D getU();
+  ComplexMatrix getU();
 
   /**
    * Returns a copy of the symbolic LU analysis object.
@@ -65,16 +65,16 @@ abstract class SparseDComplexLUDecomposition {
    * @exception IllegalArgumentException
    *                if <tt>b.size() != A.rows()</tt> or if A is singular.
    */
-  void solve(DComplexMatrix1D b);
+  void solve(ComplexVector b);
 
 }
 
-class CSparseDComplexLUDecomposition implements SparseDComplexLUDecomposition {
+class CSparseComplexLUDecomposition implements SparseComplexLUDecomposition {
 
   DZcss _S;
   DZcsn _N;
-  DComplexMatrix2D _L;
-  DComplexMatrix2D _U;
+  ComplexMatrix _L;
+  ComplexMatrix _U;
   bool _rcMatrix = false;
   bool _isNonSingular = true;
 
@@ -99,15 +99,15 @@ class CSparseDComplexLUDecomposition implements SparseDComplexLUDecomposition {
    * @throws ArgumentError
    *             if <tt>order</tt> is not in [0,3]
    */
-  CSparseDComplexLUDecomposition(DComplexMatrix2D A, int order, bool checkIfSingular) {
-    DComplexProperty.DEFAULT.checkSquare(A);
-    DComplexProperty.DEFAULT.checkSparse(A);
+  CSparseComplexLUDecomposition(ComplexMatrix A, int order, bool checkIfSingular) {
+    ComplexProperty.DEFAULT.checkSquare(A);
+    ComplexProperty.DEFAULT.checkSparse(A);
 
     if (order < 0 || order > 3) {
       throw new ArgumentError("order must be a number between 0 and 3");
     }
     DZcs dcs;
-    if (A is SparseRCDComplexMatrix2D) {
+    if (A is SparseRCComplexMatrix) {
       _rcMatrix = true;
       dcs = (A).getColumnCompressed().elements();
     } else {
@@ -141,9 +141,9 @@ class CSparseDComplexLUDecomposition implements SparseDComplexLUDecomposition {
       }
     }
     if (U == null) {
-      U = new SparseCCDComplexMatrix2D(N.U);
+      U = new SparseCCComplexMatrix(N.U);
       if (rcMatrix) {
-        U = (U as SparseCCDComplexMatrix2D).rowCompressed();
+        U = (U as SparseCCComplexMatrix).rowCompressed();
       }
     }
     Float64List det = new Float64List.fromList([pivsign, 0]);
@@ -153,11 +153,11 @@ class CSparseDComplexLUDecomposition implements SparseDComplexLUDecomposition {
     return det;
   }
 
-  DComplexMatrix2D getL() {
+  ComplexMatrix getL() {
     if (L == null) {
-      L = new SparseCCDComplexMatrix2D(N.L);
+      L = new SparseCCComplexMatrix(N.L);
       if (rcMatrix) {
-        L = (L as SparseCCDComplexMatrix2D).rowCompressed();
+        L = (L as SparseCCComplexMatrix).rowCompressed();
       }
     }
     return _L.copy();
@@ -173,11 +173,11 @@ class CSparseDComplexLUDecomposition implements SparseDComplexLUDecomposition {
     return pinv;
   }
 
-  DComplexMatrix2D getU() {
+  ComplexMatrix getU() {
     if (U == null) {
-      U = new SparseCCDComplexMatrix2D(N.U);
+      U = new SparseCCComplexMatrix(N.U);
       if (rcMatrix) {
-        U = (U as SparseCCDComplexMatrix2D).rowCompressed();
+        U = (U as SparseCCComplexMatrix).rowCompressed();
       }
     }
     return _U.copy();
@@ -200,14 +200,14 @@ class CSparseDComplexLUDecomposition implements SparseDComplexLUDecomposition {
     return _isNonSingular;
   }
 
-  void solve(DComplexMatrix1D b) {
+  void solve(ComplexVector b) {
     if (b.length != n) {
       throw new ArgumentError("b.size() != A.rows()");
     }
     if (!isNonsingular()) {
       throw new ArgumentError("A is singular");
     }
-    DComplexProperty.DEFAULT.checkDense(b);
+    ComplexProperty.DEFAULT.checkDense(b);
     DZcsa y = new DZcsa(n);
     DZcsa x;
     if (b.isView) {

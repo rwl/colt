@@ -9,13 +9,13 @@ It is provided "as is" without expressed or implied warranty.
 part of cern.colt.matrix.format;
 
 //import cern.colt.matrix.AbstractFormatter;
-//import cern.colt.matrix.AbstractMatrix1D;
-//import cern.colt.matrix.AbstractMatrix2D;
+//import cern.colt.matrix.AbstractVector;
+//import cern.colt.matrix.AbstractMatrix;
 //import cern.colt.matrix.Former;
-//import cern.colt.matrix.tdouble.DoubleMatrix1D;
-//import cern.colt.matrix.tdouble.DoubleMatrix2D;
+//import cern.colt.matrix.tdouble.DoubleVector;
+//import cern.colt.matrix.tdouble.DoubleMatrix;
 //import cern.colt.matrix.tdouble.DoubleMatrix3D;
-//import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix1D;
+//import cern.colt.matrix.tdouble.impl.DenseDoubleVector;
 
 /**
  * Flexible, well human readable matrix print formatting; By default decimal
@@ -44,7 +44,7 @@ part of cern.colt.matrix.format;
  {-16.3, 0, -3.012345678E-4, -1},<br>
  {1236.3456789, 0, 7, -1.2}<br>
  };<br>
- matrix = new DenseDoubleMatrix2D(values);</tt>
+ matrix = new DenseDoubleMatrix(values);</tt>
  * </p>
  * </td>
  * </tr>
@@ -182,7 +182,7 @@ part of cern.colt.matrix.format;
  hep.aida.bin.BinFunctions1D F = hep.aida.bin.BinFunctions1D.functions; // alias<br>
  hep.aida.bin.BinFunction1D[] aggr = {F.mean, F.rms, F.quantile(0.25), F.median, F.quantile(0.75), F.stdDev, F.min, F.max};<br>
  String format = "%1.2G";<br>
- DoubleMatrix2D matrix = new DenseDoubleMatrix2D(values); <br>
+ DoubleMatrix matrix = new DenseDoubleMatrix(values); <br>
  new Formatter(format).toTitleString(<br>
  &nbsp;&nbsp;&nbsp;matrix,rowNames,columnNames,rowAxisName,columnAxisName,title,aggr); </tt>
  * </p>
@@ -308,21 +308,21 @@ class DoubleFormatter extends AbstractFormatter {
   /**
    * Converts a given cell to a String; no alignment considered.
    */
-  String _formDoubleMatrix1D(DoubleMatrix1D matrix, int index, Former formatter) {
+  String _formDoubleVector(DoubleVector matrix, int index, Former formatter) {
     return formatter.formDouble(matrix.get(index));
   }
 
   /**
    * Converts a given cell to a String; no alignment considered.
    */
-  String _form(AbstractMatrix1D matrix, int index, Former formatter) {
-    return this._formDoubleMatrix1D(matrix as DoubleMatrix1D, index, formatter);
+  String _form(AbstractVector matrix, int index, Former formatter) {
+    return this._formDoubleVector(matrix as DoubleVector, index, formatter);
   }
 
   /**
    * Returns a string representations of all cells; no alignment considered.
    */
-  List<List<String>> format(DoubleMatrix2D matrix) {
+  List<List<String>> format(DoubleMatrix matrix) {
     List<List<String>> strings = new List<List<String>>(matrix.rows);//[matrix.columns()];
     for (int row = matrix.rows; --row >= 0; ) {
       strings[row] = _formatRow(matrix.row(row));
@@ -333,8 +333,8 @@ class DoubleFormatter extends AbstractFormatter {
   /**
    * Returns a string representations of all cells; no alignment considered.
    */
-  List<List<String>> _format2D(AbstractMatrix2D matrix) {
-    return this.format(matrix as DoubleMatrix2D);
+  List<List<String>> _format2D(AbstractMatrix matrix) {
+    return this.format(matrix as DoubleMatrix);
   }
 
   /**
@@ -363,7 +363,7 @@ class DoubleFormatter extends AbstractFormatter {
    * @param matrix
    *            the matrix to format.
    */
-  String toSourceCode(DoubleMatrix1D matrix) {
+  String toSourceCode(DoubleVector matrix) {
     DoubleFormatter copy = this.clone() as DoubleFormatter;
     copy.setPrintShape(false);
     copy.setColumnSeparator(", ");
@@ -379,7 +379,7 @@ class DoubleFormatter extends AbstractFormatter {
    * @param matrix
    *            the matrix to format.
    */
-  String toSourceCode2D(DoubleMatrix2D matrix) {
+  String toSourceCode2D(DoubleMatrix matrix) {
     DoubleFormatter copy = this.clone() as DoubleFormatter;
     String b3 = _blanks(3);
     copy.setPrintShape(false);
@@ -416,8 +416,8 @@ class DoubleFormatter extends AbstractFormatter {
    * @param matrix
    *            the matrix to convert.
    */
-  String toStringDouble1D(DoubleMatrix1D matrix) {
-    DoubleMatrix2D easy = matrix.like2D(1, matrix.length);
+  String toStringDouble1D(DoubleVector matrix) {
+    DoubleMatrix easy = matrix.like2D(1, matrix.length);
     easy.row(0).setAll(matrix);
     return toString2D(easy);
   }
@@ -428,7 +428,7 @@ class DoubleFormatter extends AbstractFormatter {
    * @param matrix
    *            the matrix to convert.
    */
-  String toStringDouble2D(DoubleMatrix2D matrix) {
+  String toStringDouble2D(DoubleMatrix matrix) {
     return super.toString2D(matrix);
   }
 
@@ -457,8 +457,8 @@ class DoubleFormatter extends AbstractFormatter {
    * @param matrix
    *            the matrix to convert.
    */
-  String toString2D(AbstractMatrix2D matrix) {
-    return this.toStringDouble2D(matrix as DoubleMatrix2D);
+  String toString2D(AbstractMatrix matrix) {
+    return this.toStringDouble2D(matrix as DoubleMatrix);
   }
 
   /**
@@ -481,7 +481,7 @@ class DoubleFormatter extends AbstractFormatter {
    *            The overall title of the matrix to be formatted.
    * @return the matrix converted to a string.
    */
-  /*String _toTitleString(DoubleMatrix2D matrix, List<String> rowNames, List<String> columnNames, String rowAxisName, String columnAxisName, String title) {
+  /*String _toTitleString(DoubleMatrix matrix, List<String> rowNames, List<String> columnNames, String rowAxisName, String columnAxisName, String title) {
     if (matrix.size() == 0) return "Empty matrix";
     List<List<String>> s = format(matrix);
     // String oldAlignment = this.alignment;
@@ -516,14 +516,14 @@ class DoubleFormatter extends AbstractFormatter {
    * @see hep.aida.tdouble.bin.DoubleBinFunction1D
    * @see hep.aida.tdouble.bin.DoubleBinFunctions1D
    */
-  /*String toTitleString(DoubleMatrix2D matrix, List<String> rowNames, List<String> columnNames, String rowAxisName, String columnAxisName, String title, List<DoubleBinFunction1D> aggr) {
+  /*String toTitleString(DoubleMatrix matrix, List<String> rowNames, List<String> columnNames, String rowAxisName, String columnAxisName, String title, List<DoubleBinFunction1D> aggr) {
     if (matrix.size() == 0) return "Empty matrix";
     if (aggr == null || aggr.length == 0) return _toTitleString(matrix, rowNames, columnNames, rowAxisName, columnAxisName, title);
 
-    DoubleMatrix2D rowStats = matrix.like2D(matrix.rows(), aggr.length); // hold
+    DoubleMatrix rowStats = matrix.like2D(matrix.rows(), aggr.length); // hold
     // row
     // aggregations
-    DoubleMatrix2D colStats = matrix.like2D(aggr.length, matrix.columns()); // hold
+    DoubleMatrix colStats = matrix.like2D(aggr.length, matrix.columns()); // hold
     // column
     // aggregations
 
@@ -543,7 +543,7 @@ class DoubleFormatter extends AbstractFormatter {
     // turn into strings
     // tmp holds "matrix" plus "colStats" below (needed so that numbers in a
     // columns can be decimal point aligned)
-    DoubleMatrix2D tmp = matrix.like2D(matrix.rows() + aggr.length, matrix.columns());
+    DoubleMatrix tmp = matrix.like2D(matrix.rows() + aggr.length, matrix.columns());
     tmp.viewPart(0, 0, matrix.rows(), matrix.columns()).assignMatrix(matrix);
     tmp.viewPart(matrix.rows(), 0, aggr.length, matrix.columns()).assignMatrix(colStats);
     colStats = null;
@@ -557,7 +557,7 @@ class DoubleFormatter extends AbstractFormatter {
 
     // copy strings into a large matrix holding the source matrix and all
     // aggregations
-    ObjectMatrix2D allStats = ObjectFactory2D.dense.make(matrix.rows() + aggr.length, matrix.columns() + aggr.length + 1);
+    ObjectMatrix allStats = ObjectFactory2D.dense.make(matrix.rows() + aggr.length, matrix.columns() + aggr.length + 1);
     allStats.viewPart(0, 0, matrix.rows() + aggr.length, matrix.columns()).assign(s1);
     allStats.viewColumn(matrix.columns()).assign("|");
     allStats.viewPart(0, matrix.columns() + 1, matrix.rows(), aggr.length).assign(s2);

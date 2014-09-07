@@ -12,7 +12,7 @@ main() {
 
   // now the processing
   int size = formats.length;
-  DoubleMatrix2D matrix = DoubleFactory2D.dense.make(values);
+  DoubleMatrix matrix = DoubleFactory2D.dense.make(values);
   List<String> strings = new List<String>(size);
   List<String> sourceCodes = new List<String>(size);
 

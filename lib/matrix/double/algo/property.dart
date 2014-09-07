@@ -13,15 +13,15 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import cern.colt.matrix.AbstractFormatter;
-import cern.colt.matrix.tdouble.DoubleMatrix1D;
-import cern.colt.matrix.tdouble.DoubleMatrix2D;
+import cern.colt.matrix.tdouble.DoubleVector;
+import cern.colt.matrix.tdouble.DoubleMatrix;
 import cern.colt.matrix.tdouble.DoubleMatrix3D;
-import cern.colt.matrix.tdouble.impl.DenseColumnDoubleMatrix2D;
-import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix1D;
-import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix2D;
-import cern.colt.matrix.tdouble.impl.SparseCCDoubleMatrix2D;
-import cern.colt.matrix.tdouble.impl.SparseDoubleMatrix1D;
-import cern.colt.matrix.tdouble.impl.SparseRCDoubleMatrix2D;
+import cern.colt.matrix.tdouble.impl.DenseColumnDoubleMatrix;
+import cern.colt.matrix.tdouble.impl.DenseDoubleVector;
+import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix;
+import cern.colt.matrix.tdouble.impl.SparseCCDoubleMatrix;
+import cern.colt.matrix.tdouble.impl.SparseDoubleVector;
+import cern.colt.matrix.tdouble.impl.SparseRCDoubleMatrix;
 import cern.jet.math.tdouble.DoubleFunctions;
 import edu.emory.mathcs.util.ConcurrencyUtils;*/
 
@@ -48,7 +48,7 @@ import edu.emory.mathcs.util.ConcurrencyUtils;*/
  * <p>
  * Note that this implementation is not synchronized.
  * <p>
- * Example: <tt>equals(DoubleMatrix2D A, DoubleMatrix2D B)</tt> is defined as
+ * Example: <tt>equals(DoubleMatrix A, DoubleMatrix B)</tt> is defined as
  * follows
  * <table>
  * <td class="PRE">
@@ -208,7 +208,7 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    * @throws ArgumentError
    *             if <tt>A.rows() < A.columns()</tt>.
    */
-  void checkRectangular(DoubleMatrix2D A) {
+  void checkRectangular(DoubleMatrix A) {
     if (A.rows < A.columns) {
       throw new ArgumentError("Matrix must be rectangular: " + AbstractFormatter.shape2D(A));
     }
@@ -220,34 +220,34 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    * @throws ArgumentError
    *             if <tt>A.rows() != A.columns()</tt>.
    */
-  void checkSquare(DoubleMatrix2D A) {
+  void checkSquare(DoubleMatrix A) {
     if (A.rows != A.columns) {
       throw new ArgumentError("Matrix must be square: " + AbstractFormatter.shape2D(A));
     }
   }
 
-  /*void checkDense2D(DoubleMatrix2D A) {
-    if (!(A is DenseDoubleMatrix2D) && !(A is DenseColumnDoubleMatrix2D)) {
+  /*void checkDense2D(DoubleMatrix A) {
+    if (!(A is DenseDoubleMatrix) && !(A is DenseColumnDoubleMatrix)) {
       throw new ArgumentError("Matrix must be dense");
     }
   }*/
 
-  void checkDense(DoubleMatrix1D A) {
-    if (!(A is DenseDoubleMatrix1D)) {
+  void checkDense(DoubleVector A) {
+    if (!(A is DenseDoubleVector)) {
       throw new ArgumentError("Matrix must be dense");
     }
   }
 
-  void checkSparse(DoubleMatrix1D A) {
-    if (!(A is SparseDoubleMatrix1D)) {
+  void checkSparse(DoubleVector A) {
+    if (!(A is SparseDoubleVector)) {
       throw new ArgumentError("Matrix must be sparse");
     }
   }
 
-  void checkSparse2D(DoubleMatrix2D A) {
-    //        if (!(A is SparseDoubleMatrix2D) && !(A is RCDoubleMatrix2D) && !(A is RCMDoubleMatrix2D)
-    //                && !(A is CCDoubleMatrix2D) && !(A is CCMDoubleMatrix2D))
-    if (!(A is SparseCCDoubleMatrix2D) && !(A is SparseRCDoubleMatrix2D)) {
+  void checkSparse2D(DoubleMatrix A) {
+    //        if (!(A is SparseDoubleMatrix) && !(A is RCDoubleMatrix) && !(A is RCMDoubleMatrix)
+    //                && !(A is CCDoubleMatrix) && !(A is CCMDoubleMatrix))
+    if (!(A is SparseCCDoubleMatrix) && !(A is SparseRCDoubleMatrix)) {
       throw new ArgumentError("Matrix must be sparse");
     }
   }
@@ -256,7 +256,7 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    * Returns the matrix's fraction of non-zero cells;
    * <tt>A.cardinality() / A.size()</tt>.
    */
-  double density(DoubleMatrix2D A) {
+  double density(DoubleMatrix A) {
     return A.cardinality / (A.length as double);
   }
 
@@ -273,7 +273,7 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    * @return <tt>true</tt> if the matrix is equal to the value; <tt>false</tt>
    *         otherwise.
    */
-  bool equals(final DoubleMatrix1D A, final double value) {
+  bool equals(final DoubleVector A, final double value) {
     if (A == null) {
       return false;
     }
@@ -344,7 +344,7 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    * @return <tt>true</tt> if both matrices are equal; <tt>false</tt>
    *         otherwise.
    */
-  bool equalsMatrix1D(final DoubleMatrix1D A, final DoubleMatrix1D B) {
+  bool equalsVector(final DoubleVector A, final DoubleVector B) {
     if (identical(A, B)) {
       return true;
     }
@@ -426,7 +426,7 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    * @return <tt>true</tt> if the matrix is equal to the value; <tt>false</tt>
    *         otherwise.
    */
-  bool equalsMatrix2DValue(final DoubleMatrix2D A, final double value) {
+  bool equalsMatrixValue(final DoubleMatrix A, final double value) {
     if (A == null) {
       return false;
     }
@@ -503,7 +503,7 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    * @return <tt>true</tt> if both matrices are equal; <tt>false</tt>
    *         otherwise.
    */
-  bool equalsMatrix2D(final DoubleMatrix2D A, final DoubleMatrix2D B) {
+  bool equalsMatrix(final DoubleMatrix A, final DoubleMatrix B) {
     if (identical(A, B)) {
       return true;
     }
@@ -740,7 +740,7 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    * @throws ArgumentError
    *             if <tt>!isSquare(A)</tt>.
    */
-  void generateNonSingular(DoubleMatrix2D A) {
+  void generateNonSingular(DoubleMatrix A) {
     checkSquare(A);
     //cern.jet.math.tdouble.DoubleFunctions F = cern.jet.math.tdouble.DoubleFunctions.functions;
     int min = Math.min(A.rows, A.columns);
@@ -762,7 +762,7 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    * A matrix <tt>A</tt> is <i>diagonal</i> if <tt>A[i,j] == 0</tt> whenever
    * <tt>i != j</tt>. Matrix may but need not be square.
    */
-  bool isDiagonal(DoubleMatrix2D A) {
+  bool isDiagonal(DoubleMatrix A) {
     double epsilon = tolerance();
     int rows = A.rows;
     int columns = A.columns;
@@ -784,7 +784,7 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    * <p>
    * Note: Ignores tolerance.
    */
-  bool isDiagonallyDominantByColumn(DoubleMatrix2D A) {
+  bool isDiagonallyDominantByColumn(DoubleMatrix A) {
     //cern.jet.math.tdouble.DoubleFunctions F = cern.jet.math.tdouble.DoubleFunctions.functions;
     int min = Math.min(A.rows, A.columns);
     for (int i = min; --i >= 0; ) {
@@ -804,7 +804,7 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    * <p>
    * Note: Ignores tolerance.
    */
-  bool isDiagonallyDominantByRow(DoubleMatrix2D A) {
+  bool isDiagonallyDominantByRow(DoubleMatrix A) {
     //cern.jet.math.tdouble.DoubleFunctions F = cern.jet.math.tdouble.DoubleFunctions.functions;
     int min = Math.min(A.rows, A.columns);
     for (int i = min; --i >= 0; ) {
@@ -819,7 +819,7 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    * A matrix <tt>A</tt> is an <i>identity</i> matrix if <tt>A[i,i] == 1</tt>
    * and all other cells are zero. Matrix may but need not be square.
    */
-  bool isIdentity(DoubleMatrix2D A) {
+  bool isIdentity(DoubleMatrix A) {
     double epsilon = tolerance();
     int rows = A.rows;
     int columns = A.columns;
@@ -838,7 +838,7 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    * A matrix <tt>A</tt> is <i>lower bidiagonal</i> if <tt>A[i,j]==0</tt>
    * unless <tt>i==j || i==j+1</tt>. Matrix may but need not be square.
    */
-  bool isLowerBidiagonal(DoubleMatrix2D A) {
+  bool isLowerBidiagonal(DoubleMatrix A) {
     double epsilon = tolerance();
     int rows = A.rows;
     int columns = A.columns;
@@ -856,7 +856,7 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    * A matrix <tt>A</tt> is <i>lower triangular</i> if <tt>A[i,j]==0</tt>
    * whenever <tt>i &lt; j</tt>. Matrix may but need not be square.
    */
-  bool isLowerTriangular(DoubleMatrix2D A) {
+  bool isLowerTriangular(DoubleMatrix A) {
     double epsilon = tolerance();
     int rows = A.rows;
     int columns = A.columns;
@@ -874,7 +874,7 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    * <p>
    * Note: Ignores tolerance.
    */
-  bool isNonNegative(DoubleMatrix2D A) {
+  bool isNonNegative(DoubleMatrix A) {
     int rows = A.rows;
     int columns = A.columns;
     for (int row = rows; --row >= 0; ) {
@@ -892,9 +892,9 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    * @throws ArgumentError
    *             if <tt>!isSquare(A)</tt>.
    */
-  bool isOrthogonal(DoubleMatrix2D A) {
+  bool isOrthogonal(DoubleMatrix A) {
     checkSquare(A);
-    return equalsMatrix2D(A.multiply(A, null, 1.0, 0.0, false, true), DoubleFactory2D.dense.identity(A.rows));
+    return equalsMatrix(A.multiply(A, null, 1.0, 0.0, false, true), DoubleFactory2D.dense.identity(A.rows));
   }
 
   /**
@@ -903,7 +903,7 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    * <p>
    * Note: Ignores tolerance.
    */
-  bool isPositive(DoubleMatrix2D A) {
+  bool isPositive(DoubleMatrix A) {
     int rows = A.rows;
     int columns = A.columns;
     for (int row = rows; --row >= 0; ) {
@@ -918,7 +918,7 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    * A matrix <tt>A</tt> is <i>singular</i> if it has no inverse, that is, iff
    * <tt>det(A)==0</tt>.
    */
-  /*bool isSingular(DoubleMatrix2D A) {
+  /*bool isSingular(DoubleMatrix A) {
     return !(DenseDoubleAlgebra.DEFAULT.det(A).abs() >= tolerance());
   }*/
 
@@ -929,7 +929,7 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    * @throws ArgumentError
    *             if <tt>!isSquare(A)</tt>.
    */
-  bool isSkewSymmetric(DoubleMatrix2D A) {
+  bool isSkewSymmetric(DoubleMatrix A) {
     checkSquare(A);
     double epsilon = tolerance();
     int rows = A.rows;
@@ -945,7 +945,7 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    * A matrix <tt>A</tt> is <i>square</i> if it has the same number of rows
    * and columns.
    */
-  bool isSquare(DoubleMatrix2D A) {
+  bool isSquare(DoubleMatrix A) {
     return A.rows == A.columns;
   }
 
@@ -954,7 +954,7 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    * <tt>A[i,j]==0</tt> whenever <tt>i &lt;= j</tt>. Matrix may but need not
    * be square.
    */
-  bool isStrictlyLowerTriangular(DoubleMatrix2D A) {
+  bool isStrictlyLowerTriangular(DoubleMatrix A) {
     double epsilon = tolerance();
     int rows = A.rows;
     int columns = A.columns;
@@ -970,7 +970,7 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    * A matrix <tt>A</tt> is <i>strictly triangular</i> if it is triangular and
    * its diagonal elements all equal 0. Matrix may but need not be square.
    */
-  bool isStrictlyTriangular(DoubleMatrix2D A) {
+  bool isStrictlyTriangular(DoubleMatrix A) {
     if (!isTriangular(A)) return false;
 
     double epsilon = tolerance();
@@ -985,7 +985,7 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    * <tt>A[i,j]==0</tt> whenever <tt>i &gt;= j</tt>. Matrix may but need not
    * be square.
    */
-  bool isStrictlyUpperTriangular(DoubleMatrix2D A) {
+  bool isStrictlyUpperTriangular(DoubleMatrix A) {
     double epsilon = tolerance();
     int rows = A.rows;
     int columns = A.columns;
@@ -1004,16 +1004,16 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    * @throws ArgumentError
    *             if <tt>!isSquare(A)</tt>.
    */
-  bool isSymmetric(DoubleMatrix2D A) {
+  bool isSymmetric(DoubleMatrix A) {
     checkSquare(A);
-    return equalsMatrix2D(A, A.dice());
+    return equalsMatrix(A, A.dice());
   }
 
   /**
    * A matrix <tt>A</tt> is <i>triangular</i> iff it is either upper or lower
    * triangular. Matrix may but need not be square.
    */
-  bool isTriangular(DoubleMatrix2D A) {
+  bool isTriangular(DoubleMatrix A) {
     return isLowerTriangular(A) || isUpperTriangular(A);
   }
 
@@ -1021,7 +1021,7 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    * A matrix <tt>A</tt> is <i>tridiagonal</i> if <tt>A[i,j]==0</tt> whenever
    * <tt>Math.abs(i-j) > 1</tt>. Matrix may but need not be square.
    */
-  bool isTridiagonal(DoubleMatrix2D A) {
+  bool isTridiagonal(DoubleMatrix A) {
     double epsilon = tolerance();
     int rows = A.rows;
     int columns = A.columns;
@@ -1039,7 +1039,7 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    * A matrix <tt>A</tt> is <i>unit triangular</i> if it is triangular and its
    * diagonal elements all equal 1. Matrix may but need not be square.
    */
-  bool isUnitTriangular(DoubleMatrix2D A) {
+  bool isUnitTriangular(DoubleMatrix A) {
     if (!isTriangular(A)) return false;
 
     double epsilon = tolerance();
@@ -1053,7 +1053,7 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    * A matrix <tt>A</tt> is <i>upper bidiagonal</i> if <tt>A[i,j]==0</tt>
    * unless <tt>i==j || i==j-1</tt>. Matrix may but need not be square.
    */
-  bool isUpperBidiagonal(DoubleMatrix2D A) {
+  bool isUpperBidiagonal(DoubleMatrix A) {
     double epsilon = tolerance();
     int rows = A.rows;
     int columns = A.columns;
@@ -1071,7 +1071,7 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    * A matrix <tt>A</tt> is <i>upper triangular</i> if <tt>A[i,j]==0</tt>
    * whenever <tt>i &gt; j</tt>. Matrix may but need not be square.
    */
-  bool isUpperTriangular(DoubleMatrix2D A) {
+  bool isUpperTriangular(DoubleMatrix A) {
     double epsilon = tolerance();
     int rows = A.rows;
     int columns = A.columns;
@@ -1086,8 +1086,8 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
   /**
    * A matrix <tt>A</tt> is <i>zero</i> if all its cells are zero.
    */
-  bool isZero(DoubleMatrix2D A) {
-    return equalsMatrix2DValue(A, 0.0);
+  bool isZero(DoubleMatrix A) {
+    return equalsMatrixValue(A, 0.0);
   }
 
   /**
@@ -1101,10 +1101,10 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    * @return the lower bandwith.
    * @throws ArgumentError
    *             if <tt>!isSquare(A)</tt>.
-   * @see #semiBandwidth(DoubleMatrix2D)
-   * @see #upperBandwidth(DoubleMatrix2D)
+   * @see #semiBandwidth(DoubleMatrix)
+   * @see #upperBandwidth(DoubleMatrix)
    */
-  int lowerBandwidth(DoubleMatrix2D A) {
+  int lowerBandwidth(DoubleMatrix A) {
     checkSquare(A);
     double epsilon = tolerance();
     int rows = A.rows;
@@ -1224,10 +1224,10 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    * @return the semi-bandwith <tt>l</tt>.
    * @throws ArgumentError
    *             if <tt>!isSquare(A)</tt>.
-   * @see #lowerBandwidth(DoubleMatrix2D)
-   * @see #upperBandwidth(DoubleMatrix2D)
+   * @see #lowerBandwidth(DoubleMatrix)
+   * @see #upperBandwidth(DoubleMatrix)
    */
-  int semiBandwidth(DoubleMatrix2D A) {
+  int semiBandwidth(DoubleMatrix A) {
     checkSquare(A);
     double epsilon = tolerance();
     int rows = A.rows;
@@ -1297,7 +1297,7 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    *
    * </pre>
    */
-  String toString2D(DoubleMatrix2D A) {
+  String toString2D(DoubleMatrix A) {
     final List names = new List();
     final List values = new List();
     String unknown = "Illegal operation or error: ";
@@ -1535,10 +1535,10 @@ class DoubleProperty {//extends cern.colt.PersistentObject {
    * @return the upper bandwith.
    * @throws ArgumentError
    *             if <tt>!isSquare(A)</tt>.
-   * @see #semiBandwidth(DoubleMatrix2D)
-   * @see #lowerBandwidth(DoubleMatrix2D)
+   * @see #semiBandwidth(DoubleMatrix)
+   * @see #lowerBandwidth(DoubleMatrix)
    */
-  int upperBandwidth(DoubleMatrix2D A) {
+  int upperBandwidth(DoubleMatrix A) {
     checkSquare(A);
     double epsilon = tolerance();
     int rows = A.rows;

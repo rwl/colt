@@ -1,6 +1,6 @@
 part of cern.colt.matrix.complex.test;
 
-class DiagonalDComplexMatrix2DTest extends DComplexMatrix2DTest {
+class DiagonalComplexMatrixTest extends ComplexMatrixTest {
 
   int DLENGTH;
 
@@ -8,10 +8,10 @@ class DiagonalDComplexMatrix2DTest extends DComplexMatrix2DTest {
 
   void createMatrices() {
     DINDEX = 3;
-    A = new DiagonalDComplexMatrix2D(NROWS, NCOLUMNS, DINDEX);
-    B = new DiagonalDComplexMatrix2D(NROWS, NCOLUMNS, DINDEX);
-    Bt = new DiagonalDComplexMatrix2D(NCOLUMNS, NROWS, -DINDEX);
-    DLENGTH = (A as DiagonalDComplexMatrix2D).diagonalLength;
+    A = new DiagonalComplexMatrix(NROWS, NCOLUMNS, DINDEX);
+    B = new DiagonalComplexMatrix(NROWS, NCOLUMNS, DINDEX);
+    Bt = new DiagonalComplexMatrix(NCOLUMNS, NROWS, -DINDEX);
+    DLENGTH = (A as DiagonalComplexMatrix).diagonalLength;
   }
 
   void populateMatrices() {
@@ -78,8 +78,8 @@ class DiagonalDComplexMatrix2DTest extends DComplexMatrix2DTest {
   }
 
   void testAssignImaginary() {
-    DoubleMatrix2D Im = DoubleFactory2D.dense.random(A.rows, A.columns);
-    DComplexMatrix2D Acopy = A.copy();
+    DoubleMatrix Im = DoubleFactory2D.dense.random(A.rows, A.columns);
+    ComplexMatrix Acopy = A.copy();
     A.setImaginary(Im);
     if (DINDEX >= 0) {
       for (int r = 0; r < DLENGTH; r++) {
@@ -95,8 +95,8 @@ class DiagonalDComplexMatrix2DTest extends DComplexMatrix2DTest {
   }
 
   void testAssignReal() {
-    DoubleMatrix2D Re = DoubleFactory2D.dense.random(A.rows, A.columns);
-    DComplexMatrix2D Acopy = A.copy();
+    DoubleMatrix Re = DoubleFactory2D.dense.random(A.rows, A.columns);
+    ComplexMatrix Acopy = A.copy();
     A.setReal(Re);
     if (DINDEX >= 0) {
       for (int r = 0; r < DLENGTH; r++) {
@@ -135,17 +135,17 @@ class DiagonalDComplexMatrix2DTest extends DComplexMatrix2DTest {
   }
 
   void testAssign() {
-    DComplexMatrix2D Acopy = A.copy();
+    ComplexMatrix Acopy = A.copy();
     A.forEach(acos);
     if (DINDEX >= 0) {
       for (int r = 0; r < DLENGTH; r++) {
-        Float64List expected = DComplex.acos(Acopy.get(r, r + DINDEX));
+        Float64List expected = Complex.acos(Acopy.get(r, r + DINDEX));
         expect(expected[0], closeTo(A.get(r, r + DINDEX)[0], TOL));
         expect(expected[1], closeTo(A.get(r, r + DINDEX)[1], TOL));
       }
     } else {
       for (int r = 0; r < DLENGTH; r++) {
-        Float64List expected = DComplex.acos(Acopy.get(r - DINDEX, r));
+        Float64List expected = Complex.acos(Acopy.get(r - DINDEX, r));
         expect(expected[0], closeTo(A.get(r - DINDEX, r)[0], TOL));
         expect(expected[1], closeTo(A.get(r - DINDEX, r)[1], TOL));
       }
@@ -153,17 +153,17 @@ class DiagonalDComplexMatrix2DTest extends DComplexMatrix2DTest {
   }
 
   void testAssignFunc() {
-    DComplexMatrix2D Acopy = A.copy();
+    ComplexMatrix Acopy = A.copy();
     A.forEachMatrix(B, div);
     if (DINDEX >= 0) {
       for (int r = 0; r < DLENGTH; r++) {
-        expect(DComplex.div_(Acopy.get(r, r + DINDEX), B.get(r, r + DINDEX))[0], closeTo(A.get(r, r + DINDEX)[0], TOL));
-        expect(DComplex.div_(Acopy.get(r, r + DINDEX), B.get(r, r + DINDEX))[1], closeTo(A.get(r, r + DINDEX)[1], TOL));
+        expect(Complex.div_(Acopy.get(r, r + DINDEX), B.get(r, r + DINDEX))[0], closeTo(A.get(r, r + DINDEX)[0], TOL));
+        expect(Complex.div_(Acopy.get(r, r + DINDEX), B.get(r, r + DINDEX))[1], closeTo(A.get(r, r + DINDEX)[1], TOL));
       }
     } else {
       for (int r = 0; r < DLENGTH; r++) {
-        expect(DComplex.div_(Acopy.get(r - DINDEX, r), B.get(r - DINDEX, r))[0], closeTo(A.get(r - DINDEX, r)[0], TOL));
-        expect(DComplex.div_(Acopy.get(r - DINDEX, r), B.get(r - DINDEX, r))[1], closeTo(A.get(r - DINDEX, r)[1], TOL));
+        expect(Complex.div_(Acopy.get(r - DINDEX, r), B.get(r - DINDEX, r))[0], closeTo(A.get(r - DINDEX, r)[0], TOL));
+        expect(Complex.div_(Acopy.get(r - DINDEX, r), B.get(r - DINDEX, r))[1], closeTo(A.get(r - DINDEX, r)[1], TOL));
       }
     }
   }
@@ -176,22 +176,22 @@ class DiagonalDComplexMatrix2DTest extends DComplexMatrix2DTest {
         rowList.add(r);
         columnList.add(r + DINDEX);
       }
-      DComplexMatrix2D Acopy = A.copy();
+      ComplexMatrix Acopy = A.copy();
       A.forEachMatrixRange(B, div, rowList, columnList);
       for (int r = 0; r < DLENGTH; r++) {
-        expect(DComplex.div_(Acopy.get(r, r + DINDEX), B.get(r, r + DINDEX))[0], closeTo(A.get(r, r + DINDEX)[0], TOL));
-        expect(DComplex.div_(Acopy.get(r, r + DINDEX), B.get(r, r + DINDEX))[1], closeTo(A.get(r, r + DINDEX)[1], TOL));
+        expect(Complex.div_(Acopy.get(r, r + DINDEX), B.get(r, r + DINDEX))[0], closeTo(A.get(r, r + DINDEX)[0], TOL));
+        expect(Complex.div_(Acopy.get(r, r + DINDEX), B.get(r, r + DINDEX))[1], closeTo(A.get(r, r + DINDEX)[1], TOL));
       }
     } else {
       for (int r = 0; r < DLENGTH; r++) {
         rowList.add(r - DINDEX);
         columnList.add(r);
       }
-      DComplexMatrix2D Acopy = A.copy();
+      ComplexMatrix Acopy = A.copy();
       A.forEachMatrixRange(B, div, rowList, columnList);
       for (int r = 0; r < DLENGTH; r++) {
-        expect(DComplex.div_(Acopy.get(r - DINDEX, r), B.get(r - DINDEX, r))[0], closeTo(A.get(r - DINDEX, r)[0], TOL));
-        expect(DComplex.div_(Acopy.get(r - DINDEX, r), B.get(r - DINDEX, r))[1], closeTo(A.get(r - DINDEX, r)[1], TOL));
+        expect(Complex.div_(Acopy.get(r - DINDEX, r), B.get(r - DINDEX, r))[0], closeTo(A.get(r - DINDEX, r)[0], TOL));
+        expect(Complex.div_(Acopy.get(r - DINDEX, r), B.get(r - DINDEX, r))[1], closeTo(A.get(r - DINDEX, r)[1], TOL));
       }
     }
   }
@@ -253,7 +253,7 @@ class DiagonalDComplexMatrix2DTest extends DComplexMatrix2DTest {
   }
 
   void testVectorize() {
-    DComplexMatrix1D Avec = A.vectorize();
+    ComplexVector Avec = A.vectorize();
     int idx = 0;
     for (int c = 0; c < NCOLUMNS; c++) {
       for (int r = 0; r < NROWS; r++) {
@@ -263,7 +263,7 @@ class DiagonalDComplexMatrix2DTest extends DComplexMatrix2DTest {
   }
 
   void testViewColumn() {
-    DComplexMatrix1D col = A.column(NCOLUMNS ~/ 2);
+    ComplexVector col = A.column(NCOLUMNS ~/ 2);
     expect(NROWS, equals(col.length));
     for (int r = 0; r < NROWS; r++) {
       assertEquals(A.get(r, NCOLUMNS ~/ 2), col.get(r), TOL);
@@ -271,7 +271,7 @@ class DiagonalDComplexMatrix2DTest extends DComplexMatrix2DTest {
   }
 
   void testViewColumnFlip() {
-    DComplexMatrix2D B = A.columnFlip();
+    ComplexMatrix B = A.columnFlip();
     expect(A.length, equals(B.length));
     for (int r = 0; r < NROWS; r++) {
       for (int c = 0; c < NCOLUMNS; c++) {
@@ -281,7 +281,7 @@ class DiagonalDComplexMatrix2DTest extends DComplexMatrix2DTest {
   }
 
   void testViewDice() {
-    DComplexMatrix2D B = A.dice();
+    ComplexMatrix B = A.dice();
     expect(NROWS, equals(B.columns));
     expect(NCOLUMNS, equals(B.rows));
     for (int r = 0; r < NROWS; r++) {
@@ -292,7 +292,7 @@ class DiagonalDComplexMatrix2DTest extends DComplexMatrix2DTest {
   }
 
   void testViewPart() {
-    DComplexMatrix2D B = A.part(NROWS ~/ 2, NCOLUMNS ~/ 2, NROWS ~/ 3, NCOLUMNS ~/ 3);
+    ComplexMatrix B = A.part(NROWS ~/ 2, NCOLUMNS ~/ 2, NROWS ~/ 3, NCOLUMNS ~/ 3);
     expect(NROWS ~/ 3, equals(B.rows));
     expect(NCOLUMNS ~/ 3, equals(B.columns));
     for (int r = 0; r < NROWS ~/ 3; r++) {
@@ -303,7 +303,7 @@ class DiagonalDComplexMatrix2DTest extends DComplexMatrix2DTest {
   }
 
   void testViewRow() {
-    DComplexMatrix1D B = A.row(NROWS ~/ 2);
+    ComplexVector B = A.row(NROWS ~/ 2);
     expect(NCOLUMNS, equals(B.length));
     for (int r = 0; r < NCOLUMNS; r++) {
       assertEquals(A.get(NROWS ~/ 2, r), B.get(r), TOL);
@@ -311,7 +311,7 @@ class DiagonalDComplexMatrix2DTest extends DComplexMatrix2DTest {
   }
 
   void testViewRowFlip() {
-    DComplexMatrix2D B = A.rowFlip();
+    ComplexMatrix B = A.rowFlip();
     expect(A.length, equals(B.length));
     for (int r = 0; r < NROWS; r++) {
       for (int c = 0; c < NCOLUMNS; c++) {
@@ -326,8 +326,8 @@ class DiagonalDComplexMatrix2DTest extends DComplexMatrix2DTest {
     if (DINDEX >= 0) {
       A.set(NROWS ~/ 4, NROWS ~/ 4 + DINDEX, value);
       A.set(NROWS ~/ 2, NROWS ~/ 2 + DINDEX, value);
-      DComplexMatrix2D B = A.where((DComplexMatrix1D element) {
-        if (DComplex.abs(DComplex.minus(element.get(NROWS ~/ 4 + DINDEX), value)) < TOL) {
+      ComplexMatrix B = A.where((ComplexVector element) {
+        if (Complex.abs(Complex.minus(element.get(NROWS ~/ 4 + DINDEX), value)) < TOL) {
           return true;
         } else {
           return false;
@@ -339,8 +339,8 @@ class DiagonalDComplexMatrix2DTest extends DComplexMatrix2DTest {
     } else {
       A.set(NROWS ~/ 4 - DINDEX, NROWS ~/ 4, value);
       A.set(NROWS ~/ 2 - DINDEX, NROWS ~/ 2, value);
-      DComplexMatrix2D B = A.where((DComplexMatrix1D element) {
-        if (DComplex.abs(DComplex.minus(element.get(NROWS ~/ 4), value)) < TOL) {
+      ComplexMatrix B = A.where((ComplexVector element) {
+        if (Complex.abs(Complex.minus(element.get(NROWS ~/ 4), value)) < TOL) {
           return true;
         } else {
           return false;
@@ -355,7 +355,7 @@ class DiagonalDComplexMatrix2DTest extends DComplexMatrix2DTest {
   void testViewSelection() {
     Int32List rowIndexes = new Int32List.fromList([NROWS ~/ 6, NROWS ~/ 5, NROWS ~/ 4, NROWS ~/ 3, NROWS ~/ 2]);
     Int32List colIndexes = new Int32List.fromList([NROWS ~/ 6, NROWS ~/ 5, NROWS ~/ 4, NROWS ~/ 3, NROWS ~/ 2, NROWS - 1]);
-    DComplexMatrix2D B = A.select(rowIndexes, colIndexes);
+    ComplexMatrix B = A.select(rowIndexes, colIndexes);
     expect(rowIndexes.length, equals(B.rows));
     expect(colIndexes.length, equals(B.columns));
     for (int r = 0; r < rowIndexes.length; r++) {
@@ -368,7 +368,7 @@ class DiagonalDComplexMatrix2DTest extends DComplexMatrix2DTest {
   void testViewStrides() {
     int rowStride = 3;
     int colStride = 5;
-    DComplexMatrix2D B = A.strides(rowStride, colStride);
+    ComplexMatrix B = A.strides(rowStride, colStride);
     for (int r = 0; r < B.rows; r++) {
       for (int c = 0; c < B.columns; c++) {
         assertEquals(A.get(r * rowStride, c * colStride), B.get(r, c), TOL);
@@ -379,7 +379,7 @@ class DiagonalDComplexMatrix2DTest extends DComplexMatrix2DTest {
   void testZMult2D() {
     Float64List alpha = new Float64List.fromList([3.0, 4.0]);
     Float64List beta = new Float64List.fromList([5.0, 6.0]);
-    DComplexMatrix2D C = new DiagonalDComplexMatrix2D(NROWS, NROWS, 0);
+    ComplexMatrix C = new DiagonalComplexMatrix(NROWS, NROWS, 0);
     for (int i = 0; i < DLENGTH; i++) {
       C.setParts(i, i, random.nextDouble(), random.nextDouble());
     }
@@ -390,12 +390,12 @@ class DiagonalDComplexMatrix2DTest extends DComplexMatrix2DTest {
       for (int i = 0; i < NROWS; i++) {
         Float64List s = new Float64List(2);
         for (int k = 0; k < NCOLUMNS; k++) {
-          s = DComplex.plus(s, DComplex.multiply(A.get(i, k), Bt.get(k, j)));
+          s = Complex.plus(s, Complex.multiply(A.get(i, k), Bt.get(k, j)));
         }
         elem[0] = expected[i][2 * j];
         elem[1] = expected[i][2 * j + 1];
-        elem = DComplex.multiply(beta, elem);
-        s = DComplex.multiply(alpha, s);
+        elem = Complex.multiply(beta, elem);
+        s = Complex.multiply(alpha, s);
         expected[i][2 * j] = s[0] + elem[0];
         expected[i][2 * j + 1] = s[1] + elem[1];
       }
@@ -416,9 +416,9 @@ class DiagonalDComplexMatrix2DTest extends DComplexMatrix2DTest {
       for (int i = 0; i < NROWS; i++) {
         Float64List s = new Float64List(2);
         for (int k = 0; k < NCOLUMNS; k++) {
-          s = DComplex.plus(s, DComplex.multiply(A.get(i, k), Bt.get(k, j)));
+          s = Complex.plus(s, Complex.multiply(A.get(i, k), Bt.get(k, j)));
         }
-        s = DComplex.multiply(alpha, s);
+        s = Complex.multiply(alpha, s);
         expected[i][2 * j] = s[0];
         expected[i][2 * j + 1] = s[1];
       }
@@ -431,7 +431,7 @@ class DiagonalDComplexMatrix2DTest extends DComplexMatrix2DTest {
     }
 
     //transposeA
-    C = new DiagonalDComplexMatrix2D(NCOLUMNS, NCOLUMNS, 0);
+    C = new DiagonalComplexMatrix(NCOLUMNS, NCOLUMNS, 0);
     for (int i = 0; i < DLENGTH; i++) {
       C.setParts(i, i, random.nextDouble(), random.nextDouble());
     }
@@ -441,12 +441,12 @@ class DiagonalDComplexMatrix2DTest extends DComplexMatrix2DTest {
       for (int i = 0; i < NCOLUMNS; i++) {
         Float64List s = new Float64List(2);
         for (int k = 0; k < NROWS; k++) {
-          s = DComplex.plus(s, DComplex.multiply(DComplex.conj(A.get(k, i)), B.get(k, j)));
+          s = Complex.plus(s, Complex.multiply(Complex.conj(A.get(k, i)), B.get(k, j)));
         }
         elem[0] = expected[i][2 * j];
         elem[1] = expected[i][2 * j + 1];
-        elem = DComplex.multiply(beta, elem);
-        s = DComplex.multiply(alpha, s);
+        elem = Complex.multiply(beta, elem);
+        s = Complex.multiply(alpha, s);
         expected[i][2 * j] = s[0] + elem[0];
         expected[i][2 * j + 1] = s[1] + elem[1];
       }
@@ -466,9 +466,9 @@ class DiagonalDComplexMatrix2DTest extends DComplexMatrix2DTest {
       for (int i = 0; i < NCOLUMNS; i++) {
         Float64List s = new Float64List(2);
         for (int k = 0; k < NROWS; k++) {
-          s = DComplex.plus(s, DComplex.multiply(DComplex.conj(A.get(k, i)), B.get(k, j)));
+          s = Complex.plus(s, Complex.multiply(Complex.conj(A.get(k, i)), B.get(k, j)));
         }
-        s = DComplex.multiply(alpha, s);
+        s = Complex.multiply(alpha, s);
         expected[i][2 * j] = s[0];
         expected[i][2 * j + 1] = s[1];
       }
@@ -481,7 +481,7 @@ class DiagonalDComplexMatrix2DTest extends DComplexMatrix2DTest {
     }
 
     //transposeB
-    C = new DiagonalDComplexMatrix2D(NROWS, NROWS, 0);
+    C = new DiagonalComplexMatrix(NROWS, NROWS, 0);
     for (int i = 0; i < DLENGTH; i++) {
       C.setParts(i, i, random.nextDouble(), random.nextDouble());
     }
@@ -491,12 +491,12 @@ class DiagonalDComplexMatrix2DTest extends DComplexMatrix2DTest {
       for (int i = 0; i < NROWS; i++) {
         Float64List s = new Float64List(2);
         for (int k = 0; k < NCOLUMNS; k++) {
-          s = DComplex.plus(s, DComplex.multiply(A.get(i, k), DComplex.conj(B.get(j, k))));
+          s = Complex.plus(s, Complex.multiply(A.get(i, k), Complex.conj(B.get(j, k))));
         }
         elem[0] = expected[i][2 * j];
         elem[1] = expected[i][2 * j + 1];
-        elem = DComplex.multiply(beta, elem);
-        s = DComplex.multiply(alpha, s);
+        elem = Complex.multiply(beta, elem);
+        s = Complex.multiply(alpha, s);
         expected[i][2 * j] = s[0] + elem[0];
         expected[i][2 * j + 1] = s[1] + elem[1];
       }
@@ -516,9 +516,9 @@ class DiagonalDComplexMatrix2DTest extends DComplexMatrix2DTest {
       for (int i = 0; i < NROWS; i++) {
         Float64List s = new Float64List(2);
         for (int k = 0; k < NCOLUMNS; k++) {
-          s = DComplex.plus(s, DComplex.multiply(A.get(i, k), DComplex.conj(B.get(j, k))));
+          s = Complex.plus(s, Complex.multiply(A.get(i, k), Complex.conj(B.get(j, k))));
         }
-        s = DComplex.multiply(alpha, s);
+        s = Complex.multiply(alpha, s);
         expected[i][2 * j] = s[0];
         expected[i][2 * j + 1] = s[1];
       }
@@ -530,7 +530,7 @@ class DiagonalDComplexMatrix2DTest extends DComplexMatrix2DTest {
       }
     }
     //transposeA and transposeB
-    C = new DiagonalDComplexMatrix2D(NCOLUMNS, NCOLUMNS, 0);
+    C = new DiagonalComplexMatrix(NCOLUMNS, NCOLUMNS, 0);
     for (int i = 0; i < DLENGTH; i++) {
       C.setParts(i, i, random.nextDouble(), random.nextDouble());
     }
@@ -540,12 +540,12 @@ class DiagonalDComplexMatrix2DTest extends DComplexMatrix2DTest {
       for (int i = 0; i < NCOLUMNS; i++) {
         Float64List s = new Float64List(2);
         for (int k = 0; k < NROWS; k++) {
-          s = DComplex.plus(s, DComplex.multiply(DComplex.conj(A.get(k, i)), DComplex.conj(Bt.get(j, k))));
+          s = Complex.plus(s, Complex.multiply(Complex.conj(A.get(k, i)), Complex.conj(Bt.get(j, k))));
         }
         elem[0] = expected[i][2 * j];
         elem[1] = expected[i][2 * j + 1];
-        elem = DComplex.multiply(beta, elem);
-        s = DComplex.multiply(alpha, s);
+        elem = Complex.multiply(beta, elem);
+        s = Complex.multiply(alpha, s);
         expected[i][2 * j] = s[0] + elem[0];
         expected[i][2 * j + 1] = s[1] + elem[1];
       }
@@ -565,9 +565,9 @@ class DiagonalDComplexMatrix2DTest extends DComplexMatrix2DTest {
       for (int i = 0; i < NCOLUMNS; i++) {
         Float64List s = new Float64List(2);
         for (int k = 0; k < NROWS; k++) {
-          s = DComplex.plus(s, DComplex.multiply(A.get(k, i), Bt.get(j, k)));
+          s = Complex.plus(s, Complex.multiply(A.get(k, i), Bt.get(j, k)));
         }
-        s = DComplex.multiply(alpha, s);
+        s = Complex.multiply(alpha, s);
         expected[i][2 * j] = s[0];
         expected[i][2 * j + 1] = s[1];
       }
@@ -582,13 +582,13 @@ class DiagonalDComplexMatrix2DTest extends DComplexMatrix2DTest {
   }
 }
 
-class DiagonalDComplexMatrix2DViewTest extends DiagonalDComplexMatrix2DTest {
+class DiagonalComplexMatrixViewTest extends DiagonalComplexMatrixTest {
   void createMatrices() {
     DINDEX = 3;
-    A = new DiagonalDComplexMatrix2D(NCOLUMNS, NROWS, -DINDEX);
-    DLENGTH = (A as DiagonalDComplexMatrix2D).diagonalLength;
+    A = new DiagonalComplexMatrix(NCOLUMNS, NROWS, -DINDEX);
+    DLENGTH = (A as DiagonalComplexMatrix).diagonalLength;
     A = A.dice();
-    B = new DiagonalDComplexMatrix2D(NCOLUMNS, NROWS, -DINDEX).dice();
-    Bt = new DiagonalDComplexMatrix2D(NROWS, NCOLUMNS, DINDEX).dice();
+    B = new DiagonalComplexMatrix(NCOLUMNS, NROWS, -DINDEX).dice();
+    Bt = new DiagonalComplexMatrix(NROWS, NCOLUMNS, DINDEX).dice();
   }
 }

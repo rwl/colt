@@ -6,7 +6,7 @@ part of cern.colt.matrix.tint.algo;
  * @throws ArgumentError
  *             if <tt>A.rows < A.columns</tt>.
  */
-void checkRectangular(IntMatrix2D A) {
+void checkRectangular(IntMatrix A) {
   if (A.rows < A.columns) {
     throw new ArgumentError("Matrix must be rectangular: " + AbstractFormatter.shape2D(A));
   }
@@ -18,7 +18,7 @@ void checkRectangular(IntMatrix2D A) {
  * @throws ArgumentError
  *             if <tt>A.rows != A.columns</tt>.
  */
-void checkSquare(IntMatrix2D A) {
+void checkSquare(IntMatrix A) {
   if (A.rows != A.columns) {
     throw new ArgumentError("Matrix must be square: " + AbstractFormatter.shape2D(A));
   }
@@ -28,7 +28,7 @@ void checkSquare(IntMatrix2D A) {
  * Returns the matrix's fraction of non-zero cells;
  * <tt>A.cardinality() / A.size()</tt>.
  */
-int density(IntMatrix2D A) {
+int density(IntMatrix A) {
   return A.cardinality() ~/ A.length;
 }
 
@@ -45,7 +45,7 @@ int density(IntMatrix2D A) {
  * @return <tt>true</tt> if the matrix is equal to the value; <tt>false</tt>
  *         otherwise.
  */
-bool equalsVectorValue(final IntMatrix1D A, final int value) {
+bool equalsVectorValue(final IntVector A, final int value) {
   if (A == null) {
     return false;
   }
@@ -105,7 +105,7 @@ bool equalsVectorValue(final IntMatrix1D A, final int value) {
  * @return <tt>true</tt> if both matrices are equal; <tt>false</tt>
  *         otherwise.
  */
-bool equalsVector(final IntMatrix1D A, final IntMatrix1D B) {
+bool equalsVector(final IntVector A, final IntVector B) {
   if (identical(A, B)) {
     return true;
   }
@@ -170,7 +170,7 @@ bool equalsVector(final IntMatrix1D A, final IntMatrix1D B) {
  * @return <tt>true</tt> if the matrix is equal to the value; <tt>false</tt>
  *         otherwise.
  */
-bool equalsMatrixValue(final IntMatrix2D A, final int value) {
+bool equalsMatrixValue(final IntMatrix A, final int value) {
   if (A == null) return false;
   final int rows = A.rows;
   final int columns = A.columns;
@@ -234,7 +234,7 @@ bool equalsMatrixValue(final IntMatrix2D A, final int value) {
  * @return <tt>true</tt> if both matrices are equal; <tt>false</tt>
  *         otherwise.
  */
-bool equalsMatrix(final IntMatrix2D A, final IntMatrix2D B) {
+bool equalsMatrix(final IntMatrix A, final IntMatrix B) {
   if (identical(A, B)) {
     return true;
   }
@@ -446,7 +446,7 @@ bool equalsMatrix(final IntMatrix2D A, final IntMatrix2D B) {
  * @throws ArgumentError
  *             if <tt>!isSquare(A)</tt>.
  */
-void generateNonSingular(IntMatrix2D A) {
+void generateNonSingular(IntMatrix A) {
   checkSquare(A);
   int min = math.min(A.rows, A.columns);
   for (int i = min; --i >= 0; ) {
@@ -467,7 +467,7 @@ String _get(List list, int index) {
  * A matrix <tt>A</tt> is <i>diagonal</i> if <tt>A[i,j] == 0</tt> whenever
  * <tt>i != j</tt>. Matrix may but need not be square.
  */
-bool isDiagonal(IntMatrix2D A) {
+bool isDiagonal(IntMatrix A) {
   int rows = A.rows;
   int columns = A.columns;
   for (int row = rows; --row >= 0; ) {
@@ -488,7 +488,7 @@ bool isDiagonal(IntMatrix2D A) {
  * <p>
  * Note: Ignores tolerance.
  */
-bool isDiagonallyDominantByColumn(IntMatrix2D A) {
+bool isDiagonallyDominantByColumn(IntMatrix A) {
   int min = math.min(A.rows, A.columns);
   for (int i = min; --i >= 0; ) {
     int diag = A.get(i, i).abs();
@@ -507,7 +507,7 @@ bool isDiagonallyDominantByColumn(IntMatrix2D A) {
  * <p>
  * Note: Ignores tolerance.
  */
-bool isDiagonallyDominantByRow(IntMatrix2D A) {
+bool isDiagonallyDominantByRow(IntMatrix A) {
   int min = math.min(A.rows, A.columns);
   for (int i = min; --i >= 0; ) {
     int diag = A.get(i, i).abs();
@@ -521,7 +521,7 @@ bool isDiagonallyDominantByRow(IntMatrix2D A) {
  * A matrix <tt>A</tt> is an <i>identity</i> matrix if <tt>A[i,i] == 1</tt>
  * and all other cells are zero. Matrix may but need not be square.
  */
-bool isIdentity(IntMatrix2D A) {
+bool isIdentity(IntMatrix A) {
   int rows = A.rows;
   int columns = A.columns;
   for (int row = rows; --row >= 0; ) {
@@ -539,7 +539,7 @@ bool isIdentity(IntMatrix2D A) {
  * A matrix <tt>A</tt> is <i>lower bidiagonal</i> if <tt>A[i,j]==0</tt>
  * unless <tt>i==j || i==j+1</tt>. Matrix may but need not be square.
  */
-bool isLowerBidiagonal(IntMatrix2D A) {
+bool isLowerBidiagonal(IntMatrix A) {
   int rows = A.rows;
   int columns = A.columns;
   for (int row = rows; --row >= 0; ) {
@@ -556,7 +556,7 @@ bool isLowerBidiagonal(IntMatrix2D A) {
  * A matrix <tt>A</tt> is <i>lower triangular</i> if <tt>A[i,j]==0</tt>
  * whenever <tt>i &lt; j</tt>. Matrix may but need not be square.
  */
-bool isLowerTriangular(IntMatrix2D A) {
+bool isLowerTriangular(IntMatrix A) {
   int rows = A.rows;
   int columns = A.columns;
   for (int column = columns; --column >= 0; ) {
@@ -573,7 +573,7 @@ bool isLowerTriangular(IntMatrix2D A) {
  * <p>
  * Note: Ignores tolerance.
  */
-bool isNonNegative(IntMatrix2D A) {
+bool isNonNegative(IntMatrix A) {
   int rows = A.rows;
   int columns = A.columns;
   for (int row = rows; --row >= 0; ) {
@@ -591,7 +591,7 @@ bool isNonNegative(IntMatrix2D A) {
  * @throws ArgumentError
  *             if <tt>!isSquare(A)</tt>.
  */
-bool isOrthogonal(IntMatrix2D A) {
+bool isOrthogonal(IntMatrix A) {
   checkSquare(A);
   return equalsMatrix(A.multiply(A, null, 1, 0, false, true),
       IntFactory2D.dense.identity(A.rows));
@@ -603,7 +603,7 @@ bool isOrthogonal(IntMatrix2D A) {
  * <p>
  * Note: Ignores tolerance.
  */
-bool isPositive(IntMatrix2D A) {
+bool isPositive(IntMatrix A) {
   int rows = A.rows;
   int columns = A.columns;
   for (int row = rows; --row >= 0; ) {
@@ -618,7 +618,7 @@ bool isPositive(IntMatrix2D A) {
  * A matrix <tt>A</tt> is <i>singular</i> if it has no inverse, that is, iff
  * <tt>det(A)==0</tt>.
  */
-//    bool isSingular(IntMatrix2D A) {
+//    bool isSingular(IntMatrix A) {
 //        return !(Math.abs(IntAlgebra.DEFAULT.det(A)) >= tolerance());
 //    }
 /**
@@ -628,7 +628,7 @@ bool isPositive(IntMatrix2D A) {
  * @throws ArgumentError
  *             if <tt>!isSquare(A)</tt>.
  */
-bool isSkewSymmetric(IntMatrix2D A) {
+bool isSkewSymmetric(IntMatrix A) {
   checkSquare(A);
   int rows = A.rows;
   int columns = A.columns;
@@ -644,7 +644,7 @@ bool isSkewSymmetric(IntMatrix2D A) {
  * A matrix <tt>A</tt> is <i>square</i> if it has the same number of rows
  * and columns.
  */
-bool isSquare(IntMatrix2D A) {
+bool isSquare(IntMatrix A) {
   return A.rows == A.columns;
 }
 
@@ -653,7 +653,7 @@ bool isSquare(IntMatrix2D A) {
  * <tt>A[i,j]==0</tt> whenever <tt>i &lt;= j</tt>. Matrix may but need not
  * be square.
  */
-bool isStrictlyLowerTriangular(IntMatrix2D A) {
+bool isStrictlyLowerTriangular(IntMatrix A) {
   int rows = A.rows;
   int columns = A.columns;
   for (int column = columns; --column >= 0; ) {
@@ -668,7 +668,7 @@ bool isStrictlyLowerTriangular(IntMatrix2D A) {
  * A matrix <tt>A</tt> is <i>strictly triangular</i> if it is triangular and
  * its diagonal elements all equal 0. Matrix may but need not be square.
  */
-bool isStrictlyTriangular(IntMatrix2D A) {
+bool isStrictlyTriangular(IntMatrix A) {
   if (!isTriangular(A)) return false;
 
   for (int i = math.min(A.rows, A.columns); --i >= 0; ) {
@@ -682,7 +682,7 @@ bool isStrictlyTriangular(IntMatrix2D A) {
  * <tt>A[i,j]==0</tt> whenever <tt>i &gt;= j</tt>. Matrix may but need not
  * be square.
  */
-bool isStrictlyUpperTriangular(IntMatrix2D A) {
+bool isStrictlyUpperTriangular(IntMatrix A) {
   int rows = A.rows;
   int columns = A.columns;
   for (int column = columns; --column >= 0; ) {
@@ -700,7 +700,7 @@ bool isStrictlyUpperTriangular(IntMatrix2D A) {
  * @throws ArgumentError
  *             if <tt>!isSquare(A)</tt>.
  */
-bool isSymmetric(IntMatrix2D A) {
+bool isSymmetric(IntMatrix A) {
   checkSquare(A);
   return equalsMatrix(A, A.dice());
 }
@@ -709,7 +709,7 @@ bool isSymmetric(IntMatrix2D A) {
  * A matrix <tt>A</tt> is <i>triangular</i> iff it is either upper or lower
  * triangular. Matrix may but need not be square.
  */
-bool isTriangular(IntMatrix2D A) {
+bool isTriangular(IntMatrix A) {
   return isLowerTriangular(A) || isUpperTriangular(A);
 }
 
@@ -717,7 +717,7 @@ bool isTriangular(IntMatrix2D A) {
  * A matrix <tt>A</tt> is <i>tridiagonal</i> if <tt>A[i,j]==0</tt> whenever
  * <tt>Math.abs(i-j) > 1</tt>. Matrix may but need not be square.
  */
-bool isTridiagonal(IntMatrix2D A) {
+bool isTridiagonal(IntMatrix A) {
   int rows = A.rows;
   int columns = A.columns;
   for (int row = rows; --row >= 0; ) {
@@ -734,7 +734,7 @@ bool isTridiagonal(IntMatrix2D A) {
  * A matrix <tt>A</tt> is <i>unit triangular</i> if it is triangular and its
  * diagonal elements all equal 1. Matrix may but need not be square.
  */
-bool isUnitTriangular(IntMatrix2D A) {
+bool isUnitTriangular(IntMatrix A) {
   if (!isTriangular(A)) return false;
 
   for (int i = math.min(A.rows, A.columns); --i >= 0; ) {
@@ -747,7 +747,7 @@ bool isUnitTriangular(IntMatrix2D A) {
  * A matrix <tt>A</tt> is <i>upper bidiagonal</i> if <tt>A[i,j]==0</tt>
  * unless <tt>i==j || i==j-1</tt>. Matrix may but need not be square.
  */
-bool isUpperBidiagonal(IntMatrix2D A) {
+bool isUpperBidiagonal(IntMatrix A) {
   int rows = A.rows;
   int columns = A.columns;
   for (int row = rows; --row >= 0; ) {
@@ -764,7 +764,7 @@ bool isUpperBidiagonal(IntMatrix2D A) {
  * A matrix <tt>A</tt> is <i>upper triangular</i> if <tt>A[i,j]==0</tt>
  * whenever <tt>i &gt; j</tt>. Matrix may but need not be square.
  */
-bool isUpperTriangular(IntMatrix2D A) {
+bool isUpperTriangular(IntMatrix A) {
   int rows = A.rows;
   int columns = A.columns;
   for (int column = columns; --column >= 0; ) {
@@ -778,7 +778,7 @@ bool isUpperTriangular(IntMatrix2D A) {
 /**
  * A matrix <tt>A</tt> is <i>zero</i> if all its cells are zero.
  */
-bool isZero(IntMatrix2D A) {
+bool isZero(IntMatrix A) {
   return equalsMatrixValue(A, 0);
 }
 
@@ -793,10 +793,10 @@ bool isZero(IntMatrix2D A) {
  * @return the lower bandwith.
  * @throws ArgumentError
  *             if <tt>!isSquare(A)</tt>.
- * @see #semiBandwidth(IntMatrix2D)
- * @see #upperBandwidth(IntMatrix2D)
+ * @see #semiBandwidth(IntMatrix)
+ * @see #upperBandwidth(IntMatrix)
  */
-int lowerBandwidth(IntMatrix2D A) {
+int lowerBandwidth(IntMatrix A) {
   checkSquare(A);
   int rows = A.rows;
 
@@ -915,10 +915,10 @@ int lowerBandwidth(IntMatrix2D A) {
  * @return the semi-bandwith <tt>l</tt>.
  * @throws ArgumentError
  *             if <tt>!isSquare(A)</tt>.
- * @see #lowerBandwidth(IntMatrix2D)
- * @see #upperBandwidth(IntMatrix2D)
+ * @see #lowerBandwidth(IntMatrix)
+ * @see #upperBandwidth(IntMatrix)
  */
-int semiBandwidth(IntMatrix2D A) {
+int semiBandwidth(IntMatrix A) {
   checkSquare(A);
   int rows = A.rows;
 
@@ -967,7 +967,7 @@ int semiBandwidth(IntMatrix2D A) {
  *
  * </pre>
  */
-String toString(IntMatrix2D A) {
+String toString(IntMatrix A) {
   final names = new List();
   final values = new List();
   String unknown = "Illegal operation or error: ";
@@ -1207,10 +1207,10 @@ String toString(IntMatrix2D A) {
  * @return the upper bandwith.
  * @throws ArgumentError
  *             if <tt>!isSquare(A)</tt>.
- * @see #semiBandwidth(IntMatrix2D)
- * @see #lowerBandwidth(IntMatrix2D)
+ * @see #semiBandwidth(IntMatrix)
+ * @see #lowerBandwidth(IntMatrix)
  */
-int upperBandwidth(IntMatrix2D A) {
+int upperBandwidth(IntMatrix A) {
   checkSquare(A);
   int rows = A.rows;
 

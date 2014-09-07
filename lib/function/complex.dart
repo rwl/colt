@@ -5,19 +5,19 @@ import 'dart:typed_data';
 
 import '../math.dart';
 
-typedef Float64List DComplexDComplexDComplexFunction(Float64List x, Float64List y);
-typedef Float64List DComplexDComplexFunc(double re, double im);
-typedef Float64List DComplexDComplexFunction(Float64List x);
-typedef bool DComplexDComplexProcedure(Float64List x, Float64List y);
-typedef double DComplexDComplexRealFunction(Float64List x, Float64List y);
-typedef bool DComplexDComplexRealProcedure(Float64List x, Float64List y, double tol);
-typedef double DComplexDComplexRealRealFunction(Float64List x, Float64List y, double tol);
-typedef bool DComplexProcedure(Float64List x);
-typedef Float64List DComplexRealDComplexFunction(Float64List x, double y);
-typedef double DComplexRealFunction(Float64List x);
-typedef Float64List IntIntDComplexFunction(int x, int y, Float64List z);
-typedef Float64List RealDComplexDComplexFunction(double x, Float64List y);
-typedef Float64List RealDComplexFunction(double x);
+typedef Float64List ComplexComplexComplexFunction(Float64List x, Float64List y);
+typedef Float64List ComplexComplexFunc(double re, double im);
+typedef Float64List ComplexComplexFunction(Float64List x);
+typedef bool ComplexComplexProcedure(Float64List x, Float64List y);
+typedef double ComplexComplexRealFunction(Float64List x, Float64List y);
+typedef bool ComplexComplexRealProcedure(Float64List x, Float64List y, double tol);
+typedef double ComplexComplexRealRealFunction(Float64List x, Float64List y, double tol);
+typedef bool ComplexProcedure(Float64List x);
+typedef Float64List ComplexRealComplexFunction(Float64List x, double y);
+typedef double ComplexRealFunction(Float64List x);
+typedef Float64List IntIntComplexFunction(int x, int y, Float64List z);
+typedef Float64List RealComplexComplexFunction(double x, Float64List y);
+typedef Float64List RealComplexFunction(double x);
 
 
 /**
@@ -54,7 +54,7 @@ Float64List acos(Float64List x) {
 
   z[0] = re;
   z[1] = im;
-  z = DComplex.sqrt(z);
+  z = Complex.sqrt(z);
 
   re = -z[1];
   im = z[0];
@@ -62,7 +62,7 @@ Float64List acos(Float64List x) {
   z[0] = x[0] + re;
   z[1] = x[1] + im;
 
-  re = Math.log(DComplex.abs(z));
+  re = Math.log(Complex.abs(z));
   im = Math.atan2(z[1], z[0]);
 
   z[0] = im;
@@ -80,7 +80,7 @@ Float64List _acos(double re, double im) {
 
   z[0] = re2;
   z[1] = im2;
-  z = DComplex.sqrt(z);
+  z = Complex.sqrt(z);
 
   re2 = -z[1];
   im2 = z[0];
@@ -88,7 +88,7 @@ Float64List _acos(double re, double im) {
   z[0] = re + re2;
   z[1] = im + im2;
 
-  re2 = Math.log(DComplex.abs(z));
+  re2 = Math.log(Complex.abs(z));
   im2 = Math.atan2(z[1], z[0]);
 
   z[0] = im2;
@@ -110,7 +110,7 @@ Float64List asin(Float64List x) {
 
   z[0] = re;
   z[1] = im;
-  z = DComplex.sqrt(z);
+  z = Complex.sqrt(z);
 
   re = -z[1];
   im = z[0];
@@ -118,7 +118,7 @@ Float64List asin(Float64List x) {
   z[0] = z[0] + re;
   z[1] = z[1] + im;
 
-  re = Math.log(DComplex.abs(z));
+  re = Math.log(Complex.abs(z));
   im = Math.atan2(z[1], z[0]);
 
   z[0] = im;
@@ -136,7 +136,7 @@ Float64List _asin(double re, double im) {
 
   z[0] = re2;
   z[1] = im2;
-  z = DComplex.sqrt(z);
+  z = Complex.sqrt(z);
 
   re2 = -z[1];
   im2 = z[0];
@@ -144,7 +144,7 @@ Float64List _asin(double re, double im) {
   z[0] = z[0] + re2;
   z[1] = z[1] + im2;
 
-  re2 = Math.log(DComplex.abs(z));
+  re2 = Math.log(Complex.abs(z));
   im2 = Math.atan2(z[1], z[0]);
 
   z[0] = im2;
@@ -163,9 +163,9 @@ Float64List atan(Float64List x) {
   re = x[0];
   im = 1.0 + x[1];
 
-  z = DComplex.div(z, re, im);
+  z = Complex.div(z, re, im);
 
-  re = Math.log(DComplex.abs(z));
+  re = Math.log(Complex.abs(z));
   im = Math.atan2(z[1], z[0]);
 
   z[0] = 0.5 * im;
@@ -185,9 +185,9 @@ Float64List _atan(double re, double im) {
   re2 = re;
   im2 = 1.0 + im;
 
-  z = DComplex.div(z, re2, im2);
+  z = Complex.div(z, re2, im2);
 
-  re2 = Math.log(DComplex.abs(z));
+  re2 = Math.log(Complex.abs(z));
   im2 = Math.atan2(z[1], z[0]);
 
   z[0] = 0.5 * im2;
@@ -323,15 +323,15 @@ Float64List _inv(double re, double im) {
 
 Float64List log(Float64List x) {
   Float64List z = new Float64List(2);
-  z[0] = Math.log(DComplex.abs(x));
-  z[1] = DComplex.arg(x);
+  z[0] = Math.log(Complex.abs(x));
+  z[1] = Complex.arg(x);
   return z;
 }
 
 Float64List _log(double re, double im) {
   Float64List z = new Float64List(2);
-  z[0] = Math.log(DComplex.abs_(re, im));
-  z[1] = DComplex.arg_(re, im);
+  z[0] = Math.log(Complex.abs_(re, im));
+  z[1] = Complex.arg_(re, im);
   return z;
 }
 
@@ -397,7 +397,7 @@ Float64List _sin(double re, double im) {
 
 Float64List sqrt(Float64List x) {
   Float64List z = new Float64List(2);
-  double absx = DComplex.abs(x);
+  double absx = Complex.abs(x);
   double tmp;
   if (absx > 0.0) {
     if (x[0] > 0.0) {
@@ -421,7 +421,7 @@ Float64List sqrt(Float64List x) {
 
 Float64List _sqrt(double re, double im) {
   Float64List z = new Float64List(2);
-  double absx = DComplex.abs_(re, im);
+  double absx = Complex.abs_(re, im);
   double tmp;
   if (absx > 0.0) {
     if (re > 0.0) {
@@ -487,7 +487,7 @@ Float64List tan(Float64List x) {
   cs_re = 0.5 * re3;
   cs_im = 0.5 * im3;
 
-  z = DComplex.div(z, cs_re, cs_im);
+  z = Complex.div(z, cs_re, cs_im);
 
   return z;
 }
@@ -522,7 +522,7 @@ Float64List _tan(double re, double im) {
   cs_re = 0.5 * re3;
   cs_im = 0.5 * im3;
 
-  z = DComplex.div(z, cs_re, cs_im);
+  z = Complex.div(z, cs_re, cs_im);
 
   return z;
 }
@@ -555,7 +555,7 @@ Float64List div(Float64List x, Float64List y) {
 }
 
 double equals(Float64List x, Float64List y, double tol) {
-  if (DComplex.abs_(x[0] - y[0], x[1] - y[1]) <= tol.abs()) {
+  if (Complex.abs_(x[0] - y[0], x[1] - y[1]) <= tol.abs()) {
     return 1.0;
   } else {
     return 0.0;
@@ -563,7 +563,7 @@ double equals(Float64List x, Float64List y, double tol) {
 }
 
 bool isEqual(Float64List x, Float64List y, double tol) {
-  if (DComplex.abs_(x[0] - y[0], x[1] - y[1]) <= tol.abs()) {
+  if (Complex.abs_(x[0] - y[0], x[1] - y[1]) <= tol.abs()) {
     return true;
   } else {
     return false;
@@ -607,8 +607,8 @@ Float64List plus(Float64List x, Float64List y) {
 
 Float64List pow1(Float64List x, double y) {
   Float64List z = new Float64List(2);
-  double re = (y * Math.log(DComplex.abs(x)));
-  double im = y * DComplex.arg(x);
+  double re = (y * Math.log(Complex.abs(x)));
+  double im = y * Complex.arg(x);
   double scalar = Math.exp(re);
   z[0] = (scalar * Math.cos(im));
   z[1] = (scalar * Math.sin(im));
@@ -632,8 +632,8 @@ Float64List pow2(double x, Float64List y) {
 
 Float64List pow3(Float64List x, Float64List y) {
   Float64List z = new Float64List(2);
-  double re = Math.log(DComplex.abs(x));
-  double im = DComplex.arg(x);
+  double re = Math.log(Complex.abs(x));
+  double im = Complex.arg(x);
 
   double re2 = (re * y[0]) - (im * y[1]);
   double im2 = (re * y[1]) + (im * y[0]);
@@ -645,7 +645,7 @@ Float64List pow3(Float64List x, Float64List y) {
   return z;
 }
 
-DComplexDComplexFunction bindArg1(final DComplexDComplexDComplexFunction function, final Float64List c) {
+ComplexComplexFunction bindArg1(final ComplexComplexComplexFunction function, final Float64List c) {
   return (Float64List v) {
     return function(c, v);
   };
@@ -657,7 +657,7 @@ DComplexDComplexFunction bindArg1(final DComplexDComplexDComplexFunction functio
 //    };
 //}
 
-DComplexDComplexFunction bindArg2(final DComplexDComplexDComplexFunction function, final Float64List c) {
+ComplexComplexFunction bindArg2(final ComplexComplexComplexFunction function, final Float64List c) {
   return (Float64List v) {
     return function(v, c);
   };
@@ -669,19 +669,19 @@ DComplexDComplexFunction bindArg2(final DComplexDComplexDComplexFunction functio
 //    };
 //}
 
-DComplexDComplexDComplexFunction chain(final DComplexDComplexDComplexFunction f, final DComplexDComplexFunction g, final DComplexDComplexFunction h) {
+ComplexComplexComplexFunction chain(final ComplexComplexComplexFunction f, final ComplexComplexFunction g, final ComplexComplexFunction h) {
   return (Float64List x, Float64List y) {
     return f(g(x), h(y));
   };
 }
 
-DComplexDComplexDComplexFunction chain2(final DComplexDComplexFunction g, final DComplexDComplexDComplexFunction h) {
+ComplexComplexComplexFunction chain2(final ComplexComplexFunction g, final ComplexComplexComplexFunction h) {
   return (Float64List x, Float64List y) {
     return g(h(x, y));
   };
 }
 
-DComplexDComplexFunction chain3(final DComplexDComplexFunction g, final DComplexDComplexFunction h) {
+ComplexComplexFunction chain3(final ComplexComplexFunction g, final ComplexComplexFunction h) {
   return (Float64List x) {
     return g(h(x));
   };
@@ -692,7 +692,7 @@ DComplexDComplexFunction chain3(final DComplexDComplexFunction g, final DComplex
   //    };
 }
 
-DComplexDComplexFunction constant(final Float64List c) {
+ComplexComplexFunction constant(final Float64List c) {
   return (Float64List x) {
     return c;
   };
@@ -703,16 +703,16 @@ DComplexDComplexFunction constant(final Float64List c) {
   //    };
 }
 
-DComplexDComplexFunction divide(final Float64List b) {
-  return multiply(DComplex.inv(b));
+ComplexComplexFunction divide(final Float64List b) {
+  return multiply(Complex.inv(b));
 }
 
-DComplexDComplexFunction divideBy(final double b) {
+ComplexComplexFunction divideBy(final double b) {
   Float64List tmp = new Float64List.fromList([b, 0]);
-  return multiply(DComplex.inv(tmp));
+  return multiply(Complex.inv(tmp));
 }
 
-DComplexRealFunction equalTo(final Float64List y) {
+ComplexRealFunction equalTo(final Float64List y) {
   return (Float64List x) {
     if (x[0] == y[0] && x[1] == y[1]) {
       return 1;
@@ -722,7 +722,7 @@ DComplexRealFunction equalTo(final Float64List y) {
   };
 }
 
-DComplexProcedure isEqualTo(final Float64List y) {
+ComplexProcedure isEqualTo(final Float64List y) {
   return (Float64List x) {
     if (x[0] == y[0] && x[1] == y[1]) {
       return true;
@@ -732,29 +732,29 @@ DComplexProcedure isEqualTo(final Float64List y) {
   };
 }
 
-DComplexDComplexFunction subtract(final Float64List x) {
+ComplexComplexFunction subtract(final Float64List x) {
   Float64List negb = new Float64List(2);
   negb[0] = -x[0];
   negb[1] = -x[1];
   return add(negb);
 }
 
-DComplexDComplexDComplexFunction minusMult(final Float64List constant) {
+ComplexComplexComplexFunction minusMult(final Float64List constant) {
   Float64List negconstant = new Float64List(2);
   negconstant[0] = -constant[0];
   negconstant[1] = -constant[1];
   return plusMultSecond(negconstant);
 }
 
-DComplexDComplexFunction multiply(final Float64List x) {
-  return new DComplexMult(x);
+ComplexComplexFunction multiply(final Float64List x) {
+  return new ComplexMult(x);
 }
 
-DComplexDComplexFunction multiplyBy(final double x) {
-  return new DComplexMult(new Float64List.fromList([x, 0]));
+ComplexComplexFunction multiplyBy(final double x) {
+  return new ComplexMult(new Float64List.fromList([x, 0]));
 }
 
-DComplexDComplexFunction add(final Float64List y) {
+ComplexComplexFunction add(final Float64List y) {
   return (Float64List x) {
     Float64List z = new Float64List(2);
     z[0] = x[0] + y[0];
@@ -771,19 +771,19 @@ DComplexDComplexFunction add(final Float64List y) {
   //    };
 }
 
-DComplexDComplexDComplexFunction plusMultSecond(Float64List constant) {
-  return new DComplexPlusMultSecond(constant);
+ComplexComplexComplexFunction plusMultSecond(Float64List constant) {
+  return new ComplexPlusMultSecond(constant);
 }
 
-DComplexDComplexDComplexFunction plusMultFirst(Float64List constant) {
-  return new DComplexPlusMultFirst(constant);
+ComplexComplexComplexFunction plusMultFirst(Float64List constant) {
+  return new ComplexPlusMultFirst(constant);
 }
 
-DComplexDComplexFunction power1(final double y) {
+ComplexComplexFunction power1(final double y) {
   return (Float64List x) {
     Float64List z = new Float64List(2);
-    double re = (y * Math.log(DComplex.abs(x)));
-    double im = y * DComplex.arg(x);
+    double re = (y * Math.log(Complex.abs(x)));
+    double im = y * Complex.arg(x);
     double scalar = Math.exp(re);
     z[0] = (scalar * Math.cos(im));
     z[1] = (scalar * Math.sin(im));
@@ -792,8 +792,8 @@ DComplexDComplexFunction power1(final double y) {
 
   //        final Float64List apply(double re, double im) {
   //            Float64List z = new Float64List(2);
-  //            double re2 = (y * Math.log(DComplex.abs(re, im)));
-  //            double im2 = y * DComplex.arg(re, im);
+  //            double re2 = (y * Math.log(Complex.abs(re, im)));
+  //            double im2 = y * Complex.arg(re, im);
   //            double scalar = Math.exp(re2);
   //            z[0] = (scalar * Math.cos(im2));
   //            z[1] = (scalar * Math.sin(im2));
@@ -802,7 +802,7 @@ DComplexDComplexFunction power1(final double y) {
   //    };
 }
 
-RealDComplexFunction power2(final Float64List y) {
+RealComplexFunction power2(final Float64List y) {
   return (double x) {
     Float64List z = new Float64List(2);
     double re = Math.log(x.abs());
@@ -819,11 +819,11 @@ RealDComplexFunction power2(final Float64List y) {
   };
 }
 
-DComplexDComplexFunction power3(final Float64List y) {
+ComplexComplexFunction power3(final Float64List y) {
   return (Float64List x) {
     Float64List z = new Float64List(2);
-    double re = Math.log(DComplex.abs(x));
-    double im = DComplex.arg(x);
+    double re = Math.log(Complex.abs(x));
+    double im = Complex.arg(x);
 
     double re2 = (re * y[0]) - (im * y[1]);
     double im2 = (re * y[1]) + (im * y[0]);
@@ -837,8 +837,8 @@ DComplexDComplexFunction power3(final Float64List y) {
 
   //        final Float64List apply(double re, double im) {
   //            Float64List z = new Float64List(2);
-  //            double re1 = (double) Math.log(DComplex.abs(re, im));
-  //            double im1 = DComplex.arg(re, im);
+  //            double re1 = (double) Math.log(Complex.abs(re, im));
+  //            double im1 = Complex.arg(re, im);
   //
   //            double re2 = (re1 * y[0]) - (im1 * y[1]);
   //            double im2 = (re1 * y[1]) + (im1 * y[0]);
@@ -862,7 +862,7 @@ Float64List _random(double re, double im) {
   return new Float64List.fromList([r.nextDouble(), r.nextDouble()]);
 }
 
-DComplexDComplexDComplexFunction swapArgs(final DComplexDComplexDComplexFunction function) {
+ComplexComplexComplexFunction swapArgs(final ComplexComplexComplexFunction function) {
   return (Float64List x, Float64List y) {
     return function(y, x);
   };
@@ -880,13 +880,13 @@ DComplexDComplexDComplexFunction swapArgs(final DComplexDComplexDComplexFunction
  * reasons publicly accessible. Intended to be passed to
  * <tt>matrix.assign(function)</tt> methods.
  */
-class DComplexMult {//implements cern.colt.function.tdcomplex.DComplexDComplexFunction {
+class ComplexMult {//implements cern.colt.function.tdcomplex.ComplexComplexFunction {
   /**
    * Public read/write access to avoid frequent object construction.
    */
   Float64List multiplicator;
 
-  DComplexMult(final Float64List multiplicator) {
+  ComplexMult(final Float64List multiplicator) {
     this.multiplicator = multiplicator;
   }
 
@@ -913,15 +913,15 @@ class DComplexMult {//implements cern.colt.function.tdcomplex.DComplexDComplexFu
   /**
    * <tt>a / constant</tt>.
    */
-  static DComplexMult div(final Float64List constant) {
-    return mult(DComplex.inv(constant));
+  static ComplexMult div(final Float64List constant) {
+    return mult(Complex.inv(constant));
   }
 
   /**
    * <tt>a * constant</tt>.
    */
-  static DComplexMult mult(final Float64List constant) {
-    return new DComplexMult(constant);
+  static ComplexMult mult(final Float64List constant) {
+    return new ComplexMult(constant);
   }
 }
 
@@ -938,7 +938,7 @@ class DComplexMult {//implements cern.colt.function.tdcomplex.DComplexDComplexFu
  * performance reasons publicly accessible. Intended to be passed to
  * <tt>matrix.assign(otherMatrix,function)</tt> methods.
  */
-class DComplexPlusMultFirst {//implements cern.colt.function.tdcomplex.DComplexDComplexDComplexFunction {
+class ComplexPlusMultFirst {//implements cern.colt.function.tdcomplex.ComplexComplexComplexFunction {
   /**
    * Public read/write access to avoid frequent object construction.
    */
@@ -947,7 +947,7 @@ class DComplexPlusMultFirst {//implements cern.colt.function.tdcomplex.DComplexD
   /**
    * Insert the method's description here. Creation date: (8/10/99 19:12:09)
    */
-  DComplexPlusMultFirst(final Float64List multiplicator) {
+  ComplexPlusMultFirst(final Float64List multiplicator) {
     this.multiplicator = multiplicator;
   }
 
@@ -966,29 +966,29 @@ class DComplexPlusMultFirst {//implements cern.colt.function.tdcomplex.DComplexD
   /**
    * <tt>a - b/constant</tt>.
    */
-  static DComplexPlusMultFirst minusDiv(final Float64List constant) {
-    return new DComplexPlusMultFirst(DComplex.neg(DComplex.inv(constant)));
+  static ComplexPlusMultFirst minusDiv(final Float64List constant) {
+    return new ComplexPlusMultFirst(Complex.neg(Complex.inv(constant)));
   }
 
   /**
    * <tt>a - b*constant</tt>.
    */
-  static DComplexPlusMultFirst minusMult(final Float64List constant) {
-    return new DComplexPlusMultFirst(DComplex.neg(constant));
+  static ComplexPlusMultFirst minusMult(final Float64List constant) {
+    return new ComplexPlusMultFirst(Complex.neg(constant));
   }
 
   /**
    * <tt>a + b/constant</tt>.
    */
-  static DComplexPlusMultFirst plusDiv(final Float64List constant) {
-    return new DComplexPlusMultFirst(DComplex.inv(constant));
+  static ComplexPlusMultFirst plusDiv(final Float64List constant) {
+    return new ComplexPlusMultFirst(Complex.inv(constant));
   }
 
   /**
    * <tt>a + b*constant</tt>.
    */
-  static DComplexPlusMultFirst plusMult(final Float64List constant) {
-    return new DComplexPlusMultFirst(constant);
+  static ComplexPlusMultFirst plusMult(final Float64List constant) {
+    return new ComplexPlusMultFirst(constant);
   }
 }
 
@@ -1005,7 +1005,7 @@ class DComplexPlusMultFirst {//implements cern.colt.function.tdcomplex.DComplexD
  * performance reasons publicly accessible. Intended to be passed to
  * <tt>matrix.assign(otherMatrix,function)</tt> methods.
  */
-class DComplexPlusMultSecond {//implements cern.colt.function.tdcomplex.DComplexDComplexDComplexFunction {
+class ComplexPlusMultSecond {//implements cern.colt.function.tdcomplex.ComplexComplexComplexFunction {
   /**
    * Public read/write access to avoid frequent object construction.
    */
@@ -1014,7 +1014,7 @@ class DComplexPlusMultSecond {//implements cern.colt.function.tdcomplex.DComplex
   /**
    * Insert the method's description here. Creation date: (8/10/99 19:12:09)
    */
-  DComplexPlusMultSecond(final Float64List multiplicator) {
+  ComplexPlusMultSecond(final Float64List multiplicator) {
     this.multiplicator = multiplicator;
   }
 
@@ -1033,28 +1033,28 @@ class DComplexPlusMultSecond {//implements cern.colt.function.tdcomplex.DComplex
   /**
    * <tt>a - b/constant</tt>.
    */
-  static DComplexPlusMultSecond minusDiv(final Float64List constant) {
-    return new DComplexPlusMultSecond(DComplex.neg(DComplex.inv(constant)));
+  static ComplexPlusMultSecond minusDiv(final Float64List constant) {
+    return new ComplexPlusMultSecond(Complex.neg(Complex.inv(constant)));
   }
 
   /**
    * <tt>a - b*constant</tt>.
    */
-  static DComplexPlusMultSecond minusMult(final Float64List constant) {
-    return new DComplexPlusMultSecond(DComplex.neg(constant));
+  static ComplexPlusMultSecond minusMult(final Float64List constant) {
+    return new ComplexPlusMultSecond(Complex.neg(constant));
   }
 
   /**
    * <tt>a + b/constant</tt>.
    */
-  static DComplexPlusMultSecond plusDiv(final Float64List constant) {
-    return new DComplexPlusMultSecond(DComplex.inv(constant));
+  static ComplexPlusMultSecond plusDiv(final Float64List constant) {
+    return new ComplexPlusMultSecond(Complex.inv(constant));
   }
 
   /**
    * <tt>a + b*constant</tt>.
    */
-  static DComplexPlusMultSecond plusMult(final Float64List constant) {
-    return new DComplexPlusMultSecond(constant);
+  static ComplexPlusMultSecond plusMult(final Float64List constant) {
+    return new ComplexPlusMultSecond(constant);
   }
 }

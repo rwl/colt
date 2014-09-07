@@ -214,7 +214,7 @@ class DoubleConstants {
  * @author Piotr Wendykier (piotr.wendykier@gmail.com)
  *
  */
-class DComplex extends DoubleConstants {
+class Complex extends DoubleConstants {
 
     static double abs(Float64List x) {
         double absX = x[0].abs();
@@ -610,6 +610,6 @@ class DComplex extends DoubleConstants {
      * Makes this class non instantiable, but still let's others inherit from
      * it.
      */
-    DComplex._internal();
+    Complex._internal();
 
 }
