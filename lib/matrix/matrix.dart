@@ -57,6 +57,10 @@ part 'int/abstract_int_vector.dart';
 part 'int/abstract_int_matrix.dart';
 part 'int/int_vector.dart';
 part 'int/int_matrix.dart';
+part 'int/sparse_int_vector.dart';
+part 'int/sparse_int_matrix.dart';
+part 'int/wrapper_int_matrix.dart';
+part 'int/diagonal_int_matrix.dart';
 
 part 'double/factory.dart';
 part 'int/factory.dart';

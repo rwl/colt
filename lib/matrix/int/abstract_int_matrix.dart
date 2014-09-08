@@ -778,7 +778,7 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
    *
    * @return cardinality
    */
-  int cardinality() {
+  int get cardinality {
     int cardinality = 0;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_rows * _columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {

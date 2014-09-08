@@ -1005,7 +1005,7 @@ class IntMatrix extends AbstractIntMatrix {
     //}
   }
 
-  int cardinality() {
+  int get cardinality {
     int cardinality = 0;
     //int nthreads = ConcurrencyUtils.getNumberOfThreads();
     final int zero = index(0, 0);

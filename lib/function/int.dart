@@ -505,14 +505,14 @@ class IntMult {
   /**
    * <tt>a / constant</tt>.
    */
-  IntMult div(final int constant) {
-    return mult(1 ~/ constant);
+  factory IntMult.div(final int constant) {
+    return new IntMult.mult(1 ~/ constant);
   }
 
   /**
    * <tt>a * constant</tt>.
    */
-  IntMult mult(final int constant) {
+  factory IntMult.mult(final int constant) {
     return new IntMult(constant);
   }
 }
@@ -551,14 +551,14 @@ class IntPlusMultFirst {
   /**
    * <tt>a - b*constant</tt>.
    */
-  IntPlusMultFirst minusMult(final int constant) {
+  factory IntPlusMultFirst.minusMult(final int constant) {
     return new IntPlusMultFirst(-constant);
   }
 
   /**
    * <tt>a + b*constant</tt>.
    */
-  IntPlusMultFirst plusMult(final int constant) {
+  factory IntPlusMultFirst.plusMult(final int constant) {
     return new IntPlusMultFirst(constant);
   }
 }
@@ -597,14 +597,14 @@ class IntPlusMultSecond {
   /**
    * <tt>a - b*constant</tt>.
    */
-  IntPlusMultSecond minusMult(final int constant) {
+  factory IntPlusMultSecond.minusMult(final int constant) {
     return new IntPlusMultSecond(-constant);
   }
 
   /**
    * <tt>a + b*constant</tt>.
    */
-  IntPlusMultSecond plusMult(final int constant) {
+  factory IntPlusMultSecond.plusMult(final int constant) {
     return new IntPlusMultSecond(constant);
   }
 }
