@@ -78,8 +78,8 @@ class DiagonalComplexMatrixTest extends ComplexMatrixTest {
   }
 
   void testAssignImaginary() {
-    DoubleMatrix Im = DoubleFactory2D.dense.random(A.rows, A.columns);
-    ComplexMatrix Acopy = A.copy();
+    AbstractDoubleMatrix Im = DoubleFactory2D.dense.random(A.rows, A.columns);
+    AbstractComplexMatrix Acopy = A.copy();
     A.setImaginary(Im);
     if (DINDEX >= 0) {
       for (int r = 0; r < DLENGTH; r++) {
@@ -95,8 +95,8 @@ class DiagonalComplexMatrixTest extends ComplexMatrixTest {
   }
 
   void testAssignReal() {
-    DoubleMatrix Re = DoubleFactory2D.dense.random(A.rows, A.columns);
-    ComplexMatrix Acopy = A.copy();
+    AbstractDoubleMatrix Re = DoubleFactory2D.dense.random(A.rows, A.columns);
+    AbstractComplexMatrix Acopy = A.copy();
     A.setReal(Re);
     if (DINDEX >= 0) {
       for (int r = 0; r < DLENGTH; r++) {
@@ -135,7 +135,7 @@ class DiagonalComplexMatrixTest extends ComplexMatrixTest {
   }
 
   void testAssign() {
-    ComplexMatrix Acopy = A.copy();
+    AbstractComplexMatrix Acopy = A.copy();
     A.forEach(acos);
     if (DINDEX >= 0) {
       for (int r = 0; r < DLENGTH; r++) {
@@ -153,7 +153,7 @@ class DiagonalComplexMatrixTest extends ComplexMatrixTest {
   }
 
   void testAssignFunc() {
-    ComplexMatrix Acopy = A.copy();
+    AbstractComplexMatrix Acopy = A.copy();
     A.forEachMatrix(B, div);
     if (DINDEX >= 0) {
       for (int r = 0; r < DLENGTH; r++) {
@@ -176,7 +176,7 @@ class DiagonalComplexMatrixTest extends ComplexMatrixTest {
         rowList.add(r);
         columnList.add(r + DINDEX);
       }
-      ComplexMatrix Acopy = A.copy();
+      AbstractComplexMatrix Acopy = A.copy();
       A.forEachMatrixRange(B, div, rowList, columnList);
       for (int r = 0; r < DLENGTH; r++) {
         expect(Complex.div_(Acopy.get(r, r + DINDEX), B.get(r, r + DINDEX))[0], closeTo(A.get(r, r + DINDEX)[0], TOL));
@@ -187,7 +187,7 @@ class DiagonalComplexMatrixTest extends ComplexMatrixTest {
         rowList.add(r - DINDEX);
         columnList.add(r);
       }
-      ComplexMatrix Acopy = A.copy();
+      AbstractComplexMatrix Acopy = A.copy();
       A.forEachMatrixRange(B, div, rowList, columnList);
       for (int r = 0; r < DLENGTH; r++) {
         expect(Complex.div_(Acopy.get(r - DINDEX, r), B.get(r - DINDEX, r))[0], closeTo(A.get(r - DINDEX, r)[0], TOL));
@@ -253,7 +253,7 @@ class DiagonalComplexMatrixTest extends ComplexMatrixTest {
   }
 
   void testVectorize() {
-    ComplexVector Avec = A.vectorize();
+    AbstractComplexVector Avec = A.vectorize();
     int idx = 0;
     for (int c = 0; c < NCOLUMNS; c++) {
       for (int r = 0; r < NROWS; r++) {
@@ -263,7 +263,7 @@ class DiagonalComplexMatrixTest extends ComplexMatrixTest {
   }
 
   void testViewColumn() {
-    ComplexVector col = A.column(NCOLUMNS ~/ 2);
+    AbstractComplexVector col = A.column(NCOLUMNS ~/ 2);
     expect(NROWS, equals(col.length));
     for (int r = 0; r < NROWS; r++) {
       assertEquals(A.get(r, NCOLUMNS ~/ 2), col.get(r), TOL);
@@ -271,7 +271,7 @@ class DiagonalComplexMatrixTest extends ComplexMatrixTest {
   }
 
   void testViewColumnFlip() {
-    ComplexMatrix B = A.columnFlip();
+    AbstractComplexMatrix B = A.columnFlip();
     expect(A.length, equals(B.length));
     for (int r = 0; r < NROWS; r++) {
       for (int c = 0; c < NCOLUMNS; c++) {
@@ -281,7 +281,7 @@ class DiagonalComplexMatrixTest extends ComplexMatrixTest {
   }
 
   void testViewDice() {
-    ComplexMatrix B = A.dice();
+    AbstractComplexMatrix B = A.dice();
     expect(NROWS, equals(B.columns));
     expect(NCOLUMNS, equals(B.rows));
     for (int r = 0; r < NROWS; r++) {
@@ -292,7 +292,7 @@ class DiagonalComplexMatrixTest extends ComplexMatrixTest {
   }
 
   void testViewPart() {
-    ComplexMatrix B = A.part(NROWS ~/ 2, NCOLUMNS ~/ 2, NROWS ~/ 3, NCOLUMNS ~/ 3);
+    AbstractComplexMatrix B = A.part(NROWS ~/ 2, NCOLUMNS ~/ 2, NROWS ~/ 3, NCOLUMNS ~/ 3);
     expect(NROWS ~/ 3, equals(B.rows));
     expect(NCOLUMNS ~/ 3, equals(B.columns));
     for (int r = 0; r < NROWS ~/ 3; r++) {
@@ -303,7 +303,7 @@ class DiagonalComplexMatrixTest extends ComplexMatrixTest {
   }
 
   void testViewRow() {
-    ComplexVector B = A.row(NROWS ~/ 2);
+    AbstractComplexVector B = A.row(NROWS ~/ 2);
     expect(NCOLUMNS, equals(B.length));
     for (int r = 0; r < NCOLUMNS; r++) {
       assertEquals(A.get(NROWS ~/ 2, r), B.get(r), TOL);
@@ -311,7 +311,7 @@ class DiagonalComplexMatrixTest extends ComplexMatrixTest {
   }
 
   void testViewRowFlip() {
-    ComplexMatrix B = A.rowFlip();
+    AbstractComplexMatrix B = A.rowFlip();
     expect(A.length, equals(B.length));
     for (int r = 0; r < NROWS; r++) {
       for (int c = 0; c < NCOLUMNS; c++) {
@@ -326,7 +326,7 @@ class DiagonalComplexMatrixTest extends ComplexMatrixTest {
     if (DINDEX >= 0) {
       A.set(NROWS ~/ 4, NROWS ~/ 4 + DINDEX, value);
       A.set(NROWS ~/ 2, NROWS ~/ 2 + DINDEX, value);
-      ComplexMatrix B = A.where((ComplexVector element) {
+      AbstractComplexMatrix B = A.where((ComplexVector element) {
         if (Complex.abs(Complex.minus(element.get(NROWS ~/ 4 + DINDEX), value)) < TOL) {
           return true;
         } else {
@@ -339,7 +339,7 @@ class DiagonalComplexMatrixTest extends ComplexMatrixTest {
     } else {
       A.set(NROWS ~/ 4 - DINDEX, NROWS ~/ 4, value);
       A.set(NROWS ~/ 2 - DINDEX, NROWS ~/ 2, value);
-      ComplexMatrix B = A.where((ComplexVector element) {
+      AbstractComplexMatrix B = A.where((ComplexVector element) {
         if (Complex.abs(Complex.minus(element.get(NROWS ~/ 4), value)) < TOL) {
           return true;
         } else {
@@ -355,7 +355,7 @@ class DiagonalComplexMatrixTest extends ComplexMatrixTest {
   void testViewSelection() {
     Int32List rowIndexes = new Int32List.fromList([NROWS ~/ 6, NROWS ~/ 5, NROWS ~/ 4, NROWS ~/ 3, NROWS ~/ 2]);
     Int32List colIndexes = new Int32List.fromList([NROWS ~/ 6, NROWS ~/ 5, NROWS ~/ 4, NROWS ~/ 3, NROWS ~/ 2, NROWS - 1]);
-    ComplexMatrix B = A.select(rowIndexes, colIndexes);
+    AbstractComplexMatrix B = A.select(rowIndexes, colIndexes);
     expect(rowIndexes.length, equals(B.rows));
     expect(colIndexes.length, equals(B.columns));
     for (int r = 0; r < rowIndexes.length; r++) {
@@ -368,7 +368,7 @@ class DiagonalComplexMatrixTest extends ComplexMatrixTest {
   void testViewStrides() {
     int rowStride = 3;
     int colStride = 5;
-    ComplexMatrix B = A.strides(rowStride, colStride);
+    AbstractComplexMatrix B = A.strides(rowStride, colStride);
     for (int r = 0; r < B.rows; r++) {
       for (int c = 0; c < B.columns; c++) {
         assertEquals(A.get(r * rowStride, c * colStride), B.get(r, c), TOL);
@@ -379,7 +379,7 @@ class DiagonalComplexMatrixTest extends ComplexMatrixTest {
   void testZMult2D() {
     Float64List alpha = new Float64List.fromList([3.0, 4.0]);
     Float64List beta = new Float64List.fromList([5.0, 6.0]);
-    ComplexMatrix C = new DiagonalComplexMatrix(NROWS, NROWS, 0);
+    AbstractComplexMatrix C = new DiagonalComplexMatrix(NROWS, NROWS, 0);
     for (int i = 0; i < DLENGTH; i++) {
       C.setParts(i, i, random.nextDouble(), random.nextDouble());
     }

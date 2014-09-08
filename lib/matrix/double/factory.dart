@@ -43,9 +43,9 @@ class DoubleFactory1D {
    * C = A||B; Constructs a new matrix which is the concatenation of two other
    * matrices. Example: <tt>0 1</tt> append <tt>3 4</tt> --> <tt>0 1 3 4</tt>.
    */
-  DoubleVector append(DoubleVector A, DoubleVector B) {
+  AbstractDoubleVector append(AbstractDoubleVector A, AbstractDoubleVector B) {
     // concatenate
-    DoubleVector matrix = make(A.length + B.length);
+    AbstractDoubleVector matrix = make(A.length + B.length);
     matrix.part(0, A.length).setAll(A);
     matrix.part(A.length, B.length).setAll(B);
     return matrix;
@@ -55,7 +55,7 @@ class DoubleFactory1D {
    * Constructs a matrix with cells having ascending values. For debugging
    * purposes. Example: <tt>0 1 2</tt>
    */
-  DoubleVector ascending(int size) {
+  AbstractDoubleVector ascending(int size) {
     return descending(size).forEach(func.chainGH(func.neg, func.subtract(size)));
   }
 
@@ -63,8 +63,8 @@ class DoubleFactory1D {
    * Constructs a matrix with cells having descending values. For debugging
    * purposes. Example: <tt>2 1 0</tt>
    */
-  DoubleVector descending(int size) {
-    DoubleVector matrix = make(size);
+  AbstractDoubleVector descending(int size) {
+    AbstractDoubleVector matrix = make(size);
     double v = 0.0;
     for (int i = size; --i >= 0; ) {
       matrix.set(i, v);
@@ -82,9 +82,9 @@ class DoubleFactory1D {
    *            The values to be filled into the new matrix.
    * @return a new matrix.
    */
-  DoubleVector makeList(List<double> values) {
+  AbstractDoubleVector makeList(List<double> values) {
     int size = values.length;
-    DoubleVector vector = make(size);
+    AbstractDoubleVector vector = make(size);
     for (int i = size; --i >= 0; ) {
       vector.set(i, values[i]);
     }
@@ -99,11 +99,11 @@ class DoubleFactory1D {
    * @param values
    *            The values to be filled into the new matrix.
    */
-  DoubleVector makeValues(Float64List values) {
+  AbstractDoubleVector makeValues(Float64List values) {
     if (this == sparse) {
       return new SparseDoubleVector.SparseDoubleVector(values);
     } else {
-      return new DenseDoubleVector.DenseDoubleVector(values);
+      return new DoubleVector.DenseDoubleVector(values);
     }
   }
 
@@ -111,13 +111,13 @@ class DoubleFactory1D {
    * Constructs a matrix which is the concatenation of all given parts. Cells
    * are copied.
    */
-  DoubleVector makeParts(List<DoubleVector> parts) {
+  AbstractDoubleVector makeParts(List<AbstractDoubleVector> parts) {
     if (parts.length == 0) return make(0);
 
     int size = 0;
     for (int i = 0; i < parts.length; i++) size += parts[i].length;
 
-    DoubleVector vector = make(size);
+    AbstractDoubleVector vector = make(size);
     size = 0;
     for (int i = 0; i < parts.length; i++) {
       vector.part(size, parts[i].length).setAll(parts[i]);
@@ -131,18 +131,18 @@ class DoubleFactory1D {
    * Constructs a matrix with the given shape, each cell initialized with
    * zero.
    */
-  DoubleVector make(int size) {
+  AbstractDoubleVector make(int size) {
     if (this == sparse) {
       return new SparseDoubleVector(size);
     }
-    return new DenseDoubleVector(size);
+    return new DoubleVector(size);
   }
 
   /**
    * Constructs a matrix with the given shape, each cell initialized with the
    * given value.
    */
-  DoubleVector makeValue(int size, double initialValue) {
+  AbstractDoubleVector makeValue(int size, double initialValue) {
     return make(size).fill(initialValue);
   }
 
@@ -150,7 +150,7 @@ class DoubleFactory1D {
    * Constructs a matrix with uniformly distributed values in <tt>(0,1)</tt>
    * (exclusive).
    */
-  DoubleVector random(int size) {
+  AbstractDoubleVector random(int size) {
     return make(size).forEach(func.random());
   }
 
@@ -165,9 +165,9 @@ class DoubleFactory1D {
    *
    * </pre>
    */
-  DoubleVector repeat(DoubleVector A, int repeat) {
+  AbstractDoubleVector repeat(AbstractDoubleVector A, int repeat) {
     int size = A.length;
-    DoubleVector matrix = make(repeat * size);
+    AbstractDoubleVector matrix = make(repeat * size);
     for (int i = repeat; --i >= 0; ) {
       matrix.part(size * i, size).setAll(A);
     }
@@ -343,7 +343,7 @@ class DoubleFactory2D {
    * @throws IllegalArgumentException
    *             if the array is not rectangular.
    */
-  static void _checkRectangularShapeParts(List<List<DoubleMatrix>> array) {
+  static void _checkRectangularShapeParts(List<List<AbstractDoubleMatrix>> array) {
     int columns = -1;
     for (int row = array.length; --row >= 0; ) {
       if (array[row] != null) {
@@ -375,7 +375,7 @@ class DoubleFactory2D {
    *
    * </pre>
    */
-  DoubleMatrix appendColumn(DoubleMatrix A, DoubleVector b) {
+  AbstractDoubleMatrix appendColumn(AbstractDoubleMatrix A, AbstractDoubleVector b) {
     // force both to have maximal shared number of rows.
     if (b.length > A.rows) {
       b = b.part(0, A.rows);
@@ -387,7 +387,7 @@ class DoubleFactory2D {
     int ac = A.columns;
     int bc = 1;
     int r = A.rows;
-    DoubleMatrix matrix = make(r, ac + bc);
+    AbstractDoubleMatrix matrix = make(r, ac + bc);
     matrix.part(0, 0, r, ac).copyFrom(A);
     matrix.column(ac).setAll(b);
     return matrix;
@@ -409,7 +409,7 @@ class DoubleFactory2D {
    *
    * </pre>
    */
-  DoubleMatrix appendColumns(DoubleMatrix A, DoubleMatrix B) {
+  AbstractDoubleMatrix appendColumns(AbstractDoubleMatrix A, AbstractDoubleMatrix B) {
     // force both to have maximal shared number of rows.
     if (B.rows > A.rows) {
       B = B.part(0, 0, A.rows, B.columns);
@@ -421,7 +421,7 @@ class DoubleFactory2D {
     int ac = A.columns;
     int bc = B.columns;
     int r = A.rows;
-    DoubleMatrix matrix = make(r, ac + bc);
+    AbstractDoubleMatrix matrix = make(r, ac + bc);
     matrix.part(0, 0, r, ac).copyFrom(A);
     matrix.part(0, ac, r, bc).copyFrom(B);
     return matrix;
@@ -445,7 +445,7 @@ class DoubleFactory2D {
    *
    * </pre>
    */
-  DoubleMatrix appendRow(DoubleMatrix A, DoubleVector b) {
+  AbstractDoubleMatrix appendRow(AbstractDoubleMatrix A, AbstractDoubleVector b) {
     // force both to have maximal shared number of columns.
     if (b.length > A.columns) {
       b = b.part(0, A.columns);
@@ -457,7 +457,7 @@ class DoubleFactory2D {
     int ar = A.rows;
     int br = 1;
     int c = A.columns;
-    DoubleMatrix matrix = make(ar + br, c);
+    AbstractDoubleMatrix matrix = make(ar + br, c);
     matrix.part(0, 0, ar, c).copyFrom(A);
     matrix.row(ar).setAll(b);
     return matrix;
@@ -483,7 +483,7 @@ class DoubleFactory2D {
    *
    * </pre>
    */
-  DoubleMatrix appendRows(DoubleMatrix A, DoubleMatrix B) {
+  AbstractDoubleMatrix appendRows(AbstractDoubleMatrix A, AbstractDoubleMatrix B) {
     // force both to have maximal shared number of columns.
     if (B.columns > A.columns) {
       B = B.part(0, 0, B.rows, A.columns);
@@ -495,7 +495,7 @@ class DoubleFactory2D {
     int ar = A.rows;
     int br = B.rows;
     int c = A.columns;
-    DoubleMatrix matrix = make(ar + br, c);
+    AbstractDoubleMatrix matrix = make(ar + br, c);
     matrix.part(0, 0, ar, c).copyFrom(A);
     matrix.part(ar, 0, br, c).copyFrom(B);
     return matrix;
@@ -511,7 +511,7 @@ class DoubleFactory2D {
    *
    * </pre>
    */
-  DoubleMatrix ascending(int rows, int columns) {
+  AbstractDoubleMatrix ascending(int rows, int columns) {
     return descending(rows, columns).forEach(func.chainGH(func.neg, func.subtract(columns * rows)));
   }
 
@@ -609,12 +609,12 @@ class DoubleFactory2D {
    * @throws IllegalArgumentException
    *             subject to the conditions outlined above.
    */
-  DoubleMatrix compose(List<List<DoubleMatrix>> parts) {
+  AbstractDoubleMatrix compose(List<List<AbstractDoubleMatrix>> parts) {
     _checkRectangularShapeParts(parts);
     int rows = parts.length;
     int columns = 0;
     if (parts.length > 0) columns = parts[0].length;
-    DoubleMatrix empty = make(0, 0);
+    AbstractDoubleMatrix empty = make(0, 0);
 
     if (rows == 0 || columns == 0) return empty;
 
@@ -623,7 +623,7 @@ class DoubleFactory2D {
     for (int column = columns; --column >= 0; ) {
       int maxWidth = 0;
       for (int row = rows; --row >= 0; ) {
-        DoubleMatrix part = parts[row][column];
+        AbstractDoubleMatrix part = parts[row][column];
         if (part != null) {
           int width = part.columns;
           if (maxWidth > 0 && width > 0 && width != maxWidth) {
@@ -640,7 +640,7 @@ class DoubleFactory2D {
     for (int row = rows; --row >= 0; ) {
       int maxHeight = 0;
       for (int column = columns; --column >= 0; ) {
-        DoubleMatrix part = parts[row][column];
+        AbstractDoubleMatrix part = parts[row][column];
         if (part != null) {
           int height = part.rows;
           if (maxHeight > 0 && height > 0 && height != maxHeight) {
@@ -658,14 +658,14 @@ class DoubleFactory2D {
     int resultCols = 0;
     for (int column = columns; --column >= 0; ) resultCols += maxWidths[column];
 
-    DoubleMatrix matrix = make(resultRows, resultCols);
+    AbstractDoubleMatrix matrix = make(resultRows, resultCols);
 
     // copy
     int r = 0;
     for (int row = 0; row < rows; row++) {
       int c = 0;
       for (int column = 0; column < columns; column++) {
-        DoubleMatrix part = parts[row][column];
+        AbstractDoubleMatrix part = parts[row][column];
         if (part != null) {
           matrix.part(r, c, part.rows, part.columns).copyFrom(part);
         }
@@ -696,12 +696,12 @@ class DoubleFactory2D {
    *            bidiagonal matrix
    * @return bidiagonal matrix
    */
-  DoubleMatrix composeBidiagonal(DoubleMatrix A, DoubleMatrix B) {
+  AbstractDoubleMatrix composeBidiagonal(AbstractDoubleMatrix A, AbstractDoubleMatrix B) {
     int ar = A.rows;
     int ac = A.columns;
     int br = B.rows;
     int bc = B.columns;
-    DoubleMatrix sum = make(ar + br - 1, ac + bc);
+    AbstractDoubleMatrix sum = make(ar + br - 1, ac + bc);
     sum.part(0, 0, ar, ac).copyFrom(A);
     sum.part(ar - 1, ac, br, bc).copyFrom(B);
     return sum;
@@ -722,12 +722,12 @@ class DoubleFactory2D {
    *
    * @return a new matrix which is the direct sum.
    */
-  DoubleMatrix composeDiagonal(DoubleMatrix A, DoubleMatrix B) {
+  AbstractDoubleMatrix composeDiagonal(AbstractDoubleMatrix A, AbstractDoubleMatrix B) {
     int ar = A.rows;
     int ac = A.columns;
     int br = B.rows;
     int bc = B.columns;
-    DoubleMatrix sum = make(ar + br, ac + bc);
+    AbstractDoubleMatrix sum = make(ar + br, ac + bc);
     sum.part(0, 0, ar, ac).copyFrom(A);
     sum.part(ar, ac, br, bc).copyFrom(B);
     return sum;
@@ -746,8 +746,8 @@ class DoubleFactory2D {
    *
    * from the given parts. Cells are copied.
    */
-  DoubleMatrix composeDiagonal3(DoubleMatrix A, DoubleMatrix B, DoubleMatrix C) {
-    DoubleMatrix diag = make(A.rows + B.rows + C.rows, A.columns + B.columns + C.columns);
+  AbstractDoubleMatrix composeDiagonal3(AbstractDoubleMatrix A, AbstractDoubleMatrix B, AbstractDoubleMatrix C) {
+    AbstractDoubleMatrix diag = make(A.rows + B.rows + C.rows, A.columns + B.columns + C.columns);
     diag.part(0, 0, A.rows, A.columns).copyFrom(A);
     diag.part(A.rows, A.columns, B.rows, B.columns).copyFrom(B);
     diag.part(A.rows + B.rows, A.columns + B.columns, C.rows, C.columns).copyFrom(C);
@@ -836,7 +836,7 @@ class DoubleFactory2D {
    * @throws IllegalArgumentException
    *             subject to the conditions outlined above.
    */
-  void decompose(List<List<DoubleMatrix>> parts, DoubleMatrix matrix) {
+  void decompose(List<List<AbstractDoubleMatrix>> parts, AbstractDoubleMatrix matrix) {
     _checkRectangularShapeParts(parts);
     int rows = parts.length;
     int columns = 0;
@@ -848,7 +848,7 @@ class DoubleFactory2D {
     for (int column = columns; --column >= 0; ) {
       int maxWidth = 0;
       for (int row = rows; --row >= 0; ) {
-        DoubleMatrix part = parts[row][column];
+        AbstractDoubleMatrix part = parts[row][column];
         if (part != null) {
           int width = part.columns;
           if (maxWidth > 0 && width > 0 && width != maxWidth) {
@@ -865,7 +865,7 @@ class DoubleFactory2D {
     for (int row = rows; --row >= 0; ) {
       int maxHeight = 0;
       for (int column = columns; --column >= 0; ) {
-        DoubleMatrix part = parts[row][column];
+        AbstractDoubleMatrix part = parts[row][column];
         if (part != null) {
           int height = part.rows;
           if (maxHeight > 0 && height > 0 && height != maxHeight) {
@@ -892,7 +892,7 @@ class DoubleFactory2D {
     for (int row = 0; row < rows; row++) {
       int c = 0;
       for (int column = 0; column < columns; column++) {
-        DoubleMatrix part = parts[row][column];
+        AbstractDoubleMatrix part = parts[row][column];
         if (part != null) {
           part.copyFrom(matrix.part(r, c, part.rows, part.columns));
         }
@@ -913,8 +913,8 @@ class DoubleFactory2D {
    *
    * </pre>
    */
-  DoubleMatrix descending(int rows, int columns) {
-    DoubleMatrix matrix = make(rows, columns);
+  AbstractDoubleMatrix descending(int rows, int columns) {
+    AbstractDoubleMatrix matrix = make(rows, columns);
     double v = 0.0;
     for (int row = rows; --row >= 0; ) {
       for (int column = columns; --column >= 0; ) {
@@ -940,9 +940,9 @@ class DoubleFactory2D {
    *
    * @return a new matrix.
    */
-  DoubleMatrix diagonal(Float64List vector) {
+  AbstractDoubleMatrix diagonal(Float64List vector) {
     int size = vector.length;
-    DoubleMatrix diag = make(size, size);
+    AbstractDoubleMatrix diag = make(size, size);
     for (int i = 0; i < size; i++) {
       diag.set(i, i, vector[i]);
     }
@@ -964,9 +964,9 @@ class DoubleFactory2D {
    *
    * @return a new matrix.
    */
-  DoubleMatrix diagonal1D(DoubleVector vector) {
+  AbstractDoubleMatrix diagonal1D(AbstractDoubleVector vector) {
     int size = vector.length;
-    DoubleMatrix diag = make(size, size);
+    AbstractDoubleMatrix diag = make(size, size);
     for (int i = size; --i >= 0; ) {
       diag.set(i, i, vector.get(i));
     }
@@ -989,9 +989,9 @@ class DoubleFactory2D {
    *            the matrix, need not be square.
    * @return a new vector.
    */
-  DoubleVector diagonal2D(DoubleMatrix A) {
+  AbstractDoubleVector diagonal2D(AbstractDoubleMatrix A) {
     int min = Math.min(A.rows, A.columns);
-    DoubleVector diag = _make1D(min);
+    AbstractDoubleVector diag = _make1D(min);
     for (int i = min; --i >= 0; ) {
       diag.set(i, A.get(i, i));
     }
@@ -1002,8 +1002,8 @@ class DoubleFactory2D {
    * Constructs an identity matrix (having ones on the diagonal and zeros
    * elsewhere).
    */
-  DoubleMatrix identity(int rowsAndColumns) {
-    DoubleMatrix matrix = make(rowsAndColumns, rowsAndColumns);
+  AbstractDoubleMatrix identity(int rowsAndColumns) {
+    AbstractDoubleMatrix matrix = make(rowsAndColumns, rowsAndColumns);
     for (int i = rowsAndColumns; --i >= 0; ) {
       matrix.set(i, i, 1.0);
     }
@@ -1025,13 +1025,13 @@ class DoubleFactory2D {
    *                <tt>values.length</tt> must be a multiple of <tt>rows</tt>
    *                .
    */
-  DoubleMatrix makeColumn(Float64List values, int rows) {
+  AbstractDoubleMatrix makeColumn(Float64List values, int rows) {
     int columns = (rows != 0 ? values.length / rows : 0);
     if (rows * columns != values.length) {
       throw new ArgumentError("Array length must be a multiple of m.");
     }
 
-    DoubleMatrix matrix = make(rows, columns);
+    AbstractDoubleMatrix matrix = make(rows, columns);
     for (int row = 0; row < rows; row++) {
       for (int column = 0; column < columns; column++) {
         matrix.set(row, column, values[row + column * rows]);
@@ -1055,11 +1055,11 @@ class DoubleFactory2D {
    *             <tt>for any 1 &lt;= row &lt; values.length: values[row].length != values[row-1].length</tt>
    *             .
    */
-  DoubleMatrix makeValues(List<Float64List> values) {
+  AbstractDoubleMatrix makeValues(List<Float64List> values) {
     if (this == sparse) {
       return new SparseDoubleMatrix.fromList(values);
     } else {
-      return new DenseDoubleMatrix.DenseDoubleMatrix(values);
+      return new DoubleMatrix.DenseDoubleMatrix(values);
     }
   }
 
@@ -1067,11 +1067,11 @@ class DoubleFactory2D {
    * Constructs a matrix with the given shape, each cell initialized with
    * zero.
    */
-  DoubleMatrix make(int rows, int columns) {
+  AbstractDoubleMatrix make(int rows, int columns) {
     if (this == sparse) {
       return new SparseDoubleMatrix(rows, columns);
     } else {
-      return new DenseDoubleMatrix(rows, columns);
+      return new DoubleMatrix(rows, columns);
     }
   }
 
@@ -1079,7 +1079,7 @@ class DoubleFactory2D {
    * Constructs a matrix with the given shape, each cell initialized with the
    * given value.
    */
-  DoubleMatrix makeValue(int rows, int columns, double initialValue) {
+  AbstractDoubleMatrix makeValue(int rows, int columns, double initialValue) {
     if (initialValue == 0) return make(rows, columns);
     return make(rows, columns).fill(initialValue);
   }
@@ -1088,7 +1088,7 @@ class DoubleFactory2D {
    * Constructs a matrix with uniformly distributed values in <tt>(0,1)</tt>
    * (exclusive).
    */
-  DoubleMatrix random(int rows, int columns) {
+  AbstractDoubleMatrix random(int rows, int columns) {
     return make(rows, columns).forEach(func.random());
   }
 
@@ -1107,10 +1107,10 @@ class DoubleFactory2D {
    *
    * </pre>
    */
-  DoubleMatrix repeat(DoubleMatrix A, int rowRepeat, int columnRepeat) {
+  AbstractDoubleMatrix repeat(AbstractDoubleMatrix A, int rowRepeat, int columnRepeat) {
     int r = A.rows;
     int c = A.columns;
-    DoubleMatrix matrix = make(r * rowRepeat, c * columnRepeat);
+    AbstractDoubleMatrix matrix = make(r * rowRepeat, c * columnRepeat);
     for (int i = rowRepeat; --i >= 0; ) {
       for (int j = columnRepeat; --j >= 0; ) {
         matrix.part(r * i, c * j, r, c).copyFrom(A);
@@ -1178,7 +1178,7 @@ class DoubleFactory2D {
   /**
    * Constructs a 1d matrix of the right dynamic type.
    */
-  DoubleVector _make1D(int size) {
+  AbstractDoubleVector _make1D(int size) {
     return make(0, 0).like1D(size);
   }
 }

@@ -17,14 +17,14 @@ part of cern.colt.matrix;
  *
  * @author Piotr Wendykier (piotr.wendykier@gmail.com)
  */
-class WrapperDoubleMatrix extends DoubleMatrix {
+class WrapperDoubleMatrix extends AbstractDoubleMatrix {
 
   /*
      * The elements of the matrix.
      */
-  DoubleMatrix _content;
+  AbstractDoubleMatrix _content;
 
-  WrapperDoubleMatrix(DoubleMatrix newContent) {
+  WrapperDoubleMatrix(AbstractDoubleMatrix newContent) {
     if (newContent != null) {
       try {
         _setUp(newContent.rows, newContent.columns);
@@ -35,7 +35,7 @@ class WrapperDoubleMatrix extends DoubleMatrix {
     this._content = newContent;
   }
 
-  DoubleMatrix setAll(final Float64List values) {
+  AbstractDoubleMatrix setAll(final Float64List values) {
     if (_content is DiagonalDoubleMatrix) {
       int dlength = (_content as DiagonalDoubleMatrix)._dlength;
       final Float64List elems = (_content as DiagonalDoubleMatrix)._elements;
@@ -68,7 +68,7 @@ class WrapperDoubleMatrix extends DoubleMatrix {
     }
   }
 
-  DoubleMatrix forEachMatrix(final DoubleMatrix y, final func.DoubleDoubleFunction function) {
+  AbstractDoubleMatrix forEachMatrix(final AbstractDoubleMatrix y, final func.DoubleDoubleFunction function) {
     checkShape(y);
     if (y is WrapperDoubleMatrix) {
       final rowList = new List<int>();
@@ -165,11 +165,11 @@ class WrapperDoubleMatrix extends DoubleMatrix {
     }
   }
 
-  DoubleMatrix like2D(int rows, int columns) {
+  AbstractDoubleMatrix like2D(int rows, int columns) {
     return _content.like2D(rows, columns);
   }
 
-  DoubleVector like1D(int size) {
+  AbstractDoubleVector like1D(int size) {
     return _content.like1D(size);
   }
 
@@ -177,8 +177,8 @@ class WrapperDoubleMatrix extends DoubleMatrix {
     _content.set(row, column, value);
   }
 
-  DoubleVector vectorize() {
-    final DenseDoubleVector v = new DenseDoubleVector(length);
+  AbstractDoubleVector vectorize() {
+    final DoubleVector v = new DoubleVector(length);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _columns);
@@ -209,11 +209,11 @@ class WrapperDoubleMatrix extends DoubleMatrix {
     return v;
   }
 
-  DoubleVector column(int column) {
+  AbstractDoubleVector column(int column) {
     return dice().row(column);
   }
 
-  DoubleMatrix columnFlip() {
+  AbstractDoubleMatrix columnFlip() {
     if (_columns == 0) return this;
     WrapperDoubleMatrix view = new ColumnFlipWrapperDoubleMatrix(this);
     view._isNoView = false;
@@ -221,7 +221,7 @@ class WrapperDoubleMatrix extends DoubleMatrix {
     return view;
   }
 
-  DoubleMatrix dice() {
+  AbstractDoubleMatrix dice() {
     WrapperDoubleMatrix view = new DiceWrapperDoubleMatrix(this);
     view._rows = _columns;
     view._columns = _rows;
@@ -230,7 +230,7 @@ class WrapperDoubleMatrix extends DoubleMatrix {
     return view;
   }
 
-  DoubleMatrix part(final int row, final int column, int height, int width) {
+  AbstractDoubleMatrix part(final int row, final int column, int height, int width) {
     _checkBox(row, column, height, width);
     WrapperDoubleMatrix view = new PartWrapperDoubleMatrix(this, row, column);
     view._rows = height;
@@ -240,19 +240,19 @@ class WrapperDoubleMatrix extends DoubleMatrix {
     return view;
   }
 
-  DoubleVector row(int row) {
+  AbstractDoubleVector row(int row) {
     _checkRow(row);
     return new DelegateDoubleVector(this, row);
   }
 
-  DoubleMatrix rowFlip() {
+  AbstractDoubleMatrix rowFlip() {
     if (_rows == 0) return this;
     WrapperDoubleMatrix view = new RowFlipWrapperDoubleMatrix(this);
     view._isNoView = false;
     return view;
   }
 
-  DoubleMatrix select(Int32List rowIndexes, Int32List columnIndexes) {
+  AbstractDoubleMatrix select(Int32List rowIndexes, Int32List columnIndexes) {
     // check for "all"
     if (rowIndexes == null) {
       rowIndexes = new Int32List(_rows);
@@ -276,7 +276,7 @@ class WrapperDoubleMatrix extends DoubleMatrix {
     return view;
   }
 
-  DoubleMatrix strides(final int _rowStride, final int _columnStride) {
+  AbstractDoubleMatrix strides(final int _rowStride, final int _columnStride) {
     if (_rowStride <= 0 || _columnStride <= 0) {
       throw new RangeError("illegal stride");
     }
@@ -292,15 +292,15 @@ class WrapperDoubleMatrix extends DoubleMatrix {
     return view;
   }
 
-  DoubleMatrix _getContent() {
+  AbstractDoubleMatrix _getContent() {
     return _content;
   }
 
-  DoubleVector _like1D(int size, int offset, int stride) {
+  AbstractDoubleVector _like1D(int size, int offset, int stride) {
     throw new Error(); // should never get called
   }
 
-  DoubleMatrix _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets) {
+  AbstractDoubleMatrix _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets) {
     throw new Error(); // should never be called
   }
 
@@ -311,7 +311,7 @@ class WrapperDoubleMatrix extends DoubleMatrix {
 
 class ColumnFlipWrapperDoubleMatrix extends WrapperDoubleMatrix {
 
-  ColumnFlipWrapperDoubleMatrix(DoubleMatrix newContent) : super(newContent);
+  ColumnFlipWrapperDoubleMatrix(AbstractDoubleMatrix newContent) : super(newContent);
 
   double get(int row, int column) {
       return _content.get(row, _columns - 1 - column);
@@ -336,7 +336,7 @@ class ColumnFlipWrapperDoubleMatrix extends WrapperDoubleMatrix {
 
 class DiceWrapperDoubleMatrix extends WrapperDoubleMatrix {
 
-  DiceWrapperDoubleMatrix(DoubleMatrix newContent) : super(newContent);
+  DiceWrapperDoubleMatrix(AbstractDoubleMatrix newContent) : super(newContent);
 
   double get(int row, int column) {
       return _content.get(column, row);
@@ -364,7 +364,7 @@ class PartWrapperDoubleMatrix extends WrapperDoubleMatrix {
   final int _row;
   final int _column;
 
-  PartWrapperDoubleMatrix(DoubleMatrix newContent, this._row, this._column) : super(newContent);
+  PartWrapperDoubleMatrix(AbstractDoubleMatrix newContent, this._row, this._column) : super(newContent);
 
   double get(int i, int j) {
       return _content.get(_row + i, _column + j);
@@ -389,7 +389,7 @@ class PartWrapperDoubleMatrix extends WrapperDoubleMatrix {
 
 class RowFlipWrapperDoubleMatrix extends WrapperDoubleMatrix {
 
-  RowFlipWrapperDoubleMatrix(DoubleMatrix newContent) : super(newContent);
+  RowFlipWrapperDoubleMatrix(AbstractDoubleMatrix newContent) : super(newContent);
 
   double get(int row, int column) {
       return _content.get(_rows - 1 - row, column);
@@ -417,7 +417,7 @@ class SelectionWrapperDoubleMatrix extends WrapperDoubleMatrix {
   final Int32List _cix;
   final Int32List _rix;
 
-  SelectionWrapperDoubleMatrix(DoubleMatrix newContent, this._cix, this._rix) : super(newContent);
+  SelectionWrapperDoubleMatrix(AbstractDoubleMatrix newContent, this._cix, this._rix) : super(newContent);
 
   double get(int i, int j) {
       return _content.get(_rix[i], _cix[j]);
@@ -445,7 +445,7 @@ class StridesWrapperDoubleMatrix extends WrapperDoubleMatrix {
   final int _rowStride;
   final int _columnStride;
 
-  StridesWrapperDoubleMatrix(DoubleMatrix newContent, this._rowStride, this._columnStride) : super(newContent);
+  StridesWrapperDoubleMatrix(AbstractDoubleMatrix newContent, this._rowStride, this._columnStride) : super(newContent);
 
   double get(int row, int column) {
       return _content.get(_rowStride * row, _columnStride * column);

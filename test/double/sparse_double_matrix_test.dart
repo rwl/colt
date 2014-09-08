@@ -134,7 +134,7 @@ class SparseDoubleMatrixTest extends DoubleMatrixTest {
     Int32List rowindexes = new Int32List(SIZE);
     Int32List columnindexes = new Int32List(SIZE);
     Float64List values = new Float64List(SIZE);
-    DoubleMatrix Adense = new DenseDoubleMatrix(A.rows, A.columns);
+    AbstractDoubleMatrix Adense = new DoubleMatrix(A.rows, A.columns);
     for (int i = 0; i < SIZE; i++) {
       rowindexes[i] = i % A.rows;
       columnindexes[i] = i % A.columns;

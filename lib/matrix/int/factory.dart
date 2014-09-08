@@ -55,9 +55,9 @@ class IntFactory1D {
    * C = A||B; Constructs a new matrix which is the concatenation of two other
    * matrices. Example: <tt>0 1</tt> append <tt>3 4</tt> --> <tt>0 1 3 4</tt>.
    */
-  IntVector append(IntVector A, IntVector B) {
+  AbstractIntVector append(AbstractIntVector A, AbstractIntVector B) {
     // concatenate
-    IntVector matrix = make(A.length + B.length);
+    AbstractIntVector matrix = make(A.length + B.length);
     matrix.part(0, A.length).copyFrom(A);
     matrix.part(A.length, B.length).copyFrom(B);
     return matrix;
@@ -67,7 +67,7 @@ class IntFactory1D {
    * Constructs a matrix with cells having ascending values. For debugging
    * purposes. Example: <tt>0 1 2</tt>
    */
-  IntVector ascending(int size) {
+  AbstractIntVector ascending(int size) {
     return descending(size).forEach(ifunc.chain2(ifunc.neg, ifunc.subtract(size)));
   }
 
@@ -75,8 +75,8 @@ class IntFactory1D {
    * Constructs a matrix with cells having descending values. For debugging
    * purposes. Example: <tt>2 1 0</tt>
    */
-  IntVector descending(int size) {
-    IntVector matrix = make(size);
+  AbstractIntVector descending(int size) {
+    AbstractIntVector matrix = make(size);
     int v = 0;
     for (int i = size; --i >= 0; ) {
       matrix.set(i, v++);
@@ -92,11 +92,11 @@ class IntFactory1D {
    * @param values
    *            The values to be filled into the new matrix.
    */
-  IntVector withValues(Int32List values) {
+  AbstractIntVector withValues(Int32List values) {
     if (this == sparse) {
       return new SparseIntVector(values);
     } else {
-      return new DenseIntVector.fromList(values);
+      return new IntVector.fromList(values);
     }
   }
 
@@ -104,7 +104,7 @@ class IntFactory1D {
    * Constructs a matrix which is the concatenation of all given parts. Cells
    * are copied.
    */
-  IntVector cat(List<IntVector> parts) {
+  AbstractIntVector cat(List<AbstractIntVector> parts) {
     if (parts.length == 0) {
       return make(0);
     }
@@ -114,7 +114,7 @@ class IntFactory1D {
       size += parts[i].length;
     }
 
-    IntVector vector = make(size);
+    AbstractIntVector vector = make(size);
     size = 0;
     for (int i = 0; i < parts.length; i++) {
       vector.part(size, parts[i].length).copyFrom(parts[i]);
@@ -128,18 +128,18 @@ class IntFactory1D {
    * Constructs a matrix with the given shape, each cell initialized with
    * zero.
    */
-  IntVector make(int size) {
+  AbstractIntVector make(int size) {
     if (this == sparse) {
       return new SparseIntVector(size);
     }
-    return new DenseIntVector(size);
+    return new IntVector(size);
   }
 
   /**
    * Constructs a matrix with the given shape, each cell initialized with the
    * given value.
    */
-  IntVector fill(int size, int initialValue) {
+  AbstractIntVector fill(int size, int initialValue) {
     return make(size).fill(initialValue);
   }
 
@@ -152,9 +152,9 @@ class IntFactory1D {
    *            The values to be filled into the new matrix.
    * @return a new matrix.
    */
-  IntVector fromList(List<int> values) {
+  AbstractIntVector fromList(List<int> values) {
     int size = values.length;
-    IntVector vector = make(size);
+    AbstractIntVector vector = make(size);
     for (int i = size; --i >= 0; ) {
       vector.put(i, values[i]);
     }
@@ -165,7 +165,7 @@ class IntFactory1D {
    * Constructs a matrix with uniformly distributed values in <tt>(0,1)</tt>
    * (exclusive).
    */
-  IntVector random(int size) {
+  AbstractIntVector random(int size) {
     return make(size).forEach(ifunc.random());
   }
 
@@ -180,9 +180,9 @@ class IntFactory1D {
    *
    * </pre>
    */
-  IntVector repeat(IntVector A, int repeat) {
+  AbstractIntVector repeat(AbstractIntVector A, int repeat) {
     int size = A.length;
-    IntVector matrix = make(repeat * size);
+    AbstractIntVector matrix = make(repeat * size);
     for (int i = repeat; --i >= 0; ) {
       matrix.part(size * i, size).copyFrom(A);
     }
@@ -236,7 +236,7 @@ class IntFactory1D {
    *            The values to be filled into the new list.
    * @return a new list.
    */
-  Int32List toList(IntVector values) {
+  Int32List toList(AbstractIntVector values) {
     int size = values.length;
     final list = new Int32List(size);
     //list.setSize(size);
@@ -359,7 +359,7 @@ class IntFactory2D {
    *
    * </pre>
    */
-  IntMatrix appendColumns(IntMatrix A, IntMatrix B) {
+  AbstractIntMatrix appendColumns(AbstractIntMatrix A, AbstractIntMatrix B) {
     // force both to have maximal shared number of rows.
     if (B.rows > A.rows) {
       B = B.part(0, 0, A.rows, B.columns);
@@ -371,13 +371,13 @@ class IntFactory2D {
     int ac = A.columns;
     int bc = B.columns;
     int r = A.rows;
-    IntMatrix matrix = make(r, ac + bc);
+    AbstractIntMatrix matrix = make(r, ac + bc);
     matrix.part(0, 0, r, ac).copyFrom(A);
     matrix.part(0, ac, r, bc).copyFrom(B);
     return matrix;
   }
 
-  IntMatrix appendColumn(IntMatrix A, IntVector b) {
+  AbstractIntMatrix appendColumn(AbstractIntMatrix A, AbstractIntVector b) {
     // force both to have maximal shared number of rows.
     if (b.length > A.rows) {
       b = b.part(0, A.rows);
@@ -389,7 +389,7 @@ class IntFactory2D {
     int ac = A.columns;
     int bc = 1;
     int r = A.rows;
-    IntMatrix matrix = make(r, ac + bc);
+    AbstractIntMatrix matrix = make(r, ac + bc);
     matrix.part(0, 0, r, ac).copyFrom(A);
     matrix.column(ac).copyFrom(b);
     return matrix;
@@ -415,7 +415,7 @@ class IntFactory2D {
    *
    * </pre>
    */
-  IntMatrix appendRows(IntMatrix A, IntMatrix B) {
+  AbstractIntMatrix appendRows(AbstractIntMatrix A, AbstractIntMatrix B) {
     // force both to have maximal shared number of columns.
     if (B.columns > A.columns) B = B.part(0, 0, B.rows, A.columns); else if (B.columns < A.columns) A = A.part(0, 0, A.rows, B.columns);
 
@@ -423,13 +423,13 @@ class IntFactory2D {
     int ar = A.rows;
     int br = B.rows;
     int c = A.columns;
-    IntMatrix matrix = make(ar + br, c);
+    AbstractIntMatrix matrix = make(ar + br, c);
     matrix.part(0, 0, ar, c).copyFrom(A);
     matrix.part(ar, 0, br, c).copyFrom(B);
     return matrix;
   }
 
-  IntMatrix appendRow(IntMatrix A, IntVector b) {
+  AbstractIntMatrix appendRow(AbstractIntMatrix A, AbstractIntVector b) {
     // force both to have maximal shared number of columns.
     if (b.length > A.columns) b = b.part(0, A.columns); else if (b.length < A.columns) A = A.part(0, 0, A.rows, b.length);
 
@@ -437,7 +437,7 @@ class IntFactory2D {
     int ar = A.rows;
     int br = 1;
     int c = A.columns;
-    IntMatrix matrix = make(ar + br, c);
+    AbstractIntMatrix matrix = make(ar + br, c);
     matrix.part(0, 0, ar, c).copyFrom(A);
     matrix.row(ar).copyFrom(b);
     return matrix;
@@ -453,7 +453,7 @@ class IntFactory2D {
    *
    * </pre>
    */
-  IntMatrix ascending(int rows, int columns) {
+  AbstractIntMatrix ascending(int rows, int columns) {
     return descending(rows, columns).forEach(ifunc.chain2(ifunc.neg, ifunc.subtract(columns * rows)));
   }
 
@@ -481,7 +481,7 @@ class IntFactory2D {
    * @throws ArgumentError
    *             if the array is not rectangular.
    */
-  static void _checkRectShape(List<List<IntMatrix>> array) {
+  static void _checkRectShape(List<List<AbstractIntMatrix>> array) {
     int columns = -1;
     for (int row = array.length; --row >= 0; ) {
       if (array[row] != null) {
@@ -495,15 +495,15 @@ class IntFactory2D {
     }
   }
 
-  IntMatrix reshape(IntVector a, int rows, int columns) {
+  AbstractIntMatrix reshape(AbstractIntVector a, int rows, int columns) {
     if (a.length != rows * columns) {
       throw new ArgumentError("a.length != rows*columns");
     }
-    IntMatrix A;
+    AbstractIntMatrix A;
     if (this == sparse) {
       A = new SparseIntMatrix(rows, columns);
     } else {
-      A = new DenseIntMatrix(rows, columns);
+      A = new IntMatrix(rows, columns);
     }
     for (int c = 0; c < columns; c++) {
       A.column(c).copyFrom(a.part(c * rows, rows));
@@ -605,12 +605,12 @@ class IntFactory2D {
    * @throws ArgumentError
    *             subject to the conditions outlined above.
    */
-  IntMatrix compose(List<List<IntMatrix>> parts) {
+  AbstractIntMatrix compose(List<List<AbstractIntMatrix>> parts) {
     _checkRectShape(parts);
     int rows = parts.length;
     int columns = 0;
     if (parts.length > 0) columns = parts[0].length;
-    IntMatrix empty = make(0, 0);
+    AbstractIntMatrix empty = make(0, 0);
 
     if (rows == 0 || columns == 0) return empty;
 
@@ -619,7 +619,7 @@ class IntFactory2D {
     for (int column = columns; --column >= 0; ) {
       int maxWidth = 0;
       for (int row = rows; --row >= 0; ) {
-        IntMatrix part = parts[row][column];
+        AbstractIntMatrix part = parts[row][column];
         if (part != null) {
           int width = part.columns;
           if (maxWidth > 0 && width > 0 && width != maxWidth) throw new ArgumentError("Different number of columns.");
@@ -634,7 +634,7 @@ class IntFactory2D {
     for (int row = rows; --row >= 0; ) {
       int maxHeight = 0;
       for (int column = columns; --column >= 0; ) {
-        IntMatrix part = parts[row][column];
+        AbstractIntMatrix part = parts[row][column];
         if (part != null) {
           int height = part.rows;
           if (maxHeight > 0 && height > 0 && height != maxHeight) throw new ArgumentError("Different number of rows.");
@@ -650,14 +650,14 @@ class IntFactory2D {
     int resultCols = 0;
     for (int column = columns; --column >= 0; ) resultCols += maxWidths[column];
 
-    IntMatrix matrix = make(resultRows, resultCols);
+    AbstractIntMatrix matrix = make(resultRows, resultCols);
 
     // copy
     int r = 0;
     for (int row = 0; row < rows; row++) {
       int c = 0;
       for (int column = 0; column < columns; column++) {
-        IntMatrix part = parts[row][column];
+        AbstractIntMatrix part = parts[row][column];
         if (part != null) {
           matrix.part(r, c, part.rows, part.columns).copyFrom(part);
         }
@@ -684,12 +684,12 @@ class IntFactory2D {
    *
    * @return a new matrix which is the direct sum.
    */
-  IntMatrix composeDiagonal(IntMatrix A, IntMatrix B) {
+  AbstractIntMatrix composeDiagonal(AbstractIntMatrix A, AbstractIntMatrix B) {
     int ar = A.rows;
     int ac = A.columns;
     int br = B.rows;
     int bc = B.columns;
-    IntMatrix sum = make(ar + br, ac + bc);
+    AbstractIntMatrix sum = make(ar + br, ac + bc);
     sum.part(0, 0, ar, ac).copyFrom(A);
     sum.part(ar, ac, br, bc).copyFrom(B);
     return sum;
@@ -708,20 +708,20 @@ class IntFactory2D {
    *
    * from the given parts. Cells are copied.
    */
-  IntMatrix composeDiag(IntMatrix A, IntMatrix B, IntMatrix C) {
-    IntMatrix diag = make(A.rows + B.rows + C.rows, A.columns + B.columns + C.columns);
+  AbstractIntMatrix composeDiag(AbstractIntMatrix A, AbstractIntMatrix B, AbstractIntMatrix C) {
+    AbstractIntMatrix diag = make(A.rows + B.rows + C.rows, A.columns + B.columns + C.columns);
     diag.part(0, 0, A.rows, A.columns).copyFrom(A);
     diag.part(A.rows, A.columns, B.rows, B.columns).copyFrom(B);
     diag.part(A.rows + B.rows, A.columns + B.columns, C.rows, C.columns).copyFrom(C);
     return diag;
   }
 
-  IntMatrix composeBidiagonal(IntMatrix A, IntMatrix B) {
+  AbstractIntMatrix composeBidiagonal(AbstractIntMatrix A, AbstractIntMatrix B) {
     int ar = A.rows;
     int ac = A.columns;
     int br = B.rows;
     int bc = B.columns;
-    IntMatrix sum = make(ar + br - 1, ac + bc);
+    AbstractIntMatrix sum = make(ar + br - 1, ac + bc);
     sum.part(0, 0, ar, ac).copyFrom(A);
     sum.part(ar - 1, ac, br, bc).copyFrom(B);
     return sum;
@@ -809,7 +809,7 @@ class IntFactory2D {
    * @throws ArgumentError
    *             subject to the conditions outlined above.
    */
-  void decompose(List<List<IntMatrix>> parts, IntMatrix matrix) {
+  void decompose(List<List<AbstractIntMatrix>> parts, AbstractIntMatrix matrix) {
     _checkRectShape(parts);
     int rows = parts.length;
     int columns = 0;
@@ -821,7 +821,7 @@ class IntFactory2D {
     for (int column = columns; --column >= 0; ) {
       int maxWidth = 0;
       for (int row = rows; --row >= 0; ) {
-        IntMatrix part = parts[row][column];
+        AbstractIntMatrix part = parts[row][column];
         if (part != null) {
           int width = part.columns;
           if (maxWidth > 0 && width > 0 && width != maxWidth) throw new ArgumentError("Different number of columns.");
@@ -836,7 +836,7 @@ class IntFactory2D {
     for (int row = rows; --row >= 0; ) {
       int maxHeight = 0;
       for (int column = columns; --column >= 0; ) {
-        IntMatrix part = parts[row][column];
+        AbstractIntMatrix part = parts[row][column];
         if (part != null) {
           int height = part.rows;
           if (maxHeight > 0 && height > 0 && height != maxHeight) throw new ArgumentError("Different number of rows.");
@@ -859,7 +859,7 @@ class IntFactory2D {
     for (int row = 0; row < rows; row++) {
       int c = 0;
       for (int column = 0; column < columns; column++) {
-        IntMatrix part = parts[row][column];
+        AbstractIntMatrix part = parts[row][column];
         if (part != null) {
           part.copyFrom(matrix.part(r, c, part.rows, part.columns));
         }
@@ -875,7 +875,7 @@ class IntFactory2D {
    */
   void demo1() {
     print("\n\n");
-    List<List<IntMatrix>> parts1 = [[null, fill(2, 2, 1), null], [fill(4, 4, 2), null, fill(4, 3, 3)], [null, fill(2, 2, 4), null]];
+    List<List<AbstractIntMatrix>> parts1 = [[null, fill(2, 2, 1), null], [fill(4, 4, 2), null, fill(4, 3, 3)], [null, fill(2, 2, 4), null]];
     print("\n" + compose(parts1).toString());
     // print("\n"+Converting.toHTML(make(parts1).toString()));
 
@@ -885,15 +885,15 @@ class IntFactory2D {
      * print("\n"+make(parts2));
      */
 
-    List<List<IntMatrix>> parts3 = [[identity(3), null,], [null, identity(3).columnFlip()], [identity(3).rowFlip(), null]];
+    List<List<AbstractIntMatrix>> parts3 = [[identity(3), null,], [null, identity(3).columnFlip()], [identity(3).rowFlip(), null]];
     print("\n" + compose(parts3).toString());
     // print("\n"+Converting.toHTML(make(parts3).toString()));
 
-    IntMatrix A = ascending(2, 2);
-    IntMatrix B = descending(2, 2);
-    IntMatrix _ = null;
+    AbstractIntMatrix A = ascending(2, 2);
+    AbstractIntMatrix B = descending(2, 2);
+    AbstractIntMatrix _ = null;
 
-    List<List<IntMatrix>> parts4 = [[A, _, A, _], [_, A, _, B]];
+    List<List<AbstractIntMatrix>> parts4 = [[A, _, A, _], [_, A, _, B]];
     print("\n" + compose(parts4).toString());
     // print("\n"+Converting.toHTML(make(parts4).toString()));
 
@@ -904,14 +904,14 @@ class IntFactory2D {
    */
   void demo2() {
     print("\n\n");
-    IntMatrix matrix;
-    IntMatrix A, B, C, D, E, F, G;
-    IntMatrix _ = null;
+    AbstractIntMatrix matrix;
+    AbstractIntMatrix A, B, C, D, E, F, G;
+    AbstractIntMatrix _ = null;
     A = fill(2, 2, 1);
     B = fill(4, 4, 2);
     C = fill(4, 3, 3);
     D = fill(2, 2, 4);
-    List<List<IntMatrix>> parts1 = [[_, A, _], [B, _, C], [_, D, _]];
+    List<List<AbstractIntMatrix>> parts1 = [[_, A, _], [B, _, C], [_, D, _]];
     matrix = compose(parts1);
     print("\n" + matrix.toString());
 
@@ -957,8 +957,8 @@ class IntFactory2D {
    *
    * </pre>
    */
-  IntMatrix descending(int rows, int columns) {
-    IntMatrix matrix = make(rows, columns);
+  AbstractIntMatrix descending(int rows, int columns) {
+    AbstractIntMatrix matrix = make(rows, columns);
     int v = 0;
     for (int row = rows; --row >= 0; ) {
       for (int column = columns; --column >= 0; ) {
@@ -983,9 +983,9 @@ class IntFactory2D {
    *
    * @return a new matrix.
    */
-  IntMatrix diagonal(IntVector vector) {
+  AbstractIntMatrix diagonal(AbstractIntVector vector) {
     int size = vector.length;
-    IntMatrix diag = make(size, size);
+    AbstractIntMatrix diag = make(size, size);
     for (int i = size; --i >= 0; ) {
       diag.set(i, i, vector.get(i));
     }
@@ -1007,9 +1007,9 @@ class IntFactory2D {
    *
    * @return a new matrix.
    */
-  IntMatrix diagonalList(Int32List vector) {
+  AbstractIntMatrix diagonalList(Int32List vector) {
     int size = vector.length;
-    IntMatrix diag = make(size, size);
+    AbstractIntMatrix diag = make(size, size);
     for (int i = 0; i < size; i++) {
       diag.set(i, i, vector[i]);
     }
@@ -1032,9 +1032,9 @@ class IntFactory2D {
    *            the matrix, need not be square.
    * @return a new vector.
    */
-  IntVector diagonal2D(IntMatrix A) {
+  AbstractIntVector diagonal2D(AbstractIntMatrix A) {
     int min = Math.min(A.rows, A.columns);
-    IntVector diag = _make1D(min);
+    AbstractIntVector diag = _make1D(min);
     for (int i = min; --i >= 0; ) {
       diag.set(i, A.get(i, i));
     }
@@ -1045,8 +1045,8 @@ class IntFactory2D {
    * Constructs an identity matrix (having ones on the diagonal and zeros
    * elsewhere).
    */
-  IntMatrix identity(int rowsAndColumns) {
-    IntMatrix matrix = make(rowsAndColumns, rowsAndColumns);
+  AbstractIntMatrix identity(int rowsAndColumns) {
+    AbstractIntMatrix matrix = make(rowsAndColumns, rowsAndColumns);
     for (int i = rowsAndColumns; --i >= 0; ) {
       matrix.set(i, i, 1);
     }
@@ -1068,11 +1068,11 @@ class IntFactory2D {
    *             <tt>for any 1 &lt;= row &lt; values.length: values[row].length != values[row-1].length</tt>
    *             .
    */
-  IntMatrix withValues(List<Int32List> values) {
+  AbstractIntMatrix withValues(List<Int32List> values) {
     if (this == sparse) {
       return new SparseIntMatrix(values);
     } else {
-      return new DenseIntMatrix.DenseIntMatrix(values);
+      return new IntMatrix.DenseIntMatrix(values);
     }
   }
 
@@ -1091,13 +1091,13 @@ class IntFactory2D {
    *                <tt>values.length</tt> must be a multiple of <tt>rows</tt>
    *                .
    */
-  IntMatrix columnMajor(Int32List values, int rows) {
+  AbstractIntMatrix columnMajor(Int32List values, int rows) {
     int columns = (rows != 0 ? values.length / rows : 0);
     if (rows * columns != values.length) {
       throw new ArgumentError("Array length must be a multiple of m.");
     }
 
-    IntMatrix matrix = make(rows, columns);
+    AbstractIntMatrix matrix = make(rows, columns);
     for (int row = 0; row < rows; row++) {
       for (int column = 0; column < columns; column++) {
         matrix.set(row, column, values[row + column * rows]);
@@ -1110,7 +1110,7 @@ class IntFactory2D {
    * Constructs a matrix with the given shape, each cell initialized with
    * zero.
    */
-  IntMatrix make(int rows, int columns) {
+  AbstractIntMatrix make(int rows, int columns) {
     if (this == sparse) {
       return new SparseIntMatrix(rows, columns);
     }
@@ -1118,14 +1118,14 @@ class IntFactory2D {
       return new SparseRCIntMatrix(rows, columns); // if (this==rowCompressedModified) return new
     }
     // RCMIntMatrix(rows,columns);
-    else return new DenseIntMatrix(rows, columns);
+    else return new IntMatrix(rows, columns);
   }
 
   /**
    * Constructs a matrix with the given shape, each cell initialized with the
    * given value.
    */
-  IntMatrix fill(int rows, int columns, int initialValue) {
+  AbstractIntMatrix fill(int rows, int columns, int initialValue) {
     if (initialValue == 0) return make(rows, columns);
     return make(rows, columns).fill(initialValue);
   }
@@ -1133,7 +1133,7 @@ class IntFactory2D {
   /**
    * Constructs a 1d matrix of the right dynamic type.
    */
-  IntVector _make1D(int size) {
+  AbstractIntVector _make1D(int size) {
     return make(0, 0).like1D(size);
   }
 
@@ -1141,7 +1141,7 @@ class IntFactory2D {
    * Constructs a matrix with uniformly distributed values in <tt>(0,1)</tt>
    * (exclusive).
    */
-  IntMatrix random(int rows, int columns) {
+  AbstractIntMatrix random(int rows, int columns) {
     return make(rows, columns).forEach(ifunc.random());
   }
 
@@ -1160,10 +1160,10 @@ class IntFactory2D {
    *
    * </pre>
    */
-  IntMatrix repeat(IntMatrix A, int rowRepeat, int columnRepeat) {
+  AbstractIntMatrix repeat(AbstractIntMatrix A, int rowRepeat, int columnRepeat) {
     int r = A.rows;
     int c = A.columns;
-    IntMatrix matrix = make(r * rowRepeat, c * columnRepeat);
+    AbstractIntMatrix matrix = make(r * rowRepeat, c * columnRepeat);
     for (int i = rowRepeat; --i >= 0; ) {
       for (int j = columnRepeat; --j >= 0; ) {
         matrix.part(r * i, c * j, r, c).copyFrom(A);

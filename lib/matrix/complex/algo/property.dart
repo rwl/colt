@@ -82,8 +82,8 @@ class ComplexProperty {
     return _tolerance;
   }
 
-  void checkDense(ComplexVector A) {
-    if (!(A is DenseComplexVector)) {
+  void checkDense(AbstractComplexVector A) {
+    if (!(A is ComplexVector)) {
       throw new ArgumentError("Matrix must be dense");
     }
   }
@@ -94,13 +94,13 @@ class ComplexProperty {
    * @throws ArgumentError
    *             if <tt>A.rows() != A.columns()</tt>.
    */
-  void checkSquare(ComplexMatrix A) {
+  void checkSquare(AbstractComplexMatrix A) {
     if (A.rows != A.columns) {
       throw new ArgumentError("Matrix must be square: " + AbstractFormatter.shape2D(A));
     }
   }
 
-  void checkSparse(ComplexMatrix A) {
+  void checkSparse(AbstractComplexMatrix A) {
     if (!(A is SparseCCComplexMatrix) && !(A is SparseRCComplexMatrix)) {
       throw new ArgumentError("Matrix must be sparse");
     }
@@ -117,7 +117,7 @@ class ComplexProperty {
    * @return <tt>true</tt> if the matrix is equal to the value; <tt>false</tt>
    *         otherwise.
    */
-  bool equalsValue1D(final ComplexVector A, final Float64List value) {
+  bool equalsValue1D(final AbstractComplexVector A, final Float64List value) {
     if (A == null) {
       return false;
     }
@@ -192,7 +192,7 @@ class ComplexProperty {
    * @return <tt>true</tt> if both matrices are equal; <tt>false</tt>
    *         otherwise.
    */
-  bool equalsVector(final ComplexVector A, final ComplexVector B) {
+  bool equalsVector(final AbstractComplexVector A, final AbstractComplexVector B) {
     if (identical(A, B)) {
       return true;
     }
@@ -277,7 +277,7 @@ class ComplexProperty {
    * @return <tt>true</tt> if the matrix is equal to the value; <tt>false</tt>
    *         otherwise.
    */
-  bool equalsValue2D(final ComplexMatrix A, final Float64List value) {
+  bool equalsValue2D(final AbstractComplexMatrix A, final Float64List value) {
     if (A == null) {
       return false;
     }
@@ -357,7 +357,7 @@ class ComplexProperty {
    * @return <tt>true</tt> if both matrices are equal; <tt>false</tt>
    *         otherwise.
    */
-  bool equalsMatrix(final ComplexMatrix A, final ComplexMatrix B) {
+  bool equalsMatrix(final AbstractComplexMatrix A, final AbstractComplexMatrix B) {
     if (identical(A, B)) {
       return true;
     }

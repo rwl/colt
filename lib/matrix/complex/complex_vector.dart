@@ -9,298 +9,200 @@ It is provided "as is" without expressed or implied warranty.
 part of cern.colt.matrix;
 
 /**
- * Abstract base class for 1-d matrices (aka <i>vectors</i>) holding
- * <tt>complex</tt> elements. A matrix has a number of cells (its <i>size</i>),
- * which are assigned upon instance construction. Elements are accessed via zero
- * based indexes. Legal indexes are of the form <tt>[0..size()-1]</tt>. Any
- * attempt to access an element at a coordinate
- * <tt>index&lt;0 || index&gt;=size()</tt> will throw an
- * <tt>IndexOutOfBoundsException</tt>.
+ * Dense 1-d matrix (aka <i>vector</i>) holding <tt>complex</tt> elements.
+ * <p>
+ * Internally holds one single contiguous one-dimensional array. Complex data is
+ * represented by 2 double values in sequence, i.e. elements[zero + 2 * k *
+ * stride] constitute real part and elements[zero + 2 * k * stride + 1]
+ * constitute imaginary part (k=0,...,size()-1).
  *
  * @author Piotr Wendykier (piotr.wendykier@gmail.com)
  *
  */
-abstract class ComplexVector extends AbstractVector {
+class ComplexVector extends AbstractComplexVector {
 
   /**
-   * Makes this class non instantiable, but still let's others inherit from
-   * it.
+   * The elements of this matrix. Complex data is represented by 2 double
+   * values in sequence, i.e. elements[zero + 2 * k * stride] constitute real
+   * part and elements[zero + 2 * k * stride] constitute imaginary part
+   * (k=0,...,size()-1).
    */
-  /*ComplexVector() {
-    }*/
+  Float64List _elements;
 
   /**
-   * Applies a function to each cell and aggregates the results.
+   * Constructs a matrix with a copy of the given values. The values are
+   * copied. So subsequent changes in <tt>values</tt> are not reflected in the
+   * matrix, and vice-versa. Due to the fact that complex data is represented
+   * by 2 double values in sequence: the real and imaginary parts, the size of
+   * new matrix will be equal to values.length / 2.
    *
-   * @param aggr
-   *            an aggregation function taking as first argument the current
-   *            aggregation and as second argument the transformed current
-   *            cell value.
-   * @param f
-   *            a function transforming the current cell value.
-   * @return the aggregated measure.
-   * @see cern.jet.math.tdcomplex.ComplexFunctions
+   * @param values
+   *            The values to be filled into the new matrix.
    */
+  factory ComplexVector.fromList(Float64List values) {
+    return new ComplexVector(values.length ~/ 2)
+      ..setAll(values);
+  }
+
+  /**
+   * Constructs a complex matrix with the same size as <tt>realPart</tt>
+   * matrix and fills the real part of this matrix with elements of
+   * <tt>realPart</tt>.
+   *
+   * @param realPart
+   *            a real matrix whose elements become a real part of this matrix
+   * @throws IllegalArgumentException
+   *             if <tt>size<0</tt>.
+   */
+  factory ComplexVector.fromRealPart(AbstractDoubleVector realPart) {
+    return new ComplexVector(realPart.length)..setReal(realPart);
+  }
+
+  /**
+   * Constructs a complex matrix with the same size as <tt>realPart</tt>
+   * matrix and fills the real part of this matrix with elements of
+   * <tt>realPart</tt> and fills the imaginary part of this matrix with
+   * elements of <tt>imaginaryPart</tt>.
+   *
+   * @param realPart
+   *            a real matrix whose elements become a real part of this matrix
+   * @param imaginaryPart
+   *            a imaginary matrix whose elements become a imaginary part of
+   *            this matrix
+   * @throws IllegalArgumentException
+   *             if <tt>size<0</tt>.
+   */
+  factory ComplexVector.fromParts(AbstractDoubleVector realPart, AbstractDoubleVector imaginaryPart) {
+    return new ComplexVector(realPart.length)
+        ..setReal(realPart)
+        ..setImaginary(imaginaryPart);
+  }
+
+  /**
+   * Constructs a matrix with the given parameters.
+   *
+   * @param size
+   *            the number of cells the matrix shall have.
+   * @param elements
+   *            the cells.
+   * @param zero
+   *            the index of the first element.
+   * @param stride
+   *            the number of indexes between any two elements, i.e.
+   *            <tt>index(i+1)-index(i)</tt>.
+   * @param isNoView
+   *            if false then the view is constructed
+   * @throws IllegalArgumentException
+   *             if <tt>size<0</tt>.
+   */
+  ComplexVector(int size, [Float64List elements = null, int zero = 0, int stride = 2, bool isNoView = true]) {
+    if (elements == null) {
+      elements = new Float64List(2 * size);
+    }
+    _setUp(size, zero, stride);
+    this._elements = elements;
+    this._isNoView = isNoView;
+  }
+
   Float64List reduce(final cfunc.ComplexComplexComplexFunction aggr, final cfunc.ComplexComplexFunction f) {
     Float64List b = new Float64List(2);
-    int size = this.length;
-    if (size == 0) {
+    if (_size == 0) {
       b[0] = double.NAN;
       b[1] = double.NAN;
       return b;
     }
-    Float64List a = f(get(0));
+    Float64List a = null;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-      nthreads = Math.min(nthreads, size);
+    if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+      nthreads = Math.min(nthreads, _size);
       List<Future> futures = new List<Future>(nthreads);
-      int k = size ~/ nthreads;
+      int k = _size ~/ nthreads;
       for (int j = 0; j < nthreads; j++) {
         final int firstIdx = j * k;
-        final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
+        final int lastIdx = (j == nthreads - 1) ? _size : firstIdx + k;
         futures[j] = ConcurrencyUtils.submit(() {
-          Float64List a = f(get(firstIdx));
+          int idx = _zero + firstIdx * _stride;
+          Float64List a = f([_elements[idx], _elements[idx + 1]]);
           for (int i = firstIdx + 1; i < lastIdx; i++) {
-            a = aggr(a, f(get(i)));
+            idx += _stride;
+            a = aggr(a, f([_elements[idx], _elements[idx + 1]]));
           }
           return a;
         });
       }
       a = ConcurrencyUtils.waitForCompletion(futures, aggr);
     } else {*/
-    for (int i = 1; i < size; i++) {
-      a = aggr(a, f(get(i)));
+    a = f(new Float64List.fromList([_elements[_zero], _elements[_zero + 1]]));
+    int idx = _zero;
+    for (int i = 1; i < _size; i++) {
+      idx += _stride;
+      a = aggr(a, f(new Float64List.fromList([_elements[idx],
+                                              _elements[idx + 1]])));
     }
     //}
     return a;
   }
 
-  /**
-   * Applies a function to each corresponding cell of two matrices and
-   * aggregates the results.
-   *
-   * @param other
-   *            the secondary matrix to operate on.
-   *
-   * @param aggr
-   *            an aggregation function taking as first argument the current
-   *            aggregation and as second argument the transformed current
-   *            cell values.
-   * @param f
-   *            a function transforming the current cell values.
-   * @return the aggregated measure.
-   * @throws ArgumentError
-   *             if <tt>size() != other.size()</tt>.
-   * @see cern.jet.math.tdcomplex.ComplexFunctions
-   */
-  Float64List reduceVector(final ComplexVector other, final cfunc.ComplexComplexComplexFunction aggr, final cfunc.ComplexComplexComplexFunction f) {
+  Float64List reduceVector(final AbstractComplexVector other, final cfunc.ComplexComplexComplexFunction aggr, final cfunc.ComplexComplexComplexFunction f) {
+    if (!(other is ComplexVector)) {
+      return super.reduceVector(other, aggr, f);
+    }
     checkSize(other);
-    int size = this.length;
-    if (size == 0) {
+    if (_size == 0) {
       Float64List b = new Float64List(2);
       b[0] = double.NAN;
       b[1] = double.NAN;
       return b;
     }
-    Float64List a = f(get(0), other.get(0));
+    final int zeroOther = other.index(0);
+    final int strideOther = other.stride();
+    final Float64List elemsOther = other.elements() as Float64List;
+    Float64List a = null;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-      nthreads = Math.min(nthreads, size);
+    if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+      nthreads = Math.min(nthreads, _size);
       List<Future> futures = new List<Future>(nthreads);
-      int k = size ~/ nthreads;
+      int k = _size ~/ nthreads;
       for (int j = 0; j < nthreads; j++) {
         final int firstIdx = j * k;
-        final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
+        final int lastIdx = (j == nthreads - 1) ? _size : firstIdx + k;
         futures[j] = ConcurrencyUtils.submit(() {
-          Float64List a = f(get(firstIdx), other.get(firstIdx));
+          int idx = _zero + firstIdx * _stride;
+          int idxOther = zeroOther + firstIdx * strideOther;
+          Float64List a = f([_elements[idx], _elements[idx + 1]], [elemsOther[idxOther], elemsOther[idxOther + 1]]);
           for (int i = firstIdx + 1; i < lastIdx; i++) {
-            a = aggr(a, f(get(i), other.get(i)));
+            idx += _stride;
+            idxOther += strideOther;
+            a = aggr(a, f([_elements[idx], _elements[idx + 1]], [elemsOther[idxOther], elemsOther[idxOther + 1]]));
           }
           return a;
         });
       }
       a = ConcurrencyUtils.waitForCompletion(futures, aggr);
     } else {*/
-    for (int i = 1; i < size; i++) {
-      a = aggr(a, f(get(i), other.get(i)));
+    int idx = _zero;
+    int idxOther = zeroOther;
+    a = f(new Float64List.fromList([_elements[_zero], _elements[_zero + 1]]),
+        new Float64List.fromList([elemsOther[zeroOther], elemsOther[zeroOther + 1]]));
+    for (int i = 1; i < _size; i++) {
+      idx += _stride;
+      idxOther += strideOther;
+      a = aggr(a, f(new Float64List.fromList([_elements[idx], _elements[idx + 1]]),
+          new Float64List.fromList([elemsOther[idxOther], elemsOther[idxOther + 1]])));
     }
     //}
     return a;
   }
 
-  /**
-   * Assigns the result of a function to each cell;
-   *
-   * @param f
-   *            a function object taking as argument the current cell's value.
-   * @return <tt>this</tt> (for convenience only).
-   * @see cern.jet.math.tdcomplex.ComplexFunctions
-   */
-  ComplexVector forEach(final cfunc.ComplexComplexFunction f) {
-    int size = this.length;
-    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-      nthreads = Math.min(nthreads, size);
-      List<Future> futures = new List<Future>(nthreads);
-      int k = size ~/ nthreads;
-      for (int j = 0; j < nthreads; j++) {
-        final int firstIdx = j * k;
-        final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
-        futures[j] = ConcurrencyUtils.submit(() {
-          for (int i = firstIdx; i < lastIdx; i++) {
-            setQuick(i, f(get(i)));
-          }
-        });
-      }
-      ConcurrencyUtils.waitForCompletion(futures);
-    } else {*/
-    for (int i = 0; i < size; i++) {
-      set(i, f(get(i)));
+  AbstractComplexVector forEach(final cfunc.ComplexComplexFunction function) {
+    if (this._elements == null) {
+      throw new Error();
     }
-    //}
-    return this;
-  }
-
-  /**
-   * Assigns the result of a function to all cells that satisfy a condition.
-   *
-   * @param cond
-   *            a condition.
-   *
-   * @param f
-   *            a function object.
-   * @return <tt>this</tt> (for convenience only).
-   * @see cern.jet.math.tdcomplex.ComplexFunctions
-   */
-  ComplexVector forEachWhere(final cfunc.ComplexProcedure cond, final cfunc.ComplexComplexFunction f) {
-    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-      nthreads = Math.min(nthreads, _size);
-      List<Future> futures = new List<Future>(nthreads);
-      int k = _size ~/ nthreads;
-      for (int j = 0; j < nthreads; j++) {
-        final int firstIdx = j * k;
-        final int lastIdx = (j == nthreads - 1) ? _size : firstIdx + k;
-        futures[j] = ConcurrencyUtils.submit(() {
-          for (int i = firstIdx; i < lastIdx; i++) {
-            Float64List elem = get(i);
-            if (cond(elem) == true) {
-              setQuick(i, f(elem));
-            }
-          }
-        });
+    if (function is cfunc.ComplexMult) {
+      Float64List multiplicator = (function as cfunc.ComplexMult).multiplicator;
+      if (multiplicator[0] == 1 && multiplicator[1] == 0) {
+        return this;
       }
-      ConcurrencyUtils.waitForCompletion(futures);
-    } else {*/
-    Float64List elem;
-    for (int i = 0; i < _size; i++) {
-      elem = get(i);
-      if (cond(elem) == true) {
-        set(i, f(elem));
-      }
-    }
-    //}
-    return this;
-  }
-
-  /**
-   * Assigns a value to all cells that satisfy a condition.
-   *
-   * @param cond
-   *            a condition.
-   *
-   * @param value
-   *            a value (re=value[0], im=value[1]).
-   * @return <tt>this</tt> (for convenience only).
-   *
-   */
-  ComplexVector fillWhere(final cfunc.ComplexProcedure cond, final Float64List value) {
-    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-      nthreads = Math.min(nthreads, _size);
-      List<Future> futures = new List<Future>(nthreads);
-      int k = _size ~/ nthreads;
-      for (int j = 0; j < nthreads; j++) {
-        final int firstIdx = j * k;
-        final int lastIdx = (j == nthreads - 1) ? _size : firstIdx + k;
-        futures[j] = ConcurrencyUtils.submit(() {
-          for (int i = firstIdx; i < lastIdx; i++) {
-            final elem = get(i);
-            if (cond(elem) == true) {
-              setQuick(i, value);
-            }
-          }
-        });
-      }
-      ConcurrencyUtils.waitForCompletion(futures);
-    } else {*/
-    Float64List elem;
-    for (int i = 0; i < _size; i++) {
-      elem = get(i);
-      if (cond(elem) == true) {
-        set(i, value);
-      }
-    }
-    //}
-    return this;
-  }
-
-  /**
-   * Assigns the result of a function to the real part of the receiver. The
-   * imaginary part of the receiver is reset to zero.
-   *
-   * @param f
-   *            a function object taking as argument the current cell's value.
-   * @return <tt>this</tt> (for convenience only).
-   * @see cern.jet.math.tdcomplex.ComplexFunctions
-   */
-  ComplexVector forEachReal(final cfunc.ComplexRealFunction f) {
-    int size = this.length;
-    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-      nthreads = Math.min(nthreads, size);
-      List<Future> futures = new List<Future>(nthreads);
-      int k = size ~/ nthreads;
-      for (int j = 0; j < nthreads; j++) {
-        final int firstIdx = j * k;
-        final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
-        futures[j] = ConcurrencyUtils.submit(() {
-          for (int i = firstIdx; i < lastIdx; i++) {
-            setPartsQuick(i, f(get(i)), 0.0);
-          }
-        });
-      }
-      ConcurrencyUtils.waitForCompletion(futures);
-    } else {*/
-    for (int i = 0; i < size; i++) {
-      setParts(i, f(get(i)), 0.0);
-    }
-    //}
-    return this;
-  }
-
-  /**
-   * Replaces all cell values of the receiver with the values of another
-   * matrix. Both matrices must have the same size. If both matrices share the
-   * same cells (as is the case if they are views derived from the same
-   * matrix) and intersect in an ambiguous way, then replaces <i>as if</i>
-   * using an intermediate auxiliary deep copy of <tt>other</tt>.
-   *
-   * @param other
-   *            the source matrix to copy from (may be identical to the
-   *            receiver).
-   * @return <tt>this</tt> (for convenience only).
-   * @throws ArgumentError
-   *             if <tt>size() != other.size()</tt>.
-   */
-  ComplexVector copyFrom(ComplexVector other) {
-    if (other == this) return this;
-    checkSize(other);
-    ComplexVector otherLoc;
-    if (_haveSharedCells(other)) {
-      otherLoc = other.copy();
-    } else {
-      otherLoc = other;
     }
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
@@ -311,875 +213,920 @@ abstract class ComplexVector extends AbstractVector {
         final int firstIdx = j * k;
         final int lastIdx = (j == nthreads - 1) ? _size : firstIdx + k;
         futures[j] = ConcurrencyUtils.submit(() {
-          for (int i = firstIdx; i < lastIdx; i++) {
-            setQuick(i, otherLoc.get(i));
-          }
-        });
-      }
-      ConcurrencyUtils.waitForCompletion(futures);
-    } else {*/
-      for (int i = 0; i < _size; i++) {
-        set(i, otherLoc.get(i));
-      }
-    //}
-    return this;
-  }
-
-  /**
-   * Assigns the result of a function to each cell;
-   *
-   * @param y
-   *            the secondary matrix to operate on.
-   * @param f
-   *            a function object taking as first argument the current cell's
-   *            value of <tt>this</tt>, and as second argument the current
-   *            cell's value of <tt>y</tt>,
-   * @return <tt>this</tt> (for convenience only).
-   * @throws ArgumentError
-   *             if <tt>size() != y.size()</tt>.
-   * @see cern.jet.math.tdcomplex.ComplexFunctions
-   */
-  ComplexVector forEachVector(final ComplexVector y, final cfunc.ComplexComplexComplexFunction f) {
-    int size = this.length;
-    checkSize(y);
-    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-      nthreads = Math.min(nthreads, size);
-      List<Future> futures = new List<Future>(nthreads);
-      int k = size ~/ nthreads;
-      for (int j = 0; j < nthreads; j++) {
-        final int firstIdx = j * k;
-        final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
-        futures[j] = ConcurrencyUtils.submit(() {
-          for (int i = firstIdx; i < lastIdx; i++) {
-            setQuick(i, f(get(i), y.get(i)));
-          }
-        });
-      }
-      ConcurrencyUtils.waitForCompletion(futures);
-    } else {*/
-      for (int i = 0; i < size; i++) {
-        set(i, f(get(i), y.get(i)));
-      }
-    //}
-    return this;
-  }
-
-  /**
-   * Sets all cells to the state specified by <tt>re</tt> and <tt>im</tt>.
-   *
-   * @param re
-   *            the real part of the value to be filled into the cells.
-   * @param im
-   *            the imaginary part of the value to be filled into the cells.
-   *
-   * @return <tt>this</tt> (for convenience only).
-   */
-  ComplexVector fill(final double re, final double im) {
-    int size = this.length;
-    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-      nthreads = Math.min(nthreads, size);
-      List<Future> futures = new List<Future>(nthreads);
-      int k = size ~/ nthreads;
-      for (int j = 0; j < nthreads; j++) {
-        final int firstIdx = j * k;
-        final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
-        futures[j] = ConcurrencyUtils.submit(() {
-          for (int i = firstIdx; i < lastIdx; i++) {
-            setPartsQuick(i, re, im);
-          }
-        });
-      }
-      ConcurrencyUtils.waitForCompletion(futures);
-    } else {*/
-      for (int i = 0; i < size; i++) {
-        setParts(i, re, im);
-      }
-    //}
-    return this;
-  }
-
-  /**
-   * Sets all cells to the state specified by <tt>values</tt>. <tt>values</tt>
-   * is required to have the same number of cells as the receiver. Complex
-   * data is represented by 2 double values in sequence: the real and
-   * imaginary parts, i.e. input array must be of size 2*size().
-   * <p>
-   * The values are copied. So subsequent changes in <tt>values</tt> are not
-   * reflected in the matrix, and vice-versa.
-   *
-   * @param values
-   *            the values to be filled into the cells.
-   * @return <tt>this</tt> (for convenience only).
-   * @throws ArgumentError
-   *             if <tt>values.length != 2*size()</tt>.
-   */
-  ComplexVector setAll(final Float64List values) {
-    int size = this.length;
-    if (values.length != 2 * size) {
-      throw new ArgumentError("The length of values[] must be equal to 2*size()=$size");
-    }
-    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-      nthreads = Math.min(nthreads, size);
-      List<Future> futures = new List<Future>(nthreads);
-      int k = size ~/ nthreads;
-      for (int j = 0; j < nthreads; j++) {
-        final int firstIdx = j * k;
-        final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
-        futures[j] = ConcurrencyUtils.submit(() {
-          for (int i = firstIdx; i < lastIdx; i++) {
-            setPartsQuick(i, values[2 * i], values[2 * i + 1]);
-          }
-        });
-      }
-      ConcurrencyUtils.waitForCompletion(futures);
-    } else {*/
-      for (int i = 0; i < size; i++) {
-        setParts(i, values[2 * i], values[2 * i + 1]);
-      }
-    //}
-    return this;
-  }
-
-  /**
-   * Replaces imaginary part of the receiver with the values of another real
-   * matrix. The real part remains unchanged. Both matrices must have the same
-   * size.
-   *
-   * @param other
-   *            the source matrix to copy from
-   * @return <tt>this</tt> (for convenience only).
-   * @throws ArgumentError
-   *             if <tt>size() != other.size()</tt>.
-   */
-  ComplexVector setImaginary(final DoubleVector other) {
-    checkSize(other);
-    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-      nthreads = Math.min(nthreads, _size);
-      List<Future> futures = new List<Future>(nthreads);
-      int k = _size ~/ nthreads;
-      for (int j = 0; j < nthreads; j++) {
-        final int firstIdx = j * k;
-        final int lastIdx = (j == nthreads - 1) ? _size : firstIdx + k;
-        futures[j] = ConcurrencyUtils.submit(() {
-          for (int i = firstIdx; i < lastIdx; i++) {
-            double re = get(i)[0];
-            double im = other.get(i);
-            setPartsQuick(i, re, im);
-          }
-        });
-      }
-      ConcurrencyUtils.waitForCompletion(futures);
-    } else {*/
-      for (int i = 0; i < _size; i++) {
-        double re = get(i)[0];
-        double im = other.get(i);
-        setParts(i, re, im);
-      }
-    //}
-    return this;
-  }
-
-  /**
-   * Replaces real part of the receiver with the values of another real
-   * matrix. The imaginary part remains unchanged. Both matrices must have the
-   * same size.
-   *
-   * @param other
-   *            the source matrix to copy from
-   * @return <tt>this</tt> (for convenience only).
-   * @throws ArgumentError
-   *             if <tt>size() != other.size()</tt>.
-   */
-  ComplexVector setReal(final DoubleVector other) {
-    checkSize(other);
-    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-      nthreads = Math.min(nthreads, _size);
-      List<Future> futures = new List<Future>(nthreads);
-      int k = _size ~/ nthreads;
-      for (int j = 0; j < nthreads; j++) {
-        final int firstIdx = j * k;
-        final int lastIdx = (j == nthreads - 1) ? _size : firstIdx + k;
-        futures[j] = ConcurrencyUtils.submit(() {
-          for (int i = firstIdx; i < lastIdx; i++) {
-            double re = other.get(i);
-            double im = get(i)[1];
-            setPartsQuick(i, re, im);
-          }
-        });
-      }
-      ConcurrencyUtils.waitForCompletion(futures);
-    } else {*/
-      for (int i = 0; i < _size; i++) {
-        double re = other.get(i);
-        double im = get(i)[1];
-        setParts(i, re, im);
-      }
-    //}
-    return this;
-  }
-
-  /**
-   * Returns the number of cells having non-zero values; ignores tolerance.
-   *
-   * @return the number of cells having non-zero values.
-   */
-  int get cardinality {
-    int size = this.length;
-    int cardinality = 0;
-    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-      nthreads = Math.min(nthreads, size);
-      List<Future> futures = new List<Future>(nthreads);
-      List<int> results = new List<int>(nthreads);
-      int k = size ~/ nthreads;
-      for (int j = 0; j < nthreads; j++) {
-        final int firstIdx = j * k;
-        final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
-        futures[j] = ConcurrencyUtils.submit(() {
-          int cardinality = 0;
           Float64List tmp = new Float64List(2);
-          for (int i = firstIdx; i < lastIdx; i++) {
-            tmp = get(i);
-            if ((tmp[0] != 0.0) || (tmp[1] != 0.0)) cardinality++;
+          int idx = _zero + firstIdx * _stride;
+          if (function is ComplexMult) {
+            Float64List multiplicator = (function as ComplexMult).multiplicator;
+            for (int k = firstIdx; k < lastIdx; k++) {
+              _elements[idx] = _elements[idx] * multiplicator[0] - _elements[idx + 1] * multiplicator[1];
+              _elements[idx + 1] = _elements[idx + 1] * multiplicator[0] + _elements[idx] * multiplicator[1];
+              idx += _stride;
+            }
+          } else {
+            for (int k = firstIdx; k < lastIdx; k++) {
+              tmp[0] = _elements[idx];
+              tmp[1] = _elements[idx + 1];
+              tmp = function(tmp);
+              _elements[idx] = tmp[0];
+              _elements[idx + 1] = tmp[1];
+              idx += _stride;
+            }
           }
-          return cardinality;
         });
       }
-      try {
-        for (int j = 0; j < nthreads; j++) {
-          results[j] = futures[j].get();
-        }
-        cardinality = results[0];
-        for (int j = 1; j < nthreads; j++) {
-          cardinality += results[j];
-        }
-      } on ExecutionException catch (ex) {
-        ex.printStackTrace();
-      } on InterruptedException catch (e) {
-        e.printStackTrace();
-      }
+      ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
     Float64List tmp = new Float64List(2);
-    for (int i = 0; i < size; i++) {
-      tmp = get(i);
-      if ((tmp[0] != 0.0) || (tmp[1] != 0.0)) cardinality++;
+    int idx = _zero;
+    if (function is cfunc.ComplexMult) {
+      Float64List multiplicator = (function as cfunc.ComplexMult).multiplicator;
+      for (int k = 0; k < _size; k++) {
+        _elements[idx] = _elements[idx] * multiplicator[0] - _elements[idx + 1] * multiplicator[1];
+        _elements[idx + 1] = _elements[idx + 1] * multiplicator[0] + _elements[idx] * multiplicator[1];
+        idx += _stride;
+      }
+    } else {
+      for (int k = 0; k < _size; k++) {
+        tmp[0] = _elements[idx];
+        tmp[1] = _elements[idx + 1];
+        tmp = function(tmp);
+        _elements[idx] = tmp[0];
+        _elements[idx + 1] = tmp[1];
+        idx += _stride;
+      }
     }
     //}
-    return cardinality;
+    return this;
   }
 
-  /**
-   * Constructs and returns a deep copy of the receiver.
-   * <p>
-   * <b>Note that the returned matrix is an independent deep copy.</b> The
-   * returned matrix is not backed by this matrix, so changes in the returned
-   * matrix are not reflected in this matrix, and vice-versa.
-   *
-   * @return a deep copy of the receiver.
-   */
-  ComplexVector copy() {
-    ComplexVector copy = like();
-    copy.copyFrom(this);
-    return copy;
+  AbstractComplexVector forEachWhere(final cfunc.ComplexProcedure cond, final cfunc.ComplexComplexFunction function) {
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+      nthreads = Math.min(nthreads, _size);
+      List<Future> futures = new List<Future>(nthreads);
+      int k = _size ~/ nthreads;
+      for (int j = 0; j < nthreads; j++) {
+        final int firstIdx = j * k;
+        final int lastIdx = (j == nthreads - 1) ? _size : firstIdx + k;
+        futures[j] = ConcurrencyUtils.submit(() {
+          Float64List elem = new Float64List(2);
+          int idx = _zero + firstIdx * _stride;
+          for (int i = firstIdx; i < lastIdx; i++) {
+            elem[0] = _elements[idx];
+            elem[1] = _elements[idx + 1];
+            if (cond(elem) == true) {
+              elem = function(elem);
+              _elements[idx] = elem[0];
+              _elements[idx + 1] = elem[1];
+            }
+            idx += _stride;
+          }
+        });
+      }
+      ConcurrencyUtils.waitForCompletion(futures);
+    } else {*/
+    Float64List elem = new Float64List(2);
+    int idx = _zero;
+    for (int i = 0; i < _size; i++) {
+      elem[0] = _elements[idx];
+      elem[1] = _elements[idx + 1];
+      if (cond(elem) == true) {
+        elem = function(elem);
+        _elements[idx] = elem[0];
+        _elements[idx + 1] = elem[1];
+      }
+      idx += _stride;
+    }
+    //}
+    return this;
   }
 
-  /**
-   * Returns whether all cells are equal to the given value.
-   *
-   * @param value
-   *            the value to test against (re=value[0], im=value[1]).
-   *
-   * @return <tt>true</tt> if all cells are equal to the given value,
-   *         <tt>false</tt> otherwise.
-   */
-  /*bool equalsValue(Float64List value) {
-    return ComplexProperty.DEFAULT.equalsValue1D(this, value);
-  }*/
-
-  /**
-   * Compares this object against the specified object. The result is
-   * <code>true</code> if and only if the argument is not <code>null</code>
-   * and is at least a <code>ComplexVector</code> object that has the same
-   * sizes as the receiver and has exactly the same values at the same
-   * indexes.
-   *
-   * @param obj
-   *            the object to compare with.
-   * @return <code>true</code> if the objects are the same; <code>false</code>
-   *         otherwise.
-   */
-  bool operator ==(var obj) {
-    if (obj is num) {
-      final c = new Float64List.fromList([obj.toDouble, 0.0]);
-      return ComplexProperty.DEFAULT.equalsValue1D(this, c);
+  AbstractComplexVector fillWhere(final cfunc.ComplexProcedure cond, final Float64List value) {
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+      nthreads = Math.min(nthreads, _size);
+      List<Future> futures = new List<Future>(nthreads);
+      int k = _size ~/ nthreads;
+      for (int j = 0; j < nthreads; j++) {
+        final int firstIdx = j * k;
+        final int lastIdx = (j == nthreads - 1) ? _size : firstIdx + k;
+        futures[j] = ConcurrencyUtils.submit(() {
+          Float64List elem = new Float64List(2);
+          int idx = _zero + firstIdx * _stride;
+          for (int i = firstIdx; i < lastIdx; i++) {
+            elem[0] = _elements[idx];
+            elem[1] = _elements[idx + 1];
+            if (cond(elem) == true) {
+              _elements[idx] = value[0];
+              _elements[idx + 1] = value[1];
+            }
+            idx += _stride;
+          }
+        });
+      }
+      ConcurrencyUtils.waitForCompletion(futures);
+    } else {*/
+    Float64List elem = new Float64List(2);
+    int idx = _zero;
+    for (int i = 0; i < _size; i++) {
+      elem[0] = _elements[idx];
+      elem[1] = _elements[idx + 1];
+      if (cond(elem) == true) {
+        _elements[idx] = value[0];
+        _elements[idx + 1] = value[1];
+      }
+      idx += _stride;
     }
-    if (obj is Float64List) {
-      return ComplexProperty.DEFAULT.equalsValue1D(this, obj);
-    }
-    if (identical(this, obj)) {
-      return true;
-    }
-    if (obj == null) {
-      return false;
-    }
-    if (obj is! ComplexVector) {
-      return false;
-    }
-
-    return ComplexProperty.DEFAULT.equalsVector(this, obj as ComplexVector);
+    //}
+    return this;
   }
 
-  /**
-   * Returns the matrix cell value at coordinate <tt>index</tt>.
-   *
-   * @param index
-   *            the index of the cell.
-   * @return the value of the specified cell.
-   * @throws IndexOutOfBoundsException
-   *             if <tt>index&lt;0 || index&gt;=size()</tt>.
-   */
-  Float64List operator [](int index) {
-    int size = this.length;
-    if (index < 0 || index >= size) {
-      _checkIndex(index);
+  AbstractComplexVector forEachReal(final cfunc.ComplexRealFunction function) {
+    if (this._elements == null) {
+      throw new Error();
     }
-    return get(index);
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+      nthreads = Math.min(nthreads, _size);
+      List<Future> futures = new List<Future>(nthreads);
+      int k = _size ~/ nthreads;
+      for (int j = 0; j < nthreads; j++) {
+        final int firstIdx = j * k;
+        final int lastIdx = (j == nthreads - 1) ? _size : firstIdx + k;
+        futures[j] = ConcurrencyUtils.submit(() {
+          int idx = _zero + firstIdx * _stride;
+          if (function == ComplexFunctions.abs) {
+            for (int k = firstIdx; k < lastIdx; k++) {
+              double absX = Math.abs(_elements[idx]);
+              double absY = Math.abs(_elements[idx + 1]);
+              if (absX == 0.0 && absY == 0.0) {
+                _elements[idx] = 0;
+              } else if (absX >= absY) {
+                double d = _elements[idx + 1] / _elements[idx];
+                _elements[idx] = absX * Math.sqrt(1.0 + d * d);
+              } else {
+                double d = _elements[idx] / _elements[idx + 1];
+                _elements[idx] = absY * Math.sqrt(1.0 + d * d);
+              }
+              _elements[idx + 1] = 0;
+              idx += _stride;
+            }
+          } else {
+            Float64List tmp = new Float64List(2);
+            for (int k = firstIdx; k < lastIdx; k++) {
+              tmp[0] = _elements[idx];
+              tmp[1] = _elements[idx + 1];
+              tmp[0] = function(tmp);
+              _elements[idx] = tmp[0];
+              _elements[idx + 1] = 0;
+              idx += _stride;
+            }
+          }
+        });
+      }
+      ConcurrencyUtils.waitForCompletion(futures);
+    } else {*/
+    int idx = _zero;
+    if (function == cfunc.abs) {
+      for (int k = 0; k < _size; k++) {
+        double absX = _elements[idx].abs();
+        double absY = _elements[idx + 1].abs();
+        if (absX == 0.0 && absY == 0.0) {
+          _elements[idx] = 0.0;
+        } else if (absX >= absY) {
+          double d = _elements[idx + 1] / _elements[idx];
+          _elements[idx] = absX * Math.sqrt(1.0 + d * d);
+        } else {
+          double d = _elements[idx] / _elements[idx + 1];
+          _elements[idx] = absY * Math.sqrt(1.0 + d * d);
+        }
+        _elements[idx + 1] = 0.0;
+        idx += _stride;
+      }
+    } else {
+      Float64List tmp = new Float64List(2);
+      for (int k = 0; k < _size; k++) {
+        tmp[0] = _elements[idx];
+        tmp[1] = _elements[idx + 1];
+        tmp[0] = function(tmp);
+        _elements[idx] = tmp[0];
+        _elements[idx + 1] = 0.0;
+        idx += _stride;
+      }
+    }
+    //}
+    return this;
   }
 
-  /**
-   * Returns the elements of this matrix.
-   *
-   * @return the elements
-   */
-  Object elements();
+  AbstractComplexVector copyFrom(AbstractComplexVector source) {
+    if (!(source is ComplexVector)) {
+      return super.copyFrom(source);
+    }
+    ComplexVector other = source as ComplexVector;
+    if (other == this) return this;
+    checkSize(other);
+    if (_isNoView && other._isNoView) { // quickest
+      //System.arraycopy(other._elements, 0, this._elements, 0, this._elements.length);
+      this._elements.setAll(0, other._elements);
+      return this;
+    }
+    if (_haveSharedCells(other)) {
+      AbstractComplexVector c = other.copy();
+      if (!(c is ComplexVector)) { // should not happen
+        return super.copyFrom(source);
+      }
+      other = c as ComplexVector;
+    }
 
-  /**
-   * Returns the imaginary part of this matrix
-   *
-   * @return the imaginary part
-   */
-  DoubleVector imaginary();
+    final Float64List elemsOther = other._elements;
+    if (_elements == null || elemsOther == null) {
+      throw new Error();
+    }
+    final int strideOther = other._stride;
+    final int zeroOther = other.index(0);
 
-  /**
-   * Fills the coordinates and values of cells having non-zero values into the
-   * specified lists. Fills into the lists, starting at index 0. After this
-   * call returns the specified lists all have a new size, the number of
-   * non-zero values.
-   * <p>
-   * In general, fill order is <i>unspecified</i>. This implementation fills
-   * like: <tt>for (index = 0..size()-1)  do ... </tt>. However, subclasses
-   * are free to us any other order, even an order that may change over time
-   * as cell values are changed. (Of course, result lists indexes are
-   * guaranteed to correspond to the same cell).
-   *
-   * @param indexList
-   *            the list to be filled with indexes, can have any size.
-   * @param valueList
-   *            the list to be filled with values, can have any size.
-   */
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+      nthreads = Math.min(nthreads, _size);
+      List<Future> futures = new List<Future>(nthreads);
+      int k = _size ~/ nthreads;
+      for (int j = 0; j < nthreads; j++) {
+        final int firstIdx = j * k;
+        final int lastIdx = (j == nthreads - 1) ? _size : firstIdx + k;
+        futures[j] = ConcurrencyUtils.submit(() {
+          int idx = _zero + firstIdx * _stride;
+          int idxOther = zeroOther + firstIdx * strideOther;
+          for (int k = firstIdx; k < lastIdx; k++) {
+            _elements[idx] = elemsOther[idxOther];
+            _elements[idx + 1] = elemsOther[idxOther + 1];
+            idx += _stride;
+            idxOther += strideOther;
+          }
+        });
+      }
+      ConcurrencyUtils.waitForCompletion(futures);
+    } else {*/
+    int idx = _zero;
+    int idxOther = zeroOther;
+    for (int k = 0; k < _size; k++) {
+      _elements[idx] = elemsOther[idxOther];
+      _elements[idx + 1] = elemsOther[idxOther + 1];
+      idx += _stride;
+      idxOther += strideOther;
+    }
+    //}
+    return this;
+  }
+
+  AbstractComplexVector forEachWith(AbstractComplexVector y, final cfunc.ComplexComplexComplexFunction function) {
+    if (!(y is ComplexVector)) {
+      return super.forEachWith(y, function);
+    }
+    checkSize(y);
+    final Float64List elemsOther = y.elements() as Float64List;
+    final int zeroOther = y.index(0);
+    final int strideOther = y.stride();
+
+    if (_elements == null || elemsOther == null) {
+      throw new Error();
+    }
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+      nthreads = Math.min(nthreads, _size);
+      List<Future> futures = new List<Future>(nthreads);
+      int k = _size ~/ nthreads;
+      for (int j = 0; j < nthreads; j++) {
+        final int firstIdx = j * k;
+        final int lastIdx = (j == nthreads - 1) ? _size : firstIdx + k;
+        futures[j] = ConcurrencyUtils.submit(() {
+          int idx = _zero + firstIdx * _stride;
+          int idxOther = zeroOther + firstIdx * strideOther;
+          if (function == cfunc.plus) {
+            for (int k = firstIdx; k < lastIdx; k++) {
+              _elements[idx] += elemsOther[idxOther];
+              _elements[idx + 1] += elemsOther[idxOther + 1];
+              idx += _stride;
+              idxOther += strideOther;
+            }
+          } else if (function == cfunc.minus) {
+            for (int k = firstIdx; k < lastIdx; k++) {
+              _elements[idx] -= elemsOther[idxOther];
+              _elements[idx + 1] -= elemsOther[idxOther + 1];
+              idx += _stride;
+              idxOther += strideOther;
+            }
+          } else if (function == cfunc.div) {
+            Float64List tmp = new Float64List(2);
+            for (int k = firstIdx; k < lastIdx; k++) {
+              double re = elemsOther[idxOther];
+              double im = elemsOther[idxOther + 1];
+              double scalar;
+              if (re.abs() >= im.abs()) {
+                scalar = (1.0 / (re + im * (im / re)));
+                tmp[0] = scalar * (_elements[idx] + _elements[idx + 1] * (im / re));
+                tmp[1] = scalar * (_elements[idx + 1] - _elements[idx] * (im / re));
+              } else {
+                scalar = (1.0 / (re * (re / im) + im));
+                tmp[0] = scalar * (_elements[idx] * (re / im) + _elements[idx + 1]);
+                tmp[1] = scalar * (_elements[idx + 1] * (re / im) - _elements[idx]);
+              }
+              _elements[idx] = tmp[0];
+              _elements[idx + 1] = tmp[1];
+              idx += _stride;
+              idxOther += strideOther;
+            }
+          } else if (function == cfunc.mult) {
+            Float64List tmp = new Float64List(2);
+            for (int k = firstIdx; k < lastIdx; k++) {
+              tmp[0] = _elements[idx] * elemsOther[idxOther] - _elements[idx + 1] * elemsOther[idxOther + 1];
+              tmp[1] = _elements[idx + 1] * elemsOther[idxOther] + _elements[idx] * elemsOther[idxOther + 1];
+              _elements[idx] = tmp[0];
+              _elements[idx + 1] = tmp[1];
+              idx += _stride;
+              idxOther += strideOther;
+            }
+          } else if (function == cfunc.multConjFirst) {
+            Float64List tmp = new Float64List(2);
+            for (int k = firstIdx; k < lastIdx; k++) {
+              tmp[0] = _elements[idx] * elemsOther[idxOther] + _elements[idx + 1] * elemsOther[idxOther + 1];
+              tmp[1] = -_elements[idx + 1] * elemsOther[idxOther] + _elements[idx] * elemsOther[idxOther + 1];
+              _elements[idx] = tmp[0];
+              _elements[idx + 1] = tmp[1];
+              idx += _stride;
+              idxOther += strideOther;
+            }
+          } else if (function == cfunc.multConjSecond) {
+            Float64List tmp = new Float64List(2);
+            for (int k = firstIdx; k < lastIdx; k++) {
+              tmp[0] = _elements[idx] * elemsOther[idxOther] + _elements[idx + 1] * elemsOther[idxOther + 1];
+              tmp[1] = _elements[idx + 1] * elemsOther[idxOther] - _elements[idx] * elemsOther[idxOther + 1];
+              _elements[idx] = tmp[0];
+              _elements[idx + 1] = tmp[1];
+              idx += _stride;
+              idxOther += strideOther;
+            }
+          } else {
+            Float64List tmp1 = new Float64List(2);
+            Float64List tmp2 = new Float64List(2);
+            for (int k = firstIdx; k < lastIdx; k++) {
+              tmp1[0] = _elements[idx];
+              tmp1[1] = _elements[idx + 1];
+              tmp2[0] = elemsOther[idxOther];
+              tmp2[1] = elemsOther[idxOther + 1];
+              tmp1 = function(tmp1, tmp2);
+              _elements[idx] = tmp1[0];
+              _elements[idx + 1] = tmp1[1];
+              idx += _stride;
+              idxOther += strideOther;
+            }
+          }
+        });
+      }
+      ConcurrencyUtils.waitForCompletion(futures);
+    } else {*/
+    int idx = _zero;
+    int idxOther = zeroOther;
+    if (function == cfunc.plus) {
+      for (int k = 0; k < _size; k++) {
+        _elements[idx] += elemsOther[idxOther];
+        _elements[idx + 1] += elemsOther[idxOther + 1];
+        idx += _stride;
+        idxOther += strideOther;
+      }
+    } else if (function == cfunc.minus) {
+      for (int k = 0; k < _size; k++) {
+        _elements[idx] -= elemsOther[idxOther];
+        _elements[idx + 1] -= elemsOther[idxOther + 1];
+        idx += _stride;
+        idxOther += strideOther;
+      }
+    } else if (function == cfunc.div) {
+      Float64List tmp = new Float64List(2);
+      for (int k = 0; k < _size; k++) {
+        double re = elemsOther[idxOther];
+        double im = elemsOther[idxOther + 1];
+        double scalar;
+        if (re.abs() >= im.abs()) {
+          scalar = (1.0 / (re + im * (im / re)));
+          tmp[0] = scalar * (_elements[idx] + _elements[idx + 1] * (im / re));
+          tmp[1] = scalar * (_elements[idx + 1] - _elements[idx] * (im / re));
+        } else {
+          scalar = (1.0 / (re * (re / im) + im));
+          tmp[0] = scalar * (_elements[idx] * (re / im) + _elements[idx + 1]);
+          tmp[1] = scalar * (_elements[idx + 1] * (re / im) - _elements[idx]);
+        }
+        _elements[idx] = tmp[0];
+        _elements[idx + 1] = tmp[1];
+        idx += _stride;
+        idxOther += strideOther;
+      }
+    } else if (function == cfunc.mult) {
+      Float64List tmp = new Float64List(2);
+      for (int k = 0; k < _size; k++) {
+        tmp[0] = _elements[idx] * elemsOther[idxOther] - _elements[idx + 1] * elemsOther[idxOther + 1];
+        tmp[1] = _elements[idx + 1] * elemsOther[idxOther] + _elements[idx] * elemsOther[idxOther + 1];
+        _elements[idx] = tmp[0];
+        _elements[idx + 1] = tmp[1];
+        idx += _stride;
+        idxOther += strideOther;
+      }
+    } else if (function == cfunc.multConjFirst) {
+      Float64List tmp = new Float64List(2);
+      for (int k = 0; k < _size; k++) {
+        tmp[0] = _elements[idx] * elemsOther[idxOther] + _elements[idx + 1] * elemsOther[idxOther + 1];
+        tmp[1] = -_elements[idx + 1] * elemsOther[idxOther] + _elements[idx] * elemsOther[idxOther + 1];
+        _elements[idx] = tmp[0];
+        _elements[idx + 1] = tmp[1];
+        idx += _stride;
+        idxOther += strideOther;
+      }
+    } else if (function == cfunc.multConjSecond) {
+      Float64List tmp = new Float64List(2);
+      for (int k = 0; k < _size; k++) {
+        tmp[0] = _elements[idx] * elemsOther[idxOther] + _elements[idx + 1] * elemsOther[idxOther + 1];
+        tmp[1] = _elements[idx + 1] * elemsOther[idxOther] - _elements[idx] * elemsOther[idxOther + 1];
+        _elements[idx] = tmp[0];
+        _elements[idx + 1] = tmp[1];
+        idx += _stride;
+        idxOther += strideOther;
+      }
+    } else {
+      Float64List tmp1 = new Float64List(2);
+      Float64List tmp2 = new Float64List(2);
+      for (int k = 0; k < _size; k++) {
+        tmp1[0] = _elements[idx];
+        tmp1[1] = _elements[idx + 1];
+        tmp2[0] = elemsOther[idxOther];
+        tmp2[1] = elemsOther[idxOther + 1];
+        tmp1 = function(tmp1, tmp2);
+        _elements[idx] = tmp1[0];
+        _elements[idx + 1] = tmp1[1];
+        idx += _stride;
+        idxOther += strideOther;
+      }
+    }
+    //}
+    return this;
+  }
+
+  AbstractComplexVector fill(final double re, final double im) {
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+      nthreads = Math.min(nthreads, _size);
+      List<Future> futures = new List<Future>(nthreads);
+      int k = _size ~/ nthreads;
+      for (int j = 0; j < nthreads; j++) {
+        final int firstIdx = j * k;
+        final int lastIdx = (j == nthreads - 1) ? _size : firstIdx + k;
+        futures[j] = ConcurrencyUtils.submit(() {
+          int idx = _zero + firstIdx * _stride;
+          for (int k = firstIdx; k < lastIdx; k++) {
+            _elements[idx] = re;
+            _elements[idx + 1] = im;
+            idx += _stride;
+          }
+        });
+      }
+      ConcurrencyUtils.waitForCompletion(futures);
+    } else {*/
+    int idx = _zero;
+    for (int i = 0; i < _size; i++) {
+      this._elements[idx] = re;
+      this._elements[idx + 1] = im;
+      idx += _stride;
+    }
+    //}
+    return this;
+  }
+
+  AbstractComplexVector setAll(Float64List values) {
+    if (_isNoView) {
+      if (values.length != 2 * _size) {
+        throw new ArgumentError("The length of values[] must be equal to 2*size()=${2 * length}");
+      }
+      //System.arraycopy(values, 0, this._elements, 0, values.length);
+      this._elements.setAll(0, values);
+    } else {
+      super.setAll(values);
+    }
+    return this;
+  }
+
+  AbstractComplexVector setImaginary(final AbstractDoubleVector other) {
+    if (!(other is DoubleVector)) {
+      return super.setImaginary(other);
+    }
+    checkSize(other);
+    final int zeroOther = other.index(0);
+    final int strideOther = other.stride();
+    final Float64List elemsOther = other.elements() as Float64List;
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+      nthreads = Math.min(nthreads, _size);
+      List<Future> futures = new List<Future>(nthreads);
+      int k = _size ~/ nthreads;
+      for (int j = 0; j < nthreads; j++) {
+        final int firstIdx = j * k;
+        final int lastIdx = (j == nthreads - 1) ? _size : firstIdx + k;
+        futures[j] = ConcurrencyUtils.submit(() {
+          int idx = _zero + firstIdx * _stride;
+          int idxOther = zeroOther + firstIdx * strideOther;
+          for (int i = firstIdx; i < lastIdx; i++) {
+            _elements[idx + 1] = elemsOther[idxOther];
+            idx += _stride;
+            idxOther += strideOther;
+          }
+        });
+      }
+      ConcurrencyUtils.waitForCompletion(futures);
+    } else {*/
+    int idx = _zero;
+    int idxOther = zeroOther;
+    for (int i = 0; i < _size; i++) {
+      _elements[idx + 1] = elemsOther[idxOther];
+      idx += _stride;
+      idxOther += strideOther;
+    }
+    //}
+    return this;
+  }
+
+  AbstractComplexVector setReal(final AbstractDoubleVector other) {
+    if (!(other is DoubleVector)) {
+      return super.setReal(other);
+    }
+    checkSize(other);
+    final int zeroOther = other.index(0);
+    final int strideOther = other.stride();
+    final Float64List elemsOther = other.elements() as Float64List;
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+      nthreads = Math.min(nthreads, _size);
+      List<Future> futures = new List<Future>(nthreads);
+      int k = _size ~/ nthreads;
+      for (int j = 0; j < nthreads; j++) {
+        final int firstIdx = j * k;
+        final int lastIdx = (j == nthreads - 1) ? _size : firstIdx + k;
+        futures[j] = ConcurrencyUtils.submit(() {
+          int idx = _zero + firstIdx * _stride;
+          int idxOther = zeroOther + firstIdx * strideOther;
+          for (int i = firstIdx; i < lastIdx; i++) {
+            _elements[idx] = elemsOther[idxOther];
+            idx += _stride;
+            idxOther += strideOther;
+          }
+        });
+      }
+      ConcurrencyUtils.waitForCompletion(futures);
+    } else {*/
+    int idx = _zero;
+    int idxOther = zeroOther;
+    for (int i = 0; i < _size; i++) {
+      _elements[idx] = elemsOther[idxOther];
+      idx += _stride;
+      idxOther += strideOther;
+    }
+    //}
+    return this;
+  }
+
+  Float64List elements() {
+    return _elements;
+  }
+
+  AbstractDoubleVector imaginary() {
+    final DoubleVector Im = new DoubleVector(_size);
+    final Float64List elemsOther = Im.elements();
+    final int zeroOther = Im.index(0);
+    final int strideOther = Im.stride();
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+      nthreads = Math.min(nthreads, _size);
+      List<Future> futures = new List<Future>(nthreads);
+      int k = _size ~/ nthreads;
+      for (int j = 0; j < nthreads; j++) {
+        final int firstIdx = j * k;
+        final int lastIdx = (j == nthreads - 1) ? _size : firstIdx + k;
+        futures[j] = ConcurrencyUtils.submit(() {
+          int idx = _zero + firstIdx * _stride;
+          int idxOther = zeroOther + firstIdx * strideOther;
+          for (int k = firstIdx; k < lastIdx; k++) {
+            elemsOther[idxOther] = _elements[idx + 1];
+            idx += _stride;
+            idxOther += strideOther;
+          }
+        });
+      }
+      ConcurrencyUtils.waitForCompletion(futures);
+    } else {*/
+    int idx = _zero;
+    int idxOther = zeroOther;
+    for (int i = 0; i < _size; i++) {
+      elemsOther[idxOther] = _elements[idx + 1];
+      idx += _stride;
+      idxOther += strideOther;
+    }
+    //}
+    return Im;
+  }
+
   void nonZeros(final List<int> indexList, final List<Float64List> valueList) {
     indexList.clear();
     valueList.clear();
     int s = length;
-    for (int i = 0; i < s; i++) {
-      Float64List value = get(i);
+
+    int idx = _zero;
+    for (int k = 0; k < s; k++) {
+      Float64List value = new Float64List(2);
+      value[0] = _elements[idx];
+      value[1] = _elements[idx + 1];
       if (value[0] != 0 || value[1] != 0) {
-        indexList.add(i);
+        indexList.add(k);
         valueList.add(value);
       }
+      idx += _stride;
     }
-
   }
 
-  /**
-   * Returns the matrix cell value at coordinate <tt>index</tt>.
-   *
-   * <p>
-   * Provided with invalid parameters this method may return invalid objects
-   * without throwing any exception. <b>You should only use this method when
-   * you are absolutely sure that the coordinate is within bounds.</b>
-   * Precondition (unchecked): <tt>index&lt;0 || index&gt;=size()</tt>.
-   *
-   * @param index
-   *            the index of the cell.
-   * @return the value of the specified cell.
-   */
-  Float64List get(int index);
-
-  /**
-   * Returns the real part of this matrix
-   *
-   * @return the real part
-   */
-  DoubleVector real();
-
-  /**
-   * Construct and returns a new empty matrix <i>of the same dynamic type</i>
-   * as the receiver, having the same size. For example, if the receiver is an
-   * instance of type <tt>DenseComplexVector</tt> the new matrix must also
-   * be of type <tt>DenseComplexVector</tt>. In general, the new matrix
-   * should have internal parametrization as similar as possible.
-   *
-   * @return a new empty matrix of the same dynamic type.
-   */
-  ComplexVector like() {
-    int size = this.length;
-    return like1D(size);
+  Float64List get(int index) {
+    int idx = _zero + index * _stride;
+    return new Float64List.fromList([_elements[idx], _elements[idx + 1]]);
   }
 
-  /**
-   * Construct and returns a new empty matrix <i>of the same dynamic type</i>
-   * as the receiver, having the specified size. For example, if the receiver
-   * is an instance of type <tt>DenseComplexVector</tt> the new matrix must
-   * also be of type <tt>DenseComplexVector</tt>. In general, the new
-   * matrix should have internal parametrization as similar as possible.
-   *
-   * @param size
-   *            the number of cell the matrix shall have.
-   * @return a new empty matrix of the same dynamic type.
-   */
-  ComplexVector like1D(int size);
-
-  /**
-   * Construct and returns a new 2-d matrix <i>of the corresponding dynamic
-   * type</i>, entirely independent of the receiver. For example, if the
-   * receiver is an instance of type <tt>DenseComplexVector</tt> the new
-   * matrix must be of type <tt>DenseComplexMatrix</tt>.
-   *
-   * @param rows
-   *            the number of rows the matrix shall have.
-   * @param columns
-   *            the number of columns the matrix shall have.
-   * @return a new matrix of the corresponding dynamic type.
-   */
-  ComplexMatrix like2D(int rows, int columns);
-
-  /**
-   * Returns new DoubleMatrix of size rows x columns whose elements are
-   * taken column-wise from this matrix.
-   *
-   * @param rows
-   *            number of rows
-   * @param columns
-   *            number of columns
-   * @return new 2D matrix with columns being the elements of this matrix.
-   */
-  ComplexMatrix reshape(int rows, int columns);
-
-  /**
-   * Returns new DoubleMatrix3D of size slices x rows x columns, whose
-   * elements are taken column-wise from this matrix.
-   *
-   * @param rows
-   *            number of rows
-   * @param columns
-   *            number of columns
-   * @return new 2D matrix with columns being the elements of this matrix.
-   */
-  //ComplexMatrix3D reshape(int slices, int rows, int columns);
-
-  /**
-   * Sets the matrix cell at coordinate <tt>index</tt> to the specified value.
-   *
-   * @param index
-   *            the index of the cell.
-   * @param re
-   *            the real part of the value to be filled into the specified
-   *            cell.
-   * @param im
-   *            the imaginary part of the value to be filled into the
-   *            specified cell.
-   *
-   * @throws IndexOutOfBoundsException
-   *             if <tt>index&lt;0 || index&gt;=size()</tt>.
-   */
-  void put(int index, double re, double im) {
-    int size = this.length;
-    if (index < 0 || index >= size) _checkIndex(index);
-    setParts(index, re, im);
-  }
-
-  /**
-   * Sets the matrix cell at coordinate <tt>index</tt> to the specified value.
-   *
-   * @param index
-   *            the index of the cell.
-   * @param value
-   *            the value to be filled into the specified cell (re=value[0],
-   *            im=value[1]).
-   *
-   * @throws IndexOutOfBoundsException
-   *             if <tt>index&lt;0 || index&gt;=size()</tt>.
-   */
-  void operator []=(int index, Float64List value) {
-    int size = this.length;
-    if (index < 0 || index >= size) _checkIndex(index);
-    set(index, value);
-  }
-
-  /**
-   * Sets the matrix cell at coordinate <tt>index</tt> to the specified value.
-   *
-   * <p>
-   * Provided with invalid parameters this method may access illegal indexes
-   * without throwing any exception. <b>You should only use this method when
-   * you are absolutely sure that the coordinate is within bounds.</b>
-   * Precondition (unchecked): <tt>index&lt;0 || index&gt;=size()</tt>.
-   *
-   * @param index
-   *            the index of the cell.
-   * @param re
-   *            the real part of the value to be filled into the specified
-   *            cell.
-   * @param im
-   *            the imaginary part of the value to be filled into the
-   *            specified cell.
-   */
-  void setParts(int index, double re, double im);
-
-  /**
-   * Sets the matrix cell at coordinate <tt>index</tt> to the specified value.
-   *
-   * <p>
-   * Provided with invalid parameters this method may access illegal indexes
-   * without throwing any exception. <b>You should only use this method when
-   * you are absolutely sure that the coordinate is within bounds.</b>
-   * Precondition (unchecked): <tt>index&lt;0 || index&gt;=size()</tt>.
-   *
-   * @param index
-   *            the index of the cell.
-   * @param value
-   *            the value to be filled into the specified cell (re=value[0],
-   *            im=value[1]).
-   */
-  void set(int index, Float64List value);
-
-  /**
-   * Swaps each element <tt>this[i]</tt> with <tt>other[i]</tt>.
-   *
-   * @throws ArgumentError
-   *             if <tt>size() != other.size()</tt>.
-   */
-  void swap(final ComplexVector other) {
-    int size = this.length;
-    checkSize(other);
+  AbstractDoubleVector real() {
+    final DoubleVector R = new DoubleVector(_size);
+    final Float64List elemsOther = R.elements();
+    final int zeroOther = R.index(0);
+    final int strideOther = R.stride();
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-      nthreads = Math.min(nthreads, size);
+    if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+      nthreads = Math.min(nthreads, _size);
       List<Future> futures = new List<Future>(nthreads);
-      int k = size ~/ nthreads;
+      int k = _size ~/ nthreads;
       for (int j = 0; j < nthreads; j++) {
         final int firstIdx = j * k;
-        final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
+        final int lastIdx = (j == nthreads - 1) ? _size : firstIdx + k;
         futures[j] = ConcurrencyUtils.submit(() {
-          Float64List tmp;
-          for (int i = firstIdx; i < lastIdx; i++) {
-            tmp = get(i);
-            setQuick(i, other.get(i));
-            other.setQuick(i, tmp);
+          int idx = _zero + firstIdx * _stride;
+          int idxOther = zeroOther + firstIdx * strideOther;
+          for (int k = firstIdx; k < lastIdx; k++) {
+            elemsOther[idxOther] = _elements[idx];
+            idx += _stride;
+            idxOther += strideOther;
           }
         });
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-      Float64List tmp;
-      for (int i = 0; i < size; i++) {
-        tmp = get(i);
-        set(i, other.get(i));
-        other.set(i, tmp);
-      }
+    int idx = _zero;
+    int idxOther = zeroOther;
+    for (int i = 0; i < _size; i++) {
+      elemsOther[idxOther] = _elements[idx];
+      idx += _stride;
+      idxOther += strideOther;
+    }
     //}
+    return R;
   }
 
-  /**
-   * Constructs and returns a 1-dimensional array containing the cell values.
-   * The values are copied. So subsequent changes in <tt>values</tt> are not
-   * reflected in the matrix, and vice-versa. The returned array
-   * <tt>values</tt> has the form <br>
-   * <tt>for (int i = 0; i < size; i++) {
-   *      tmp = get(i);
-   *      values[2 * i] = tmp[0]; //real part
-   *      values[2 * i + 1] = tmp[1]; //imaginary part
-   *     }</tt>
-   *
-   * @return an array filled with the values of the cells.
-   */
-  Float64List toList() {
-    int size = this.length;
-    Float64List values = new Float64List(2 * size);
-    fillList(values);
-    return values;
+  AbstractComplexVector like1D(int size) {
+    return new ComplexVector(size);
   }
 
-  /**
-   * Fills the cell values into the specified 1-dimensional array. The values
-   * are copied. So subsequent changes in <tt>values</tt> are not reflected in
-   * the matrix, and vice-versa. After this call returns the array
-   * <tt>values</tt> has the form <br>
-   * <tt>for (int i = 0; i < size; i++) {
-   *      tmp = get(i);
-   *      values[2 * i] = tmp[0]; //real part
-   *      values[2 * i + 1] = tmp[1]; //imaginary part
-   *     }</tt>
-   *
-   * @throws ArgumentError
-   *             if <tt>values.length < 2*size()</tt>.
-   */
-  void fillList(final Float64List values) {
-    int size = this.length;
-    if (values.length < 2 * size) throw new ArgumentError("values too small");
+  AbstractComplexMatrix like2D(int rows, int columns) {
+    return new ComplexMatrix(rows, columns);
+  }
+
+  AbstractComplexMatrix reshape(final int rows, final int columns) {
+    if (rows * columns != _size) {
+      throw new ArgumentError("rows*columns != size");
+    }
+    AbstractComplexMatrix M = new ComplexMatrix(rows, columns);
+    final Float64List elemsOther = M.elements() as Float64List;
+    final int zeroOther = M.index(0, 0);
+    final int rowStrideOther = M.rowStride;
+    final int columnStrideOther = M.columnStride;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-      nthreads = Math.min(nthreads, size);
+    if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+      nthreads = Math.min(nthreads, _size);
       List<Future> futures = new List<Future>(nthreads);
-      int k = size ~/ nthreads;
+      int k = columns ~/ nthreads;
       for (int j = 0; j < nthreads; j++) {
-        final int firstIdx = j * k;
-        final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
+        final int firstColumn = j * k;
+        final int lastColumn = (j == nthreads - 1) ? columns : firstColumn + k;
         futures[j] = ConcurrencyUtils.submit(() {
-          Float64List tmp;
-          for (int i = firstIdx; i < lastIdx; i++) {
-            tmp = get(i);
-            values[2 * i] = tmp[0];
-            values[2 * i + 1] = tmp[1];
+          int idx;
+          int idxOther;
+          for (int c = firstColumn; c < lastColumn; c++) {
+            idxOther = zeroOther + c * columnStrideOther;
+            idx = _zero + (c * rows) * _stride;
+            for (int r = 0; r < rows; r++) {
+              elemsOther[idxOther] = _elements[idx];
+              elemsOther[idxOther + 1] = _elements[idx + 1];
+              idxOther += rowStrideOther;
+              idx += _stride;
+            }
           }
         });
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-      Float64List tmp;
-      for (int i = 0; i < size; i++) {
-        tmp = get(i);
-        values[2 * i] = tmp[0];
-        values[2 * i + 1] = tmp[1];
+    int idxOther;
+    int idx = _zero;
+    for (int c = 0; c < columns; c++) {
+      idxOther = zeroOther + c * columnStrideOther;
+      for (int r = 0; r < rows; r++) {
+        elemsOther[idxOther] = _elements[idx];
+        elemsOther[idxOther + 1] = _elements[idx + 1];
+        idxOther += rowStrideOther;
+        idx += _stride;
       }
+    }
+    //}
+    return M;
+  }
+
+  /*ComplexMatrix3D reshape3D(final int slices, final int rows, final int columns) {
+    if (slices * rows * columns != _size) {
+      throw new IllegalArgumentException("slices*rows*columns != size");
+    }
+    ComplexMatrix3D M = new DenseComplexMatrix3D(slices, rows, columns);
+    final Float64List elemsOther = M.elements() as Float64List;
+    final int zeroOther = M.index(0, 0, 0);
+    final int sliceStrideOther = M.sliceStride();
+    final int rowStrideOther = M.rowStride();
+    final int columnStrideOther = M.columnStride();
+    int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+      nthreads = Math.min(nthreads, _size);
+      List<Future> futures = new List<Future>(nthreads);
+      int k = slices ~/ nthreads;
+      for (int j = 0; j < nthreads; j++) {
+        final int firstSlice = j * k;
+        final int lastSlice = (j == nthreads - 1) ? slices : firstSlice + k;
+        futures[j] = ConcurrencyUtils.submit(() {
+          int idx;
+          int idxOther;
+          for (int s = firstSlice; s < lastSlice; s++) {
+            for (int c = 0; c < columns; c++) {
+              idxOther = zeroOther + s * sliceStrideOther + c * columnStrideOther;
+              idx = _zero + (s * rows * columns + c * rows) * _stride;
+              for (int r = 0; r < rows; r++) {
+                elemsOther[idxOther] = _elements[idx];
+                elemsOther[idxOther + 1] = _elements[idx + 1];
+                idxOther += rowStrideOther;
+                idx += _stride;
+              }
+            }
+          }
+        });
+      }
+      ConcurrencyUtils.waitForCompletion(futures);
+    } else {
+      int idxOther;
+      int idx = _zero;
+      for (int s = 0; s < slices; s++) {
+        for (int c = 0; c < columns; c++) {
+          idxOther = zeroOther + s * sliceStrideOther + c * columnStrideOther;
+          for (int r = 0; r < rows; r++) {
+            elemsOther[idxOther] = _elements[idx];
+            elemsOther[idxOther + 1] = _elements[idx + 1];
+            idxOther += rowStrideOther;
+            idx += _stride;
+          }
+        }
+      }
+    }
+    return M;
+  }*/
+
+  void setParts(int index, double re, double im) {
+    int idx = _zero + index * _stride;
+    this._elements[idx] = re;
+    this._elements[idx + 1] = im;
+  }
+
+  void set(int index, Float64List value) {
+    int idx = _zero + index * _stride;
+    this._elements[idx] = value[0];
+    this._elements[idx + 1] = value[1];
+  }
+
+  void swap(AbstractComplexVector other) {
+    if (!(other is ComplexVector)) {
+      super.swap(other);
+    }
+    ComplexVector y = other as ComplexVector;
+    if (y == this) {
+      return;
+    }
+    checkSize(y);
+
+    final Float64List elemsOther = y._elements;
+    if (_elements == null || elemsOther == null) {
+      throw new Error();
+    }
+    final int strideOther = y._stride;
+    final int zeroOther = y.index(0);
+
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+      nthreads = Math.min(nthreads, _size);
+      List<Future> futures = new List<Future>(nthreads);
+      int k = _size ~/ nthreads;
+      for (int j = 0; j < nthreads; j++) {
+        final int firstIdx = j * k;
+        final int lastIdx = (j == nthreads - 1) ? _size : firstIdx + k;
+        futures[j] = ConcurrencyUtils.submit(() {
+          int idx = _zero + firstIdx * _stride;
+          int idxOther = zeroOther + firstIdx * strideOther;
+          double tmp;
+          for (int k = firstIdx; k < lastIdx; k++) {
+            tmp = _elements[idx];
+            _elements[idx] = elemsOther[idxOther];
+            elemsOther[idxOther] = tmp;
+            tmp = _elements[idx + 1];
+            _elements[idx + 1] = elemsOther[idxOther + 1];
+            elemsOther[idxOther + 1] = tmp;
+            idx += _stride;
+            idxOther += strideOther;
+          }
+        });
+      }
+      ConcurrencyUtils.waitForCompletion(futures);
+    } else {*/
+    int idx = _zero;
+    int idxOther = zeroOther;
+    double tmp;
+    for (int k = 0; k < _size; k++) {
+      tmp = _elements[idx];
+      _elements[idx] = elemsOther[idxOther];
+      elemsOther[idxOther] = tmp;
+      tmp = _elements[idx + 1];
+      _elements[idx + 1] = elemsOther[idxOther + 1];
+      elemsOther[idxOther + 1] = tmp;
+      idx += _stride;
+      idxOther += strideOther;
+    }
     //}
   }
 
-  /**
-   * Returns a string representation using default formatting ("%.4f").
-   *
-   * @return a string representation of the matrix.
-   */
-  String toString() {
-    return toStringFormat("%.4f");
-  }
-
-  /**
-   * Returns a string representation using given <tt>format</tt>
-   *
-   * @param format
-   *            a format for java.lang.String.format().
-   * @return a string representation of the matrix.
-   */
-  String toStringFormat(String format) {
-    final f = new NumberFormat(format);
-    StringBuffer s = new StringBuffer("ComplexVector: ${length} elements\n\n");
-    Float64List elem = new Float64List(2);
-    for (int i = 0; i < length; i++) {
-      elem = get(i);
-      if (elem[1] == 0) {
-        s.write(f.format(elem[0]) + "\n");
-        continue;
-      }
-      if (elem[0] == 0) {
-        s.write(f.format(elem[1]) + "i\n");
-        continue;
-      }
-      if (elem[1] < 0) {
-        s.write(f.format(elem[0]) + " - " + f.format(-elem[1]) + "i\n");
-        continue;
-      }
-      s.write(f.format(elem[0]) + " + " + f.format(elem[1]) + "i\n");
+  void fillList(Float64List values) {
+    if (values.length < 2 * _size) {
+      throw new ArgumentError("values too small");
     }
-    return s.toString();
-  }
-
-  /**
-   * Constructs and returns a new <i>flip view</i>. What used to be index
-   * <tt>0</tt> is now index <tt>size()-1</tt>, ..., what used to be index
-   * <tt>size()-1</tt> is now index <tt>0</tt>. The returned view is backed by
-   * this matrix, so changes in the returned view are reflected in this
-   * matrix, and vice-versa.
-   *
-   * @return a new flip view.
-   */
-  ComplexVector flip() {
-    return _view()._vFlip() as ComplexVector;
-  }
-
-  /**
-   * Constructs and returns a new <i>sub-range view</i> that is a
-   * <tt>width</tt> sub matrix starting at <tt>index</tt>.
-   *
-   * Operations on the returned view can only be applied to the restricted
-   * range. Any attempt to access coordinates not contained in the view will
-   * throw an <tt>IndexOutOfBoundsException</tt>.
-   * <p>
-   * <b>Note that the view is really just a range restriction:</b> The
-   * returned matrix is backed by this matrix, so changes in the returned
-   * matrix are reflected in this matrix, and vice-versa.
-   * <p>
-   * The view contains the cells from <tt>index..index+width-1</tt>. and has
-   * <tt>view.size() == width</tt>. A view's legal coordinates are again zero
-   * based, as usual. In other words, legal coordinates of the view are
-   * <tt>0 .. view.size()-1==width-1</tt>. As usual, any attempt to access a
-   * cell at other coordinates will throw an
-   * <tt>IndexOutOfBoundsException</tt>.
-   *
-   * @param index
-   *            The index of the first cell.
-   * @param width
-   *            The width of the range.
-   * @throws IndexOutOfBoundsException
-   *             if <tt>index<0 || width<0 || index+width>size()</tt>.
-   * @return the new view.
-   *
-   */
-  ComplexVector part(int index, int width) {
-    return _view()._vPart(index, width) as ComplexVector;
-  }
-
-  /**
-   * Constructs and returns a new <i>selection view</i> that is a matrix
-   * holding the cells matching the given condition. Applies the condition to
-   * each cell and takes only those cells where
-   * <tt>condition(get(i))</tt> yields <tt>true</tt>.
-   *
-   * The returned view is backed by this matrix, so changes in the returned
-   * view are reflected in this matrix, and vice-versa.
-   *
-   * @param condition
-   *            The condition to be matched.
-   * @return the new view.
-   */
-  ComplexVector where(cfunc.ComplexProcedure condition) {
-    int size = this.length;
-    List<int> matches = new List<int>();
-    for (int i = 0; i < size; i++) {
-      if (condition(get(i))) {
-        matches.add(i);
-      }
+    if (_isNoView) {
+      //System.arraycopy(this._elements, 0, values, 0, this._elements.length);
+      values.setAll(0, this._elements);
+    } else {
+      super.fillList(values);
     }
-    //matches.trimToSize();
-    return select(new Int32List.fromList(matches));
   }
 
-  /**
-   * Constructs and returns a new <i>selection view</i> that is a matrix
-   * holding the indicated cells. There holds
-   * <tt>view.size() == indexes.length</tt> and
-   * <tt>view.get(i) == this.get(indexes[i])</tt>. Indexes can occur multiple
-   * times and can be in arbitrary order.
-   *
-   * Note that modifying <tt>indexes</tt> after this call has returned has no
-   * effect on the view. The returned view is backed by this matrix, so
-   * changes in the returned view are reflected in this matrix, and
-   * vice-versa.
-   *
-   * @param indexes
-   *            The indexes of the cells that shall be visible in the new
-   *            view. To indicate that <i>all</i> cells shall be visible,
-   *            simply set this parameter to <tt>null</tt>.
-   * @return the new view.
-   * @throws IndexOutOfBoundsException
-   *             if <tt>!(0 <= indexes[i] < size())</tt> for any
-   *             <tt>i=0..indexes.length()-1</tt>.
-   */
-  ComplexVector select(Int32List indexes) {
-    // check for "all"
-    int size = this.length;
-    if (indexes == null) {
-      indexes = new Int32List(size);
-      for (int i = size - 1; --i >= 0; ) indexes[i] = i;
-    }
-
-    _checkIndexes(indexes);
-    Int32List offsets = new Int32List(indexes.length);
-    for (int i = 0; i < indexes.length; i++) {
-      offsets[i] = index(indexes[i]);
-    }
-    return _viewSelectionLike(offsets);
-  }
-
-  /**
-   * Constructs and returns a new <i>stride view</i> which is a sub matrix
-   * consisting of every i-th cell. More specifically, the view has size
-   * <tt>this.size()/stride</tt> holding cells <tt>this.get(i*stride)</tt> for
-   * all <tt>i = 0..size()/stride - 1</tt>.
-   *
-   * @param stride
-   *            the step factor.
-   * @throws IndexOutOfBoundsException
-   *             if <tt>stride <= 0</tt>.
-   * @return the new view.
-   *
-   */
-  ComplexVector strides(int stride) {
-    return _view()._vStrides(stride) as ComplexVector;
-  }
-
-  /**
-   * Returns the dot product of two vectors x and y. Operates on cells at
-   * indexes <tt>0 .. Math.min(size(),y.size())</tt>.
-   *
-   * @param y
-   *            the second vector.
-   * @return the sum of products.
-   */
-  /*Float64List zDotProduct(ComplexVector y) {
-        int size = this.size();
-        return zDotProduct(y, 0, size);
-    }*/
-
-  /**
-   * Returns the dot product of two vectors x and y. Operates on cells at
-   * indexes <tt>from .. Min(size(),y.size(),from+length)-1</tt>.
-   *
-   * @param y
-   *            the second vector.
-   * @param from
-   *            the first index to be considered.
-   * @param length
-   *            the number of cells to be considered.
-   * @return the sum of products; zero if <tt>from<0 || length<0</tt>.
-   */
-  Float64List dot(final ComplexVector y, [final int from = 0, int length = null]) {
+  Float64List dot(final AbstractComplexVector y, [final int from = 0, int length = null]) {
     if (length == null) {
       length = this.length;
     }
     int size = this.length;
-    if (from < 0 || length <= 0) return new Float64List.fromList([0.0, 0.0]);
+    if (from < 0 || length <= 0) {
+      return new Float64List.fromList([0, 0]);
+    }
 
     int tail = from + length;
-    if (size < tail) tail = size;
-    if (y._size < tail) tail = y._size;
+    if (size < tail) {
+      tail = size;
+    }
+    if (y.length < tail) {
+      tail = y.length;
+    }
     length = tail - from;
+    final Float64List elemsOther = y.elements() as Float64List;
+    if (_elements == null || elemsOther == null) {
+      throw new Error();
+    }
+    final int strideOther = y.stride();
+    final int zero = index(from);
+    final int zeroOther = y.index(from);
     Float64List sum = new Float64List(2);
 
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+    if ((nthreads > 1) && (length >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, length);
       List<Future> futures = new List<Future>(nthreads);
       List<Float64List> results = new List<Float64List>(nthreads);//[2];
-      int k = length / nthreads;
+      int k = length ~/ nthreads;
       for (int j = 0; j < nthreads; j++) {
         final int firstIdx = j * k;
         final int lastIdx = (j == nthreads - 1) ? length : firstIdx + k;
         futures[j] = ConcurrencyUtils.submit(() {
           Float64List sum = new Float64List(2);
-          Float64List tmp;
-          int idx;
+          int idx = zero + firstIdx * _stride;
+          int idxOther = zeroOther + firstIdx * strideOther;
           for (int k = firstIdx; k < lastIdx; k++) {
-            idx = k + from;
-            tmp = y.get(idx);
-            tmp[1] = -tmp[1]; // complex conjugate
-            sum = Complex.plus(sum, Complex.mult(tmp, get(idx)));
+            sum[0] += _elements[idx] * elemsOther[idxOther] + _elements[idx + 1] * elemsOther[idxOther + 1];
+            sum[1] += _elements[idx + 1] * elemsOther[idxOther] - _elements[idx] * elemsOther[idxOther + 1];
+            idx += _stride;
+            idxOther += strideOther;
           }
           return sum;
         });
@@ -1198,79 +1145,23 @@ abstract class ComplexVector extends AbstractVector {
         e.printStackTrace();
       }
     } else {*/
-    Float64List tmp;
-    int idx;
+    int idx = zero;
+    int idxOther = zeroOther;
     for (int k = 0; k < length; k++) {
-      idx = k + from;
-      tmp = y.get(idx);
-      tmp[1] = -tmp[1]; // complex conjugate
-      sum = Complex.plus(sum, Complex.multiply(tmp, get(idx)));
+      sum[0] += _elements[idx] * elemsOther[idxOther] + _elements[idx + 1] * elemsOther[idxOther + 1];
+      sum[1] += _elements[idx + 1] * elemsOther[idxOther] - _elements[idx] * elemsOther[idxOther + 1];
+      idx += _stride;
+      idxOther += strideOther;
     }
     //}
     return sum;
   }
 
-  /**
-   * Returns the dot product of two vectors x and y.
-   *
-   * @param y
-   *            the second vector.
-   * @param nonZeroIndexes
-   *            the indexes of cells in <tt>y</tt>having a non-zero value.
-   * @return the sum of products.
-   */
-  Float64List dotNonZero(ComplexVector y, Int32List nonZeroIndexes, [int from = 0, int length = null]) {
-    if (length == null) {
-      length = this.length;
-    }
-    int size = this.length;
-    if (from < 0 || length <= 0) {
-      return new Float64List.fromList([0.0, 0.0]);
-    }
-
-    int tail = from + length;
-    if (size < tail) tail = size;
-    if (y._size < tail) tail = y._size;
-    length = tail - from;
-    if (length <= 0) {
-      return new Float64List.fromList([0.0, 0.0]);
-    }
-
-    // setup
-    //List<int> indexesCopy = new List<int>.from(nonZeroIndexes);
-    Int32List indexesCopy = new Int32List.fromList(nonZeroIndexes);
-    //indexesCopy.trimToSize();
-    indexesCopy.sort();
-    Int32List nonZeroIndexElements = indexesCopy;//.elements();
-    int index = 0;
-    int s = indexesCopy.length;
-
-    // skip to start
-    while ((index < s) && nonZeroIndexElements[index] < from) {
-      index++;
-    }
-
-    // now the sparse dot product
-    int i;
-    Float64List sum = new Float64List(2);
-    Float64List tmp;
-    while ((--length >= 0) && (index < s) && ((i = nonZeroIndexElements[index]) < tail)) {
-      tmp = y.get(i);
-      tmp[1] = -tmp[1]; // complex conjugate
-      sum = Complex.plus(sum, Complex.multiply(tmp, get(i)));
-      index++;
-    }
-
-    return sum;
-  }
-
-  /**
-   * Returns the sum of all cells.
-   *
-   * @return the sum.
-   */
   Float64List sum() {
     Float64List sum = new Float64List(2);
+    if (this._elements == null) {
+      throw new Error();
+    }
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
@@ -1282,8 +1173,11 @@ abstract class ComplexVector extends AbstractVector {
         final int lastIdx = (j == nthreads - 1) ? _size : firstIdx + k;
         futures[j] = ConcurrencyUtils.submit(() {
           Float64List sum = new Float64List(2);
+          int idx = _zero + firstIdx * _stride;
           for (int k = firstIdx; k < lastIdx; k++) {
-            sum = Complex.plus(sum, get(k));
+            sum[0] += _elements[idx];
+            sum[1] += _elements[idx + 1];
+            idx += _stride;
           }
           return sum;
         });
@@ -1294,8 +1188,8 @@ abstract class ComplexVector extends AbstractVector {
         }
         sum = results[0];
         for (int j = 1; j < nthreads; j++) {
-          sum[0] += results[j][0];
-          sum[1] += results[j][1];
+          sum[0] = sum[0] + results[j][0];
+          sum[1] = sum[1] + results[j][1];
         }
       } on ExecutionException catch (ex) {
         ex.printStackTrace();
@@ -1303,40 +1197,191 @@ abstract class ComplexVector extends AbstractVector {
         e.printStackTrace();
       }
     } else {*/
+    int idx = _zero;
     for (int k = 0; k < _size; k++) {
-      sum = Complex.plus(sum, get(k));
+      sum[0] += _elements[idx];
+      sum[1] += _elements[idx + 1];
+      idx += _stride;
     }
     //}
     return sum;
   }
 
-  /**
-   * Returns the number of cells having non-zero values, but at most
-   * maxCardinality; ignores tolerance.
-   *
-   * @param maxCardinality
-   *            maximal cardinality
-   * @return number of cells having non-zero values, but at most
-   *         maxCardinality.
-   */
   int _cardinality(int maxCardinality) {
-    int size = this.length;
     int cardinality = 0;
+    int idx = _zero;
     int i = 0;
-    Float64List tmp = new Float64List(2);
-    while (i++ < size && cardinality < maxCardinality) {
-      tmp = get(i);
-      if ((tmp[0] != 0.0) || (tmp[1] != 0.0)) cardinality++;
+    while (i < _size && cardinality < maxCardinality) {
+      if (_elements[idx] != 0 || _elements[idx + 1] != 0) {
+        cardinality++;
+      }
+      idx += _stride;
+      i++;
     }
     return cardinality;
   }
 
+  bool _haveSharedCellsRaw(AbstractComplexVector other) {
+    if (other is SelectedDenseComplexVector) {
+      return this._elements == other._elements;
+    } else if (other is ComplexVector) {
+      return this._elements == other._elements;
+    }
+    return false;
+  }
+
+  int index(int rank) {
+    return _zero + rank * _stride;
+  }
+
+  AbstractComplexVector _viewSelectionLike(Int32List offsets) {
+    return new SelectedDenseComplexVector.withOffsets(this._elements, offsets);
+  }
+
+  Object clone() {
+    return new ComplexVector(_size, _elements, _zero, _stride, _isNoView);
+  }
+}
+
+/**
+ * Selection view on dense 1-d matrices holding <tt>complex</tt> elements.
+ * <b>Implementation:</b>
+ * <p>
+ * Objects of this class are typically constructed via <tt>viewIndexes</tt>
+ * methods on some source matrix. The interface introduced in abstract super
+ * classes defines everything a user can do. From a user point of view there is
+ * nothing special about this class; it presents the same functionality with the
+ * same signatures and semantics as its abstract superclass(es) while
+ * introducing no additional functionality. Thus, this class need not be visible
+ * to users.
+ * <p>
+ * This class uses no delegation. Its instances point directly to the data. Cell
+ * addressing overhead is 1 additional array index access per get/set.
+ * <p>
+ * Note that this implementation is not synchronized.
+ *
+ * @author Piotr Wendykier (piotr.wendykier@gmail.com)
+ */
+class SelectedDenseComplexVector extends AbstractComplexVector {
+
   /**
-   * Returns the content of this matrix if it is a wrapper; or <tt>this</tt>
-   * otherwise. Override this method in wrappers.
+   * The elements of this matrix.
    */
-  ComplexVector _getContent() {
-    return this;
+  Float64List _elements;
+
+  /**
+   * The offsets of visible indexes of this matrix.
+   */
+  Int32List _offsets;
+
+  /**
+   * The offset.
+   */
+  int __offset;
+
+  /**
+   * Constructs a matrix view with the given parameters.
+   *
+   * @param elements
+   *            the cells.
+   * @param indexes
+   *            The indexes of the cells that shall be visible.
+   */
+  factory SelectedDenseComplexVector.withOffsets(Float64List elements, Int32List offsets) {
+    return new SelectedDenseComplexVector(offsets.length, elements, 0, 1, offsets, 0);
+  }
+
+  /**
+   * Constructs a matrix view with the given parameters.
+   *
+   * @param size
+   *            the number of cells the matrix shall have.
+   * @param elements
+   *            the cells.
+   * @param zero
+   *            the index of the first element.
+   * @param stride
+   *            the number of indexes between any two elements, i.e.
+   *            <tt>index(i+1)-index(i)</tt>.
+   * @param offsets
+   *            the offsets of the cells that shall be visible.
+   * @param offset
+   */
+  SelectedDenseComplexVector(int size, Float64List elements, int zero, int stride, Int32List offsets, int offset) {
+    _setUp(size, zero, stride);
+
+    this._elements = elements;
+    this._offsets = offsets;
+    this.__offset = offset;
+    this._isNoView = false;
+  }
+
+  int _offset(int absRank) {
+    return _offsets[absRank];
+  }
+
+  Float64List get(int index) {
+    int idx = _zero + index * _stride;
+    return new Float64List.fromList([_elements[__offset + _offsets[idx]], _elements[__offset + _offsets[idx] + 1]]);
+  }
+
+  AbstractDoubleVector real() {
+    final DoubleVector R = new DoubleVector(_size);
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+      nthreads = Math.min(nthreads, _size);
+      List<Future> futures = new List<Future>(nthreads);
+      int k = _size ~/ nthreads;
+      for (int j = 0; j < nthreads; j++) {
+        final int firstIdx = j * k;
+        final int lastIdx = (j == nthreads - 1) ? _size : firstIdx + k;
+        futures[j] = ConcurrencyUtils.submit(() {
+          for (int k = firstIdx; k < lastIdx; k++) {
+            final tmp = getQuick(k);
+            R.setQuick(k, tmp[0]);
+          }
+        });
+      }
+      ConcurrencyUtils.waitForCompletion(futures);
+    } else {*/
+    for (int i = 0; i < _size; i++) {
+      final tmp = get(i);
+      R.set(i, tmp[0]);
+    }
+    //}
+    return R;
+  }
+
+  AbstractDoubleVector imaginary() {
+    final DoubleVector Im = new DoubleVector(_size);
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+      nthreads = Math.min(nthreads, _size);
+      List<Future> futures = new List<Future>(nthreads);
+      int k = _size / nthreads;
+      for (int j = 0; j < nthreads; j++) {
+        final int firstIdx = j * k;
+        final int lastIdx = (j == nthreads - 1) ? _size : firstIdx + k;
+        futures[j] = ConcurrencyUtils.submit(() {
+          for (int k = firstIdx; k < lastIdx; k++) {
+            final tmp = getQuick(k);
+            Im.setQuick(k, tmp[1]);
+          }
+        });
+      }
+      ConcurrencyUtils.waitForCompletion(futures);
+    } else {*/
+    for (int i = 0; i < _size; i++) {
+      final tmp = get(i);
+      Im.set(i, tmp[1]);
+    }
+    //}
+
+    return Im;
+  }
+
+  Float64List elements() {
+    throw new UnsupportedError("This method is not supported.");
   }
 
   /**
@@ -1344,63 +1389,61 @@ abstract class ComplexVector extends AbstractVector {
    *
    * @param other
    *            matrix
-   * @return <tt>true</tt> if both matrices share at least one identical cell
+   * @return <tt>true</tt> if both matrices share at least one identical cell.
    */
-  bool _haveSharedCells(ComplexVector other) {
-    if (other == null) return false;
-    if (this == other) return true;
-    return _getContent()._haveSharedCellsRaw(other._getContent());
-  }
 
-  /**
-   * Always returns false
-   *
-   * @param other
-   *            matrix
-   * @return false
-   */
-  bool _haveSharedCellsRaw(ComplexVector other) {
+  bool _haveSharedCellsRaw(AbstractComplexVector other) {
+    if (other is SelectedDenseComplexVector) {
+      return this._elements == other._elements;
+    } else if (other is ComplexVector) {
+      return this._elements == other._elements;
+    }
     return false;
   }
 
-  /**
-   * Constructs and returns a new view equal to the receiver. The view is a
-   * shallow clone. Calls <code>clone()</code> and casts the result.
-   * <p>
-   * <b>Note that the view is not a deep copy.</b> The returned matrix is
-   * backed by this matrix, so changes in the returned matrix are reflected in
-   * this matrix, and vice-versa.
-   * <p>
-   * Use {@link #copy()} to construct an independent deep copy rather than a
-   * new view.
-   *
-   * @return a new view of the receiver.
-   */
-  ComplexVector _view() {
-    return clone() as ComplexVector;
+  int index(int rank) {
+    return __offset + _offsets[_zero + rank * _stride];
   }
 
-  /**
-   * Construct and returns a new selection view.
-   *
-   * @param offsets
-   *            the offsets of the visible elements.
-   * @return a new view.
-   */
-  ComplexVector _viewSelectionLike(Int32List offsets);
+  AbstractComplexVector like1D(int size) {
+    return new ComplexVector(size);
+  }
 
-  /**
-   * Returns the dot product of two vectors x and y.
-   *
-   * @param y
-   *            the second vector.
-   * @param nonZeroIndexes
-   *            the indexes of cells in <tt>y</tt>having a non-zero value.
-   * @return the sum of products.
-   */
-  /*Float64List _zDotProduct(ComplexVector y, IntArrayList nonZeroIndexes) {
-    return zDotProduct(y, 0, size(), nonZeroIndexes);
+  AbstractComplexMatrix like2D(int rows, int columns) {
+    return new ComplexMatrix(rows, columns);
+  }
+
+  AbstractComplexMatrix reshape(int rows, int columns) {
+    throw new UnsupportedError("This method is not supported.");
+  }
+
+  /*ComplexMatrix3D reshape3D(int slices, int rows, int columns) {
+    throw new UnsupportedError("This method is not supported.");
   }*/
 
-  Object clone();
+  void set(int index, Float64List value) {
+    int idx = _zero + index * _stride;
+    _elements[__offset + _offsets[idx]] = value[0];
+    _elements[__offset + _offsets[idx] + 1] = value[1];
+  }
+
+  void setParts(int index, double re, double im) {
+    int idx = _zero + index * _stride;
+    _elements[__offset + _offsets[idx]] = re;
+    _elements[__offset + _offsets[idx] + 1] = im;
+  }
+
+  void _setUp(int size, [int zero = 0, int stride = 1]) {
+    super._setUp(size, zero, stride);
+    this.__offset = 0;
+  }
+
+  AbstractComplexVector _viewSelectionLike(Int32List offsets) {
+    return new SelectedDenseComplexVector.withOffsets(this._elements, offsets);
+  }
+
+  Object clone() {
+    return new SelectedDenseComplexVector(_size, _elements, _zero, _stride, _offsets, __offset);
+  }
+
 }

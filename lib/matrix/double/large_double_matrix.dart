@@ -27,11 +27,11 @@ part of cern.colt.matrix;
  * @author Piotr Wendykier (piotr.wendykier@gmail.com)
  * 
  */
-class DenseLargeDoubleMatrix extends WrapperDoubleMatrix {
+class LargeDoubleMatrix extends WrapperDoubleMatrix {
 
   List<Float64List> _elements;
 
-  DenseLargeDoubleMatrix(int rows, int columns, [List<Float64List> elements=null]) : super(null) {
+  LargeDoubleMatrix(int rows, int columns, [List<Float64List> elements=null]) : super(null) {
     try {
       _setUp(rows, columns);
     } on ArgumentError catch (exc) { // we can hold rows*columns>MAX_INT cells !
@@ -59,19 +59,19 @@ class DenseLargeDoubleMatrix extends WrapperDoubleMatrix {
     return _elements;
   }
 
-  DoubleMatrix _getContent() {
+  AbstractDoubleMatrix _getContent() {
     return this;
   }
 
-  DoubleMatrix like2D(int rows, int columns) {
-    return new DenseLargeDoubleMatrix(rows, columns);
+  AbstractDoubleMatrix like2D(int rows, int columns) {
+    return new LargeDoubleMatrix(rows, columns);
   }
 
-  DoubleVector like1D(int size) {
-    return new DenseDoubleVector(size);
+  AbstractDoubleVector like1D(int size) {
+    return new DoubleVector(size);
   }
 
   Object clone() {
-    return new DenseLargeDoubleMatrix(_rows, _columns, _elements);
+    return new LargeDoubleMatrix(_rows, _columns, _elements);
   }
 }

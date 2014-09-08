@@ -270,7 +270,7 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
     this._values = values;
   }
 
-  ComplexMatrix assign(final cfunc.ComplexComplexFunction function) {
+  AbstractComplexMatrix assign(final cfunc.ComplexComplexFunction function) {
     if (function is cfunc.ComplexMult) { // x[i] = mult*x[i]
       final Float64List alpha = (function as cfunc.ComplexMult).multiplicator;
       if (alpha[0] == 1 && alpha[1] == 0) {
@@ -299,7 +299,7 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
     return this;
   }
 
-  ComplexMatrix fill(double re, double im) {
+  AbstractComplexMatrix fill(double re, double im) {
     if (re == 0 && im == 0) {
       //Arrays.fill(_rowPointers, 0);
       //Arrays.fill(_columnIndexes, 0);
@@ -317,7 +317,7 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
     return this;
   }
 
-  ComplexMatrix copyFrom(ComplexMatrix source) {
+  AbstractComplexMatrix copyFrom(AbstractComplexMatrix source) {
     if (source == this) return this; // nothing to do
     checkShape(source);
 
@@ -349,7 +349,7 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
     return this;
   }
 
-  ComplexMatrix forEachMatrix(final ComplexMatrix y, cfunc.ComplexComplexComplexFunction function) {
+  AbstractComplexMatrix forEachMatrix(final AbstractComplexMatrix y, cfunc.ComplexComplexComplexFunction function) {
     checkShape(y);
     if ((y is SparseRCComplexMatrix) && (function == cfunc.plus)) { // x[i] = x[i] + y[i]
       SparseRCComplexMatrix yy = y;
@@ -483,7 +483,7 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
     return _rowPointers[_rows];
   }
 
-  ComplexMatrix forEachNonZero(final cfunc.IntIntComplexFunction function) {
+  AbstractComplexMatrix forEachNonZero(final cfunc.IntIntComplexFunction function) {
     Float64List value = new Float64List(2);
     for (int i = 0; i < _rows; i++) {
       int high = _rowPointers[i + 1];
@@ -533,8 +533,8 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
    *
    * @return this matrix in a dense form
    */
-  DenseComplexMatrix dense() {
-    final DenseComplexMatrix dense = new DenseComplexMatrix(_rows, _columns);
+  ComplexMatrix dense() {
+    final ComplexMatrix dense = new ComplexMatrix(_rows, _columns);
     forEachNonZero((int i, int j, Float64List value) {
       dense.set(i, j, get(i, j));
       return value;
@@ -640,11 +640,11 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
     return _values;
   }
 
-  ComplexMatrix like2D(int rows, int columns) {
+  AbstractComplexMatrix like2D(int rows, int columns) {
     return new SparseRCComplexMatrix.sized(rows, columns);
   }
 
-  ComplexVector like1D(int size) {
+  AbstractComplexVector like1D(int size) {
     return new SparseComplexVector(size);
   }
 
@@ -770,7 +770,7 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
     _realloc(0);
   }
 
-  ComplexVector mult(ComplexVector y, ComplexVector z, [Float64List alpha = null, Float64List beta = null, bool transposeA = false]) {
+  AbstractComplexVector mult(AbstractComplexVector y, AbstractComplexVector z, [Float64List alpha = null, Float64List beta = null, bool transposeA = false]) {
     if (alpha == null) {
       alpha = new Float64List.fromList([1.0, 0.0]);
     }
@@ -781,20 +781,20 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
     final int columnsA = transposeA ? _rows : _columns;
 
     bool ignore = (z == null || !transposeA);
-    if (z == null) z = new DenseComplexVector(rowsA);
+    if (z == null) z = new ComplexVector(rowsA);
 
-    if (!(y is DenseComplexVector && z is DenseComplexVector)) {
+    if (!(y is ComplexVector && z is ComplexVector)) {
       return super.mult(y, z, alpha, beta, transposeA);
     }
 
     if (columnsA != y.length || rowsA > z.length) throw new ArgumentError("Incompatible args: " + ((transposeA ? dice() : this).toStringShort()) + ", " + y.toStringShort() + ", " + z.toStringShort());
 
-    DenseComplexVector zz = z as DenseComplexVector;
+    ComplexVector zz = z as ComplexVector;
     final Float64List elementsZ = zz._elements;
     final int strideZ = zz.stride();
     final int zeroZ = z.index(0);
 
-    DenseComplexVector yy = y as DenseComplexVector;
+    ComplexVector yy = y as ComplexVector;
     final Float64List elementsY = yy._elements;
     final int strideY = yy.stride();
     final int zeroY = y.index(0);
@@ -974,7 +974,7 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
     return z;
   }
 
-  ComplexMatrix multiply(ComplexMatrix B, ComplexMatrix C, [Float64List alpha = null, Float64List beta = null, bool transposeA = false, bool transposeB = false]) {
+  AbstractComplexMatrix multiply(AbstractComplexMatrix B, AbstractComplexMatrix C, [Float64List alpha = null, Float64List beta = null, bool transposeA = false, bool transposeB = false]) {
     if (alpha == null) {
       alpha = new Float64List.fromList([1.0, 0.0]);
     }
@@ -999,7 +999,7 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
       if (B is SparseRCComplexMatrix) {
         C = new SparseRCComplexMatrix.sized(rowsA, p, rowsA * p);
       } else {
-        C = new DenseComplexMatrix(rowsA, p);
+        C = new ComplexMatrix(rowsA, p);
       }
     }
 
@@ -1017,21 +1017,21 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
       C.forEach(cfunc.multiply(beta));
     }
 
-    if ((B is DenseComplexMatrix) && (C is DenseComplexMatrix)) {
+    if ((B is ComplexMatrix) && (C is ComplexMatrix)) {
       SparseRCComplexMatrix AA;
       if (transposeA) {
         AA = conjugateTranspose();
       } else {
         AA = this;
       }
-      DenseComplexMatrix BB;
+      ComplexMatrix BB;
       if (transposeB) {
-        BB = B.conjugateTranspose as DenseComplexMatrix;
+        BB = B.conjugateTranspose as ComplexMatrix;
       } else {
         BB = B;
       }
 
-      DenseComplexMatrix CC = C;
+      ComplexMatrix CC = C;
       Int32List rowPointersA = AA._rowPointers;
       Int32List columnIndexesA = AA._columnIndexes;
       Float64List valuesA = AA._values;
@@ -1043,7 +1043,7 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
           valA[1] = valuesA[2 * ka + 1];
           Float64List scal = Complex.multiply(alpha, valA);
           int jj = columnIndexesA[ka];
-          CC.row(ii).forEachVector(BB.row(jj), cfunc.plusMultSecond(scal));
+          CC.row(ii).forEachWith(BB.row(jj), cfunc.plusMultSecond(scal));
         }
       }
     } else if ((B is SparseRCComplexMatrix) && (C is SparseRCComplexMatrix)) {
@@ -1135,11 +1135,11 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
         B = B.conjugateTranspose();
       }
       // cache views
-      final List<ComplexVector> Brows = new List<ComplexVector>(columnsA);
+      final List<AbstractComplexVector> Brows = new List<AbstractComplexVector>(columnsA);
       for (int i = columnsA; --i >= 0; ) {
         Brows[i] = B.row(i);
       }
-      final List<ComplexVector> Crows = new List<ComplexVector>(rowsA);
+      final List<AbstractComplexVector> Crows = new List<AbstractComplexVector>(rowsA);
       for (int i = rowsA; --i >= 0; ) {
         Crows[i] = C.row(i);
       }
@@ -1157,9 +1157,9 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
           valA[1] = valuesA[2 * k + 1];
           fun.multiplicator = Complex.multiply(valA, alpha);
           if (!transposeA) {
-            Crows[i].forEachVector(Brows[j], fun);
+            Crows[i].forEachWith(Brows[j], fun);
           } else {
-            Crows[j].forEachVector(Brows[i], fun);
+            Crows[j].forEachWith(Brows[i], fun);
           }
         }
       }
@@ -1194,7 +1194,7 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
     _values = valuesNew;
   }
 
-  ComplexMatrix _getContent() {
+  AbstractComplexMatrix _getContent() {
     return this;
   }
 

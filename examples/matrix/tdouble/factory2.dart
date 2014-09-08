@@ -3,15 +3,15 @@ import 'package:colt/colt.dart';
 
 void main() {
   stdout.writeln("\n\n");
-  DoubleMatrix matrix;
-  DoubleMatrix A, B, C, D;
-  DoubleMatrix _ = null;
+  AbstractDoubleMatrix matrix;
+  AbstractDoubleMatrix A, B, C, D;
+  AbstractDoubleMatrix _ = null;
 
   A = make(2, 2, 1);
   B = make(4, 4, 2);
   C = make(4, 3, 3);
   D = make(2, 2, 4);
-  List<List<DoubleMatrix>> parts1 = [[_, A, _], [B, _, C], [_, D, _]];
+  List<List<AbstractDoubleMatrix>> parts1 = [[_, A, _], [B, _, C], [_, D, _]];
   matrix = DoubleFactory2D.compose(parts1);
   stdout.writeln("\n" + matrix);
 

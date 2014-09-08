@@ -308,7 +308,7 @@ class DoubleFormatter extends AbstractFormatter {
   /**
    * Converts a given cell to a String; no alignment considered.
    */
-  String _formDoubleVector(DoubleVector matrix, int index, Former formatter) {
+  String _formDoubleVector(AbstractDoubleVector matrix, int index, Former formatter) {
     return formatter.formDouble(matrix.get(index));
   }
 
@@ -316,13 +316,13 @@ class DoubleFormatter extends AbstractFormatter {
    * Converts a given cell to a String; no alignment considered.
    */
   String _form(AbstractVector matrix, int index, Former formatter) {
-    return this._formDoubleVector(matrix as DoubleVector, index, formatter);
+    return this._formDoubleVector(matrix as AbstractDoubleVector, index, formatter);
   }
 
   /**
    * Returns a string representations of all cells; no alignment considered.
    */
-  List<List<String>> format(DoubleMatrix matrix) {
+  List<List<String>> format(AbstractDoubleMatrix matrix) {
     List<List<String>> strings = new List<List<String>>(matrix.rows);//[matrix.columns()];
     for (int row = matrix.rows; --row >= 0; ) {
       strings[row] = _formatRow(matrix.row(row));
@@ -334,7 +334,7 @@ class DoubleFormatter extends AbstractFormatter {
    * Returns a string representations of all cells; no alignment considered.
    */
   List<List<String>> _format2D(AbstractMatrix matrix) {
-    return this.format(matrix as DoubleMatrix);
+    return this.format(matrix as AbstractDoubleMatrix);
   }
 
   /**
@@ -363,7 +363,7 @@ class DoubleFormatter extends AbstractFormatter {
    * @param matrix
    *            the matrix to format.
    */
-  String toSourceCode(DoubleVector matrix) {
+  String toSourceCode(AbstractDoubleVector matrix) {
     DoubleFormatter copy = this.clone() as DoubleFormatter;
     copy.setPrintShape(false);
     copy.setColumnSeparator(", ");
@@ -379,7 +379,7 @@ class DoubleFormatter extends AbstractFormatter {
    * @param matrix
    *            the matrix to format.
    */
-  String toSourceCode2D(DoubleMatrix matrix) {
+  String toSourceCode2D(AbstractDoubleMatrix matrix) {
     DoubleFormatter copy = this.clone() as DoubleFormatter;
     String b3 = _blanks(3);
     copy.setPrintShape(false);
@@ -416,8 +416,8 @@ class DoubleFormatter extends AbstractFormatter {
    * @param matrix
    *            the matrix to convert.
    */
-  String toStringDouble1D(DoubleVector matrix) {
-    DoubleMatrix easy = matrix.like2D(1, matrix.length);
+  String toStringDouble1D(AbstractDoubleVector matrix) {
+    AbstractDoubleMatrix easy = matrix.like2D(1, matrix.length);
     easy.row(0).setAll(matrix);
     return toString2D(easy);
   }
@@ -428,7 +428,7 @@ class DoubleFormatter extends AbstractFormatter {
    * @param matrix
    *            the matrix to convert.
    */
-  String toStringDouble2D(DoubleMatrix matrix) {
+  String toStringDouble2D(AbstractDoubleMatrix matrix) {
     return super.toString2D(matrix);
   }
 
@@ -458,7 +458,7 @@ class DoubleFormatter extends AbstractFormatter {
    *            the matrix to convert.
    */
   String toString2D(AbstractMatrix matrix) {
-    return this.toStringDouble2D(matrix as DoubleMatrix);
+    return this.toStringDouble2D(matrix as AbstractDoubleMatrix);
   }
 
   /**

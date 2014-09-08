@@ -121,7 +121,7 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
     }
   }
 
-  DoubleMatrix forEach(final func.DoubleFunction function) {
+  AbstractDoubleMatrix forEach(final func.DoubleFunction function) {
     if (function is DoubleMult) { // x[i] = mult*x[i]
       final double alpha = (function as DoubleMult).multiplicator;
       if (alpha == 1) {
@@ -144,12 +144,12 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
     return this;
   }
 
-  DoubleMatrix fill(double value) {
+  AbstractDoubleMatrix fill(double value) {
     for (int i = _dlength; --i >= 0; ) _elements[i] = value;
     return this;
   }
 
-  DoubleMatrix setAll(final Float64List values) {
+  AbstractDoubleMatrix setAll(final Float64List values) {
     if (values.length != _dlength) {
       throw new ArgumentError("Must have same length: length=${values.length} dlength=$_dlength");
     }
@@ -176,7 +176,7 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
     return this;
   }
 
-  DoubleMatrix setAll2D(final List<Float64List> values) {
+  AbstractDoubleMatrix setAll2D(final List<Float64List> values) {
     if (values.length != _rows) {
       throw new ArgumentError("Must have same number of rows: rows=${values.length} rows()=${rows}");
     }
@@ -197,7 +197,7 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
     return this;
   }
 
-  DoubleMatrix copyFrom(DoubleMatrix source) {
+  AbstractDoubleMatrix copyFrom(AbstractDoubleMatrix source) {
     // overriden for performance only
     if (source == this) return this; // nothing to do
     checkShape(source);
@@ -216,7 +216,7 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
     }
   }
 
-  DoubleMatrix forEachMatrix(final DoubleMatrix y, final func.DoubleDoubleFunction function) {
+  AbstractDoubleMatrix forEachMatrix(final AbstractDoubleMatrix y, final func.DoubleDoubleFunction function) {
     checkShape(y);
     if (y is DiagonalDoubleMatrix) {
       DiagonalDoubleMatrix other = y;
@@ -408,7 +408,7 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
     }
   }
 
-  DoubleMatrix forEachNonZero(final func.IntIntDoubleFunction function) {
+  AbstractDoubleMatrix forEachNonZero(final func.IntIntDoubleFunction function) {
     for (int j = _dlength; --j >= 0; ) {
       double value = _elements[j];
       if (value != 0) {
@@ -598,11 +598,11 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
     }
   }
 
-  DoubleMatrix like2D(int rows, int columns) {
+  AbstractDoubleMatrix like2D(int rows, int columns) {
     return new SparseDoubleMatrix(rows, columns);
   }
 
-  DoubleVector like1D(int size) {
+  AbstractDoubleVector like1D(int size) {
     return new SparseDoubleVector(size);
   }
 
@@ -630,7 +630,7 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
     }
   }
 
-  DoubleVector mult(DoubleVector y, DoubleVector z, [double alpha=1.0, double beta=0.0, final bool transposeA=false]) {
+  AbstractDoubleVector mult(AbstractDoubleVector y, AbstractDoubleVector z, [double alpha=1.0, double beta=0.0, final bool transposeA=false]) {
     int rowsA = _rows;
     int columnsA = _columns;
     if (transposeA) {
@@ -639,9 +639,9 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
     }
 
     bool ignore = (z == null);
-    if (z == null) z = new DenseDoubleVector(rowsA);
+    if (z == null) z = new DoubleVector(rowsA);
 
-    if (!(this._isNoView && y is DenseDoubleVector && z is DenseDoubleVector)) {
+    if (!(this._isNoView && y is DoubleVector && z is DoubleVector)) {
       return super.mult(y, z, alpha, beta, transposeA);
     }
 
@@ -653,12 +653,12 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
       z.forEach(func.multiply(beta));
     }
 
-    DenseDoubleVector zz = z as DenseDoubleVector;
+    DoubleVector zz = z as DoubleVector;
     final Float64List elementsZ = zz._elements;
     final int strideZ = zz.stride();
     final int zeroZ = z.index(0);
 
-    DenseDoubleVector yy = y as DenseDoubleVector;
+    DoubleVector yy = y as DoubleVector;
     final Float64List elementsY = yy._elements;
     final int strideY = yy.stride();
     final int zeroY = y.index(0);
@@ -691,7 +691,7 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
     return z;
   }
 
-  DoubleMatrix _getContent() {
+  AbstractDoubleMatrix _getContent() {
     return this;
   }
 

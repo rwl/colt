@@ -31,7 +31,7 @@ abstract class SparseComplexLUDecomposition {
   /**
    * Returns the lower triangular factor, <tt>L</tt>.
    */
-  ComplexMatrix getL();
+  AbstractComplexMatrix getL();
 
   /**
    * Returns a copy of the pivot permutation vector.
@@ -41,7 +41,7 @@ abstract class SparseComplexLUDecomposition {
   /**
    * Returns the upper triangular factor, <tt>U</tt>.
    */
-  ComplexMatrix getU();
+  AbstractComplexMatrix getU();
 
   /**
    * Returns a copy of the symbolic LU analysis object.
@@ -65,7 +65,7 @@ abstract class SparseComplexLUDecomposition {
    * @exception IllegalArgumentException
    *                if <tt>b.size() != A.rows()</tt> or if A is singular.
    */
-  void solve(ComplexVector b);
+  void solve(AbstractComplexVector b);
 
 }
 
@@ -73,8 +73,8 @@ class CSparseComplexLUDecomposition implements SparseComplexLUDecomposition {
 
   DZcss _S;
   DZcsn _N;
-  ComplexMatrix _L;
-  ComplexMatrix _U;
+  AbstractComplexMatrix _L;
+  AbstractComplexMatrix _U;
   bool _rcMatrix = false;
   bool _isNonSingular = true;
 
@@ -99,7 +99,7 @@ class CSparseComplexLUDecomposition implements SparseComplexLUDecomposition {
    * @throws ArgumentError
    *             if <tt>order</tt> is not in [0,3]
    */
-  CSparseComplexLUDecomposition(ComplexMatrix A, int order, bool checkIfSingular) {
+  CSparseComplexLUDecomposition(AbstractComplexMatrix A, int order, bool checkIfSingular) {
     ComplexProperty.DEFAULT.checkSquare(A);
     ComplexProperty.DEFAULT.checkSparse(A);
 
@@ -153,7 +153,7 @@ class CSparseComplexLUDecomposition implements SparseComplexLUDecomposition {
     return det;
   }
 
-  ComplexMatrix getL() {
+  AbstractComplexMatrix getL() {
     if (L == null) {
       L = new SparseCCComplexMatrix(N.L);
       if (rcMatrix) {
@@ -173,7 +173,7 @@ class CSparseComplexLUDecomposition implements SparseComplexLUDecomposition {
     return pinv;
   }
 
-  ComplexMatrix getU() {
+  AbstractComplexMatrix getU() {
     if (U == null) {
       U = new SparseCCComplexMatrix(N.U);
       if (rcMatrix) {
@@ -200,7 +200,7 @@ class CSparseComplexLUDecomposition implements SparseComplexLUDecomposition {
     return _isNonSingular;
   }
 
-  void solve(ComplexVector b) {
+  void solve(AbstractComplexVector b) {
     if (b.length != n) {
       throw new ArgumentError("b.size() != A.rows()");
     }

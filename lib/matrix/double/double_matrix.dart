@@ -9,42 +9,41 @@ It is provided "as is" without expressed or implied warranty.
 part of cern.colt.matrix;
 
 /**
- * Applies a procedure to an argument. Optionally can return a boolean flag
- * to inform the object calling the procedure.
- *
- * <p>
- * Example: forEach() methods often use procedure objects. To signal to a
- * forEach() method whether iteration should continue normally or terminate
- * (because for example a matching element has been found), a procedure can
- * return <tt>false</tt> to indicate termination and <tt>true</tt> to
- * indicate continuation.
- *
- * @param element
- *            element passed to the procedure.
- * @return a flag to inform the object calling the procedure.
- */
-typedef bool DoubleVectorProcedure(DoubleVector element);
-
-class DoubleMatrixLocation {
-  final double value;
-  final int row, column;
-  DoubleMatrixLocation(this.value, this.row, this.column);
-}
-
-/**
- * Abstract base class for 2-d matrices holding <tt>double</tt> elements. First
- * see the <a href="package-summary.html">package summary</a> and javadoc <a
+ * Dense 2-d matrix holding <tt>double</tt> elements. First see the <a
+ * href="package-summary.html">package summary</a> and javadoc <a
  * href="package-tree.html">tree view</a> to get the broad picture.
  * <p>
- * A matrix has a number of rows and columns, which are assigned upon instance
- * construction - The matrix's size is then <tt>rows()*columns()</tt>. Elements
- * are accessed via <tt>[row,column]</tt> coordinates. Legal coordinates range
- * from <tt>[0,0]</tt> to <tt>[rows()-1,columns()-1]</tt>. Any attempt to access
- * an element at a coordinate
- * <tt>column&lt;0 || column&gt;=columns() || row&lt;0 || row&gt;=rows()</tt>
- * will throw an <tt>RangeError</tt>.
+ * <b>Implementation:</b>
  * <p>
- * <b>Note</b> that this implementation is not synchronized.
+ * Internally holds one single contigous one-dimensional array, addressed in row
+ * major. Note that this implementation is not synchronized.
+ * <p>
+ * <b>Time complexity:</b>
+ * <p>
+ * <tt>O(1)</tt> (i.e. constant time) for the basic operations <tt>get</tt>,
+ * <tt>getQuick</tt>, <tt>set</tt>, <tt>setQuick</tt> and <tt>size</tt>,
+ * <p>
+ * Cells are internally addressed in row-major. Applications demanding utmost
+ * speed can exploit this fact. Setting/getting values in a loop row-by-row is
+ * quicker than column-by-column. Thus
+ *
+ * <pre>
+ * for (int row = 0; row &lt; rows; row++) {
+ *     for (int column = 0; column &lt; columns; column++) {
+ *         matrix.setQuick(row, column, someValue);
+ *     }
+ * }
+ * </pre>
+ *
+ * is quicker than
+ *
+ * <pre>
+ * for (int column = 0; column &lt; columns; column++) {
+ *     for (int row = 0; row &lt; rows; row++) {
+ *         matrix.setQuick(row, column, someValue);
+ *     }
+ * }
+ * </pre>
  *
  * @author wolfgang.hoschek@cern.ch
  * @version 1.0, 09/24/99
@@ -52,103 +51,175 @@ class DoubleMatrixLocation {
  * @author Piotr Wendykier (piotr.wendykier@gmail.com)
  *
  */
-abstract class DoubleMatrix extends AbstractMatrix {
+class DoubleMatrix extends AbstractDoubleMatrix {
+
+  Float64List _elements;
 
   /**
-   * Makes this class non instantiable, but still let's others inherit from
-   * it.
-   */
-  DoubleMatrix();
-
-  /**
-   * Applies a function to each cell and aggregates the results. Returns a
-   * value <tt>v</tt> such that <tt>v==a(size())</tt> where
-   * <tt>a(i) == aggr( a(i-1), f(get(row,column)) )</tt> and terminators are
-   * <tt>a(1) == f(get(0,0)), a(0)==Double.NaN</tt>.
+   * Constructs a matrix with a copy of the given values. <tt>values</tt> is
+   * required to have the form <tt>values[row][column]</tt> and have exactly
+   * the same number of columns in every row.
    * <p>
-   * <b>Example:</b>
+   * The values are copied. So subsequent changes in <tt>values</tt> are not
+   * reflected in the matrix, and vice-versa.
    *
-   * <pre>
-   * 	 cern.jet.math.Functions F = cern.jet.math.Functions.functions;
-   * 	 2 x 2 matrix
-   * 	 0 1
-   * 	 2 3
-   *
-   * 	 // Sum( x[row,col]*x[row,col] )
-   * 	 matrix.aggregate(F.plus,F.square);
-   * 	 --&gt; 14
-   *
-   * </pre>
-   *
-   * For further examples, see the <a
-   * href="package-summary.html#FunctionObjects">package doc</a>.
-   *
-   * @param aggr
-   *            an aggregation function taking as first argument the current
-   *            aggregation and as second argument the transformed current
-   *            cell value.
-   * @param f
-   *            a function transforming the current cell value.
-   * @return the aggregated measure.
-   * @see cern.jet.math.tdouble.DoubleFunctions
+   * @param values
+   *            The values to be filled into the new matrix.
+   * @throws ArgumentError
+   *             if
+   *             <tt>for any 1 &lt;= row &lt; values.length: values[row].length != values[row-1].length</tt>
+   *             .
    */
+  factory DoubleMatrix.fromList(List<Float64List> values) {
+    return new DoubleMatrix(values.length, values.length == 0 ? 0 : values[0].length)
+      ..setAll2D(values);
+  }
+
+  /**
+   * Constructs a matrix with a given number of rows and columns. All entries
+   * are initially <tt>0</tt>.
+   *
+   * @param rows
+   *            the number of rows the matrix shall have.
+   * @param columns
+   *            the number of columns the matrix shall have.
+   * @throws ArgumentError
+   *             if
+   *             <tt>rows<0 || columns<0 || (double)columns*rows > Integer.MAX_VALUE</tt>
+   *             .
+   */
+  //    DenseDoubleMatrix(int rows, int columns) {
+  //        _setUp(rows, columns);
+  //        this._elements = new Float64List(rows * columns);
+  //    }
+
+  /**
+   * Constructs a matrix with the given parameters.
+   *
+   * @param rows
+   *            the number of rows the matrix shall have.
+   * @param columns
+   *            the number of columns the matrix shall have.
+   * @param elements
+   *            the cells.
+   * @param rowZero
+   *            the position of the first element.
+   * @param columnZero
+   *            the position of the first element.
+   * @param rowStride
+   *            the number of elements between two rows, i.e.
+   *            <tt>index(i+1,j)-index(i,j)</tt>.
+   * @param columnStride
+   *            the number of elements between two columns, i.e.
+   *            <tt>index(i,j+1)-index(i,j)</tt>.
+   * @param isView
+   *            if true then a matrix view is constructed
+   * @throws ArgumentError
+   *             if
+   *             <tt>rows<0 || columns<0 || (double)columns*rows > Integer.MAX_VALUE</tt>
+   *             or flip's are illegal.
+   */
+  DoubleMatrix(int rows, int columns, [Float64List elements = null, int rowZero = 0, int columnZero = 0, int rowStride = null, int columnStride = 1, bool isView = false]) {
+    if (elements == null) {
+      elements = new Float64List(rows * columns);
+    }
+    _setUp(rows, columns, rowZero, columnZero, rowStride, columnStride);
+    this._elements = elements;
+    this._isNoView = !isView;
+  }
+
+  /**
+   * Constructs a matrix from MatrixVectorReader.
+   *
+   * @param reader
+   *            matrix reader
+   * @throws IOException
+   */
+  /*factory DenseDoubleMatrix.read(MatrixVectorReader reader) {//throws IOException {
+    MatrixInfo info;
+    if (reader.hasInfo()) {
+      info = reader.readMatrixInfo();
+    } else {
+      info = new MatrixInfo(true, MatrixInfo.MatrixField.Real, MatrixInfo.MatrixSymmetry.General);
+    }
+
+    if (info.isPattern()) throw new UnsupportedOperationException("Pattern matrices are not supported");
+    if (info.isDense()) throw new UnsupportedOperationException("Dense matrices are not supported");
+    if (info.isComplex()) throw new UnsupportedOperationException("Complex matrices are not supported");
+
+    MatrixSize size = reader.readMatrixSize(info);
+    final m = new DenseDoubleMatrix(size.numRows(), size.numColumns());
+    m._elements = new Float64List(_rows * _columns);
+    int numEntries = size.numEntries();
+    List<int> columnIndexes = new List<int>(numEntries);
+    List<int> rowIndexes = new List<int>(numEntries);
+    Float64List values = new Float64List(numEntries);
+    reader.readCoordinate(rowIndexes, columnIndexes, values);
+    for (int i = 0; i < numEntries; i++) {
+      m.setQuick(rowIndexes[i], columnIndexes[i], values[i]);
+    }
+    if (info.isSymmetric()) {
+      for (int i = 0; i < numEntries; i++) {
+        if (rowIndexes[i] != columnIndexes[i]) {
+          m.setQuick(columnIndexes[i], rowIndexes[i], values[i]);
+        }
+      }
+    } else if (info.isSkewSymmetric()) {
+      for (int i = 0; i < numEntries; i++) {
+        if (rowIndexes[i] != columnIndexes[i]) {
+          m.setQuick(columnIndexes[i], rowIndexes[i], -values[i]);
+        }
+      }
+    }
+    return m;
+  }*/
+
   double reduce(DoubleDoubleFunction aggr, DoubleFunction f) {
     if (length == 0) return double.NAN;
+    final int zero = index(0, 0);
     double a = 0.0;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    if ((nthreads > 1) && (_rows * _columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-      nthreads = math.min(nthreads, _rows);
+    if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+      nthreads = Math.min(nthreads, _rows);
       List<Future> futures = new List<Future>(nthreads);
       int k = _rows ~/ nthreads;
       for (int j = 0; j < nthreads; j++) {
-        final int firstRow = j * k;
-        final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
+        final int firstRow = _rows - j * k;
+        final int lastRow = (j == (nthreads - 1)) ? 0 : firstRow - k;
         futures[j] = ConcurrencyUtils.submit(() {
-          double a = f(getQuick(firstRow, 0));
+          double a = f(_elements[zero + (firstRow - 1) * _rowStride + (_columns - 1) * _columnStride]);
           int d = 1;
-          for (int r = firstRow; r < lastRow; r++) {
-            for (int c = d; c < _columns; c++) {
-              a = aggr(a, f(getQuick(r, c)));
+          for (int r = firstRow; --r >= lastRow; ) {
+            int ridx = zero + r * _rowStride;
+            for (int c = _columns - d; --c >= 0; ) {
+              a = aggr(a, f(_elements[ridx + c * _columnStride]));
             }
             d = 0;
           }
-          return Double.valueOf(a);
+          return a;
         });
       }
       a = ConcurrencyUtils.waitForCompletion(futures, aggr);
     } else {*/
-      a = f(get(0, 0));
-      int d = 1; // first cell already done
-      for (int r = 0; r < _rows; r++) {
-        for (int c = d; c < _columns; c++) {
-          a = aggr(a, f(get(r, c)));
-        }
-        d = 0;
+    a = f(_elements[zero + (_rows - 1) * _rowStride + (_columns - 1) * _columnStride]);
+    int d = 1;
+    for (int r = _rows; --r >= 0; ) {
+      int ridx = zero + r * _rowStride;
+      for (int c = _columns - d; --c >= 0; ) {
+        a = aggr(a, f(_elements[ridx + c * _columnStride]));
       }
+      d = 0;
+    }
     //}
     return a;
   }
 
-  /**
-   * Applies a function to each cell that satisfies a condition and aggregates
-   * the results.
-   *
-   * @param aggr
-   *            an aggregation function taking as first argument the current
-   *            aggregation and as second argument the transformed current
-   *            cell value.
-   * @param f
-   *            a function transforming the current cell value.
-   * @param cond
-   *            a condition.
-   * @return the aggregated measure.
-   * @see cern.jet.math.tdouble.DoubleFunctions
-   */
-  double reduceWhere(final DoubleDoubleFunction aggr, final DoubleFunction f, final DoubleProcedure cond) {
+  double reduceWhere(DoubleDoubleFunction aggr, DoubleFunction f, DoubleProcedure cond) {
     if (length == 0) return double.NAN;
+    final int zero = index(0, 0);
     double a = 0.0;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    if ((nthreads > 1) && (_rows * _columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+    if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
       List<Future> futures = new List<Future>(nthreads);
       int k = _rows ~/ nthreads;
@@ -156,67 +227,50 @@ abstract class DoubleMatrix extends AbstractMatrix {
         final int firstRow = j * k;
         final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
         futures[j] = ConcurrencyUtils.submit(() {
-          double elem = getQuick(firstRow, 0);
+          double elem = _elements[zero + firstRow * _rowStride];
           double a = 0;
           if (cond(elem) == true) {
-            a = aggr(a, f(elem));
+            a = f(elem);
           }
           int d = 1;
           for (int r = firstRow; r < lastRow; r++) {
             for (int c = d; c < _columns; c++) {
-              elem = getQuick(r, c);
+              elem = _elements[zero + r * _rowStride + c * _columnStride];
               if (cond(elem) == true) {
                 a = aggr(a, f(elem));
               }
             }
             d = 0;
           }
-          return Double.valueOf(a);
+          return a;
         });
       }
       a = ConcurrencyUtils.waitForCompletion(futures, aggr);
     } else {*/
-      double elem = get(0, 0);
-      if (cond(elem) == true) {
-        a = aggr(a, f(elem));
-      }
-      int d = 1; // first cell already done
-      for (int r = 0; r < _rows; r++) {
-        for (int c = d; c < _columns; c++) {
-          elem = get(r, c);
-          if (cond(elem) == true) {
-            a = aggr(a, f(elem));
-          }
+    double elem = _elements[zero];
+    if (cond(elem) == true) {
+      a = f(_elements[zero]);
+    }
+    int d = 1; // first cell already done
+    for (int r = 0; r < _rows; r++) {
+      for (int c = d; c < _columns; c++) {
+        elem = _elements[zero + r * _rowStride + c * _columnStride];
+        if (cond(elem) == true) {
+          a = aggr(a, f(elem));
         }
-        d = 0;
       }
+      d = 0;
+    }
     //}
     return a;
   }
 
-  /**
-   * Applies a function to all cells with a given indexes and aggregates the
-   * results.
-   *
-   * @param aggr
-   *            an aggregation function taking as first argument the current
-   *            aggregation and as second argument the transformed current
-   *            cell value.
-   * @param f
-   *            a function transforming the current cell value.
-   * @param rowList
-   *            row indexes.
-   * @param columnList
-   *            column indexes.
-   *
-   * @return the aggregated measure.
-   * @see cern.jet.math.tdouble.DoubleFunctions
-   */
-  double reduceRange(final DoubleDoubleFunction aggr, final DoubleFunction f, final /*/*IntArrayList*/Int32List*/Int32List rowList, final /*/*IntArrayList*/Int32List*/Int32List columnList) {
+  double reduceRange(DoubleDoubleFunction aggr, DoubleFunction f, final /*IntArrayList*/List<int> rowList, final /*IntArrayList*/List<int> columnList) {
     if (this.length == 0) return double.NAN;
+    final int zero = index(0, 0);
     final int size = rowList.length;
-    final Int32List rowElements = rowList;//.elements();
-    final Int32List columnElements = columnList;//.elements();
+    final List<int> rowElements = rowList;//.elements();
+    final List<int> columnElements = columnList;//.elements();
     double a = 0.0;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -227,10 +281,10 @@ abstract class DoubleMatrix extends AbstractMatrix {
         final int firstIdx = j * k;
         final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
         futures[j] = ConcurrencyUtils.submit(() {
-          double a = f(getQuick(rowElements[firstIdx], columnElements[firstIdx]));
+          double a = f(_elements[zero + rowElements[firstIdx] * _rowStride + columnElements[firstIdx] * _columnStride]);
           double elem;
           for (int i = firstIdx + 1; i < lastIdx; i++) {
-            elem = getQuick(rowElements[i], columnElements[i]);
+            elem = _elements[zero + rowElements[i] * _rowStride + columnElements[i] * _columnStride];
             a = aggr(a, f(elem));
           }
           return a;
@@ -238,67 +292,30 @@ abstract class DoubleMatrix extends AbstractMatrix {
       }
       a = ConcurrencyUtils.waitForCompletion(futures, aggr);
     } else {*/
-      double elem;
-      a = f(get(rowElements[0], columnElements[0]));
-      for (int i = 1; i < size; i++) {
-        elem = get(rowElements[i], columnElements[i]);
-        a = aggr(a, f(elem));
-      }
+    double elem;
+    a = f(_elements[zero + rowElements[0] * _rowStride + columnElements[0] * _columnStride]);
+    for (int i = 1; i < size; i++) {
+      elem = _elements[zero + rowElements[i] * _rowStride + columnElements[i] * _columnStride];
+      a = aggr(a, f(elem));
+    }
     //}
     return a;
   }
 
-  /**
-   * Applies a function to each corresponding cell of two matrices and
-   * aggregates the results. Returns a value <tt>v</tt> such that
-   * <tt>v==a(size())</tt> where
-   * <tt>a(i) == aggr( a(i-1), f(get(row,column),other.get(row,column)) )</tt>
-   * and terminators are
-   * <tt>a(1) == f(get(0,0),other.get(0,0)), a(0)==Double.NaN</tt>.
-   * <p>
-   * <b>Example:</b>
-   *
-   * <pre>
-   * 	 cern.jet.math.Functions F = cern.jet.math.Functions.functions;
-   * 	 x == 2 x 2 matrix
-   * 	 0 1
-   * 	 2 3
-   *
-   * 	 y == 2 x 2 matrix
-   * 	 0 1
-   * 	 2 3
-   *
-   * 	 // Sum( x[row,col] * y[row,col] )
-   * 	 x.aggregate(y, F.plus, F.mult);
-   * 	 --&gt; 14
-   *
-   * 	 // Sum( (x[row,col] + y[row,col])&circ;2 )
-   * 	 x.aggregate(y, F.plus, F.chain(F.square,F.plus));
-   * 	 --&gt; 56
-   *
-   * </pre>
-   *
-   * For further examples, see the <a
-   * href="package-summary.html#FunctionObjects">package doc</a>.
-   *
-   * @param aggr
-   *            an aggregation function taking as first argument the current
-   *            aggregation and as second argument the transformed current
-   *            cell values.
-   * @param f
-   *            a function transforming the current cell values.
-   * @return the aggregated measure.
-   * @throws ArgumentError
-   *             if
-   *             <tt>columns() != other.columns() || rows() != other.rows()</tt>
-   * @see cern.jet.math.tdouble.DoubleFunctions
-   */
-  double reduceMatrix(final DoubleMatrix other, final DoubleDoubleFunction aggr, final DoubleDoubleFunction f) {
+  double reduceMatrix(final AbstractDoubleMatrix other, DoubleDoubleFunction aggr, DoubleDoubleFunction f) {
+    if (!(other is DoubleMatrix)) {
+      return super.reduceMatrix(other, aggr, f);
+    }
     checkShape(other);
     if (length == 0) return double.NAN;
+    final int zero = index(0, 0);
+    final int zeroOther = other.index(0, 0);
+    final int rowStrideOther = other.rowStride;
+    final int colStrideOther = other.columnStride;
+    final Float64List elementsOther = other.elements() as Float64List;
     double a = 0.0;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    if ((nthreads > 1) && (_rows * _columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+    if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
       List<Future> futures = new List<Future>(nthreads);
       int k = _rows ~/ nthreads;
@@ -306,11 +323,11 @@ abstract class DoubleMatrix extends AbstractMatrix {
         final int firstRow = j * k;
         final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
         futures[j] = ConcurrencyUtils.submit(() {
-          double a = f(getQuick(firstRow, 0), other.getQuick(firstRow, 0));
+          double a = f(_elements[zero + firstRow * _rowStride], elementsOther[zeroOther + firstRow * rowStrideOther]);
           int d = 1;
           for (int r = firstRow; r < lastRow; r++) {
             for (int c = d; c < _columns; c++) {
-              a = aggr(a, f(getQuick(r, c), other.getQuick(r, c)));
+              a = aggr(a, f(_elements[zero + r * _rowStride + c * _columnStride], elementsOther[zeroOther + r * rowStrideOther + c * colStrideOther]));
             }
             d = 0;
           }
@@ -319,49 +336,30 @@ abstract class DoubleMatrix extends AbstractMatrix {
       }
       a = ConcurrencyUtils.waitForCompletion(futures, aggr);
     } else {*/
-      a = f(get(0, 0), other.get(0, 0));
-      int d = 1; // first cell already done
-      for (int r = 0; r < _rows; r++) {
-        for (int c = d; c < _columns; c++) {
-          a = aggr(a, f(get(r, c), other.get(r, c)));
-        }
-        d = 0;
+    int d = 1; // first cell already done
+    a = f(_elements[zero], elementsOther[zeroOther]);
+    for (int r = 0; r < _rows; r++) {
+      for (int c = d; c < _columns; c++) {
+        a = aggr(a, f(_elements[zero + r * _rowStride + c * _columnStride], elementsOther[zeroOther + r * rowStrideOther + c * colStrideOther]));
       }
+      d = 0;
+    }
     //}
     return a;
   }
 
-  /**
-   * Assigns the result of a function to each cell;
-   * <tt>x[row,col] = function(x[row,col])</tt>.
-   * <p>
-   * <b>Example:</b>
-   *
-   * <pre>
-   * 	 matrix = 2 x 2 matrix
-   * 	 0.5 1.5
-   * 	 2.5 3.5
-   *
-   * 	 // change each cell to its sine
-   * 	 matrix.assign(cern.jet.math.Functions.sin);
-   * 	 --&gt;
-   * 	 2 x 2 matrix
-   * 	 0.479426  0.997495
-   * 	 0.598472 -0.350783
-   *
-   * </pre>
-   *
-   * For further examples, see the <a
-   * href="package-summary.html#FunctionObjects">package doc</a>.
-   *
-   * @param f
-   *            a function object taking as argument the current cell's value.
-   * @return <tt>this</tt> (for convenience only).
-   * @see cern.jet.math.tdouble.DoubleFunctions
-   */
-  DoubleMatrix forEach(final DoubleFunction f) {
+  AbstractDoubleMatrix forEach(DoubleFunction function) {
+    final Float64List elems = this._elements;
+    if (elems == null) throw new Error();
+    final int zero = index(0, 0);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    if ((nthreads > 1) && (_rows * _columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+    if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+      if (function is DoubleMult) { // x[i] =
+        // mult*x[i]
+        double multiplicator = function.multiplicator;
+        if (multiplicator == 1) return this;
+        if (multiplicator == 0) return assign(0);
+      }
       nthreads = Math.min(nthreads, _rows);
       List<Future> futures = new List<Future>(nthreads);
       int k = _rows ~/ nthreads;
@@ -369,38 +367,68 @@ abstract class DoubleMatrix extends AbstractMatrix {
         final int firstRow = j * k;
         final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
         futures[j] = ConcurrencyUtils.submit(() {
-          for (int r = firstRow; r < lastRow; r++) {
-            for (int c = 0; c < _columns; c++) {
-              setQuick(r, c, f(getQuick(r, c)));
+          int idx = zero + firstRow * _rowStride;
+          // specialization for speed
+          if (function is DoubleMult) {
+            // x[i] = mult*x[i]
+            double multiplicator = function.multiplicator;
+            if (multiplicator == 1) return;
+            for (int r = firstRow; r < lastRow; r++) {
+              for (int i = idx,
+                  c = 0; c < _columns; c++) {
+                elems[i] *= multiplicator;
+                i += _columnStride;
+              }
+              idx += _rowStride;
+            }
+          } else {
+            // the general case x[i] = f(x[i])
+            for (int r = firstRow; r < lastRow; r++) {
+              for (int i = idx,
+                  c = 0; c < _columns; c++) {
+                elems[i] = function(elems[i]);
+                i += _columnStride;
+              }
+              idx += _rowStride;
             }
           }
         });
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-      for (int r = 0; r < _rows; r++) {
-        for (int c = 0; c < _columns; c++) {
-          set(r, c, f(get(r, c)));
+    int idx = zero + (_rows - 1) * _rowStride + (_columns - 1) * _columnStride;
+    // specialization for speed
+    if (function is DoubleMult) { // x[i] =
+      // mult*x[i]
+      double multiplicator = (function as DoubleMult).multiplicator;
+      if (multiplicator == 1) return this;
+      if (multiplicator == 0) return fill(0.0);
+      for (int r = _rows; --r >= 0; ) { // the general case
+        for (int i = idx,
+            c = _columns; --c >= 0; ) {
+          elems[i] *= multiplicator;
+          i -= _columnStride;
         }
+        idx -= _rowStride;
       }
+    } else { // the general case x[i] = f(x[i])
+      for (int r = _rows; --r >= 0; ) {
+        for (int i = idx,
+            c = _columns; --c >= 0; ) {
+          elems[i] = function(elems[i]);
+          i -= _columnStride;
+        }
+        idx -= _rowStride;
+      }
+    }
     //}
     return this;
   }
 
-  /**
-   * Assigns the result of a function to all cells that satisfy a condition.
-   *
-   * @param cond
-   *            a condition.
-   *
-   * @param f
-   *            a function object.
-   * @return <tt>this</tt> (for convenience only).
-   * @see cern.jet.math.tdouble.DoubleFunctions
-   */
-  DoubleMatrix forEachWhere(final DoubleProcedure cond, final DoubleFunction f) {
+  AbstractDoubleMatrix forEachWhere(DoubleProcedure cond, func.DoubleFunction function) {
+    final int zero = index(0, 0);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    if ((nthreads > 1) && (_rows * _columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+    if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
       List<Future> futures = new List<Future>(nthreads);
       int k = _rows ~/ nthreads;
@@ -409,45 +437,43 @@ abstract class DoubleMatrix extends AbstractMatrix {
         final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
         futures[j] = ConcurrencyUtils.submit(() {
           double elem;
+          int idx = zero + firstRow * _rowStride;
           for (int r = firstRow; r < lastRow; r++) {
-            for (int c = 0; c < _columns; c++) {
-              elem = getQuick(r, c);
+            for (int i = idx,
+                c = 0; c < _columns; c++) {
+              elem = _elements[i];
               if (cond(elem) == true) {
-                setQuick(r, c, f(elem));
+                _elements[i] = function(elem);
               }
+              i += _columnStride;
             }
+            idx += _rowStride;
           }
         });
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-      double elem;
-      for (int r = 0; r < _rows; r++) {
-        for (int c = 0; c < _columns; c++) {
-          elem = get(r, c);
-          if (cond(elem) == true) {
-            set(r, c, f(elem));
-          }
+    double elem;
+    int idx = zero;
+    for (int r = 0; r < _rows; r++) {
+      for (int i = idx,
+          c = 0; c < _columns; c++) {
+        elem = _elements[i];
+        if (cond(elem) == true) {
+          _elements[i] = function(elem);
         }
+        i += _columnStride;
       }
+      idx += _rowStride;
+    }
     //}
     return this;
   }
 
-  /**
-   * Assigns a value to all cells that satisfy a condition.
-   *
-   * @param cond
-   *            a condition.
-   *
-   * @param value
-   *            a value.
-   * @return <tt>this</tt> (for convenience only).
-   *
-   */
-  DoubleMatrix fillWhere(final DoubleProcedure cond, final double value) {
+  AbstractDoubleMatrix fillWhere(DoubleProcedure cond, final double value) {
+    final int zero = index(0, 0);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    if ((nthreads > 1) && (_rows * _columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+    if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
       List<Future> futures = new List<Future>(nthreads);
       int k = _rows ~/ nthreads;
@@ -456,86 +482,44 @@ abstract class DoubleMatrix extends AbstractMatrix {
         final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
         futures[j] = ConcurrencyUtils.submit(() {
           double elem;
+          int idx = zero + firstRow * _rowStride;
           for (int r = firstRow; r < lastRow; r++) {
-            for (int c = 0; c < _columns; c++) {
-              elem = getQuick(r, c);
+            for (int i = idx,
+                c = 0; c < _columns; c++) {
+              elem = _elements[i];
               if (cond(elem) == true) {
-                setQuick(r, c, value);
+                _elements[i] = value;
               }
+              i += _columnStride;
             }
+            idx += _rowStride;
           }
         });
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-      double elem;
-      for (int r = 0; r < _rows; r++) {
-        for (int c = 0; c < _columns; c++) {
-          elem = get(r, c);
-          if (cond(elem) == true) {
-            set(r, c, value);
-          }
+    double elem;
+    int idx = zero;
+    for (int r = 0; r < _rows; r++) {
+      for (int i = idx,
+          c = 0; c < _columns; c++) {
+        elem = _elements[i];
+        if (cond(elem) == true) {
+          _elements[i] = value;
         }
+        i += _columnStride;
       }
-    //}
-    return this;
-  }
-
-  /**
-   * Sets all cells to the state specified by <tt>value</tt>.
-   *
-   * @param value
-   *            the value to be filled into the cells.
-   * @return <tt>this</tt> (for convenience only).
-   */
-  DoubleMatrix fill(final num value) {
-    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    if ((nthreads > 1) && (_rows * _columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-      nthreads = Math.min(nthreads, _rows);
-      List<Future> futures = new List<Future>(nthreads);
-      int k = _rows ~/ nthreads;
-      for (int j = 0; j < nthreads; j++) {
-        final int firstRow = j * k;
-        final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
-        futures[j] = ConcurrencyUtils.submit(() {
-          for (int r = firstRow; r < lastRow; r++) {
-            for (int c = 0; c < _columns; c++) {
-              setQuick(r, c, value.toDouble());
-            }
-          }
-        });
-      }
-      ConcurrencyUtils.waitForCompletion(futures);
-    } else {*/
-      for (int r = 0; r < _rows; r++) {
-        for (int c = 0; c < _columns; c++) {
-          set(r, c, value.toDouble());
-        }
-      }
-    //}
-    return this;
-  }
-
-  /**
-   * Sets all cells to the state specified by <tt>values</tt>. <tt>values</tt>
-   * is required to have the form <tt>values[row*column]</tt> and elements
-   * have to be stored in a row-wise order.
-   * <p>
-   * The values are copied. So subsequent changes in <tt>values</tt> are not
-   * reflected in the matrix, and vice-versa.
-   *
-   * @param values
-   *            the values to be filled into the cells.
-   * @return <tt>this</tt> (for convenience only).
-   * @throws ArgumentError
-   *             if <tt>values.length != rows()*columns()</tt>.
-   */
-  DoubleMatrix setAll(List<double> values) {
-    if (values.length != _rows * _columns) {
-      throw new ArgumentError("Must have same length: length=${values.length}rows()*columns()=${rows * columns}");
+      idx += _rowStride;
     }
+    //}
+    return this;
+  }
+
+  AbstractDoubleMatrix fill(final double value) {
+    final Float64List elems = this._elements;
+    final int zero = index(0, 0);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    if ((nthreads > 1) && (_rows * _columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+    if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
       List<Future> futures = new List<Future>(nthreads);
       int k = _rows ~/ nthreads;
@@ -543,107 +527,192 @@ abstract class DoubleMatrix extends AbstractMatrix {
         final int firstRow = j * k;
         final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
         futures[j] = ConcurrencyUtils.submit(() {
-          int idx = firstRow * _columns;
+          int idx = zero + firstRow * _rowStride;
           for (int r = firstRow; r < lastRow; r++) {
-            for (int c = 0; c < _columns; c++) {
-              setQuick(r, c, values[idx++]);
+            for (int i = idx,
+                c = 0; c < _columns; c++) {
+              elems[i] = value;
+              i += _columnStride;
             }
+            idx += _rowStride;
           }
         });
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-      int idx = 0;
-      for (int r = 0; r < _rows; r++) {
-        for (int c = 0; c < _columns; c++) {
-          set(r, c, values[idx++]);
-        }
+    int idx = zero;
+    for (int r = 0; r < _rows; r++) {
+      for (int i = idx,
+          c = 0; c < _columns; c++) {
+        elems[i] = value;
+        i += _columnStride;
       }
-    //}
-
-    return this;
-  }
-
-  /**
-   * Sets all cells to the state specified by <tt>values</tt>. <tt>values</tt>
-   * is required to have the form <tt>values[row][column]</tt> and have
-   * exactly the same number of rows and columns as the receiver.
-   * <p>
-   * The values are copied. So subsequent changes in <tt>values</tt> are not
-   * reflected in the matrix, and vice-versa.
-   *
-   * @param values
-   *            the values to be filled into the cells.
-   * @return <tt>this</tt> (for convenience only).
-   * @throws ArgumentError
-   *             if
-   *             <tt>values.length != rows() || for any 0 &lt;= row &lt; rows(): values[row].length != columns()</tt>
-   *             .
-   */
-  DoubleMatrix setAll2D(final List<Float64List> values) {
-    if (values.length != _rows) {
-      throw new ArgumentError("Must have same number of rows: rows=${values.length}rows()=${rows}");
+      idx += _rowStride;
     }
-    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    if ((nthreads > 1) && (_rows * _columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-      nthreads = Math.min(nthreads, _rows);
-      List<Future> futures = new List<Future>(nthreads);
-      int k = _rows ~/ nthreads;
-      for (int j = 0; j < nthreads; j++) {
-        final int firstRow = j * k;
-        final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
-        futures[j] = ConcurrencyUtils.submit(() {
-          for (int r = firstRow; r < lastRow; r++) {
-            List<double> currentRow = values[r];
-            if (currentRow.length != _columns) throw new ArgumentError("Must have same number of columns in every row: columns=" + currentRow.length + "columns()=" + columns());
-            for (int c = 0; c < _columns; c++) {
-              setQuick(r, c, currentRow[c]);
-            }
-          }
-        });
-      }
-      ConcurrencyUtils.waitForCompletion(futures);
-    } else {*/
-      for (int r = 0; r < _rows; r++) {
-        List<double> currentRow = values[r];
-        if (currentRow.length != _columns) {
-          throw new ArgumentError("Must have same number of columns in every row: columns=${currentRow.length}columns()=${columns}");
-        }
-        for (int c = 0; c < _columns; c++) {
-          set(r, c, currentRow[c]);
-        }
-      }
     //}
     return this;
   }
 
-  /**
-   * Replaces all cell values of the receiver with the values of another
-   * matrix. Both matrices must have the same number of rows and columns. If
-   * both matrices share the same cells (as is the case if they are views
-   * derived from the same matrix) and intersect in an ambiguous way, then
-   * replaces <i>as if</i> using an intermediate auxiliary deep copy of
-   * <tt>other</tt>.
-   *
-   * @param other
-   *            the source matrix to copy from (may be identical to the
-   *            receiver).
-   * @return <tt>this</tt> (for convenience only).
-   * @throws ArgumentError
-   *             if
-   *             <tt>columns() != other.columns() || rows() != other.rows()</tt>
-   */
-  DoubleMatrix copyFrom(DoubleMatrix other) {
-    if (other == this) return this;
-    checkShape(other);
-    DoubleMatrix source;
-    if (_haveSharedCells(other)) {
-      source = other.copy();
+  AbstractDoubleMatrix setAll(final Float64List values) {
+    if (values.length != length) {
+      throw new ArgumentError("Must have same length: length=${values.length} rows()*columns()=${rows * columns}");
+    }
+    //int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    if (this._isNoView) {
+      this._elements.setAll(0, values);
+      //System.arraycopy(values, 0, this._elements, 0, values.length);
     } else {
-      source = other;
+      final int zero = index(0, 0);
+      /*if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+        nthreads = Math.min(nthreads, _rows);
+        List<Future> futures = new List<Future>(nthreads);
+        int k = _rows ~/ nthreads;
+        for (int j = 0; j < nthreads; j++) {
+          final int firstRow = j * k;
+          final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
+          futures[j] = ConcurrencyUtils.submit(() {
+            int idxOther = firstRow * _columns;
+            int idx = zero + firstRow * _rowStride;
+            for (int r = firstRow; r < lastRow; r++) {
+              for (int i = idx,
+                  c = 0; c < _columns; c++) {
+                _elements[i] = values[idxOther++];
+                i += _columnStride;
+              }
+              idx += _rowStride;
+            }
+          });
+        }
+        ConcurrencyUtils.waitForCompletion(futures);
+      } else {*/
+      int idxOther = 0;
+      int idx = zero;
+      for (int r = 0; r < _rows; r++) {
+        for (int i = idx,
+            c = 0; c < _columns; c++) {
+          _elements[i] = values[idxOther++];
+          i += _columnStride;
+        }
+        idx += _rowStride;
+      }
+      //}
     }
-    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    if ((nthreads > 1) && (_rows * _columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+    return this;
+  }
+
+  AbstractDoubleMatrix setAll2D(final List<Float64List> values) {
+    if (values.length != _rows) {
+      throw new ArgumentError("Must have same number of rows: rows=${values.length} rows()=${rows}");
+    }
+    //int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    if (this._isNoView) {
+      /*if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+        nthreads = Math.min(nthreads, _rows);
+        List<Future> futures = new List<Future>(nthreads);
+        int k = _rows ~/ nthreads;
+        for (int j = 0; j < nthreads; j++) {
+          final int firstRow = j * k;
+          final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
+          futures[j] = ConcurrencyUtils.submit(() {
+            int i = firstRow * _rowStride;
+            for (int r = firstRow; r < lastRow; r++) {
+              Float64List currentRow = values[r];
+              if (currentRow.length != _columns) throw new ArgumentError("Must have same number of columns in every row: columns=" + currentRow.length + "columns()=" + columns());
+              System.arraycopy(currentRow, 0, _elements, i, _columns);
+              i += _columns;
+            }
+          });
+        }
+        ConcurrencyUtils.waitForCompletion(futures);
+      } else {*/
+      int i = 0;
+      for (int r = 0; r < _rows; r++) {
+        Float64List currentRow = values[r];
+        if (currentRow.length != _columns) {
+          throw new ArgumentError("Must have same number of columns in every row: columns=${currentRow.length} columns()=${columns}");
+        }
+        this._elements.setAll(i, currentRow);
+        //System.arraycopy(currentRow, 0, this._elements, i, _columns);
+        i += _columns;
+      }
+      //}
+    } else {
+      final int zero = this.index(0, 0);
+      /*if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+        nthreads = Math.min(nthreads, _rows);
+        List<Future> futures = new List<Future>(nthreads);
+        int k = _rows ~/ nthreads;
+        for (int j = 0; j < nthreads; j++) {
+          final int firstRow = j * k;
+          final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
+          futures[j] = ConcurrencyUtils.submit(() {
+            int idx = zero + firstRow * _rowStride;
+            for (int r = firstRow; r < lastRow; r++) {
+              Float64List currentRow = values[r];
+              if (currentRow.length != _columns) throw new ArgumentError("Must have same number of columns in every row: columns=" + currentRow.length + "columns()=" + columns());
+              for (int i = idx,
+                  c = 0; c < _columns; c++) {
+                _elements[i] = currentRow[c];
+                i += _columnStride;
+              }
+              idx += _rowStride;
+            }
+          });
+        }
+        ConcurrencyUtils.waitForCompletion(futures);
+      } else {*/
+      int idx = zero;
+      for (int r = 0; r < _rows; r++) {
+        Float64List currentRow = values[r];
+        if (currentRow.length != _columns) {
+          throw new ArgumentError("Must have same number of columns in every row: columns=${currentRow.length} columns()=${columns}");
+        }
+        for (int i = idx,
+            c = 0; c < _columns; c++) {
+          _elements[i] = currentRow[c];
+          i += _columnStride;
+        }
+        idx += _rowStride;
+      }
+      //}
+      return this;
+    }
+    return this;
+  }
+
+  AbstractDoubleMatrix copyFrom(final AbstractDoubleMatrix source) {
+    // overriden for performance only
+    if (!(source is DoubleMatrix)) {
+      super.copyFrom(source);
+      return this;
+    }
+    DoubleMatrix other = source as DoubleMatrix;
+    if (other == this) return this; // nothing to do
+    checkShape(other);
+    //int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    if (this._isNoView && other._isNoView) { // quickest
+      this._elements.setAll(0, other._elements);
+      //System.arraycopy(other._elements, 0, this._elements, 0, this._elements.length);
+      return this;
+    }
+    if (_haveSharedCells(other)) {
+      AbstractDoubleMatrix c = other.copy();
+      if (!(c is DoubleMatrix)) { // should not happen
+        super.copyFrom(other);
+        return this;
+      }
+      other = c as DoubleMatrix;
+    }
+
+    final Float64List elementsOther = other._elements;
+    if (_elements == null || elementsOther == null) {
+      throw new Error();
+    }
+    final int zeroOther = other.index(0, 0);
+    final int zero = this.index(0, 0);
+    final int columnStrideOther = other._columnStride;
+    final int rowStrideOther = other._rowStride;
+    /*if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
       List<Future> futures = new List<Future>(nthreads);
       int k = _rows ~/ nthreads;
@@ -651,67 +720,62 @@ abstract class DoubleMatrix extends AbstractMatrix {
         final int firstRow = j * k;
         final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
         futures[j] = ConcurrencyUtils.submit(() {
+          int idx = zero + firstRow * _rowStride;
+          int idxOther = zeroOther + firstRow * rowStrideOther;
           for (int r = firstRow; r < lastRow; r++) {
-            for (int c = 0; c < _columns; c++) {
-              setQuick(r, c, source.getQuick(r, c));
+            for (int i = idx,
+                j = idxOther,
+                c = 0; c < _columns; c++) {
+              _elements[i] = elementsOther[j];
+              i += _columnStride;
+              j += columnStrideOther;
             }
+            idx += _rowStride;
+            idxOther += rowStrideOther;
           }
         });
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-      for (int r = 0; r < _rows; r++) {
-        for (int c = 0; c < _columns; c++) {
-          set(r, c, source.get(r, c));
-        }
+    int idx = zero;
+    int idxOther = zeroOther;
+    for (int r = 0; r < _rows; r++) {
+      for (int i = idx,
+          j = idxOther,
+          c = 0; c < _columns; c++) {
+        _elements[i] = elementsOther[j];
+        i += _columnStride;
+        j += columnStrideOther;
       }
+      idx += _rowStride;
+      idxOther += rowStrideOther;
+    }
     //}
     return this;
   }
 
-  /**
-   * Assigns the result of a function to each cell;
-   * <tt>x[row,col] = function(x[row,col],y[row,col])</tt>.
-   * <p>
-   * <b>Example:</b>
-   *
-   * <pre>
-   * 	 // assign x[row,col] = x[row,col]&lt;sup&gt;y[row,col]&lt;/sup&gt;
-   * 	 m1 = 2 x 2 matrix
-   * 	 0 1
-   * 	 2 3
-   *
-   * 	 m2 = 2 x 2 matrix
-   * 	 0 2
-   * 	 4 6
-   *
-   * 	 m1.assign(m2, cern.jet.math.Functions.pow);
-   * 	 --&gt;
-   * 	 m1 == 2 x 2 matrix
-   * 	 1   1
-   * 	 16 729
-   *
-   * </pre>
-   *
-   * For further examples, see the <a
-   * href="package-summary.html#FunctionObjects">package doc</a>.
-   *
-   * @param y
-   *            the secondary matrix to operate on.
-   * @param function
-   *            a function object taking as first argument the current cell's
-   *            value of <tt>this</tt>, and as second argument the current
-   *            cell's value of <tt>y</tt>,
-   * @return <tt>this</tt> (for convenience only).
-   * @throws ArgumentError
-   *             if
-   *             <tt>columns() != other.columns() || rows() != other.rows()</tt>
-   * @see cern.jet.math.tdouble.DoubleFunctions
-   */
-  DoubleMatrix forEachMatrix(final DoubleMatrix y, final DoubleDoubleFunction function) {
+  AbstractDoubleMatrix forEachMatrix(final AbstractDoubleMatrix y, DoubleDoubleFunction function) {
+    // overriden for performance only
+    if (!(y is DoubleMatrix)) {
+      super.forEachMatrix(y, function);
+      return this;
+    }
+    DoubleMatrix other = y as DoubleMatrix;
     checkShape(y);
+    final Float64List elementsOther = other._elements;
+    if (_elements == null || elementsOther == null) throw new Error();
+    final int zeroOther = other.index(0, 0);
+    final int zero = this.index(0, 0);
+    final int columnStrideOther = other._columnStride;
+    final int rowStrideOther = other._rowStride;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    if ((nthreads > 1) && (_rows * _columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+    if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+      if (function is DoublePlusMultSecond) {
+        double multiplicator = function.multiplicator;
+        if (multiplicator == 0) { // x[i] = x[i] + 0*y[i]
+          return this;
+        }
+      }
       nthreads = Math.min(nthreads, _rows);
       List<Future> futures = new List<Future>(nthreads);
       int k = _rows ~/ nthreads;
@@ -719,49 +783,217 @@ abstract class DoubleMatrix extends AbstractMatrix {
         final int firstRow = j * k;
         final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
         futures[j] = ConcurrencyUtils.submit(() {
-          for (int r = firstRow; r < lastRow; r++) {
-            for (int c = 0; c < _columns; c++) {
-              setQuick(r, c, function(getQuick(r, c), y.getQuick(r, c)));
+          int idx;
+          int idxOther;
+          // specialized for speed
+          if (function == cern.jet.math.tdouble.DoubleFunctions.mult) {
+            // x[i] = x[i]*y[i]
+            idx = zero + firstRow * _rowStride;
+            idxOther = zeroOther + firstRow * rowStrideOther;
+            for (int r = firstRow; r < lastRow; r++) {
+              for (int i = idx,
+                  j = idxOther,
+                  c = 0; c < _columns; c++) {
+                _elements[i] *= elementsOther[j];
+                i += _columnStride;
+                j += columnStrideOther;
+              }
+              idx += _rowStride;
+              idxOther += rowStrideOther;
+            }
+          } else if (function == cern.jet.math.tdouble.DoubleFunctions.div) {
+            // x[i] = x[i] / y[i]
+            idx = zero + firstRow * _rowStride;
+            idxOther = zeroOther + firstRow * rowStrideOther;
+            for (int r = firstRow; r < lastRow; r++) {
+              for (int i = idx,
+                  j = idxOther,
+                  c = 0; c < _columns; c++) {
+                _elements[i] /= elementsOther[j];
+                i += _columnStride;
+                j += columnStrideOther;
+              }
+              idx += _rowStride;
+              idxOther += rowStrideOther;
+            }
+          } else if (function is DoublePlusMultSecond) {
+            double multiplicator = function.multiplicator;
+            if (multiplicator == 1) {
+              // x[i] = x[i] + y[i]
+              idx = zero + firstRow * _rowStride;
+              idxOther = zeroOther + firstRow * rowStrideOther;
+              for (int r = firstRow; r < lastRow; r++) {
+                for (int i = idx,
+                    j = idxOther,
+                    c = 0; c < _columns; c++) {
+                  _elements[i] += elementsOther[j];
+                  i += _columnStride;
+                  j += columnStrideOther;
+                }
+                idx += _rowStride;
+                idxOther += rowStrideOther;
+              }
+            } else if (multiplicator == -1) {
+              // x[i] = x[i] - y[i]
+              idx = zero + firstRow * _rowStride;
+              idxOther = zeroOther + firstRow * rowStrideOther;
+              for (int r = firstRow; r < lastRow; r++) {
+                for (int i = idx,
+                    j = idxOther,
+                    c = 0; c < _columns; c++) {
+                  _elements[i] -= elementsOther[j];
+                  i += _columnStride;
+                  j += columnStrideOther;
+                }
+                idx += _rowStride;
+                idxOther += rowStrideOther;
+              }
+            } else { // the general case
+              // x[i] = x[i] + mult*y[i]
+              idx = zero + firstRow * _rowStride;
+              idxOther = zeroOther + firstRow * rowStrideOther;
+              for (int r = firstRow; r < lastRow; r++) {
+                for (int i = idx,
+                    j = idxOther,
+                    c = 0; c < _columns; c++) {
+                  _elements[i] += multiplicator * elementsOther[j];
+                  i += _columnStride;
+                  j += columnStrideOther;
+                }
+                idx += _rowStride;
+                idxOther += rowStrideOther;
+              }
+            }
+          } else { // the general case x[i] = f(x[i],y[i])
+            idx = zero + firstRow * _rowStride;
+            idxOther = zeroOther + firstRow * rowStrideOther;
+            for (int r = firstRow; r < lastRow; r++) {
+              for (int i = idx,
+                  j = idxOther,
+                  c = 0; c < _columns; c++) {
+                _elements[i] = function(_elements[i], elementsOther[j]);
+                i += _columnStride;
+                j += columnStrideOther;
+              }
+              idx += _rowStride;
+              idxOther += rowStrideOther;
             }
           }
         });
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
+    int idx;
+    int idxOther;
+    // specialized for speed
+    if (function == func.mult) {
+      // x[i] = x[i] * y[i]
+      idx = zero;
+      idxOther = zeroOther;
       for (int r = 0; r < _rows; r++) {
-        for (int c = 0; c < _columns; c++) {
-          set(r, c, function(get(r, c), y.get(r, c)));
+        for (int i = idx,
+            j = idxOther,
+            c = 0; c < _columns; c++) {
+          _elements[i] *= elementsOther[j];
+          i += _columnStride;
+          j += columnStrideOther;
+        }
+        idx += _rowStride;
+        idxOther += rowStrideOther;
+      }
+    } else if (function == func.div) {
+      // x[i] = x[i] / y[i]
+      idx = zero;
+      idxOther = zeroOther;
+      for (int r = 0; r < _rows; r++) {
+        for (int i = idx,
+            j = idxOther,
+            c = 0; c < _columns; c++) {
+          _elements[i] /= elementsOther[j];
+          i += _columnStride;
+          j += columnStrideOther;
+        }
+        idx += _rowStride;
+        idxOther += rowStrideOther;
+      }
+    } else if (function is DoublePlusMultSecond) {
+      double multiplicator = (function as DoublePlusMultSecond).multiplicator;
+      if (multiplicator == 0) { // x[i] = x[i] + 0*y[i]
+        return this;
+      } else if (multiplicator == 1) { // x[i] = x[i] + y[i]
+        idx = zero;
+        idxOther = zeroOther;
+        for (int r = 0; r < _rows; r++) {
+          for (int i = idx,
+              j = idxOther,
+              c = 0; c < _columns; c++) {
+            _elements[i] += elementsOther[j];
+            i += _columnStride;
+            j += columnStrideOther;
+          }
+          idx += _rowStride;
+          idxOther += rowStrideOther;
+        }
+
+      } else if (multiplicator == -1) { // x[i] = x[i] - y[i]
+        idx = zero;
+        idxOther = zeroOther;
+        for (int r = 0; r < _rows; r++) {
+          for (int i = idx,
+              j = idxOther,
+              c = 0; c < _columns; c++) {
+            _elements[i] -= elementsOther[j];
+            i += _columnStride;
+            j += columnStrideOther;
+          }
+          idx += _rowStride;
+          idxOther += rowStrideOther;
+        }
+      } else { // the general case
+        // x[i] = x[i] + mult*y[i]
+        idx = zero;
+        idxOther = zeroOther;
+        for (int r = 0; r < _rows; r++) {
+          for (int i = idx,
+              j = idxOther,
+              c = 0; c < _columns; c++) {
+            _elements[i] += multiplicator * elementsOther[j];
+            i += _columnStride;
+            j += columnStrideOther;
+          }
+          idx += _rowStride;
+          idxOther += rowStrideOther;
         }
       }
+    } else { // the general case x[i] = f(x[i],y[i])
+      idx = zero;
+      idxOther = zeroOther;
+      for (int r = 0; r < _rows; r++) {
+        for (int i = idx,
+            j = idxOther,
+            c = 0; c < _columns; c++) {
+          _elements[i] = function(_elements[i], elementsOther[j]);
+          i += _columnStride;
+          j += columnStrideOther;
+        }
+        idx += _rowStride;
+        idxOther += rowStrideOther;
+      }
+    }
     //}
     return this;
   }
 
-  /**
-   * Assigns the result of a function to all cells with a given indexes
-   *
-   * @param y
-   *            the secondary matrix to operate on.
-   * @param function
-   *            a function object taking as first argument the current cell's
-   *            value of <tt>this</tt>, and as second argument the current
-   *            cell's value of <tt>y</tt>,
-   * @param rowList
-   *            row indexes.
-   * @param columnList
-   *            column indexes.
-   *
-   * @return <tt>this</tt> (for convenience only).
-   * @throws ArgumentError
-   *             if
-   *             <tt>columns() != other.columns() || rows() != other.rows()</tt>
-   * @see cern.jet.math.tdouble.DoubleFunctions
-   */
-  DoubleMatrix forEachMatrixRange(final DoubleMatrix y, final DoubleDoubleFunction function, /*IntArrayList*/Int32List rowList, /*IntArrayList*/Int32List columnList) {
+  AbstractDoubleMatrix forEachMatrixRange(final AbstractDoubleMatrix y, DoubleDoubleFunction function,  /*IntArrayList*/List<int> rowList,  /*IntArrayList*/List<int> columnList) {
     checkShape(y);
     final int size = rowList.length;
-    final Int32List rowElements = rowList;//.elements();
-    final Int32List columnElements = columnList;//.elements();
+    final List<int> rowElements = rowList;//.elements();
+    final List<int> columnElements = columnList;//.elements();
+    final Float64List elementsOther = y.elements() as Float64List;
+    final int zeroOther = y.index(0, 0);
+    final int zero = this.index(0, 0);
+    final int columnStrideOther = y.columnStride;
+    final int rowStrideOther = y.rowStride;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
@@ -771,89 +1003,50 @@ abstract class DoubleMatrix extends AbstractMatrix {
         final int firstIdx = j * k;
         final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
         futures[j] = ConcurrencyUtils.submit(() {
+          int idx;
+          int idxOther;
           for (int i = firstIdx; i < lastIdx; i++) {
-            setQuick(rowElements[i], columnElements[i], function(getQuick(rowElements[i], columnElements[i]), y.getQuick(rowElements[i], columnElements[i])));
+            idx = zero + rowElements[i] * _rowStride + columnElements[i] * _columnStride;
+            idxOther = zeroOther + rowElements[i] * rowStrideOther + columnElements[i] * columnStrideOther;
+            _elements[idx] = function(_elements[idx], elementsOther[idxOther]);
           }
         });
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-      for (int i = 0; i < size; i++) {
-        set(rowElements[i], columnElements[i], function(get(rowElements[i], columnElements[i]), y.get(rowElements[i], columnElements[i])));
-      }
+    int idx;
+    int idxOther;
+    for (int i = 0; i < size; i++) {
+      idx = zero + rowElements[i] * _rowStride + columnElements[i] * _columnStride;
+      idxOther = zeroOther + rowElements[i] * rowStrideOther + columnElements[i] * columnStrideOther;
+      _elements[idx] = function(_elements[idx], elementsOther[idxOther]);
+    }
     //}
     return this;
   }
 
-  /**
-   * Sets all cells to the state specified by <tt>values</tt>. <tt>values</tt>
-   * is required to have the form <tt>values[row*column]</tt> and elements
-   * have to be stored in a row-wise order.
-   * <p>
-   * The values are copied. So subsequent changes in <tt>values</tt> are not
-   * reflected in the matrix, and vice-versa.
-   *
-   * @param values
-   *            the values to be filled into the cells.
-   * @return <tt>this</tt> (for convenience only).
-   * @throws ArgumentError
-   *             if <tt>values.length != rows()*columns()</tt>.
-   */
-//  DoubleMatrix assignList(List<double> values) {
-//    if (values.length != _rows * _columns) {
-//      throw new ArgumentError("Must have same length: length=${values.length} rows()*columns()=${rows * columns}");
-//    }
-//    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
-//    if ((nthreads > 1) && (_rows * _columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-//      nthreads = Math.min(nthreads, _rows);
-//      List<Future> futures = new List<Future>(nthreads);
-//      int k = _rows ~/ nthreads;
-//      for (int j = 0; j < nthreads; j++) {
-//        final int firstRow = j * k;
-//        final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
-//        futures[j] = ConcurrencyUtils.submit(() {
-//          int idx = firstRow * _columns;
-//          for (int r = firstRow; r < lastRow; r++) {
-//            for (int c = 0; c < _columns; c++) {
-//              setQuick(r, c, values[idx++]);
-//            }
-//          }
-//        });
-//      }
-//      ConcurrencyUtils.waitForCompletion(futures);
-//    } else {*/
-//      int idx = 0;
-//      for (int r = 0; r < _rows; r++) {
-//        for (int c = 0; c < _columns; c++) {
-//          setQuick(r, c, values[idx++]);
-//        }
-//      }
-//    //}
-//    return this;
-//  }
-
-  /**
-   * Returns the number of cells having non-zero values; ignores tolerance.
-   *
-   * @return cardinality
-   */
   int get cardinality {
     int cardinality = 0;
+    final int zero = this.index(0, 0);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    if ((nthreads > 1) && (_rows * _columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+    if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
       List<Future> futures = new List<Future>(nthreads);
-      Int32List results = new Int32List(nthreads);
+      List<int> results = new List<int>(nthreads);
       int k = _rows ~/ nthreads;
       for (int j = 0; j < nthreads; j++) {
         final int firstRow = j * k;
         final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
         futures[j] = ConcurrencyUtils.submit(() {
           int cardinality = 0;
+          int idx = zero + firstRow * _rowStride;
           for (int r = firstRow; r < lastRow; r++) {
-            for (int c = 0; c < _columns; c++) {
-              if (getQuick(r, c) != 0) cardinality++;
+            for (int i = idx,
+                c = 0; c < _columns; c++) {
+              if (_elements[i] != 0) cardinality++;
+              i += _columnStride;
             }
+            idx += _rowStride;
           }
           return cardinality;
         });
@@ -872,92 +1065,25 @@ abstract class DoubleMatrix extends AbstractMatrix {
         e.printStackTrace();
       }
     } else {*/
-      for (int r = 0; r < _rows; r++) {
-        for (int c = 0; c < _columns; c++) {
-          if (get(r, c) != 0) cardinality++;
-        }
+    int idx = zero;
+    for (int r = 0; r < _rows; r++) {
+      for (int i = idx,
+          c = 0; c < _columns; c++) {
+        if (_elements[i] != 0) cardinality++;
+        i += _columnStride;
       }
+      idx += _rowStride;
+    }
     //}
     return cardinality;
   }
 
-  /**
-   * Constructs and returns a deep copy of the receiver.
-   * <p>
-   * <b>Note that the returned matrix is an independent deep copy.</b> The
-   * returned matrix is not backed by this matrix, so changes in the returned
-   * matrix are not reflected in this matrix, and vice-versa.
-   *
-   * @return a deep copy of the receiver.
-   */
-  DoubleMatrix copy() {
-    return like().copyFrom(this);
+  Float64List elements() {
+    return _elements;
   }
 
-  /**
-   * Returns the elements of this matrix.
-   *
-   * @return the elements
-   */
-  Object elements();
-
-  /**
-   * Returns whether all cells are equal to the given value.
-   *
-   * @param value
-   *            the value to test against.
-   * @return <tt>true</tt> if all cells are equal to the given value,
-   *         <tt>false</tt> otherwise.
-   */
-  /*bool equalsValue(double value) {
-    return DoubleProperty.DEFAULT.equalsMatrixValue(this, value);
-  }*/
-
-  /**
-   * Compares this object against the specified object. The result is
-   * <code>true</code> if and only if the argument is not <code>null</code>
-   * and is at least a <code>DoubleMatrix</code> object that has the same
-   * number of columns and rows as the receiver and has exactly the same
-   * values at the same coordinates.
-   *
-   * @param obj
-   *            the object to compare with.
-   * @return <code>true</code> if the objects are the same; <code>false</code>
-   *         otherwise.
-   */
-  bool operator ==(var obj) {
-    if (obj is num) {
-      return DoubleProperty.DEFAULT.equalsMatrixValue(this, obj.toDouble());
-    }
-    if (identical(this, obj)) {
-      return true;
-    }
-    if (obj == null) {
-      return false;
-    }
-    if (obj is! DoubleMatrix) {
-      return false;
-    }
-
-    return DoubleProperty.DEFAULT.equalsMatrix(this, obj as DoubleMatrix);
-  }
-
-  /**
-   * Assigns the result of a function to each <i>non-zero</i> cell;
-   * <tt>x[row,col] = function(x[row,col])</tt>. Use this method for fast
-   * special-purpose iteration. If you want to modify another matrix instead
-   * of <tt>this</tt> (i.e. work in read-only mode), simply return the input
-   * value unchanged.
-   *
-   * Parameters to function are as follows: <tt>first==row</tt>,
-   * <tt>second==column</tt>, <tt>third==nonZeroValue</tt>.
-   *
-   * @param function
-   *            a function object taking as argument the current non-zero
-   *            cell's row, column and value.
-   * @return <tt>this</tt> (for convenience only).
-   */
-  DoubleMatrix forEachNonZero(final func.IntIntDoubleFunction function) {
+  AbstractDoubleMatrix forEachNonZero(func.IntIntDoubleFunction function) {
+    final int zero = this.index(0, 0);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
@@ -967,92 +1093,133 @@ abstract class DoubleMatrix extends AbstractMatrix {
         final int firstRow = j * k;
         final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
         futures[j] = ConcurrencyUtils.submit(() {
+          int idx = zero + firstRow * _rowStride;
           for (int r = firstRow; r < lastRow; r++) {
-            for (int c = 0; c < _columns; c++) {
-              double value = getQuick(r, c);
+            for (int i = idx,
+                c = 0; c < _columns; c++) {
+              double value = _elements[i];
               if (value != 0) {
-                double a = function(r, c, value);
-                if (a != value) setQuick(r, c, a);
+                _elements[i] = function(r, c, value);
               }
+              i += _columnStride;
             }
+            idx += _rowStride;
           }
         });
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-      for (int r = 0; r < _rows; r++) {
-        for (int c = 0; c < _columns; c++) {
-          double value = get(r, c);
-          if (value != 0) {
-            double a = function(r, c, value);
-            if (a != value) set(r, c, a);
-          }
+    int idx = zero;
+    for (int r = 0; r < _rows; r++) {
+      for (int i = idx,
+          c = 0; c < _columns; c++) {
+        double value = _elements[i];
+        if (value != 0) {
+          _elements[i] = function(r, c, value);
         }
+        i += _columnStride;
       }
+      idx += _rowStride;
+    }
     //}
     return this;
   }
 
   /**
-   * Returns the matrix cell value at coordinate <tt>[row,column]</tt>.
+   * Returns a new matrix that has the same elements as this matrix, but they
+   * are addressed internally in column major. This method creates a new
+   * object (not a view), so changes in the returned matrix are NOT reflected
+   * in this matrix.
    *
-   * @param row
-   *            the index of the row-coordinate.
-   * @param column
-   *            the index of the column-coordinate.
-   * @return the value of the specified cell.
-   * @throws RangeError
-   *             if
-   *             <tt>column&lt;0 || column&gt;=columns() || row&lt;0 || row&gt;=rows()</tt>
+   * @return this matrix with elements addressed internally in column major
    */
-  double at(int row, int column) {
-    if (column < 0 || column >= _columns || row < 0 || row >= _rows) {
-      throw new RangeError("row:$row, column:$column");
+  /*DenseColumnDoubleMatrix getColumnMajor() {
+    DenseColumnDoubleMatrix R = new DenseColumnDoubleMatrix(_rows, _columns);
+    final int zeroR = R.index(0, 0) as int;
+    final int rowStrideR = R.rowStride();
+    final int columnStrideR = R.columnStride();
+    final Float64List elementsR = R.elements();
+    final int zero = this.index(0, 0);
+    int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+      nthreads = Math.min(nthreads, _rows);
+      List<Future> futures = new List<Future>(nthreads);
+      int k = _rows ~/ nthreads;
+      for (int j = 0; j < nthreads; j++) {
+        final int firstRow = j * k;
+        final int lastRow = (j == (nthreads - 1)) ? _rows : firstRow + k;
+        futures[j] = ConcurrencyUtils.submit(() {
+          int idx = zero + (firstRow - 1) * _rowStride;
+          int idxR = zeroR + (firstRow - 1) * rowStrideR;
+          for (int r = firstRow; r < lastRow; r++) {
+            for (int i = idx,
+                j = idxR,
+                c = 0; r < _columns; c++) {
+              elementsR[j] = _elements[i];
+              i += _rowStride;
+              j += rowStrideR;
+            }
+            idx += _columnStride;
+            idxR += columnStrideR;
+          }
+        });
+      }
+      ConcurrencyUtils.waitForCompletion(futures);
+    } else {
+      int idx = zero;
+      int idxR = zeroR;
+      for (int r = 0; r < _rows; r++) {
+        for (int i = idx,
+            j = idxR,
+            c = 0; r < _columns; c++) {
+          elementsR[j] = _elements[i];
+          i += _rowStride;
+          j += rowStrideR;
+        }
+        idx += _columnStride;
+        idxR += columnStrideR;
+      }
     }
-    return get(row, column);
-  }
+    return R;
+  }*/
 
-  /**
-   * Return the maximum value of this matrix together with its location
-   *
-   * @return maximum_value, row_location, column_location;
-   */
   DoubleMatrixLocation max() {
     int rowLocation = 0;
     int columnLocation = 0;
+    final int zero = this.index(0, 0);
     double maxValue = 0.0;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
       List<Future> futures = new List<Future>(nthreads);
-      List<List<double>> results = new List<List<double>>(nthreads);//[2];
+      List<Float64List> results = new List<Float64List>(nthreads);//[2];
       int k = _rows ~/ nthreads;
       for (int j = 0; j < nthreads; j++) {
         final int firstRow = j * k;
         final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
         futures[j] = ConcurrencyUtils.submit(() {
+          double maxValue = _elements[zero + firstRow * _rowStride];
           int rowLocation = firstRow;
-          int columnLocation = 0;
-          double maxValue = getQuick(rowLocation, 0);
-          int d = 1;
+          int colLocation = 0;
           double elem;
+          int d = 1;
           for (int r = firstRow; r < lastRow; r++) {
             for (int c = d; c < _columns; c++) {
-              elem = getQuick(r, c);
+              elem = _elements[zero + r * _rowStride + c * _columnStride];
               if (maxValue < elem) {
                 maxValue = elem;
                 rowLocation = r;
-                columnLocation = c;
+                colLocation = c;
               }
             }
             d = 0;
           }
-          return [maxValue, rowLocation, columnLocation];
+          return [maxValue, rowLocation, colLocation];
         });
       }
       try {
         for (int j = 0; j < nthreads; j++) {
-          results[j] = futures[j].get() as List<double>;
+          results[j] = futures[j].get() as Float64List;
         }
         maxValue = results[0][0];
         rowLocation = results[0][1] as int;
@@ -1070,38 +1237,34 @@ abstract class DoubleMatrix extends AbstractMatrix {
         e.printStackTrace();
       }
     } else {*/
-      maxValue = get(0, 0);
-      double elem;
-      int d = 1;
-      for (int r = 0; r < _rows; r++) {
-        for (int c = d; c < _columns; c++) {
-          elem = get(r, c);
-          if (maxValue < elem) {
-            maxValue = elem;
-            rowLocation = r;
-            columnLocation = c;
-          }
+    maxValue = _elements[zero];
+    int d = 1;
+    double elem;
+    for (int r = 0; r < _rows; r++) {
+      for (int c = d; c < _columns; c++) {
+        elem = _elements[zero + r * _rowStride + c * _columnStride];
+        if (maxValue < elem) {
+          maxValue = elem;
+          rowLocation = r;
+          columnLocation = c;
         }
-        d = 0;
       }
+      d = 0;
+    }
     //}
     return new DoubleMatrixLocation(maxValue, rowLocation, columnLocation);
   }
 
-  /**
-   * Return the minimum value of this matrix together with its location
-   *
-   * @return minimum_value, row_location, column_location};
-   */
   DoubleMatrixLocation min() {
     int rowLocation = 0;
     int columnLocation = 0;
+    final int zero = this.index(0, 0);
     double minValue = 0.0;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
       List<Future> futures = new List<Future>(nthreads);
-      List<List<double>> results = new List<List<double>>(nthreads);//[2];
+      List<Float64List> results = new List<Float64List>(nthreads);//[2];
       int k = _rows ~/ nthreads;
       for (int j = 0; j < nthreads; j++) {
         final int firstRow = j * k;
@@ -1109,12 +1272,12 @@ abstract class DoubleMatrix extends AbstractMatrix {
         futures[j] = ConcurrencyUtils.submit(() {
           int rowLocation = firstRow;
           int columnLocation = 0;
-          double minValue = getQuick(rowLocation, 0);
-          int d = 1;
+          double minValue = _elements[zero + firstRow * _rowStride];
           double elem;
+          int d = 1;
           for (int r = firstRow; r < lastRow; r++) {
             for (int c = d; c < _columns; c++) {
-              elem = getQuick(r, c);
+              elem = _elements[zero + r * _rowStride + c * _columnStride];
               if (minValue > elem) {
                 minValue = elem;
                 rowLocation = r;
@@ -1128,7 +1291,7 @@ abstract class DoubleMatrix extends AbstractMatrix {
       }
       try {
         for (int j = 0; j < nthreads; j++) {
-          results[j] = futures[j].get() as List<double>;
+          results[j] = futures[j].get() as Float64List;
         }
         minValue = results[0][0];
         rowLocation = results[0][1] as int;
@@ -1146,131 +1309,716 @@ abstract class DoubleMatrix extends AbstractMatrix {
         e.printStackTrace();
       }
     } else {*/
-      minValue = get(0, 0);
-      double elem;
-      int d = 1;
-      for (int r = 0; r < _rows; r++) {
-        for (int c = d; c < _columns; c++) {
-          elem = get(r, c);
-          if (minValue > elem) {
-            minValue = elem;
-            rowLocation = r;
-            columnLocation = c;
-          }
+    minValue = _elements[zero];
+    int d = 1;
+    double elem;
+    for (int r = 0; r < _rows; r++) {
+      for (int c = d; c < _columns; c++) {
+        elem = _elements[zero + r * _rowStride + c * _columnStride];
+        if (minValue > elem) {
+          minValue = elem;
+          rowLocation = r;
+          columnLocation = c;
         }
-        d = 0;
       }
+      d = 0;
+    }
     //}
     return new DoubleMatrixLocation(minValue, rowLocation, columnLocation);
   }
 
-  /**
-   * Fills the coordinates and values of cells having negative values into the
-   * specified lists. Fills into the lists, starting at index 0. After this
-   * call returns the specified lists all have a new size, the number of
-   * non-zero values.
-   *
-   * @param rowList
-   *            the list to be filled with row indexes, can have any size.
-   * @param columnList
-   *            the list to be filled with column indexes, can have any size.
-   * @param valueList
-   *            the list to be filled with values, can have any size.
-   */
-  void negativeValues(final /*IntArrayList*/List<int> rowList, final /*IntArrayList*/List<int> columnList, final /*/*DoubleArrayList*/List<double>*/List<double> valueList) {
+  void negativeValues(final /*IntArrayList*/List<int> rowList, final /*IntArrayList*/List<int> columnList, final /*DoubleArrayList*/List<double> valueList) {
     rowList.clear();
     columnList.clear();
     valueList.clear();
+    int idx = this.index(0, 0);
     for (int r = 0; r < _rows; r++) {
-      for (int c = 0; c < _columns; c++) {
-        double value = get(r, c);
+      for (int i = idx,
+          c = 0; c < _columns; c++) {
+        double value = _elements[i];
         if (value < 0) {
           rowList.add(r);
           columnList.add(c);
           valueList.add(value);
         }
+        i += _columnStride;
       }
+      idx += _rowStride;
     }
-
   }
 
-  /**
-   * Fills the coordinates and values of cells having non-zero values into the
-   * specified lists. Fills into the lists, starting at index 0. After this
-   * call returns the specified lists all have a new size, the number of
-   * non-zero values.
-   * <p>
-   * In general, fill order is <i>unspecified</i>. This implementation fills
-   * like <tt>for (row = 0..rows-1) for (column = 0..columns-1) do ... </tt>.
-   * However, subclasses are free to us any other order, even an order that
-   * may change over time as cell values are changed. (Of course, result lists
-   * indexes are guaranteed to correspond to the same cell).
-   * <p>
-   * <b>Example:</b> <br>
-   *
-   * <pre>
-   * 	 2 x 3 matrix:
-   * 	 0, 0, 8
-   * 	 0, 7, 0
-   * 	 --&gt;
-   * 	 rowList    = (0,1)
-   * 	 columnList = (2,1)
-   * 	 valueList  = (8,7)
-   *
-   * </pre>
-   *
-   * In other words, <tt>get(0,2)==8, get(1,1)==7</tt>.
-   *
-   * @param rowList
-   *            the list to be filled with row indexes, can have any size.
-   * @param columnList
-   *            the list to be filled with column indexes, can have any size.
-   * @param valueList
-   *            the list to be filled with values, can have any size.
-   */
-  void nonZeros(final /*IntArrayList*/List<int> rowList, final /*IntArrayList*/List<int> columnList, final /*/*DoubleArrayList*/List<double>*/List<double> valueList) {
+  void nonZeros(final /*IntArrayList*/List<int> rowList, final /*IntArrayList*/List<int> columnList, final /*DoubleArrayList*/List<double> valueList) {
     rowList.clear();
     columnList.clear();
     valueList.clear();
+    int idx = this.index(0, 0);
     for (int r = 0; r < _rows; r++) {
-      for (int c = 0; c < _columns; c++) {
-        double value = get(r, c);
+      for (int i = idx,
+          c = 0; c < _columns; c++) {
+        double value = _elements[i];
         if (value != 0) {
           rowList.add(r);
           columnList.add(c);
           valueList.add(value);
         }
+        i += _columnStride;
       }
+      idx += _rowStride;
     }
   }
 
-  /**
-   * Fills the coordinates and values of cells having positive values into the
-   * specified lists. Fills into the lists, starting at index 0. After this
-   * call returns the specified lists all have a new size, the number of
-   * non-zero values.
-   *
-   * @param rowList
-   *            the list to be filled with row indexes, can have any size.
-   * @param columnList
-   *            the list to be filled with column indexes, can have any size.
-   * @param valueList
-   *            the list to be filled with values, can have any size.
-   */
   void positiveValues(final /*IntArrayList*/List<int> rowList, final /*IntArrayList*/List<int> columnList, final /*DoubleArrayList*/List<double> valueList) {
     rowList.clear();
     columnList.clear();
     valueList.clear();
+    int idx = this.index(0, 0);
     for (int r = 0; r < _rows; r++) {
-      for (int c = 0; c < _columns; c++) {
-        double value = get(r, c);
+      for (int i = idx,
+          c = 0; c < _columns; c++) {
+        double value = _elements[i];
         if (value > 0) {
           rowList.add(r);
           columnList.add(c);
           valueList.add(value);
         }
+        i += _columnStride;
+      }
+      idx += _rowStride;
+    }
+  }
+
+  double get(int row, int column) {
+    return _elements[_rowZero + row * _rowStride + _columnZero + column * _columnStride];
+  }
+
+  int index(int row, int column) {
+    return _rowZero + row * _rowStride + _columnZero + column * _columnStride;
+  }
+
+  AbstractDoubleMatrix like2D(int rows, int columns) {
+    return new DoubleMatrix(rows, columns);
+  }
+
+  AbstractDoubleVector like1D(int size) {
+    return new DoubleVector(size);
+  }
+
+  void set(int row, int column, double value) {
+    _elements[_rowZero + row * _rowStride + _columnZero + column * _columnStride] = value;
+  }
+
+  List<Float64List> toList() {
+    final List<Float64List> values = new List<Float64List>(_rows);//[_columns];
+    final int zero = this.index(0, 0);
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+      nthreads = Math.min(nthreads, _rows);
+      List<Future> futures = new List<Future>(nthreads);
+      int k = _rows ~/ nthreads;
+      for (int j = 0; j < nthreads; j++) {
+        final int firstRow = j * k;
+        final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
+        futures[j] = ConcurrencyUtils.submit(() {
+          int idx = zero + firstRow * _rowStride;
+          for (int r = firstRow; r < lastRow; r++) {
+            Float64List currentRow = values[r];
+            for (int i = idx,
+                c = 0; c < _columns; c++) {
+              currentRow[c] = _elements[i];
+              i += _columnStride;
+            }
+            idx += _rowStride;
+          }
+        });
+      }
+      ConcurrencyUtils.waitForCompletion(futures);
+    } else {*/
+    int idx = zero;
+    for (int r = 0; r < _rows; r++) {
+      values[r] = new Float64List(_columns);
+      Float64List currentRow = values[r];
+      for (int i = idx,
+          c = 0; c < _columns; c++) {
+        currentRow[c] = _elements[i];
+        i += _columnStride;
+      }
+      idx += _rowStride;
+    }
+    //}
+    return values;
+  }
+
+  AbstractDoubleVector vectorize() {
+    final DoubleVector v = new DoubleVector(length);
+    final int zero = index(0, 0);
+    final int zeroOther = v.index(0);
+    final int strideOther = v.stride();
+    final Float64List elementsOther = v.elements();
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+      nthreads = Math.min(nthreads, _columns);
+      List<Future> futures = new List<Future>(nthreads);
+      int k = _columns ~/ nthreads;
+      for (int j = 0; j < nthreads; j++) {
+        final int firstColumn = j * k;
+        final int lastColumn = (j == nthreads - 1) ? _columns : firstColumn + k;
+        futures[j] = ConcurrencyUtils.submit(() {
+          int idx = 0;
+          int idxOther = zeroOther + firstColumn * _rows;
+          for (int c = firstColumn; c < lastColumn; c++) {
+            idx = zero + c * _columnStride;
+            for (int r = 0; r < _rows; r++) {
+              elementsOther[idxOther] = _elements[idx];
+              idx += _rowStride;
+              idxOther += strideOther;
+            }
+          }
+        });
+      }
+      ConcurrencyUtils.waitForCompletion(futures);
+    } else {*/
+    int idx = zero;
+    int idxOther = zeroOther;
+    for (int c = 0; c < _columns; c++) {
+      idx = zero + c * _columnStride;
+      for (int r = 0; r < _rows; r++) {
+        elementsOther[idxOther] = _elements[idx];
+        idx += _rowStride;
+        idxOther += strideOther;
       }
     }
+    //}
+    return v;
+  }
+
+  /*void zAssign8Neighbors(DoubleMatrix B, func.Double9Function function) {
+    // 1. using only 4-5 out of the 9 cells in "function" is *not* the
+    // limiting factor for performance.
+
+    // 2. if the "function" would be hardwired into the innermost loop, a
+    // speedup of 1.5-2.0 would be seen
+    // but then the multi-purpose interface is gone...
+
+    if (!(B is DenseDoubleMatrix)) {
+      super.zAssign8Neighbors(B, function);
+      return;
+    }
+    if (function == null) throw new ArgumentError("function must not be null.");
+    checkShape(B);
+    int r = _rows - 1;
+    int c = _columns - 1;
+    if (_rows < 3 || _columns < 3) return; // nothing to do
+
+    DenseDoubleMatrix BB = B as DenseDoubleMatrix;
+    int A_rs = _rowStride;
+    int B_rs = BB._rowStride;
+    int A_cs = _columnStride;
+    int B_cs = BB._columnStride;
+    Float64List elems = this._elements;
+    Float64List B_elems = BB._elements;
+    if (elems == null || B_elems == null) throw new Error();
+
+    int A_index = index(1, 1);
+    int B_index = BB.index(1, 1);
+    for (int i = 1; i < r; i++) {
+      double a00, a01, a02;
+      double a10, a11, a12;
+      double a20, a21, a22;
+
+      int B11 = B_index;
+
+      int A02 = A_index - A_rs - A_cs;
+      int A12 = A02 + A_rs;
+      int A22 = A12 + A_rs;
+
+      // in each step six cells can be remembered in registers - they
+      // don't need to be reread from slow memory
+      a00 = elems[A02];
+      A02 += A_cs;
+      a01 = elems[A02]; // A02+=A_cs;
+      a10 = elems[A12];
+      A12 += A_cs;
+      a11 = elems[A12]; // A12+=A_cs;
+      a20 = elems[A22];
+      A22 += A_cs;
+      a21 = elems[A22]; // A22+=A_cs;
+
+      for (int j = 1; j < c; j++) {
+        // in each step 3 instead of 9 cells need to be read from
+        // memory.
+        a02 = elems[A02 += A_cs];
+        a12 = elems[A12 += A_cs];
+        a22 = elems[A22 += A_cs];
+
+        B_elems[B11] = function(a00, a01, a02, a10, a11, a12, a20, a21, a22);
+        B11 += B_cs;
+
+        // move remembered cells
+        a00 = a01;
+        a01 = a02;
+        a10 = a11;
+        a11 = a12;
+        a20 = a21;
+        a21 = a22;
+      }
+      A_index += A_rs;
+      B_index += B_rs;
+    }
+  }*/
+
+  AbstractDoubleVector mult(final AbstractDoubleVector y, AbstractDoubleVector z, [final double alpha = 1.0, final double beta = 0.0, final bool transposeA = false]) {
+    if (transposeA) {
+      return dice().mult(y, z, alpha, beta, false);
+    }
+    if (z == null) {
+      z = new DoubleVector(_rows);
+    }
+    if (!(y is DoubleVector && z is DoubleVector)) return super.mult(y, z, alpha, beta, transposeA);
+
+    if (_columns != y.length || _rows > z.length) throw new ArgumentError("Incompatible args: " + toStringShort() + ", " + y.toStringShort() + ", " + z.toStringShort());
+
+    final Float64List elemsY = y.elements() as Float64List;
+    final Float64List elemsZ = z.elements() as Float64List;
+    if (_elements == null || elemsY == null || elemsZ == null) {
+      throw new Error();
+    }
+    final int strideY = y.stride();
+    final int strideZ = z.stride();
+    final int zero = index(0, 0);
+    final int zeroY = y.index(0);
+    final int zeroZ = z.index(0);
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+      nthreads = Math.min(nthreads, _rows);
+      List<Future> futures = new List<Future>(nthreads);
+      int k = _rows ~/ nthreads;
+      for (int j = 0; j < nthreads; j++) {
+        final int firstRow = j * k;
+        final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
+        futures[j] = ConcurrencyUtils.submit(() {
+          int idxZero = zero + firstRow * _rowStride;
+          int idxZeroZ = zeroZ + firstRow * strideZ;
+          for (int r = firstRow; r < lastRow; r++) {
+            double sum = 0;
+            int idx = idxZero;
+            int idxY = zeroY;
+            for (int c = 0; c < _columns; c++) {
+              sum += _elements[idx] * elemsY[idxY];
+              idx += _columnStride;
+              idxY += strideY;
+            }
+            elemsZ[idxZeroZ] = alpha * sum + beta * elemsZ[idxZeroZ];
+            idxZero += _rowStride;
+            idxZeroZ += strideZ;
+          }
+        });
+      }
+      ConcurrencyUtils.waitForCompletion(futures);
+    } else {*/
+    int idxZero = zero;
+    int idxZeroZ = zeroZ;
+    for (int r = 0; r < _rows; r++) {
+      double sum = 0.0;
+      int idx = idxZero;
+      int idxY = zeroY;
+      for (int c = 0; c < _columns; c++) {
+        sum += _elements[idx] * elemsY[idxY];
+        idx += _columnStride;
+        idxY += strideY;
+      }
+      elemsZ[idxZeroZ] = alpha * sum + beta * elemsZ[idxZeroZ];
+      idxZero += _rowStride;
+      idxZeroZ += strideZ;
+    }
+    //}
+    return z;
+  }
+
+  AbstractDoubleMatrix multiply(final AbstractDoubleMatrix B, AbstractDoubleMatrix C, [final double alpha = 1.0, final double beta = 0.0, final bool transposeA = false, bool transposeB = false]) {
+    final int rowsA = _rows;
+    final int columnsA = _columns;
+    final int rowsB = B.rows;
+    final int columnsB = B.columns;
+    final int rowsC = transposeA ? columnsA : rowsA;
+    final int columnsC = transposeB ? rowsB : columnsB;
+
+    if (C == null) {
+      C = new DoubleMatrix(rowsC, columnsC);
+    }
+
+    /*
+    * determine how to split and parallelize best into blocks if more
+    * B.columns than tasks --> split B.columns, as follows:
+    *
+    * xx|xx|xxx B xx|xx|xxx xx|xx|xxx A xxx xx|xx|xxx C xxx xx|xx|xxx xxx
+    * xx|xx|xxx xxx xx|xx|xxx xxx xx|xx|xxx
+    *
+    * if less B.columns than tasks --> split A.rows, as follows:
+    *
+    * xxxxxxx B xxxxxxx xxxxxxx A xxx xxxxxxx C xxx xxxxxxx --- ------- xxx
+    * xxxxxxx xxx xxxxxxx --- ------- xxx xxxxxxx
+    */
+    if (transposeA) {
+      return dice().multiply(B, C, alpha, beta, false, transposeB);
+    }
+    if (B is SparseDoubleMatrix || B is SparseRCDoubleMatrix) {
+      // exploit quick sparse mult
+      // A*B = (B' * A')'
+      if (C == null) {
+        return B.multiply(this, null, alpha, beta, !transposeB, true).dice();
+      } else {
+        B.multiply(this, C.dice(), alpha, beta, !transposeB, true);
+        return C;
+      }
+    }
+    if (transposeB) {
+      return this.multiply(B.dice(), C, alpha, beta, transposeA, false);
+    }
+
+    if (!(C is DoubleMatrix)) {
+      return super.multiply(B, C, alpha, beta, transposeA, transposeB);
+    }
+
+    if (B.rows != columnsA) {
+      throw new ArgumentError("Matrix inner dimensions must agree:" + this.toStringShort() + ", " + B.toStringShort());
+    }
+    if (C.rows != rowsA || C.columns != columnsB) {
+      throw new ArgumentError("Incompatibe result matrix: " + this.toStringShort() + ", " + B.toStringShort() + ", " + C.toStringShort());
+    }
+    if (this == C || B == C) {
+      throw new ArgumentError("Matrices must not be identical");
+    }
+
+    int flops = 2 * rowsA * columnsA * columnsB;
+    int noOfTasks = 1;//Math.min(flops / 30000, ConcurrencyUtils.getNumberOfThreads()) as int; // each
+    /* thread should process at least 30000 flops */
+    bool splitB = (columnsB >= noOfTasks);
+    int width = splitB ? columnsB : rowsA;
+    noOfTasks = Math.min(width, noOfTasks);
+
+    if (noOfTasks < 2) { //parallelization doesn't pay off (too much start up overhead)
+      return this.multiplySequential(B, C, alpha, beta, transposeA, transposeB);
+    }
+
+    // set up concurrent tasks
+    int span = width ~/ noOfTasks;
+    final List<Future> subTasks = new List<Future>(noOfTasks);
+    for (int i = 0; i < noOfTasks; i++) {
+      final int offset = i * span;
+      if (i == noOfTasks - 1) span = width - span * i; // last span may be a bit larger
+
+      AbstractDoubleMatrix AA, BB, CC;
+      if (splitB) {
+        // split B along columns into blocks
+        AA = this;
+        BB = B.part(0, offset, columnsA, span);
+        CC = C.part(0, offset, rowsA, span);
+      } else {
+        // split A along rows into blocks
+        AA = this.part(offset, 0, span, columnsA);
+        BB = B;
+        CC = C.part(offset, 0, span, columnsB);
+      }
+
+      /*subTasks[i] = ConcurrencyUtils.submit(() {
+        (AA as DenseDoubleMatrix).zMultSequential(BB, CC, alpha, beta, transposeA, transposeB);
+      });*/
+      (AA as DoubleMatrix).multiplySequential(BB, CC, alpha, beta, transposeA, transposeB);
+    }
+
+    //ConcurrencyUtils.waitForCompletion(subTasks);
+    return C;
+  }
+
+  double sum() {
+    double sum = 0.0;
+    if (_elements == null) {
+      throw new Error();
+    }
+    final int zero = index(0, 0);
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+      nthreads = Math.min(nthreads, _rows);
+      List<Future> futures = new List<Future>(nthreads);
+      int k = _rows ~/ nthreads;
+      for (int j = 0; j < nthreads; j++) {
+        final int firstRow = j * k;
+        final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
+        futures[j] = ConcurrencyUtils.submit(() {
+          double sum = 0;
+          int idx = zero + firstRow * _rowStride;
+          for (int r = firstRow; r < lastRow; r++) {
+            for (int i = idx,
+                c = 0; c < _columns; c++) {
+              sum += _elements[i];
+              i += _columnStride;
+            }
+            idx += _rowStride;
+          }
+          return sum;
+        });
+      }
+      try {
+        for (int j = 0; j < nthreads; j++) {
+          sum += futures[j].get() as double;
+        }
+      } on ExecutionException catch (ex) {
+        ex.printStackTrace();
+      } on InterruptedException catch (e) {
+        e.printStackTrace();
+      }
+    } else {*/
+    int idx = zero;
+    for (int r = 0; r < _rows; r++) {
+      for (int i = idx,
+          c = 0; c < _columns; c++) {
+        sum += _elements[i];
+        i += _columnStride;
+      }
+      idx += _rowStride;
+    }
+    //}
+    return sum;
+  }
+
+  AbstractDoubleMatrix multiplySequential(AbstractDoubleMatrix B, AbstractDoubleMatrix C, double alpha, double beta, bool transposeA, bool transposeB) {
+    if (transposeA) {
+      return dice().multiply(B, C, alpha, beta, false, transposeB);
+    }
+    if (B is SparseDoubleMatrix || B is SparseRCDoubleMatrix || B is SparseCCDoubleMatrix) {
+      // exploit quick sparse mult
+      // A*B = (B' * A')'
+      if (C == null) {
+        return B.multiply(this, null, alpha, beta, !transposeB, true).dice();
+      } else {
+        B.multiply(this, C.dice(), alpha, beta, !transposeB, true);
+        return C;
+      }
+    }
+    if (transposeB) {
+      return this.multiply(B.dice(), C, alpha, beta, transposeA, false);
+    }
+
+    int rowsA = _rows;
+    int columnsA = _columns;
+    int p = B.columns;
+    if (C == null) {
+      C = new DoubleMatrix(rowsA, p);
+    }
+    if (!(B is DoubleMatrix) || !(C is DoubleMatrix)) {
+      return super.multiply(B, C, alpha, beta, transposeA, transposeB);
+    }
+    if (B.rows != columnsA) {
+      throw new ArgumentError("Matrix inner dimensions must agree:" + toStringShort() + ", " + B.toStringShort());
+    }
+    if (C.rows != rowsA || C.columns != p) {
+      throw new ArgumentError("Incompatibel result matrix: " + toStringShort() + ", " + B.toStringShort() + ", " + C.toStringShort());
+    }
+    if (this == C || B == C) {
+      throw new ArgumentError("Matrices must not be identical");
+    }
+
+    DoubleMatrix BB = B as DoubleMatrix;
+    DoubleMatrix CC = C as DoubleMatrix;
+    final Float64List AElems = this._elements;
+    final Float64List BElems = BB._elements;
+    final Float64List CElems = CC._elements;
+    if (AElems == null || BElems == null || CElems == null) {
+      throw new Error();
+    }
+
+    int cA = this._columnStride;
+    int cB = BB._columnStride;
+    int cC = CC._columnStride;
+
+    int rA = this._rowStride;
+    int rB = BB._rowStride;
+    int rC = CC._rowStride;
+
+    /*
+   * A is blocked to hide memory latency xxxxxxx B xxxxxxx xxxxxxx A xxx
+   * xxxxxxx C xxx xxxxxxx --- ------- xxx xxxxxxx xxx xxxxxxx --- -------
+   * xxx xxxxxxx
+   */
+    final int BLOCK_SIZE = 30000; // * 8 == Level 2 cache in bytes
+    int m_optimal = (BLOCK_SIZE - columnsA) ~/ (columnsA + 1);
+    if (m_optimal <= 0) m_optimal = 1;
+    int blocks = rowsA ~/ m_optimal;
+    int rr = 0;
+    if (rowsA % m_optimal != 0) blocks++;
+    for ( ; --blocks >= 0; ) {
+      int jB = BB.index(0, 0);
+      int indexA = index(rr, 0);
+      int jC = CC.index(rr, 0);
+      rr += m_optimal;
+      if (blocks == 0) m_optimal += rowsA - rr;
+
+      for (int j = p; --j >= 0; ) {
+        int iA = indexA;
+        int iC = jC;
+        for (int i = m_optimal; --i >= 0; ) {
+          int kA = iA;
+          int kB = jB;
+          double s = 0.0;
+
+          // loop unrolled
+          kA -= cA;
+          kB -= rB;
+
+          for (int k = columnsA % 4; --k >= 0; ) {
+            s += AElems[kA += cA] * BElems[kB += rB];
+          }
+          for (int k = columnsA ~/ 4; --k >= 0; ) {
+            s += AElems[kA += cA] * BElems[kB += rB] + AElems[kA += cA] * BElems[kB += rB] + AElems[kA += cA] * BElems[kB += rB] + AElems[kA += cA] * BElems[kB += rB];
+          }
+
+          CElems[iC] = alpha * s + beta * CElems[iC];
+          iA += rA;
+          iC += rC;
+        }
+        jB += cB;
+        jC += cC;
+      }
+    }
+    return C;
+  }
+
+  bool _haveSharedCellsRaw(AbstractDoubleMatrix other) {
+    if (other is SelectedDenseDoubleMatrix) {
+      return this._elements == other._elements;
+    } else if (other is DoubleMatrix) {
+      return this._elements == other._elements;
+    }
+    return false;
+  }
+
+  AbstractDoubleVector _like1D(int size, int zero, int stride) {
+    return new DoubleVector(size, this._elements, zero, stride, true);
+  }
+
+  AbstractDoubleMatrix _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets) {
+    return new SelectedDenseDoubleMatrix.offset(this._elements, rowOffsets, columnOffsets, 0);
+  }
+
+  Object clone() {
+    return new DoubleMatrix(_rows, _columns, _elements, _rowZero, _columnZero, _rowStride, _columnStride, !_isNoView);
+  }
+}
+
+/**
+ * Selection view on dense 2-d matrices holding <tt>double</tt> elements. First
+ * see the <a href="package-summary.html">package summary</a> and javadoc <a
+ * href="package-tree.html">tree view</a> to get the broad picture.
+ * <p>
+ * <b>Implementation:</b>
+ * <p>
+ * Objects of this class are typically constructed via <tt>viewIndexes</tt>
+ * methods on some source matrix. The interface introduced in abstract super
+ * classes defines everything a user can do. From a user point of view there is
+ * nothing special about this class; it presents the same functionality with the
+ * same signatures and semantics as its abstract superclass(es) while
+ * introducing no additional functionality. Thus, this class need not be visible
+ * to users. By the way, the same principle applies to concrete DenseXXX and
+ * SparseXXX classes: they presents the same functionality with the same
+ * signatures and semantics as abstract superclass(es) while introducing no
+ * additional functionality. Thus, they need not be visible to users, either.
+ * Factory methods could hide all these concrete types.
+ * <p>
+ * This class uses no delegation. Its instances point directly to the data. Cell
+ * addressing overhead is 1 additional int addition and 2 additional array index
+ * accesses per get/set.
+ * <p>
+ * Note that this implementation is not synchronized.
+ * <p>
+ * <b>Memory requirements:</b>
+ * <p>
+ * <tt>memory [bytes] = 4*(rowIndexes.length+columnIndexes.length)</tt>. Thus,
+ * an index view with 1000 x 1000 indexes additionally uses 8 KB.
+ * <p>
+ * <b>Time complexity:</b>
+ * <p>
+ * Depends on the parent view holding cells.
+ * <p>
+ *
+ * @author wolfgang.hoschek@cern.ch
+ * @version 1.0, 09/24/99
+ *
+ * @author Piotr Wendykier (piotr.wendykier@gmail.com)
+ * @version 1.1, 08/22/2007
+ */
+class SelectedDenseDoubleMatrix extends AbstractDoubleMatrix {
+
+  /**
+   * The elements of this matrix.
+   */
+  Float64List _elements;
+
+  /**
+   * The offsets of the visible cells of this matrix.
+   */
+  Int32List _rowOffsets;
+
+  Int32List _columnOffsets;
+
+  /**
+   * The offset.
+   */
+  int _offset;
+
+  /**
+   * Constructs a matrix view with the given parameters.
+   *
+   * @param elements
+   *            the cells.
+   * @param rowOffsets
+   *            The row offsets of the cells that shall be visible.
+   * @param columnOffsets
+   *            The column offsets of the cells that shall be visible.
+   * @param offset
+   */
+  factory SelectedDenseDoubleMatrix.offset(Float64List elements, Int32List rowOffsets, Int32List columnOffsets, int offset) {
+    return new SelectedDenseDoubleMatrix(rowOffsets.length, columnOffsets.length, elements, 0, 0, 1, 1, rowOffsets, columnOffsets, offset, true);
+  }
+
+  /**
+   * Constructs a matrix view with the given parameters.
+   *
+   * @param rows
+   *            the number of rows the matrix shall have.
+   * @param columns
+   *            the number of columns the matrix shall have.
+   * @param elements
+   *            the cells.
+   * @param rowZero
+   *            the position of the first element.
+   * @param columnZero
+   *            the position of the first element.
+   * @param rowStride
+   *            the number of elements between two rows, i.e.
+   *            <tt>index(i+1,j)-index(i,j)</tt>.
+   * @param columnStride
+   *            the number of elements between two columns, i.e.
+   *            <tt>index(i,j+1)-index(i,j)</tt>.
+   * @param rowOffsets
+   *            The row offsets of the cells that shall be visible.
+   * @param columnOffsets
+   *            The column offsets of the cells that shall be visible.
+   * @param offset
+   */
+  SelectedDenseDoubleMatrix(int rows, int columns, Float64List elements, int rowZero, int columnZero, int rowStride, int columnStride, Int32List rowOffsets, Int32List columnOffsets, int offset, bool isView) {
+    // be sure parameters are valid, we do not check...
+    _setUp(rows, columns, rowZero, columnZero, rowStride, columnStride);
+
+    this._elements = elements;
+    this._rowOffsets = rowOffsets;
+    this._columnOffsets = columnOffsets;
+    this._offset = offset;
+
+    this._isNoView = !isView;
+  }
+
+  Float64List elements() {
+    return _elements;
   }
 
   /**
@@ -1289,22 +2037,27 @@ abstract class DoubleMatrix extends AbstractMatrix {
    *            the index of the column-coordinate.
    * @return the value at the specified coordinate.
    */
-  double get(int row, int column);
+  double get(int row, int column) {
+    // if (debug) if (column<0 || column>=columns || row<0 || row>=rows)
+    // throw new IndexOutOfBoundsException("row:"+row+", column:"+column);
+    // return elements[index(row,column)];
+    // manually inlined:
+    return _elements[_offset + _rowOffsets[_rowZero + row * _rowStride] + _columnOffsets[_columnZero + column * _columnStride]];
+  }
 
   /**
-   * Construct and returns a new empty matrix <i>of the same dynamic type</i>
-   * as the receiver, having the same number of rows and columns. For example,
-   * if the receiver is an instance of type <tt>DenseDoubleMatrix</tt> the
-   * new matrix must also be of type <tt>DenseDoubleMatrix</tt>, if the
-   * receiver is an instance of type <tt>SparseDoubleMatrix</tt> the new
-   * matrix must also be of type <tt>SparseDoubleMatrix</tt>, etc. In
-   * general, the new matrix should have internal parametrization as similar
-   * as possible.
+   * Returns the position of the given coordinate within the (virtual or
+   * non-virtual) internal 1-dimensional array.
    *
-   * @return a new empty matrix of the same dynamic type.
+   * @param row
+   *            the index of the row-coordinate.
+   * @param column
+   *            the index of the column-coordinate.
    */
-  DoubleMatrix like() {
-    return like2D(_rows, _columns);
+  int index(int row, int column) {
+    // return this.offset + super.index(row,column);
+    // manually inlined:
+    return this._offset + _rowOffsets[_rowZero + row * _rowStride] + _columnOffsets[_columnZero + column * _columnStride];
   }
 
   /**
@@ -1323,7 +2076,9 @@ abstract class DoubleMatrix extends AbstractMatrix {
    *            the number of columns the matrix shall have.
    * @return a new empty matrix of the same dynamic type.
    */
-  DoubleMatrix like2D(int rows, int columns);
+  AbstractDoubleMatrix like2D(int rows, int columns) {
+    return new DoubleMatrix(rows, columns);
+  }
 
   /**
    * Construct and returns a new 1-d matrix <i>of the corresponding dynamic
@@ -1337,46 +2092,8 @@ abstract class DoubleMatrix extends AbstractMatrix {
    *            the number of cells the matrix shall have.
    * @return a new matrix of the corresponding dynamic type.
    */
-  DoubleVector like1D(int size);
-
-  /**
-   * Normalizes this matrix, i.e. makes the sum of all elements equal to 1.0
-   * If the matrix contains negative elements then all the values are shifted
-   * to ensure non-negativity.
-   */
-  void normalize() {
-    double min = this.min().value;
-    if (min < 0) {
-      forEach(func.subtract(min));
-    }
-    if (max().value == 0) {
-      fill(1.0 / length);
-    } else {
-      double sumScaleFactor = sum();
-      sumScaleFactor = 1.0 / sumScaleFactor;
-      forEach(func.multiply(sumScaleFactor));
-    }
-  }
-
-  /**
-   * Sets the matrix cell at coordinate <tt>[row,column]</tt> to the specified
-   * value.
-   *
-   * @param row
-   *            the index of the row-coordinate.
-   * @param column
-   *            the index of the column-coordinate.
-   * @param value
-   *            the value to be filled into the specified cell.
-   * @throws RangeError
-   *             if
-   *             <tt>column&lt;0 || column&gt;=columns() || row&lt;0 || row&gt;=rows()</tt>
-   */
-  void put(int row, int column, double value) {
-    if (column < 0 || column >= _columns || row < 0 || row >= _rows) {
-      throw new RangeError("row:$row, column:$column");
-    }
-    set(row, column, value);
+  AbstractDoubleVector like1D(int size) {
+    return new DoubleVector(size);
   }
 
   /**
@@ -1397,67 +2114,30 @@ abstract class DoubleMatrix extends AbstractMatrix {
    * @param value
    *            the value to be filled into the specified cell.
    */
-  void set(int row, int column, double value);
-
-  /**
-   * Constructs and returns a 2-dimensional array containing the cell values.
-   * The returned array <tt>values</tt> has the form
-   * <tt>values[row][column]</tt> and has the same number of rows and columns
-   * as the receiver.
-   * <p>
-   * The values are copied. So subsequent changes in <tt>values</tt> are not
-   * reflected in the matrix, and vice-versa.
-   *
-   * @return an array filled with the values of the cells.
-   */
-  List<Float64List> toList() {
-    final List<Float64List> values = new List<Float64List>.generate(_rows,
-        (_) => new Float64List(_columns));
-    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-      nthreads = Math.min(nthreads, _rows);
-      List<Future> futures = new List<Future>(nthreads);
-      int k = _rows ~/ nthreads;
-      for (int j = 0; j < nthreads; j++) {
-        final int firstRow = j * k;
-        final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
-        futures[j] = ConcurrencyUtils.submit(() {
-          for (int r = firstRow; r < lastRow; r++) {
-            List<double> currentRow = values[r];
-            for (int c = 0; c < _columns; c++) {
-              currentRow[c] = getQuick(r, c);
-            }
-          }
-        });
-      }
-      ConcurrencyUtils.waitForCompletion(futures);
-    } else {*/
-      for (int r = 0; r < _rows; r++) {
-        List<double> currentRow = values[r];
-        for (int c = 0; c < _columns; c++) {
-          currentRow[c] = get(r, c);
-        }
-      }
-    //}
-    return values;
-  }
-
-  /**
-   * Returns a string representation using default formatting.
-   *
-   * @see cern.colt.matrix.tdouble.algo.DoubleFormatter
-   */
-  String toString() {
-    return new DoubleFormatter().toStringDouble2D(this);
+  void set(int row, int column, double value) {
+    // if (debug) if (column<0 || column>=columns || row<0 || row>=rows)
+    // throw new IndexOutOfBoundsException("row:"+row+", column:"+column);
+    // elements[index(row,column)] = value;
+    // manually inlined:
+    _elements[_offset + _rowOffsets[_rowZero + row * _rowStride] + _columnOffsets[_columnZero + column * _columnStride]] = value;
   }
 
   /**
    * Returns a vector obtained by stacking the columns of the matrix on top of
    * one another.
    *
-   * @return a vector of columns of this matrix.
+   * @return
    */
-  DoubleVector vectorize();
+  AbstractDoubleVector vectorize() {
+    DoubleVector v = new DoubleVector(length);
+    int idx = 0;
+    for (int c = 0; c < _columns; c++) {
+      for (int r = 0; r < _rows; r++) {
+        v.set(idx++, get(c, r));
+      }
+    }
+    return v;
+  }
 
   /**
    * Constructs and returns a new <i>slice view</i> representing the rows of
@@ -1478,126 +2158,21 @@ abstract class DoubleMatrix extends AbstractMatrix {
    * </tr>
    * </table>
    *
-   * @param column
-   *            the column to fix.
+   * @param the
+   *            column to fix.
    * @return a new slice view.
-   * @throws RangeError
+   * @throws IllegalArgumentException
    *             if <tt>column < 0 || column >= columns()</tt>.
    * @see #viewRow(int)
    */
-  DoubleVector column(int column) {
+  AbstractDoubleVector column(int column) {
     _checkColumn(column);
     int viewSize = this._rows;
-    int viewZero = index(0, column);
+    int viewZero = this._rowZero;
     int viewStride = this._rowStride;
-    return _like1D(viewSize, viewZero, viewStride);
-  }
-
-  /**
-   * Constructs and returns a new <i>flip view</i> along the column axis. What
-   * used to be column <tt>0</tt> is now column <tt>columns()-1</tt>, ...,
-   * what used to be column <tt>columns()-1</tt> is now column <tt>0</tt>. The
-   * returned view is backed by this matrix, so changes in the returned view
-   * are reflected in this matrix, and vice-versa.
-   * <p>
-   * <b>Example:</b>
-   * <table border="0">
-   * <tr nowrap>
-   * <td valign="top">2 x 3 matrix: <br>
-   * 1, 2, 3<br>
-   * 4, 5, 6</td>
-   * <td>columnFlip ==></td>
-   * <td valign="top">2 x 3 matrix:<br>
-   * 3, 2, 1 <br>
-   * 6, 5, 4</td>
-   * <td>columnFlip ==></td>
-   * <td valign="top">2 x 3 matrix: <br>
-   * 1, 2, 3<br>
-   * 4, 5, 6</td>
-   * </tr>
-   * </table>
-   *
-   * @return a new flip view.
-   * @see #viewRowFlip()
-   */
-  DoubleMatrix columnFlip() {
-    return _view()._vColumnFlip() as DoubleMatrix;
-  }
-
-  /**
-   * Constructs and returns a new <i>dice (transposition) view</i>; Swaps
-   * axes; example: 3 x 4 matrix --> 4 x 3 matrix. The view has both
-   * dimensions exchanged; what used to be columns become rows, what used to
-   * be rows become columns. In other words:
-   * <tt>view.get(row,column)==this.get(column,row)</tt>. This is a zero-copy
-   * transposition, taking O(1), i.e. constant time. The returned view is
-   * backed by this matrix, so changes in the returned view are reflected in
-   * this matrix, and vice-versa. Use idioms like
-   * <tt>result = viewDice(A).copy()</tt> to generate an independent
-   * transposed matrix.
-   * <p>
-   * <b>Example:</b>
-   * <table border="0">
-   * <tr nowrap>
-   * <td valign="top">2 x 3 matrix: <br>
-   * 1, 2, 3<br>
-   * 4, 5, 6</td>
-   * <td>transpose ==></td>
-   * <td valign="top">3 x 2 matrix:<br>
-   * 1, 4 <br>
-   * 2, 5 <br>
-   * 3, 6</td>
-   * <td>transpose ==></td>
-   * <td valign="top">2 x 3 matrix: <br>
-   * 1, 2, 3<br>
-   * 4, 5, 6</td>
-   * </tr>
-   * </table>
-   *
-   * @return a new dice view.
-   */
-  DoubleMatrix dice() {
-    return _view()._vDice() as DoubleMatrix;
-  }
-
-  /**
-   * Constructs and returns a new <i>sub-range view</i> that is a
-   * <tt>height x width</tt> sub matrix starting at <tt>[row,column]</tt>.
-   *
-   * Operations on the returned view can only be applied to the restricted
-   * range. Any attempt to access coordinates not contained in the view will
-   * throw an <tt>RangeError</tt>.
-   * <p>
-   * <b>Note that the view is really just a range restriction:</b> The
-   * returned matrix is backed by this matrix, so changes in the returned
-   * matrix are reflected in this matrix, and vice-versa.
-   * <p>
-   * The view contains the cells from <tt>[row,column]</tt> to
-   * <tt>[row+height-1,column+width-1]</tt>, all inclusive. and has
-   * <tt>view.rows() == height; view.columns() == width;</tt>. A view's legal
-   * coordinates are again zero based, as usual. In other words, legal
-   * coordinates of the view range from <tt>[0,0]</tt> to
-   * <tt>[view.rows()-1==height-1,view.columns()-1==width-1]</tt>. As usual,
-   * any attempt to access a cell at a coordinate
-   * <tt>column&lt;0 || column&gt;=view.columns() || row&lt;0 || row&gt;=view.rows()</tt>
-   * will throw an <tt>RangeError</tt>.
-   *
-   * @param row
-   *            The index of the row-coordinate.
-   * @param column
-   *            The index of the column-coordinate.
-   * @param height
-   *            The height of the box.
-   * @param width
-   *            The width of the box.
-   * @throws RangeError
-   *             if
-   *             <tt>column<0 || width<0 || column+width>columns() || row<0 || height<0 || row+height>rows()</tt>
-   * @return the new view.
-   *
-   */
-  DoubleMatrix part(int row, int column, int height, int width) {
-    return _view()._vPart(row, column, height, width) as DoubleMatrix;
+    Int32List viewOffsets = this._rowOffsets;
+    int viewOffset = this._offset + _columnOffset(_columnRank(column));
+    return new SelectedDenseDoubleVector(viewSize, this._elements, viewZero, viewStride, viewOffsets, viewOffset);
   }
 
   /**
@@ -1619,517 +2194,65 @@ abstract class DoubleMatrix extends AbstractMatrix {
    * </tr>
    * </table>
    *
-   * @param row
-   *            the row to fix.
+   * @param the
+   *            row to fix.
    * @return a new slice view.
-   * @throws RangeError
+   * @throws IndexOutOfBoundsException
    *             if <tt>row < 0 || row >= rows()</tt>.
    * @see #viewColumn(int)
    */
-  DoubleVector row(int r) {
-    _checkRow(r);
+  AbstractDoubleVector row(int row) {
+    _checkRow(row);
     int viewSize = this._columns;
-    int viewZero = index(r, 0);
+    int viewZero = _columnZero;
     int viewStride = this._columnStride;
-    return _like1D(viewSize, viewZero, viewStride);
-  }
-  
-  DoubleVector operator [](int r) => row(r);
-
-  /**
-   * Constructs and returns a new <i>flip view</i> along the row axis. What
-   * used to be row <tt>0</tt> is now row <tt>rows()-1</tt>, ..., what used to
-   * be row <tt>rows()-1</tt> is now row <tt>0</tt>. The returned view is
-   * backed by this matrix, so changes in the returned view are reflected in
-   * this matrix, and vice-versa.
-   * <p>
-   * <b>Example:</b>
-   * <table border="0">
-   * <tr nowrap>
-   * <td valign="top">2 x 3 matrix: <br>
-   * 1, 2, 3<br>
-   * 4, 5, 6</td>
-   * <td>rowFlip ==></td>
-   * <td valign="top">2 x 3 matrix:<br>
-   * 4, 5, 6 <br>
-   * 1, 2, 3</td>
-   * <td>rowFlip ==></td>
-   * <td valign="top">2 x 3 matrix: <br>
-   * 1, 2, 3<br>
-   * 4, 5, 6</td>
-   * </tr>
-   * </table>
-   *
-   * @return a new flip view.
-   * @see #viewColumnFlip()
-   */
-  DoubleMatrix rowFlip() {
-    return _view()._vRowFlip() as DoubleMatrix;
+    Int32List viewOffsets = this._columnOffsets;
+    int viewOffset = this._offset + _rowOffset(_rowRank(row));
+    return new SelectedDenseDoubleVector(viewSize, this._elements, viewZero, viewStride, viewOffsets, viewOffset);
   }
 
   /**
-   * Constructs and returns a new <i>selection view</i> that is a matrix
-   * holding all <b>rows</b> matching the given condition. Applies the
-   * condition to each row and takes only those row where
-   * <tt>condition(viewRow(i))</tt> yields <tt>true</tt>. To match
-   * columns, use a dice view.
-   * <p>
-   * <b>Example:</b> <br>
+   * Returns the position of the given absolute rank within the (virtual or
+   * non-virtual) internal 1-dimensional array. Default implementation.
+   * Override, if necessary.
    *
-   * <pre>
-   * 	 // extract and view all rows which have a value &lt; threshold in the first column (representing &quot;age&quot;)
-   * 	 final double threshold = 16;
-   * 	 matrix.viewSelection(
-   * 	    new DoubleVectorProcedure() {
-   * 	       final bool apply(DoubleVector m) { return m.get(0) &lt; threshold; }
-   * 	    }
-   * 	 );
-   *
-   * 	 // extract and view all rows with RMS &lt; threshold
-   * 	 // The RMS (Root-Mean-Square) is a measure of the average &quot;size&quot; of the elements of a data sequence.
-   * 	 matrix = 0 1 2 3
-   * 	 final double threshold = 0.5;
-   * 	 matrix.viewSelection(
-   * 	    new DoubleVectorProcedure() {
-   * 	       final bool apply(DoubleVector m) { return Math.sqrt(m.aggregate(F.plus,F.square) / m.size()) &lt; threshold; }
-   * 	    }
-   * 	 );
-   *
-   * </pre>
-   *
-   * For further examples, see the <a
-   * href="package-summary.html#FunctionObjects">package doc</a>. The returned
-   * view is backed by this matrix, so changes in the returned view are
-   * reflected in this matrix, and vice-versa.
-   *
-   * @param condition
-   *            The condition to be matched.
-   * @return the new view.
+   * @param rank
+   *            the absolute rank of the element.
+   * @return the position.
    */
-  DoubleMatrix where(DoubleVectorProcedure condition) {
-    /*IntArrayList*/List<int> matches = new /*IntArrayList*/List<int>();
-    for (int i = 0; i < _rows; i++) {
-      if (condition(row(i))) {
-        matches.add(i);
-      }
-    }
-
-    //matches.trimToSize();
-    return select(new Int32List.fromList(matches)/*.elements()*/, null); // take all columns
+  int _columnOffset(int absRank) {
+    return _columnOffsets[absRank];
   }
 
   /**
-   * Constructs and returns a new <i>selection view</i> that is a matrix
-   * holding the indicated cells. There holds
-   * <tt>view.rows() == rowIndexes.length, view.columns() == columnIndexes.length</tt>
-   * and <tt>view.get(i,j) == this.get(rowIndexes[i],columnIndexes[j])</tt>.
-   * Indexes can occur multiple times and can be in arbitrary order.
-   * <p>
-   * <b>Example:</b>
+   * Returns the position of the given absolute rank within the (virtual or
+   * non-virtual) internal 1-dimensional array. Default implementation.
+   * Override, if necessary.
    *
-   * <pre>
-   * 	 this = 2 x 3 matrix:
-   * 	 1, 2, 3
-   * 	 4, 5, 6
-   * 	 rowIndexes     = (0,1)
-   * 	 columnIndexes  = (1,0,1,0)
-   * 	 --&gt;
-   * 	 view = 2 x 4 matrix:
-   * 	 2, 1, 2, 1
-   * 	 5, 4, 5, 4
-   *
-   * </pre>
-   *
-   * Note that modifying the index arguments after this call has returned has
-   * no effect on the view. The returned view is backed by this matrix, so
-   * changes in the returned view are reflected in this matrix, and
-   * vice-versa.
-   * <p>
-   * To indicate "all" rows or "all columns", simply set the respective
-   * parameter
-   *
-   * @param rowIndexes
-   *            The rows of the cells that shall be visible in the new view.
-   *            To indicate that <i>all</i> rows shall be visible, simply set
-   *            this parameter to <tt>null</tt>.
-   * @param columnIndexes
-   *            The columns of the cells that shall be visible in the new
-   *            view. To indicate that <i>all</i> columns shall be visible,
-   *            simply set this parameter to <tt>null</tt>.
-   * @return the new view.
-   * @throws RangeError
-   *             if <tt>!(0 <= rowIndexes[i] < rows())</tt> for any
-   *             <tt>i=0..rowIndexes.length()-1</tt>.
-   * @throws RangeError
-   *             if <tt>!(0 <= columnIndexes[i] < columns())</tt> for any
-   *             <tt>i=0..columnIndexes.length()-1</tt>.
+   * @param rank
+   *            the absolute rank of the element.
+   * @return the position.
    */
-  DoubleMatrix select(Int32List rowIndexes, Int32List columnIndexes) {
-    // check for "all"
-    if (rowIndexes == null) {
-      rowIndexes = new Int32List(_rows);
-      for (int i = 0; i < _rows; i++) rowIndexes[i] = i;
-    }
-    if (columnIndexes == null) {
-      columnIndexes = new Int32List(_columns);
-      for (int i = 0; i < _columns; i++) columnIndexes[i] = i;
-    }
-
-    _checkRowIndexes(rowIndexes);
-    _checkColumnIndexes(columnIndexes);
-    Int32List rowOffsets = new Int32List(rowIndexes.length);
-    Int32List columnOffsets = new Int32List(columnIndexes.length);
-    for (int i = 0; i < rowIndexes.length; i++) {
-      rowOffsets[i] = _rowOffset(_rowRank(rowIndexes[i]));
-    }
-    for (int i = 0; i < columnIndexes.length; i++) {
-      columnOffsets[i] = _columnOffset(_columnRank(columnIndexes[i]));
-    }
-    return _viewSelectionLike(rowOffsets, columnOffsets);
-  }
-
-  DoubleMatrix selectIterable(Iterable<Int32List> indexes) {
-    int n = indexes.length;
-    Int32List rowIndexes = new Int32List(n);
-    Int32List columnIndexes = new Int32List(n);
-    int idx = 0;
-    for (Iterator<Int32List> iterator = indexes.iterator; iterator.current != null; ) {
-      iterator.moveNext();
-      Int32List _is = iterator.current;
-      rowIndexes[idx] = _is[0];
-      columnIndexes[idx] = _is[1];
-      idx++;
-    }
-    _checkRowIndexes(rowIndexes);
-    _checkColumnIndexes(columnIndexes);
-    Int32List rowOffsets = new Int32List(rowIndexes.length);
-    Int32List columnOffsets = new Int32List(columnIndexes.length);
-    for (int i = 0; i < rowIndexes.length; i++) {
-      rowOffsets[i] = _rowOffset(_rowRank(rowIndexes[i]));
-    }
-    for (int i = 0; i < columnIndexes.length; i++) {
-      columnOffsets[i] = _columnOffset(_columnRank(columnIndexes[i]));
-    }
-    return _viewSelectionLike(rowOffsets, columnOffsets);
+  int _rowOffset(int absRank) {
+    return _rowOffsets[absRank];
   }
 
   /**
-   * Sorts the matrix rows into ascending order, according to the <i>natural
-   * ordering</i> of the matrix values in the given column. This sort is
-   * guaranteed to be <i>stable</i>. For further information, see
-   * {@link cern.colt.matrix.tdouble.algo.DoubleSorting#sort(DoubleMatrix,int)}
-   * . For more advanced sorting functionality, see
-   * {@link cern.colt.matrix.tdouble.algo.DoubleSorting}.
-   *
-   * @return a new sorted vector (matrix) view.
-   * @throws RangeError
-   *             if <tt>column < 0 || column >= columns()</tt>.
+   * Returns <tt>true</tt> if both matrices share common cells. More formally,
+   * returns <tt>true</tt> if <tt>other != null</tt> and at least one of the
+   * following conditions is met
+   * <ul>
+   * <li>the receiver is a view of the other matrix
+   * <li>the other matrix is a view of the receiver
+   * <li><tt>this == other</tt>
+   * </ul>
    */
-  /*DoubleMatrix viewSorted(int column) {
-    return DoubleSorting.mergeSort.sort(this, column);
-  }*/
-
-  /**
-   * Constructs and returns a new <i>stride view</i> which is a sub matrix
-   * consisting of every i-th cell. More specifically, the view has
-   * <tt>this.rows()/rowStride</tt> rows and
-   * <tt>this.columns()/columnStride</tt> columns holding cells
-   * <tt>this.get(i*rowStride,j*columnStride)</tt> for all
-   * <tt>i = 0..rows()/rowStride - 1, j = 0..columns()/columnStride - 1</tt>.
-   * The returned view is backed by this matrix, so changes in the returned
-   * view are reflected in this matrix, and vice-versa.
-   *
-   * @param rowStride
-   *            the row step factor.
-   * @param columnStride
-   *            the column step factor.
-   * @return a new view.
-   * @throws RangeError
-   *             if <tt>rowStride<=0 || columnStride<=0</tt>.
-   */
-  DoubleMatrix strides(int rowStride, int columnStride) {
-    return _view()._vStrides(rowStride, columnStride) as DoubleMatrix;
-  }
-
-  /**
-   * 8 neighbor stencil transformation. For efficient finite difference
-   * operations. Applies a function to a moving <tt>3 x 3</tt> window. Does
-   * nothing if <tt>rows() < 3 || columns() < 3</tt>.
-   *
-   * <pre>
-   * 	 B[i,j] = function(
-   * 	    A[i-1,j-1], A[i-1,j], A[i-1,j+1],
-   * 	    A[i,  j-1], A[i,  j], A[i,  j+1],
-   * 	    A[i+1,j-1], A[i+1,j], A[i+1,j+1]
-   * 	    )
-   *
-   * 	 x x x -     - x x x     - - - -
-   * 	 x o x -     - x o x     - - - -
-   * 	 x x x -     - x x x ... - x x x
-   * 	 - - - -     - - - -     - x o x
-   * 	 - - - -     - - - -     - x x x
-   *
-   * </pre>
-   *
-   * Make sure that cells of <tt>this</tt> and <tt>B</tt> do not overlap. In
-   * case of overlapping views, behaviour is unspecified.
-   *
-   * </pre>
-   *
-   * <p>
-   * <b>Example:</b>
-   *
-   * <pre>
-   *
-   * final double alpha = 0.25; final double beta = 0.75; // 8 neighbors
-   * cern.colt.function.Double9Function f = new
-   * cern.colt.function.Double9Function() {    final
-   * double apply(       double a00, double a01,
-   * double a02,       double a10, double a11,
-   * double a12,       double a20, double a21,
-   * double a22) {
-   *          return beta*a11 +
-   * alpha*(a00+a01+a02 + a10+a12 + a20+a21+a22);
-   *       } }; A.zAssign8Neighbors(B,f); // 4
-   * neighbors cern.colt.function.Double9Function g = new
-   * cern.colt.function.Double9Function() {    final
-   * double apply(       double a00, double a01,
-   * double a02,       double a10, double a11,
-   * double a12,       double a20, double a21,
-   * double a22) {       return beta*a11 +
-   * alpha*(a01+a10+a12+a21);    } C.zAssign8Neighbors(B,g); //
-   * fast, even though it doesn't look like it };
-   *
-   * </pre>
-   *
-   * @param B
-   *            the matrix to hold the results.
-   * @param function
-   *            the function to be applied to the 9 cells.
-   * @throws NullPointerException
-   *             if <tt>function==null</tt>.
-   * @throws ArgumentError
-   *             if <tt>rows() != B.rows() || columns() != B.columns()</tt>.
-   */
-  /*void zAssign8Neighbors(DoubleMatrix B, func.Double9Function function) {
-    if (function == null) throw new ArgumentError("function must not be null.");
-    checkShape(B);
-    if (_rows < 3 || _columns < 3) return; // nothing to do
-    int r = _rows - 1;
-    int c = _columns - 1;
-    double a00, a01, a02;
-    double a10, a11, a12;
-    double a20, a21, a22;
-    for (int i = 1; i < r; i++) {
-      a00 = at(i - 1, 0);
-      a01 = at(i - 1, 1);
-      a10 = at(i, 0);
-      a11 = at(i, 1);
-      a20 = at(i + 1, 0);
-      a21 = at(i + 1, 1);
-
-      for (int j = 1; j < c; j++) {
-        // in each step six cells can be remembered in registers - they
-        // don't need to be reread from slow memory
-        // in each step 3 instead of 9 cells need to be read from
-        // memory.
-        a02 = at(i - 1, j + 1);
-        a12 = at(i, j + 1);
-        a22 = at(i + 1, j + 1);
-
-        B.put(i, j, function(a00, a01, a02, a10, a11, a12, a20, a21, a22));
-
-        a00 = a01;
-        a10 = a11;
-        a20 = a21;
-
-        a01 = a02;
-        a11 = a12;
-        a21 = a22;
-      }
+  bool _haveSharedCellsRaw(AbstractDoubleMatrix other) {
+    if (other is SelectedDenseDoubleMatrix) {
+      return this._elements == other._elements;
+    } else if (other is DoubleMatrix) {
+      return this._elements == other._elements;
     }
-  }*/
-
-  /**
-   * Linear algebraic matrix-vector multiplication; <tt>z = A * y</tt>;
-   * Equivalent to <tt>return A.zMult(y,z,1,0);</tt>
-   */
-  //    DoubleVector zMult(DoubleVector y, DoubleVector z) {
-  //        return zMult(y, z, 1, 0, false);
-  //    }
-
-  /**
-   * Linear algebraic matrix-vector multiplication;
-   * <tt>z = alpha * A * y + beta*z</tt>.
-   * <tt>z[i] = alpha*Sum(A[i,j] * y[j]) + beta*z[i], i=0..A.rows()-1, j=0..y.size()-1</tt>
-   * . Where <tt>A == this</tt>. <br>
-   * Note: Matrix shape conformance is checked <i>after</i> potential
-   * transpositions.
-   *
-   * @param y
-   *            the source vector.
-   * @param z
-   *            the vector where results are to be stored. Set this parameter
-   *            to <tt>null</tt> to indicate that a new result vector shall be
-   *            constructed.
-   * @return z (for convenience only).
-   *
-   * @throws ArgumentError
-   *             if <tt>A.columns() != y.size() || A.rows() > z.size())</tt>.
-   */
-  DoubleVector mult(final DoubleVector y, DoubleVector z, [double alpha = 1.0, double beta = 0.0, bool transposeA = false]) {
-    if (transposeA) return dice().mult(y, z, alpha, beta, false);
-    DoubleVector zz;
-    if (z == null) {
-      zz = y.like1D(_rows);
-    } else {
-      zz = z;
-    }
-    if (_columns != y.length || _rows > zz.length) {
-      throw new ArgumentError("Incompatible args: " + toStringShort() + ", " + y.toStringShort() + ", " + zz.toStringShort());
-    }
-
-    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-      nthreads = Math.min(nthreads, _rows);
-      List<Future> futures = new List<Future>(nthreads);
-      int k = _rows ~/ nthreads;
-      for (int j = 0; j < nthreads; j++) {
-        final int firstRow = j * k;
-        final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
-        futures[j] = ConcurrencyUtils.submit(() {
-          for (int r = firstRow; r < lastRow; r++) {
-            double s = 0.0;
-            for (int c = 0; c < _columns; c++) {
-              s += getQuick(r, c) * y.getQuick(c);
-            }
-            zz.setQuick(r, alpha * s + beta * zz.getQuick(r));
-          }
-        });
-      }
-      ConcurrencyUtils.waitForCompletion(futures);
-    } else {*/
-      for (int r = 0; r < _rows; r++) {
-        double s = 0.0;
-        for (int c = 0; c < _columns; c++) {
-          s += get(r, c) * y.get(c);
-        }
-        zz.set(r, alpha * s + beta * zz.get(r));
-      }
-    //}
-    return zz;
-  }
-
-  /**
-   * Linear algebraic matrix-matrix multiplication;
-   * <tt>C = alpha * A x B + beta*C</tt>.
-   * <tt>C[i,j] = alpha*Sum(A[i,k] * B[k,j]) + beta*C[i,j], k=0..n-1</tt>. <br>
-   * Matrix shapes: <tt>A(m x n), B(n x p), C(m x p)</tt>. <br>
-   * Note: Matrix shape conformance is checked <i>after</i> potential
-   * transpositions.
-   *
-   * @param B
-   *            the second source matrix.
-   * @param C
-   *            the matrix where results are to be stored. Set this parameter
-   *            to <tt>null</tt> to indicate that a new result matrix shall be
-   *            constructed.
-   * @return C (for convenience only).
-   *
-   * @throws ArgumentError
-   *             if <tt>B.rows() != A.columns()</tt>.
-   * @throws ArgumentError
-   *             if
-   *             <tt>C.rows() != A.rows() || C.columns() != B.columns()</tt>.
-   * @throws ArgumentError
-   *             if <tt>A == C || B == C</tt>.
-   */
-  DoubleMatrix multiply(final DoubleMatrix B, DoubleMatrix C, [double alpha = 1.0, double beta = 0.0, bool transposeA = false, bool transposeB = false]) {
-    if (transposeA) {
-      return dice().multiply(B, C, alpha, beta, false, transposeB);
-    }
-    if (transposeB) {
-      return this.multiply(B.dice(), C, alpha, beta, transposeA, false);
-    }
-
-    final int m = _rows;
-    final int n = _columns;
-    final int p = B._columns;
-    DoubleMatrix CC;
-    if (C == null) {
-      CC = like2D(m, p);
-    } else {
-      CC = C;
-    }
-    if (B._rows != n) throw new ArgumentError("Matrix inner dimensions must agree:" + toStringShort() + ", " + B.toStringShort());
-    if (CC._rows != m || CC._columns != p) throw new ArgumentError("Incompatibe result matrix: " + toStringShort() + ", " + B.toStringShort() + ", " + CC.toStringShort());
-    if (this == CC || B == CC) throw new ArgumentError("Matrices must not be identical");
-    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-      nthreads = Math.min(nthreads, p);
-      List<Future> futures = new List<Future>(nthreads);
-      int k = p ~/ nthreads;
-      for (int j = 0; j < nthreads; j++) {
-        final int firstIdx = j * k;
-        final int lastIdx = (j == nthreads - 1) ? p : firstIdx + k;
-        futures[j] = ConcurrencyUtils.submit(() {
-          for (int a = firstIdx; a < lastIdx; a++) {
-            for (int b = 0; b < m; b++) {
-              double s = 0;
-              for (int c = 0; c < n; c++) {
-                s += getQuick(b, c) * B.getQuick(c, a);
-              }
-              CC.setQuick(b, a, alpha * s + beta * CC.getQuick(b, a));
-            }
-          }
-        });
-      }
-      ConcurrencyUtils.waitForCompletion(futures);
-    } else {*/
-      for (int a = 0; a < p; a++) {
-        for (int b = 0; b < m; b++) {
-          double s = 0.0;
-          for (int c = 0; c < n; c++) {
-            s += get(b, c) * B.get(c, a);
-          }
-          CC.set(b, a, alpha * s + beta * CC.get(b, a));
-        }
-      }
-    //}
-    return CC;
-  }
-
-  /**
-   * Returns the sum of all cells; <tt>Sum( x[i,j] )</tt>.
-   *
-   * @return the sum.
-   */
-  double sum() {
-    if (length == 0) return 0.0;
-    return reduce(func.plus, func.identity);
-  }
-
-  /**
-   * Returns the content of this matrix if it is a wrapper; or <tt>this</tt>
-   * otherwise. Override this method in wrappers.
-   */
-  DoubleMatrix _getContent() {
-    return this;
-  }
-
-  /**
-   * Returns <tt>true</tt> if both matrices share at least one identical cell.
-   */
-  bool _haveSharedCells(DoubleMatrix other) {
-    if (other == null) return false;
-    if (this == other) return true;
-    return _getContent()._haveSharedCellsRaw(other._getContent());
-  }
-
-  /**
-   * Returns <tt>true</tt> if both matrices share at least one identical cell.
-   */
-  bool _haveSharedCellsRaw(DoubleMatrix other) {
     return false;
   }
 
@@ -2150,23 +2273,43 @@ abstract class DoubleMatrix extends AbstractMatrix {
    *            <tt>index(i+1)-index(i)</tt>.
    * @return a new matrix of the corresponding dynamic type.
    */
-  DoubleVector _like1D(int size, int zero, int stride);
+  AbstractDoubleVector _like1D(int size, int zero, int stride) {
+    throw new Error(); // this method is never called since
+    // viewRow() and viewColumn are overridden
+    // properly.
+  }
 
   /**
-   * Constructs and returns a new view equal to the receiver. The view is a
-   * shallow clone. Calls <code>clone()</code> and casts the result.
-   * <p>
-   * <b>Note that the view is not a deep copy.</b> The returned matrix is
-   * backed by this matrix, so changes in the returned matrix are reflected in
-   * this matrix, and vice-versa.
-   * <p>
-   * Use {@link #copy()} to construct an independent deep copy rather than a
-   * new view.
+   * Sets up a matrix with a given number of rows and columns.
    *
-   * @return a new view of the receiver.
+   * @param rows
+   *            the number of rows the matrix shall have.
+   * @param columns
+   *            the number of columns the matrix shall have.
+   * @throws IllegalArgumentException
+   *             if <tt>(double)columns*rows > Integer.MAX_VALUE</tt>.
    */
-  DoubleMatrix _view() {
-    return clone() as DoubleMatrix;
+  void _setUp2D(int rows, int columns) {
+    super._setUp(rows, columns);
+    this._rowStride = 1;
+    this._columnStride = 1;
+    this._offset = 0;
+  }
+
+  /**
+   * Self modifying version of viewDice().
+   */
+  AbstractMatrix _vDice() {
+    super._vDice();
+    // swap
+    Int32List tmp = _rowOffsets;
+    _rowOffsets = _columnOffsets;
+    _columnOffsets = tmp;
+
+    // flips stay unaffected
+
+    this._isNoView = false;
+    return this;
   }
 
   /**
@@ -2178,7 +2321,11 @@ abstract class DoubleMatrix extends AbstractMatrix {
    *            the offsets of the visible elements.
    * @return a new view.
    */
-  DoubleMatrix _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets);
+  AbstractDoubleMatrix _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets) {
+    return new SelectedDenseDoubleMatrix.offset(this._elements, rowOffsets, columnOffsets, this._offset);
+  }
 
-  Object clone();
+  Object clone() {
+    return new SelectedDenseDoubleMatrix(_rows, _columns, _elements, _rowZero, _columnZero, _rowStride, _columnStride, _rowOffsets, _columnOffsets, _offset, !_isNoView);
+  }
 }

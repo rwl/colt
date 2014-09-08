@@ -751,7 +751,7 @@ ComplexComplexFunction multiply(final Float64List x) {
 }
 
 ComplexComplexFunction multiplyBy(final double x) {
-  return new ComplexMult(new Float64List.fromList([x, 0]));
+  return new ComplexMult(new Float64List.fromList([x, 0.0]));
 }
 
 ComplexComplexFunction add(final Float64List y) {

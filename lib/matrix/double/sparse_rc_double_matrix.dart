@@ -354,7 +354,7 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
     this._values = values;
   }
 
-  DoubleMatrix forEach(final func.DoubleFunction function) {
+  AbstractDoubleMatrix forEach(final func.DoubleFunction function) {
     if (function is DoubleMult) { // x[i] = mult*x[i]
       final double alpha = (function as DoubleMult).multiplicator;
       if (alpha == 1) {
@@ -379,7 +379,7 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
     return this;
   }
 
-  DoubleMatrix fill(double value) {
+  AbstractDoubleMatrix fill(double value) {
     if (value == 0.0) {
       _rowPointers.fillRange(0, _rowPointers.length, 0);
       _columnIndexes.fillRange(0, _columnIndexes.length, 0);
@@ -393,7 +393,7 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
     return this;
   }
 
-  DoubleMatrix copyFrom(DoubleMatrix source) {
+  AbstractDoubleMatrix copyFrom(AbstractDoubleMatrix source) {
     if (source == this) return this; // nothing to do
     checkShape(source);
 
@@ -427,7 +427,7 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
     return this;
   }
 
-  DoubleMatrix forEachMatrix(final DoubleMatrix y, func.DoubleDoubleFunction function) {
+  AbstractDoubleMatrix forEachMatrix(final AbstractDoubleMatrix y, func.DoubleDoubleFunction function) {
     checkShape(y);
     if ((y is SparseRCDoubleMatrix) && (function == func.plus)) { // x[i] = x[i] + y[i]
       SparseRCDoubleMatrix yy = y;
@@ -547,7 +547,7 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
     return _rowPointers[_rows];
   }
 
-  DoubleMatrix forEachNonZero(final func.IntIntDoubleFunction function) {
+  AbstractDoubleMatrix forEachNonZero(final func.IntIntDoubleFunction function) {
 
     for (int i = _rows; --i >= 0; ) {
       int low = _rowPointers[i];
@@ -597,8 +597,8 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
    *
    * @return this matrix in a dense form
    */
-  DenseDoubleMatrix getDense() {
-    final DenseDoubleMatrix dense = new DenseDoubleMatrix(_rows, _columns);
+  DoubleMatrix getDense() {
+    final DoubleMatrix dense = new DoubleMatrix(_rows, _columns);
     forEachNonZero((int i, int j, double value) {
       dense.set(i, j, get(i, j));
       return value;
@@ -675,11 +675,11 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
     return _columnIndexesSorted;
   }
 
-  DoubleMatrix like2D(int rows, int columns) {
+  AbstractDoubleMatrix like2D(int rows, int columns) {
     return new SparseRCDoubleMatrix.sized(rows, columns);
   }
 
-  DoubleVector like1D(int size) {
+  AbstractDoubleVector like1D(int size) {
     return new SparseDoubleVector(size);
   }
 
@@ -809,25 +809,25 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
     _realloc(0);
   }
 
-  DoubleVector mult(DoubleVector y, DoubleVector z, [final double alpha = 1.0, final double beta = 0.0, final bool transposeA = false]) {
+  AbstractDoubleVector mult(AbstractDoubleVector y, AbstractDoubleVector z, [final double alpha = 1.0, final double beta = 0.0, final bool transposeA = false]) {
     final int rowsA = transposeA ? _columns : _rows;
     final int columnsA = transposeA ? _rows : _columns;
 
     bool ignore = (z == null || !transposeA);
-    if (z == null) z = new DenseDoubleVector(rowsA);
+    if (z == null) z = new DoubleVector(rowsA);
 
-    if (!(y is DenseDoubleVector && z is DenseDoubleVector)) {
+    if (!(y is DoubleVector && z is DoubleVector)) {
       return super.mult(y, z, alpha, beta, transposeA);
     }
 
     if (columnsA != y.length || rowsA > z.length) throw new ArgumentError("Incompatible args: " + ((transposeA ? dice() : this).toStringShort()) + ", " + y.toStringShort() + ", " + z.toStringShort());
 
-    DenseDoubleVector zz = z as DenseDoubleVector;
+    DoubleVector zz = z as DoubleVector;
     final Float64List elementsZ = zz._elements;
     final int strideZ = zz.stride();
     final int zeroZ = z.index(0);
 
-    DenseDoubleVector yy = y as DenseDoubleVector;
+    DoubleVector yy = y as DoubleVector;
     final Float64List elementsY = yy._elements;
     final int strideY = yy.stride();
     final int zeroY = y.index(0);
@@ -978,7 +978,7 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
     return z;
   }
 
-  DoubleMatrix multiply(DoubleMatrix B, DoubleMatrix C, [final double alpha=1.0, double beta=0.0, final bool transposeA=false, bool transposeB=false]) {
+  AbstractDoubleMatrix multiply(AbstractDoubleMatrix B, AbstractDoubleMatrix C, [final double alpha=1.0, double beta=0.0, final bool transposeA=false, bool transposeB=false]) {
     int rowsA = _rows;
     int columnsA = _columns;
     if (transposeA) {
@@ -997,7 +997,7 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
       if (B is SparseRCDoubleMatrix) {
         C = new SparseRCDoubleMatrix.sized(rowsA, p, rowsA * p);
       } else {
-        C = new DenseDoubleMatrix(rowsA, p);
+        C = new DoubleMatrix(rowsA, p);
       }
     }
 
@@ -1009,21 +1009,21 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
       C.forEach(func.multiply(beta));
     }
 
-    if ((B is DenseDoubleMatrix) && (C is DenseDoubleMatrix)) {
+    if ((B is DoubleMatrix) && (C is DoubleMatrix)) {
       SparseRCDoubleMatrix AA;
       if (transposeA) {
         AA = getTranspose();
       } else {
         AA = this;
       }
-      DenseDoubleMatrix BB;
+      DoubleMatrix BB;
       if (transposeB) {
-        BB = B.dice() as DenseDoubleMatrix;
+        BB = B.dice() as DoubleMatrix;
       } else {
         BB = B;
       }
 
-      DenseDoubleMatrix CC = C;
+      DoubleMatrix CC = C;
       Int32List rowPointersA = AA._rowPointers;
       Int32List columnIndexesA = AA._columnIndexes;
       Float64List valuesA = AA._values;
@@ -1112,9 +1112,9 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
         B = B.dice();
       }
       // cache views
-      final List<DoubleVector> Brows = new List<DoubleVector>(columnsA);
+      final List<AbstractDoubleVector> Brows = new List<AbstractDoubleVector>(columnsA);
       for (int i = columnsA; --i >= 0; ) Brows[i] = B.row(i);
-      final List<DoubleVector> Crows = new List<DoubleVector>(rowsA);
+      final List<AbstractDoubleVector> Crows = new List<AbstractDoubleVector>(rowsA);
       for (int i = rowsA; --i >= 0; ) Crows[i] = C.row(i);
 
       final DoublePlusMultSecond fun = new DoublePlusMultSecond.plusMult(0.0);
@@ -1164,7 +1164,7 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
     _values = valuesNew;
   }
 
-  DoubleMatrix _getContent() {
+  AbstractDoubleMatrix _getContent() {
     return this;
   }
 

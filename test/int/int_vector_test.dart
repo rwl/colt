@@ -40,10 +40,10 @@ testIntVector(String name, IntVectorTest t) {
 
 abstract class IntVectorTest {
   /** Matrix to test. */
-  IntVector A;
+  AbstractIntVector A;
 
   /** Matrix of the same size as [A]. */
-  IntVector B;
+  AbstractIntVector B;
 
   int SIZE = 2 * 17 * 5;
 
@@ -126,7 +126,7 @@ abstract class IntVectorTest {
   }
 
   void testForEach() {
-    IntVector Acopy = A.copy();
+    AbstractIntVector Acopy = A.copy();
     A.forEach(ifunc.neg);
     for (int i = 0; i < A.length; i++) {
       int expected = -Acopy.get(i);
@@ -143,7 +143,7 @@ abstract class IntVectorTest {
   }
 
   void testForEachWith() {
-    IntVector Acopy = A.copy();
+    AbstractIntVector Acopy = A.copy();
     A.forEachWith(B, ifunc.plus);
     for (int i = 0; i < A.length; i++) {
       expect(Acopy.get(i) + B.get(i), equals(A.get(i)));
@@ -158,7 +158,7 @@ abstract class IntVectorTest {
         return false;
       }
     }
-    IntVector Acopy = A.copy();
+    AbstractIntVector Acopy = A.copy();
     A.fillWhere(procedure, -1);
     for (int i = 0; i < A.length; i++) {
       if (Acopy.get(i).abs() > 1) {
@@ -177,7 +177,7 @@ abstract class IntVectorTest {
         return false;
       }
     }
-    IntVector Acopy = A.copy();
+    AbstractIntVector Acopy = A.copy();
     A.forEachWhere(procedure, ifunc.neg);
     for (int i = 0; i < A.length; i++) {
       if (Acopy.get(i).abs() > 1) {
@@ -291,7 +291,7 @@ abstract class IntVectorTest {
   void testReshape() {
     int rows = 10;
     int columns = 17;
-    IntMatrix B = A.reshape(rows, columns);
+    AbstractIntMatrix B = A.reshape(rows, columns);
     int idx = 0;
     for (int c = 0; c < columns; c++) {
       for (int r = 0; r < rows; r++) {
@@ -316,8 +316,8 @@ abstract class IntVectorTest {
   }*/
 
   void testSwap() {
-    IntVector Acopy = A.copy();
-    IntVector Bcopy = B.copy();
+    AbstractIntVector Acopy = A.copy();
+    AbstractIntVector Bcopy = B.copy();
     A.swap(B);
     for (int i = 0; i < A.length; i++) {
       expect(Bcopy.get(i), equals(A.get(i)));
@@ -326,7 +326,7 @@ abstract class IntVectorTest {
   }
 
   void testFlip() {
-    IntVector b = A.flip();
+    AbstractIntVector b = A.flip();
     expect(A.length, b.length);
     for (int i = 0; i < A.length; i++) {
       expect(A.get(i), equals(b.get(A.length - 1 - i)));
@@ -334,14 +334,14 @@ abstract class IntVectorTest {
   }
 
   void testPart() {
-    IntVector b = A.part(15, 11);
+    AbstractIntVector b = A.part(15, 11);
     for (int i = 0; i < 11; i++) {
       expect(A.get(15 + i), equals(b.get(i)));
     }
   }
 
   void testWhere() {
-    IntVector b = A.where((int element) {
+    AbstractIntVector b = A.where((int element) {
       return element % 2 == 0;
     });
     for (int i = 0; i < b.length; i++) {
@@ -354,7 +354,7 @@ abstract class IntVectorTest {
 
   void testSelect() {
     final indexes = new Int32List.fromList([5, 11, 22, 37, 101]);
-    IntVector b = A.select(indexes);
+    AbstractIntVector b = A.select(indexes);
     for (int i = 0; i < indexes.length; i++) {
       expect(A.get(indexes[i]), equals(b.get(i)));
     }
@@ -369,7 +369,7 @@ abstract class IntVectorTest {
 
   void testStrides() {
     int stride = 3;
-    IntVector b = A.strides(stride);
+    AbstractIntVector b = A.strides(stride);
     for (int i = 0; i < b.length; i++) {
       expect(A.get(i * stride), equals(b.get(i)));
     }

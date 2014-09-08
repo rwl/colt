@@ -16,12 +16,12 @@ part of cern.colt.matrix;
  * @version 1.0, 09/24/99
  * @author Piotr Wendykier (piotr.wendykier@gmail.com)
  */
-class DelegateDoubleVector extends DoubleVector {
+class DelegateDoubleVector extends AbstractDoubleVector {
 
   /*
    * The elements of the matrix.
    */
-  DoubleMatrix _content;
+  AbstractDoubleMatrix _content;
 
   /*
    * The row this view is bound to.
@@ -36,7 +36,7 @@ class DelegateDoubleVector extends DoubleVector {
    * @param row
    *            the row this view is bound to
    */
-  DelegateDoubleVector(DoubleMatrix newContent, int row) {
+  DelegateDoubleVector(AbstractDoubleMatrix newContent, int row) {
     if (row < 0 || row >= newContent.rows) {
       throw new ArgumentError();
     }
@@ -49,11 +49,11 @@ class DelegateDoubleVector extends DoubleVector {
     return _content.get(_row, index);
   }
 
-  DoubleVector like1D(int size) {
+  AbstractDoubleVector like1D(int size) {
     return _content.like1D(size);
   }
 
-  DoubleMatrix like2D(int rows, int columns) {
+  AbstractDoubleMatrix like2D(int rows, int columns) {
     return _content.like2D(rows, columns);
   }
 
@@ -65,7 +65,7 @@ class DelegateDoubleVector extends DoubleVector {
     return _content.elements();
   }
 
-  DoubleMatrix reshape(int rows, int columns) {
+  AbstractDoubleMatrix reshape(int rows, int columns) {
     throw new ArgumentError("This method is not supported.");
   }
 
@@ -73,7 +73,7 @@ class DelegateDoubleVector extends DoubleVector {
     throw new IllegalArgumentException("This method is not supported.");
   }*/
 
-  DoubleVector _viewSelectionLike(Int32List offsets) {
+  AbstractDoubleVector _viewSelectionLike(Int32List offsets) {
     throw new Error(); // should never get called
   }
 

@@ -41,10 +41,10 @@ testComplexVector(String name, ComplexVectorTest t) {
 abstract class ComplexVectorTest {
 
   /** Matrix to test. */
-  ComplexVector A;
+  AbstractComplexVector A;
 
   /** Matrix of the same size as [A]. */
-  ComplexVector B;
+  AbstractComplexVector B;
 
   int SIZE = 2 * 17 * 5;
 
@@ -92,7 +92,7 @@ abstract class ComplexVectorTest {
   }
 
   void testAssign() {
-    ComplexVector Acopy = A.copy();
+    AbstractComplexVector Acopy = A.copy();
     A.forEach(acos);
     for (int i = 0; i < A.length; i++) {
       Float64List expected = Complex.acos(Acopy.get(i));
@@ -109,8 +109,8 @@ abstract class ComplexVectorTest {
   }
 
   void testAssignMatrixFunc() {
-    ComplexVector Acopy = A.copy();
-    A.forEachVector(B, div);
+    AbstractComplexVector Acopy = A.copy();
+    A.forEachWith(B, div);
     for (int i = 0; i < A.length; i++) {
       assertEquals(Complex.div_(Acopy.get(i), B.get(i)), A.get(i), TOL);
     }
@@ -124,7 +124,7 @@ abstract class ComplexVectorTest {
         return false;
       }
     }
-    ComplexVector Acopy = A.copy();
+    AbstractComplexVector Acopy = A.copy();
     A.forEachWhere(procedure, tan);
     for (int i = 0; i < A.length; i++) {
       if (Complex.abs(Acopy.get(i)) > 0.1) {
@@ -143,7 +143,7 @@ abstract class ComplexVectorTest {
         return false;
       }
     }
-    ComplexVector Acopy = A.copy();
+    AbstractComplexVector Acopy = A.copy();
     Float64List value = new Float64List.fromList([-1.0, -1.0]);
     A.fillWhere(procedure, value);
     for (int i = 0; i < A.length; i++) {
@@ -156,7 +156,7 @@ abstract class ComplexVectorTest {
   }
 
   void testAssignRealFunc() {
-    ComplexVector Acopy = A.copy();
+    AbstractComplexVector Acopy = A.copy();
     A.forEachReal(abs);
     for (int i = 0; i < A.length; i++) {
       Float64List elem = A.get(i);
@@ -191,8 +191,8 @@ abstract class ComplexVectorTest {
   }
 
   void testAssignImaginary() {
-    ComplexVector Acopy = A.copy();
-    DoubleVector Im = DoubleFactory1D.dense.random(A.length);
+    AbstractComplexVector Acopy = A.copy();
+    AbstractDoubleVector Im = DoubleFactory1D.dense.random(A.length);
     A.setImaginary(Im);
     for (int i = 0; i < A.length; i++) {
       Float64List elem = A.get(i);
@@ -202,8 +202,8 @@ abstract class ComplexVectorTest {
   }
 
   void testAssignReal() {
-    ComplexVector Acopy = A.copy();
-    DoubleVector Re = DoubleFactory1D.dense.random(A.length);
+    AbstractComplexVector Acopy = A.copy();
+    AbstractDoubleVector Re = DoubleFactory1D.dense.random(A.length);
     A.setReal(Re);
     for (int i = 0; i < A.length; i++) {
       Float64List elem = A.get(i);
@@ -231,14 +231,14 @@ abstract class ComplexVectorTest {
   }
 
   void testGetImaginaryPart() {
-    DoubleVector Im = A.imaginary();
+    AbstractDoubleVector Im = A.imaginary();
     for (int i = 0; i < A.length; i++) {
       expect(A.get(i)[1], closeTo(Im.get(i), TOL));
     }
   }
 
   void testGetRealPart() {
-    DoubleVector Re = A.real();
+    AbstractDoubleVector Re = A.real();
     for (int i = 0; i < A.length; i++) {
       expect(A.get(i)[0], closeTo(Re.get(i), TOL));
     }
@@ -259,7 +259,7 @@ abstract class ComplexVectorTest {
   void testReshape() {
     int rows = 10;
     int columns = 17;
-    ComplexMatrix B = A.reshape(rows, columns);
+    AbstractComplexMatrix B = A.reshape(rows, columns);
     int idx = 0;
     for (int c = 0; c < columns; c++) {
       for (int r = 0; r < rows; r++) {
@@ -284,8 +284,8 @@ abstract class ComplexVectorTest {
   }*/
 
   void testSwap() {
-    ComplexVector Acopy = A.copy();
-    ComplexVector Bcopy = B.copy();
+    AbstractComplexVector Acopy = A.copy();
+    AbstractComplexVector Bcopy = B.copy();
     A.swap(B);
     for (int i = 0; i < A.length; i++) {
       assertEquals(Bcopy.get(i), A.get(i), TOL);
@@ -313,21 +313,21 @@ abstract class ComplexVectorTest {
   }
 
   void testViewFlip() {
-    ComplexVector B = A.flip();
+    AbstractComplexVector B = A.flip();
     for (int i = 0; i < A.length; i++) {
       assertEquals(A.get(A.length - 1 - i), B.get(i), TOL);
     }
   }
 
   void testViewPart() {
-    ComplexVector B = A.part(A.length ~/ 2, A.length ~/ 3);
+    AbstractComplexVector B = A.part(A.length ~/ 2, A.length ~/ 3);
     for (int i = 0; i < A.length / 3; i++) {
       assertEquals(A.get(A.length ~/ 2 + i), B.get(i), TOL);
     }
   }
 
   void testViewSelectionProc() {
-    ComplexVector B = A.where((Float64List element) {
+    AbstractComplexVector B = A.where((Float64List element) {
       if (element[0] < element[1]) {
         return true;
       } else {
@@ -344,7 +344,7 @@ abstract class ComplexVectorTest {
 
   void testViewSelection() {
     Int32List indexes = new Int32List.fromList([A.length ~/ 6, A.length ~/ 5, A.length ~/ 4, A.length ~/ 3, A.length ~/ 2]);
-    ComplexVector B = A.select(indexes);
+    AbstractComplexVector B = A.select(indexes);
     for (int i = 0; i < indexes.length; i++) {
       assertEquals(A.get(indexes[i]), B.get(i), TOL);
     }
@@ -352,7 +352,7 @@ abstract class ComplexVectorTest {
 
   void testViewStrides() {
     int stride = 3;
-    ComplexVector B = A.strides(stride);
+    AbstractComplexVector B = A.strides(stride);
     for (int i = 0; i < B.length; i++) {
       assertEquals(A.get(i * stride), B.get(i), TOL);
     }

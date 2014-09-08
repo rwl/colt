@@ -8,7 +8,7 @@ import 'package:btf/btf.dart' as btf;
 import '../../matrix.dart';
 import 'algo.dart';
 
-typedef void solve(DoubleMatrix A, DoubleVector b);
+typedef void solve(AbstractDoubleMatrix A, AbstractDoubleVector b);
 
 /**
  * For a square matrix <tt>A</tt>, the LU decomposition is an unit lower
@@ -35,7 +35,7 @@ abstract class SparseDoubleLUDecomposition {
    *
    * @return <tt>L</tt>
    */
-  DoubleMatrix getL();
+  AbstractDoubleMatrix getL();
 
   /**
    * Returns a copy of the pivot permutation vector.
@@ -49,7 +49,7 @@ abstract class SparseDoubleLUDecomposition {
    *
    * @return <tt>U</tt>
    */
-  DoubleMatrix getU();
+  AbstractDoubleMatrix getU();
 
   /**
    * Returns a copy of the symbolic LU analysis object
@@ -75,7 +75,7 @@ abstract class SparseDoubleLUDecomposition {
    * @exception ArgumentError
    *                if <tt>b.size() != A.rows()</tt> or if A is singular.
    */
-  void solve(DoubleVector b);
+  void solve(AbstractDoubleVector b);
 
 }
 
@@ -87,8 +87,8 @@ abstract class SparseDoubleLUDecomposition {
 class CSparseDoubleLUDecomposition implements SparseDoubleLUDecomposition {
   Dcss _S;
   Dcsn _N;
-  DoubleMatrix _L;
-  DoubleMatrix _U;
+  AbstractDoubleMatrix _L;
+  AbstractDoubleMatrix _U;
   bool _rcMatrix = false;
   bool _isNonSingular = true;
   /**
@@ -114,7 +114,7 @@ class CSparseDoubleLUDecomposition implements SparseDoubleLUDecomposition {
      * @throws ArgumentError
      *             if <tt>order</tt> is not in [0,3]
      */
-  CSparseDoubleLUDecomposition(DoubleMatrix A, int order, bool checkIfSingular) {
+  CSparseDoubleLUDecomposition(AbstractDoubleMatrix A, int order, bool checkIfSingular) {
     DoubleProperty.DEFAULT.checkSquare(A);
     DoubleProperty.DEFAULT.checkSparse2D(A);
 
@@ -170,7 +170,7 @@ class CSparseDoubleLUDecomposition implements SparseDoubleLUDecomposition {
     return det;
   }
 
-  DoubleMatrix getL() {
+  AbstractDoubleMatrix getL() {
     if (_L == null) {
       _L = new SparseCCDoubleMatrix(_N.L);
       if (_rcMatrix) {
@@ -190,7 +190,7 @@ class CSparseDoubleLUDecomposition implements SparseDoubleLUDecomposition {
     return pinv;
   }
 
-  DoubleMatrix getU() {
+  AbstractDoubleMatrix getU() {
     if (_U == null) {
       _U = new SparseCCDoubleMatrix(_N.U);
       if (_rcMatrix) {
@@ -217,7 +217,7 @@ class CSparseDoubleLUDecomposition implements SparseDoubleLUDecomposition {
     return _isNonSingular;
   }
 
-  void solve(DoubleVector b) {
+  void solve(AbstractDoubleVector b) {
     if (b.length != _n) {
       throw new ArgumentError("b.size() != A.rows()");
     }
@@ -260,8 +260,8 @@ class SparseDoubleKLUDecomposition implements SparseDoubleLUDecomposition {
   klu.KLU_symbolic _S;
   klu.KLU_numeric _N;
   klu.KLU_common _Common;
-  DoubleMatrix _L;
-  DoubleMatrix _U;
+  AbstractDoubleMatrix _L;
+  AbstractDoubleMatrix _U;
   bool _rcMatrix = false;
   bool _isNonSingular = true;
   /**
@@ -287,7 +287,7 @@ class SparseDoubleKLUDecomposition implements SparseDoubleLUDecomposition {
      * @throws ArgumentError
      *             if <tt>order</tt> is not in [0,1]
      */
-  SparseDoubleKLUDecomposition(DoubleMatrix A, int order, bool checkIfSingular, [bool preOrder = true]) {
+  SparseDoubleKLUDecomposition(AbstractDoubleMatrix A, int order, bool checkIfSingular, [bool preOrder = true]) {
     DoubleProperty.DEFAULT.checkSquare(A);
     DoubleProperty.DEFAULT.checkSparse2D(A);
 
@@ -349,7 +349,7 @@ class SparseDoubleKLUDecomposition implements SparseDoubleLUDecomposition {
     return det;
   }
 
-  DoubleMatrix getL() {
+  AbstractDoubleMatrix getL() {
     if (_L == null) {
       Int32List Lp = new Int32List(_N.lnz + 1);
       Int32List Li = new Int32List(_N.lnz);
@@ -371,7 +371,7 @@ class SparseDoubleKLUDecomposition implements SparseDoubleLUDecomposition {
     return pinv;
   }
 
-  DoubleMatrix getU() {
+  AbstractDoubleMatrix getU() {
     if (_U == null) {
       Int32List Up = new Int32List(_N.unz + 1);
       Int32List Ui = new Int32List(_N.unz);
@@ -410,7 +410,7 @@ class SparseDoubleKLUDecomposition implements SparseDoubleLUDecomposition {
     return _isNonSingular;
   }
 
-  void solve(DoubleVector b) {
+  void solve(AbstractDoubleVector b) {
     if (b.length != _n) {
       throw new ArgumentError("b.size() != A.rows()");
     }

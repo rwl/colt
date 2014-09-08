@@ -8,45 +8,148 @@ It is provided "as is" without expressed or implied warranty.
  */
 part of cern.colt.matrix;
 
-typedef bool ComplexVectorProcedure(ComplexVector element);
-
 /**
- * Abstract base class for 2-d matrices holding <tt>complex</tt> elements.
- *
- * A matrix has a number of rows and columns, which are assigned upon instance
- * construction - The matrix's size is then <tt>rows()*columns()</tt>. Elements
- * are accessed via <tt>[row,column]</tt> coordinates. Legal coordinates range
- * from <tt>[0,0]</tt> to <tt>[rows()-1,columns()-1]</tt>. Any attempt to access
- * an element at a coordinate
- * <tt>column&lt;0 || column&gt;=columns() || row&lt;0 || row&gt;=rows()</tt>
- * will throw an <tt>IndexOutOfBoundsException</tt>.
+ * Dense 2-d matrix holding <tt>complex</tt> elements. <b>Implementation:</b>
  * <p>
- * <b>Note</b> that this implementation is not synchronized.
+ * Internally holds one single contigous one-dimensional array, addressed in row
+ * major. Complex data is represented by 2 double values in sequence, i.e.
+ * elements[idx] constitute the real part and elements[idx+1] constitute the
+ * imaginary part, where idx = index(0,0) + row * rowStride + column *
+ * columnStride. Note that this implementation is not synchronized.
+ * <p>
+ * Cells are internally addressed in row-major. Applications demanding utmost
+ * speed can exploit this fact. Setting/getting values in a loop row-by-row is
+ * quicker than column-by-column. Thus
+ *
+ * <pre>
+ * for (int row = 0; row &lt; rows; row++) {
+ *     for (int column = 0; column &lt; columns; column++) {
+ *         matrix.setQuick(row, column, someValue);
+ *     }
+ * }
+ * </pre>
+ *
+ * is quicker than
+ *
+ * <pre>
+ * for (int column = 0; column &lt; columns; column++) {
+ *     for (int row = 0; row &lt; rows; row++) {
+ *         matrix.setQuick(row, column, someValue);
+ *     }
+ * }
+ * </pre>
+ *
  *
  * @author Piotr Wendykier (piotr.wendykier@gmail.com)
  *
  */
-abstract class ComplexMatrix extends AbstractMatrix {
+class ComplexMatrix extends AbstractComplexMatrix {
 
   /**
-   * Makes this class non instantiable, but still let's others inherit from
-   * it.
+   * The elements of this matrix. elements are stored in row major. Complex
+   * data is represented by 2 double values in sequence, i.e. elements[idx]
+   * constitute the real part and elements[idx+1] constitute the imaginary
+   * part, where idx = index(0,0) + row * rowStride + column * columnStride.
    */
-  ComplexMatrix() {
+  Float64List _elements;
+
+  /**
+   * Constructs a matrix with a copy of the given values. <tt>values</tt> is
+   * required to have the form
+   * <tt>re = values[row][2*column]; im = values[row][2*column+1]</tt> and
+   * have exactly the same number of rows and columns as the receiver. Due to
+   * the fact that complex data is represented by 2 double values in sequence:
+   * the real and imaginary parts, the new matrix will be of the size
+   * values.length by values[0].length / 2.
+   * <p>
+   * The values are copied. So subsequent changes in <tt>values</tt> are not
+   * reflected in the matrix, and vice-versa.
+   *
+   * @param values
+   *            The values to be filled into the new matrix.
+   * @throws ArgumentError
+   *             if
+   *             <tt>for any 1 &lt;= row &lt; values.length: values[row].length != values[row-1].length</tt>
+   *             .
+   */
+  factory ComplexMatrix.fromList(List<Float64List> values) {
+    return new ComplexMatrix(values.length, values.length == 0 ? 0 : values[0].length / 2)
+      ..setAll2D(values);
   }
 
   /**
-   * Applies a function to each cell and aggregates the results.
+   * Constructs a complex matrix with the same size as <tt>realPart</tt>
+   * matrix and fills the real part of this matrix with elements of
+   * <tt>realPart</tt>.
    *
-   * @param aggr
-   *            an aggregation function taking as first argument the current
-   *            aggregation and as second argument the transformed current
-   *            cell value.
-   * @param f
-   *            a function transforming the current cell value.
-   * @return the aggregated measure.
-   * @see cern.jet.math.tdcomplex.ComplexFunctions
+   * @param realPart
+   *            a real matrix whose elements become a real part of this matrix
+   * @throws ArgumentError
+   *             if
+   *             <tt>rows<0 || columns<0 || (double)columns*rows > Integer.MAX_VALUE</tt>
+   *             .
    */
+  factory ComplexMatrix.fromRealPart(AbstractDoubleMatrix realPart) {
+    return new ComplexMatrix(realPart.rows, realPart.columns)..setReal(realPart);
+  }
+
+  /**
+   * Constructs a matrix with a given number of rows and columns. All entries
+   * are initially <tt>0</tt>.
+   *
+   * @param rows
+   *            the number of rows the matrix shall have.
+   * @param columns
+   *            the number of columns the matrix shall have.
+   * @throws ArgumentError
+   *             if
+   *             <tt>rows<0 || columns<0 || (double)columns*rows > Integer.MAX_VALUE</tt>
+   *             .
+   */
+  /*DenseComplexMatrix(int rows, int columns) {
+        _setUp(rows, columns, 0, 0, 2 * columns, 2);
+        this._elements = new Float64List(rows * 2 * columns);
+    }*/
+
+  /**
+   * Constructs a matrix with the given parameters.
+   *
+   * @param rows
+   *            the number of rows the matrix shall have.
+   * @param columns
+   *            the number of columns the matrix shall have.
+   * @param elements
+   *            the cells.
+   * @param rowZero
+   *            the position of the first element.
+   * @param columnZero
+   *            the position of the first element.
+   * @param rowStride
+   *            the number of elements between two rows, i.e.
+   *            <tt>index(i+1,j)-index(i,j)</tt>.
+   * @param columnStride
+   *            the number of elements between two columns, i.e.
+   *            <tt>index(i,j+1)-index(i,j)</tt>.
+   * @param isNoView
+   *            if false then the view is constructed
+   *
+   * @throws ArgumentError
+   *             if
+   *             <tt>rows<0 || columns<0 || (double)columns*rows > Integer.MAX_VALUE</tt>
+   *             or flip's are illegal.
+   */
+  ComplexMatrix(int rows, int columns, [Float64List elements = null, int rowZero = 0, int columnZero = 0, int rowStride = null, int columnStride = 2, bool isNoView = true]) {
+    if (rowStride == null) {
+      rowStride = 2 * columns;
+    }
+    if (elements == null) {
+      elements = new Float64List(rows * 2 * columns);
+    }
+    _setUp(rows, columns, rowZero, columnZero, rowStride, columnStride);
+    this._elements = elements;
+    this._isNoView = isNoView;
+  }
+
   Float64List reduce(final cfunc.ComplexComplexComplexFunction aggr, final cfunc.ComplexComplexFunction f) {
     Float64List b = new Float64List(2);
     if (length == 0) {
@@ -54,21 +157,24 @@ abstract class ComplexMatrix extends AbstractMatrix {
       b[1] = double.NAN;
       return b;
     }
+    final int zero = index(0, 0);
     Float64List a = null;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
       List<Future> futures = new List<Future>(nthreads);
-      int k = _rows ~/ nthreads;
+      int k = _rows / nthreads;
       for (int j = 0; j < nthreads; j++) {
         final int firstRow = j * k;
         final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
         futures[j] = ConcurrencyUtils.submit(() {
-          Float64List a = f(get(firstRow, 0));
+          int idx = zero + firstRow * _rowStride;
+          Float64List a = f(_elements[idx], _elements[idx + 1]);
           int d = 1;
           for (int r = firstRow; r < lastRow; r++) {
             for (int c = d; c < _columns; c++) {
-              a = aggr(a, f(get(r, c)));
+              idx = zero + r * _rowStride + c * _columnStride;
+              a = aggr(a, f(_elements[idx], _elements[idx + 1]));
             }
             d = 0;
           }
@@ -77,11 +183,13 @@ abstract class ComplexMatrix extends AbstractMatrix {
       }
       a = ConcurrencyUtils.waitForCompletion(futures, aggr);
     } else {*/
-    a = f(get(0, 0));
+    a = f(new Float64List.fromList([_elements[zero], _elements[zero + 1]]));
     int d = 1; // first cell already done
+    int idx;
     for (int r = 0; r < _rows; r++) {
       for (int c = d; c < _columns; c++) {
-        a = aggr(a, f(get(r, c)));
+        idx = zero + r * _rowStride + c * _columnStride;
+        a = aggr(a, f(new Float64List.fromList([_elements[idx], _elements[idx + 1]])));
       }
       d = 0;
     }
@@ -89,23 +197,10 @@ abstract class ComplexMatrix extends AbstractMatrix {
     return a;
   }
 
-  /**
-   * Applies a function to each corresponding cell of two matrices and
-   * aggregates the results.
-   *
-   * @param aggr
-   *            an aggregation function taking as first argument the current
-   *            aggregation and as second argument the transformed current
-   *            cell values.
-   * @param f
-   *            a function transforming the current cell values.
-   * @return the aggregated measure.
-   * @throws ArgumentError
-   *             if
-   *             <tt>columns() != other.columns() || rows() != other.rows()</tt>
-   * @see cern.jet.math.tdcomplex.ComplexFunctions
-   */
-  Float64List reduceMatrix(final ComplexMatrix other, final cfunc.ComplexComplexComplexFunction aggr, final cfunc.ComplexComplexComplexFunction f) {
+  Float64List reduceMatrix(final AbstractComplexMatrix other, final cfunc.ComplexComplexComplexFunction aggr, final cfunc.ComplexComplexComplexFunction f) {
+    if (!(other is ComplexMatrix)) {
+      return super.reduceMatrix(other, aggr, f);
+    }
     checkShape(other);
     Float64List b = new Float64List(2);
     if (length == 0) {
@@ -113,21 +208,30 @@ abstract class ComplexMatrix extends AbstractMatrix {
       b[1] = double.NAN;
       return b;
     }
+    final int zero = index(0, 0);
+    final int zeroOther = other.index(0, 0);
+    final int rowStrideOther = other.rowStride;
+    final int columnStrideOther = other.columnStride;
+    final Float64List elemsOther = other.elements() as Float64List;
     Float64List a = null;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
       List<Future> futures = new List<Future>(nthreads);
-      int k = _rows ~/ nthreads;
+      int k = _rows / nthreads;
       for (int j = 0; j < nthreads; j++) {
         final int firstRow = j * k;
         final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
         futures[j] = ConcurrencyUtils.submit(() {
-          Float64List a = f(get(firstRow, 0), other.get(firstRow, 0));
+          int idx = zero + firstRow * _rowStride;
+          int idxOther = zeroOther + firstRow * rowStrideOther;
+          Float64List a = f([_elements[idx], _elements[idx + 1]], [elemsOther[idxOther], elemsOther[idxOther + 1]]);
           int d = 1;
           for (int r = firstRow; r < lastRow; r++) {
             for (int c = d; c < _columns; c++) {
-              a = aggr(a, f(get(r, c), other.get(r, c)));
+              idx = zero + r * _rowStride + c * _columnStride;
+              idxOther = zeroOther + r * rowStrideOther + c * columnStrideOther;
+              a = aggr(a, f([_elements[idx], _elements[idx + 1]], [elemsOther[idxOther], elemsOther[idxOther + 1]]));
             }
             d = 0;
           }
@@ -136,11 +240,15 @@ abstract class ComplexMatrix extends AbstractMatrix {
       }
       a = ConcurrencyUtils.waitForCompletion(futures, aggr);
     } else {*/
-    a = f(get(0, 0), other.get(0, 0));
+    int idx;
+    int idxOther;
+    a = f(new Float64List.fromList([_elements[zero], _elements[zero + 1]]), new Float64List.fromList([elemsOther[zeroOther], elemsOther[zeroOther + 1]]));
     int d = 1; // first cell already done
     for (int r = 0; r < _rows; r++) {
       for (int c = d; c < _columns; c++) {
-        a = aggr(a, f(get(r, c), other.get(r, c)));
+        idx = zero + r * _rowStride + c * _columnStride;
+        idxOther = zeroOther + r * rowStrideOther + c * columnStrideOther;
+        a = aggr(a, f(new Float64List.fromList([_elements[idx], _elements[idx + 1]]), new Float64List.fromList([elemsOther[idxOther], elemsOther[idxOther + 1]])));
       }
       d = 0;
     }
@@ -148,200 +256,312 @@ abstract class ComplexMatrix extends AbstractMatrix {
     return a;
   }
 
-  /**
-   * Assigns the result of a function to each cell;
-   *
-   * @param f
-   *            a function object taking as argument the current cell's value.
-   * @return <tt>this</tt> (for convenience only).
-   * @see cern.jet.math.tdcomplex.ComplexFunctions
-   */
-  ComplexMatrix forEach(final cfunc.ComplexComplexFunction f) {
+  AbstractComplexMatrix forEach(final cfunc.ComplexComplexFunction function) {
+    final int zero = index(0, 0);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+      if (function is ComplexMult) {
+        Float64List multiplicator = (function as ComplexMult).multiplicator;
+        if (multiplicator[0] == 1 && multiplicator[1] == 0) return this;
+        if (multiplicator[0] == 0 && multiplicator[1] == 0) return assignValue(0, 0);
+      }
       nthreads = Math.min(nthreads, _rows);
       List<Future> futures = new List<Future>(nthreads);
-      int k = _rows ~/ nthreads;
+      int k = _rows / nthreads;
       for (int j = 0; j < nthreads; j++) {
         final int firstRow = j * k;
         final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
         futures[j] = ConcurrencyUtils.submit(() {
-          for (int r = firstRow; r < lastRow; r++) {
-            for (int c = 0; c < _columns; c++) {
-              set(r, c, f(get(r, c)));
-            }
-          }
-        });
-      }
-      ConcurrencyUtils.waitForCompletion(futures);
-    } else {*/
-    for (int r = 0; r < _rows; r++) {
-      for (int c = 0; c < _columns; c++) {
-        set(r, c, f(get(r, c)));
-      }
-    }
-    //}
-    return this;
-  }
-
-  /**
-   * Assigns the result of a function to all cells that satisfy a condition.
-   *
-   * @param cond
-   *            a condition.
-   *
-   * @param f
-   *            a function object.
-   * @return <tt>this</tt> (for convenience only).
-   * @see cern.jet.math.tdcomplex.ComplexFunctions
-   */
-  ComplexMatrix forEachWhere(final cfunc.ComplexProcedure cond, final cfunc.ComplexComplexFunction f) {
-    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-      nthreads = Math.min(nthreads, _rows);
-      List<Future> futures = new List<Future>(nthreads);
-      int k = _rows ~/ nthreads;
-      for (int j = 0; j < nthreads; j++) {
-        final int firstRow = j * k;
-        final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
-        futures[j] = ConcurrencyUtils.submit(() {
-          Float64List elem;
-          for (int r = firstRow; r < lastRow; r++) {
-            for (int c = 0; c < _columns; c++) {
-              elem = get(r, c);
-              if (cond(elem) == true) {
-                set(r, c, f(elem));
+          int idx = zero + firstRow * _rowStride;
+          Float64List tmp = new Float64List(2);
+          if (function is ComplexMult) {
+            Float64List multiplicator = (function as ComplexMult).multiplicator;
+            // x[i] = mult*x[i]
+            for (int r = firstRow; r < lastRow; r++) {
+              for (int i = idx,
+                  c = 0; c < _columns; c++) {
+                tmp[0] = _elements[i];
+                tmp[1] = _elements[i + 1];
+                _elements[i] = tmp[0] * multiplicator[0] - tmp[1] * multiplicator[1];
+                _elements[i + 1] = tmp[1] * multiplicator[0] + tmp[0] * multiplicator[1];
+                i += _columnStride;
               }
+              idx += _rowStride;
             }
-          }
-        });
-      }
-      ConcurrencyUtils.waitForCompletion(futures);
-    } else {*/
-    Float64List elem;
-    for (int r = 0; r < _rows; r++) {
-      for (int c = 0; c < _columns; c++) {
-        elem = get(r, c);
-        if (cond(elem) == true) {
-          set(r, c, f(elem));
-        }
-      }
-    }
-    //}
-    return this;
-  }
-
-  /**
-   * Assigns a value to all cells that satisfy a condition.
-   *
-   * @param cond
-   *            a condition.
-   *
-   * @param value
-   *            a value (re=value[0], im=value[1]).
-   * @return <tt>this</tt> (for convenience only).
-   *
-   */
-  ComplexMatrix fillWhere(final cfunc.ComplexProcedure cond, final Float64List value) {
-    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-      nthreads = Math.min(nthreads, _rows);
-      List<Future> futures = new List<Future>(nthreads);
-      int k = _rows ~/ nthreads;
-      for (int j = 0; j < nthreads; j++) {
-        final int firstRow = j * k;
-        final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
-        futures[j] = ConcurrencyUtils.submit(() {
-          Float64List elem;
-          for (int r = firstRow; r < lastRow; r++) {
-            for (int c = 0; c < _columns; c++) {
-              elem = get(r, c);
-              if (cond(elem) == true) {
-                set(r, c, value);
+          } else {
+            for (int r = firstRow; r < lastRow; r++) {
+              for (int i = idx,
+                  c = 0; c < _columns; c++) {
+                tmp = function(_elements[i], _elements[i + 1]);
+                _elements[i] = tmp[0];
+                _elements[i + 1] = tmp[1];
+                i += _columnStride;
               }
+              idx += _rowStride;
             }
           }
         });
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-    Float64List elem;
-    for (int r = 0; r < _rows; r++) {
-      for (int c = 0; c < _columns; c++) {
-        elem = get(r, c);
-        if (cond(elem) == true) {
-          set(r, c, value);
+    int idx = zero;
+    Float64List tmp = new Float64List(2);
+    if (function is cfunc.ComplexMult) {
+      Float64List multiplicator = (function as cfunc.ComplexMult).multiplicator;
+      // x[i] = mult*x[i]
+      for (int r = 0; r < _rows; r++) {
+        for (int i = idx,
+            c = 0; c < _columns; c++) {
+          tmp[0] = _elements[i];
+          tmp[1] = _elements[i + 1];
+          _elements[i] = tmp[0] * multiplicator[0] - tmp[1] * multiplicator[1];
+          _elements[i + 1] = tmp[1] * multiplicator[0] + tmp[0] * multiplicator[1];
+          i += _columnStride;
         }
+        idx += _rowStride;
       }
-    }
-    //}
-    return this;
-  }
-
-  /**
-   * Assigns the result of a function to the real part of the receiver. The
-   * imaginary part of the receiver is reset to zero.
-   *
-   * @param f
-   *            a function object taking as argument the current cell's value.
-   * @return <tt>this</tt> (for convenience only).
-   * @see cern.jet.math.tdcomplex.ComplexFunctions
-   */
-  ComplexMatrix forEachReal(final cfunc.ComplexRealFunction f) {
-    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-      nthreads = Math.min(nthreads, _rows);
-      List<Future> futures = new List<Future>(nthreads);
-      int k = _rows ~/ nthreads;
-      for (int j = 0; j < nthreads; j++) {
-        final int firstRow = j * k;
-        final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
-        futures[j] = ConcurrencyUtils.submit(() {
-          for (int r = firstRow; r < lastRow; r++) {
-            for (int c = 0; c < _columns; c++) {
-              double re = f(get(r, c));
-              set(r, c, re, 0);
-            }
-          }
-        });
-      }
-      ConcurrencyUtils.waitForCompletion(futures);
-    } else {*/
-    for (int r = 0; r < _rows; r++) {
-      for (int c = 0; c < _columns; c++) {
-        double re = f(get(r, c));
-        setParts(r, c, re, 0.0);
-      }
-    }
-    //}
-    return this;
-  }
-
-  /**
-   * Replaces all cell values of the receiver with the values of another
-   * matrix. Both matrices must have the same number of rows and columns. If
-   * both matrices share the same cells (as is the case if they are views
-   * derived from the same matrix) and intersect in an ambiguous way, then
-   * replaces <i>as if</i> using an intermediate auxiliary deep copy of
-   * <tt>other</tt>.
-   *
-   * @param other
-   *            the source matrix to copy from (may be identical to the
-   *            receiver).
-   * @return <tt>this</tt> (for convenience only).
-   * @throws ArgumentError
-   *             if
-   *             <tt>columns() != other.columns() || rows() != other.rows()</tt>
-   */
-  ComplexMatrix copyFrom(ComplexMatrix other) {
-    if (other == this) return this;
-    checkShape(other);
-    ComplexMatrix otherLoc;
-    if (_haveSharedCells(other)) {
-      otherLoc = other.copy();
     } else {
-      otherLoc = other;
+      for (int r = 0; r < _rows; r++) {
+        for (int i = idx,
+            c = 0; c < _columns; c++) {
+          tmp = function(new Float64List.fromList([_elements[i], _elements[i + 1]]));
+          _elements[i] = tmp[0];
+          _elements[i + 1] = tmp[1];
+          i += _columnStride;
+        }
+        idx += _rowStride;
+      }
     }
+    //}
+    return this;
+  }
+
+  AbstractComplexMatrix forEachWhere(final cfunc.ComplexProcedure cond, final cfunc.ComplexComplexFunction function) {
+    final int zero = index(0, 0);
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+      nthreads = Math.min(nthreads, _rows);
+      List<Future> futures = new List<Future>(nthreads);
+      int k = _rows / nthreads;
+      for (int j = 0; j < nthreads; j++) {
+        final int firstRow = j * k;
+        final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
+        futures[j] = ConcurrencyUtils.submit(() {
+          Float64List elem = new Float64List(2);
+          int idx = zero + firstRow * _rowStride;
+          for (int r = firstRow; r < lastRow; r++) {
+            for (int i = idx,
+                c = 0; c < _columns; c++) {
+              elem[0] = _elements[i];
+              elem[1] = _elements[i + 1];
+              if (cond(elem) == true) {
+                elem = function(elem);
+                _elements[i] = elem[0];
+                _elements[i + 1] = elem[1];
+              }
+              i += _columnStride;
+            }
+            idx += _rowStride;
+          }
+        });
+      }
+      ConcurrencyUtils.waitForCompletion(futures);
+    } else {*/
+    Float64List elem = new Float64List(2);
+    int idx = zero;
+    for (int r = 0; r < _rows; r++) {
+      for (int i = idx,
+          c = 0; c < _columns; c++) {
+        elem[0] = _elements[i];
+        elem[1] = _elements[i + 1];
+        if (cond(elem) == true) {
+          elem = function(elem);
+          _elements[i] = elem[0];
+          _elements[i + 1] = elem[1];
+        }
+        i += _columnStride;
+      }
+      idx += _rowStride;
+    }
+    //}
+    return this;
+  }
+
+  AbstractComplexMatrix fillWhere(final cfunc.ComplexProcedure cond, final Float64List value) {
+    final int zero = index(0, 0);
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+      nthreads = Math.min(nthreads, _rows);
+      List<Future> futures = new List<Future>(nthreads);
+      int k = _rows / nthreads;
+      for (int j = 0; j < nthreads; j++) {
+        final int firstRow = j * k;
+        final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
+        futures[j] = ConcurrencyUtils.submit(() {
+          int idx = zero + firstRow * _rowStride;
+          Float64List elem = new Float64List(2);
+          for (int r = firstRow; r < lastRow; r++) {
+            for (int i = idx,
+                c = 0; c < _columns; c++) {
+              elem[0] = _elements[i];
+              elem[1] = _elements[i + 1];
+              if (cond(elem) == true) {
+                _elements[i] = value[0];
+                _elements[i + 1] = value[1];
+              }
+              i += _columnStride;
+            }
+            idx += _rowStride;
+          }
+        });
+      }
+      ConcurrencyUtils.waitForCompletion(futures);
+    } else {*/
+    Float64List elem = new Float64List(2);
+    int idx = zero;
+    for (int r = 0; r < _rows; r++) {
+      for (int i = idx,
+          c = 0; c < _columns; c++) {
+        elem[0] = _elements[i];
+        elem[1] = _elements[i + 1];
+        if (cond(elem) == true) {
+          _elements[i] = value[0];
+          _elements[i + 1] = value[1];
+        }
+        i += _columnStride;
+      }
+      idx += _rowStride;
+    }
+    //}
+    return this;
+  }
+
+  AbstractComplexMatrix forEachReal(final cfunc.ComplexRealFunction function) {
+    final int zero = index(0, 0);
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+      nthreads = Math.min(nthreads, _rows);
+      List<Future> futures = new List<Future>(nthreads);
+      int k = _rows / nthreads;
+      for (int j = 0; j < nthreads; j++) {
+        final int firstRow = j * k;
+        final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
+        futures[j] = ConcurrencyUtils.submit(() {
+          int idx = zero + firstRow * _rowStride;
+          Float64List tmp = new Float64List(2);
+          if (function == cfunc.abs) {
+            for (int r = firstRow; r < lastRow; r++) {
+              for (int i = idx,
+                  c = 0; c < _columns; c++) {
+                tmp[0] = _elements[i];
+                tmp[1] = _elements[i + 1];
+                double absX = Math.abs(_elements[i]);
+                double absY = Math.abs(_elements[i + 1]);
+                if (absX == 0 && absY == 0) {
+                  _elements[i] = 0;
+                } else if (absX >= absY) {
+                  double d = tmp[1] / tmp[0];
+                  _elements[i] = absX * Math.sqrt(1 + d * d);
+                } else {
+                  double d = tmp[0] / tmp[1];
+                  _elements[i] = absY * Math.sqrt(1 + d * d);
+                }
+                _elements[i + 1] = 0;
+                i += _columnStride;
+              }
+              idx += _rowStride;
+            }
+          } else {
+            for (int r = firstRow; r < lastRow; r++) {
+              for (int i = idx,
+                  c = 0; c < _columns; c++) {
+                tmp[0] = _elements[i];
+                tmp[1] = _elements[i + 1];
+                tmp[0] = function(tmp);
+                _elements[i] = tmp[0];
+                _elements[i + 1] = 0;
+                i += _columnStride;
+              }
+              idx += _rowStride;
+            }
+          }
+        });
+      }
+      ConcurrencyUtils.waitForCompletion(futures);
+    } else {*/
+    int idx = zero;
+    Float64List tmp = new Float64List(2);
+    if (function == cfunc.abs) {
+      for (int r = 0; r < _rows; r++) {
+        for (int i = idx,
+            c = 0; c < _columns; c++) {
+          tmp[0] = _elements[i];
+          tmp[1] = _elements[i + 1];
+          double absX = tmp[0].abs();
+          double absY = tmp[1].abs();
+          if (absX == 0 && absY == 0) {
+            _elements[i] = 0.0;
+          } else if (absX >= absY) {
+            double d = tmp[1] / tmp[0];
+            _elements[i] = absX * Math.sqrt(1 + d * d);
+          } else {
+            double d = tmp[0] / tmp[1];
+            _elements[i] = absY * Math.sqrt(1 + d * d);
+          }
+          _elements[i + 1] = 0.0;
+          i += _columnStride;
+        }
+        idx += _rowStride;
+      }
+    } else {
+      for (int r = 0; r < _rows; r++) {
+        for (int i = idx,
+            c = 0; c < _columns; c++) {
+          tmp[0] = _elements[i];
+          tmp[1] = _elements[i + 1];
+          tmp[0] = function(tmp);
+          _elements[i] = tmp[0];
+          _elements[i + 1] = 0.0;
+          i += _columnStride;
+        }
+        idx += _rowStride;
+      }
+    }
+    //}
+    return this;
+  }
+
+  AbstractComplexMatrix copyFrom(final AbstractComplexMatrix source) {
+    // overriden for performance only
+    if (!(source is ComplexMatrix)) {
+      super.copyFrom(source);
+      return this;
+    }
+    ComplexMatrix other = source as ComplexMatrix;
+    if (other == this) return this; // nothing to do
+    checkShape(other);
+    if (this._isNoView && other._isNoView) { // quickest
+      //System.arraycopy(other._elements, 0, this._elements, 0, this._elements.length);
+      this._elements.setAll(0, other._elements);
+      return this;
+    }
+    if (_haveSharedCells(other)) {
+      AbstractComplexMatrix c = other.copy();
+      if (!(c is ComplexMatrix)) { // should not happen
+        super.copyFrom(other);
+        return this;
+      }
+      other = c as ComplexMatrix;
+    }
+
+    final Float64List elemsOther = other._elements;
+    if (_elements == null || elemsOther == null) {
+      throw new Error();
+    }
+    final int columnStrideOther = other._columnStride;
+    final int rowStrideOther = other._rowStride;
+    final int zeroOther = other.index(0, 0);
+    final int zero = index(0, 0);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
@@ -351,41 +571,57 @@ abstract class ComplexMatrix extends AbstractMatrix {
         final int firstRow = j * k;
         final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
         futures[j] = ConcurrencyUtils.submit(() {
+          int idx = zero + firstRow * _rowStride;
+          int idxOther = zeroOther + firstRow * rowStrideOther;
           for (int r = firstRow; r < lastRow; r++) {
-            for (int c = 0; c < _columns; c++) {
-              set(r, c, otherLoc.get(r, c));
+            for (int i = idx,
+                j = idxOther,
+                c = 0; c < _columns; c++) {
+              _elements[i] = elemsOther[j];
+              _elements[i + 1] = elemsOther[j + 1];
+              i += _columnStride;
+              j += columnStrideOther;
             }
+            idx += _rowStride;
+            idxOther += rowStrideOther;
           }
         });
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
+    int idx = zero;
+    int idxOther = zeroOther;
     for (int r = 0; r < _rows; r++) {
-      for (int c = 0; c < _columns; c++) {
-        set(r, c, otherLoc.get(r, c));
+      for (int i = idx,
+          j = idxOther,
+          c = 0; c < _columns; c++) {
+        _elements[i] = elemsOther[j];
+        _elements[i + 1] = elemsOther[j + 1];
+        i += _columnStride;
+        j += columnStrideOther;
       }
+      idx += _rowStride;
+      idxOther += rowStrideOther;
     }
     //}
     return this;
   }
 
-  /**
-   * Assigns the result of a function to each cell.
-   *
-   * @param y
-   *            the secondary matrix to operate on.
-   * @param f
-   *            a function object taking as first argument the current cell's
-   *            value of <tt>this</tt>, and as second argument the current
-   *            cell's value of <tt>y</tt>,
-   * @return <tt>this</tt> (for convenience only).
-   * @throws ArgumentError
-   *             if
-   *             <tt>columns() != other.columns() || rows() != other.rows()</tt>
-   * @see cern.jet.math.tdcomplex.ComplexFunctions
-   */
-  ComplexMatrix forEachMatrix(final ComplexMatrix y, final cfunc.ComplexComplexComplexFunction f) {
+  AbstractComplexMatrix forEachMatrix(final AbstractComplexMatrix y, final cfunc.ComplexComplexComplexFunction function) {
+    // overriden for performance only
+    if (!(y is ComplexMatrix)) {
+      super.forEachMatrix(y, function);
+      return this;
+    }
     checkShape(y);
+    final Float64List elemsOther = (y as ComplexMatrix)._elements;
+    if (_elements == null || elemsOther == null) {
+      throw new Error();
+    }
+    final int columnStrideOther = y.columnStride;
+    final int rowStrideOther = y.rowStride;
+    final int zeroOther = y.index(0, 0);
+    final int zero = index(0, 0);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
@@ -395,227 +631,342 @@ abstract class ComplexMatrix extends AbstractMatrix {
         final int firstRow = j * k;
         final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
         futures[j] = ConcurrencyUtils.submit(() {
-          for (int r = firstRow; r < lastRow; r++) {
-            for (int c = 0; c < _columns; c++) {
-              set(r, c, f(get(r, c), y.get(r, c)));
+          int idx = zero + firstRow * _rowStride;
+          int idxOther = zeroOther + firstRow * rowStrideOther;
+          Float64List tmp1 = new Float64List(2);
+          Float64List tmp2 = new Float64List(2);
+          if (function == cfunc.mult) {
+            for (int r = firstRow; r < lastRow; r++) {
+              for (int i = idx,
+                  j = idxOther,
+                  c = 0; c < _columns; c++) {
+                tmp1[0] = _elements[i];
+                tmp1[1] = _elements[i + 1];
+                tmp2[0] = elemsOther[j];
+                tmp2[1] = elemsOther[j + 1];
+                _elements[i] = tmp1[0] * tmp2[0] - tmp1[1] * tmp2[1];
+                _elements[i + 1] = tmp1[1] * tmp2[0] + tmp1[0] * tmp2[1];
+                i += _columnStride;
+                j += columnStrideOther;
+              }
+              idx += _rowStride;
+              idxOther += rowStrideOther;
+            }
+          } else if (function == cfunc.multConjFirst) {
+            for (int r = firstRow; r < lastRow; r++) {
+              for (int i = idx,
+                  j = idxOther,
+                  c = 0; c < _columns; c++) {
+                tmp1[0] = _elements[i];
+                tmp1[1] = _elements[i + 1];
+                tmp2[0] = elemsOther[j];
+                tmp2[1] = elemsOther[j + 1];
+                _elements[i] = tmp1[0] * tmp2[0] + tmp1[1] * tmp2[1];
+                _elements[i + 1] = -tmp1[1] * tmp2[0] + tmp1[0] * tmp2[1];
+                i += _columnStride;
+                j += columnStrideOther;
+              }
+              idx += _rowStride;
+              idxOther += rowStrideOther;
+            }
+
+          } else if (function == cfunc.multConjSecond) {
+            for (int r = firstRow; r < lastRow; r++) {
+              for (int i = idx,
+                  j = idxOther,
+                  c = 0; c < _columns; c++) {
+                tmp1[0] = _elements[i];
+                tmp1[1] = _elements[i + 1];
+                tmp2[0] = elemsOther[j];
+                tmp2[1] = elemsOther[j + 1];
+                _elements[i] = tmp1[0] * tmp2[0] + tmp1[1] * tmp2[1];
+                _elements[i + 1] = tmp1[1] * tmp2[0] - tmp1[0] * tmp2[1];
+                i += _columnStride;
+                j += columnStrideOther;
+              }
+              idx += _rowStride;
+              idxOther += rowStrideOther;
+            }
+          } else {
+            for (int r = firstRow; r < lastRow; r++) {
+              for (int i = idx,
+                  j = idxOther,
+                  c = 0; c < _columns; c++) {
+                tmp1[0] = _elements[i];
+                tmp1[1] = _elements[i + 1];
+                tmp2[0] = elemsOther[j];
+                tmp2[1] = elemsOther[j + 1];
+                tmp1 = function(tmp1, tmp2);
+                _elements[i] = tmp1[0];
+                _elements[i + 1] = tmp1[1];
+                i += _columnStride;
+                j += columnStrideOther;
+              }
+              idx += _rowStride;
+              idxOther += rowStrideOther;
             }
           }
         });
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-    for (int r = 0; r < _rows; r++) {
-      for (int c = 0; c < _columns; c++) {
-        set(r, c, f(get(r, c), y.get(r, c)));
+    Float64List tmp1 = new Float64List(2);
+    Float64List tmp2 = new Float64List(2);
+    int idx = zero;
+    int idxOther = zeroOther;
+    if (function == cfunc.mult) {
+      for (int r = 0; r < _rows; r++) {
+        for (int i = idx,
+            j = idxOther,
+            c = 0; c < _columns; c++) {
+          tmp1[0] = _elements[i];
+          tmp1[1] = _elements[i + 1];
+          tmp2[0] = elemsOther[j];
+          tmp2[1] = elemsOther[j + 1];
+          _elements[i] = tmp1[0] * tmp2[0] - tmp1[1] * tmp2[1];
+          _elements[i + 1] = tmp1[1] * tmp2[0] + tmp1[0] * tmp2[1];
+          i += _columnStride;
+          j += columnStrideOther;
+        }
+        idx += _rowStride;
+        idxOther += rowStrideOther;
+      }
+    } else if (function == cfunc.multConjFirst) {
+      for (int r = 0; r < _rows; r++) {
+        for (int i = idx,
+            j = idxOther,
+            c = 0; c < _columns; c++) {
+          tmp1[0] = _elements[i];
+          tmp1[1] = _elements[i + 1];
+          tmp2[0] = elemsOther[j];
+          tmp2[1] = elemsOther[j + 1];
+          _elements[i] = tmp1[0] * tmp2[0] + tmp1[1] * tmp2[1];
+          _elements[i + 1] = -tmp1[1] * tmp2[0] + tmp1[0] * tmp2[1];
+          i += _columnStride;
+          j += columnStrideOther;
+        }
+        idx += _rowStride;
+        idxOther += rowStrideOther;
+      }
+
+    } else if (function == cfunc.multConjSecond) {
+      for (int r = 0; r < _rows; r++) {
+        for (int i = idx,
+            j = idxOther,
+            c = 0; c < _columns; c++) {
+          tmp1[0] = _elements[i];
+          tmp1[1] = _elements[i + 1];
+          tmp2[0] = elemsOther[j];
+          tmp2[1] = elemsOther[j + 1];
+          _elements[i] = tmp1[0] * tmp2[0] + tmp1[1] * tmp2[1];
+          _elements[i + 1] = tmp1[1] * tmp2[0] - tmp1[0] * tmp2[1];
+          i += _columnStride;
+          j += columnStrideOther;
+        }
+        idx += _rowStride;
+        idxOther += rowStrideOther;
+      }
+    } else {
+      for (int r = 0; r < _rows; r++) {
+        for (int i = idx,
+            j = idxOther,
+            c = 0; c < _columns; c++) {
+          tmp1[0] = _elements[i];
+          tmp1[1] = _elements[i + 1];
+          tmp2[0] = elemsOther[j];
+          tmp2[1] = elemsOther[j + 1];
+          tmp1 = function(tmp1, tmp2);
+          _elements[i] = tmp1[0];
+          _elements[i + 1] = tmp1[1];
+          i += _columnStride;
+          j += columnStrideOther;
+        }
+        idx += _rowStride;
+        idxOther += rowStrideOther;
       }
     }
     //}
     return this;
   }
 
-  /**
-   * Assigns the result of a function to all cells with a given indexes
-   *
-   * @param y
-   *            the secondary matrix to operate on.
-   * @param function
-   *            a function object taking as first argument the current cell's
-   *            value of <tt>this</tt>, and as second argument the current
-   *            cell's value of <tt>y</tt>,
-   * @param rowList
-   *            row indexes.
-   * @param columnList
-   *            column indexes.
-   *
-   * @return <tt>this</tt> (for convenience only).
-   * @throws ArgumentError
-   *             if
-   *             <tt>columns() != other.columns() || rows() != other.rows()</tt>
-   * @see cern.jet.math.tdouble.DoubleFunctions
-   */
-  ComplexMatrix forEachMatrixRange(final ComplexMatrix y, final cfunc.ComplexComplexComplexFunction function, Int32List rowList, Int32List columnList) {
-    checkShape(y);
-    final int size = rowList.length;
-    final Int32List rowElements = rowList;
-    final Int32List columnElements = columnList;
-    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-      nthreads = Math.min(nthreads, _rows);
-      List<Future> futures = new List<Future>(nthreads);
-      int k = size ~/ nthreads;
-      for (int j = 0; j < nthreads; j++) {
-        final int firstIdx = j * k;
-        final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
-        futures[j] = ConcurrencyUtils.submit(() {
-          for (int i = firstIdx; i < lastIdx; i++) {
-            set(rowElements[i], columnElements[i], function(get(rowElements[i], columnElements[i]), y.get(rowElements[i], columnElements[i])));
-          }
-        });
-      }
-      ConcurrencyUtils.waitForCompletion(futures);
-    } else {*/
-    for (int i = 0; i < size; i++) {
-      set(rowElements[i], columnElements[i], function(get(rowElements[i], columnElements[i]), y.get(rowElements[i], columnElements[i])));
-    }
-    //}
-    return this;
-  }
-
-  /**
-   * Sets all cells to the state specified by <tt>re</tt> and <tt>im</tt>.
-   *
-   * @param re
-   *            the real part of the value to be filled into the cells.
-   * @param im
-   *            the imaginary part of the value to be filled into the cells.
-   *
-   * @return <tt>this</tt> (for convenience only).
-   */
-  ComplexMatrix fill(/*Float64List value*/final double re, final double im) {
+  AbstractComplexMatrix fill(final double re, final double im) {
+    final int zero = index(0, 0);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
       List<Future> futures = new List<Future>(nthreads);
-      int k = _rows ~/ nthreads;
+      int k = _rows / nthreads;
       for (int j = 0; j < nthreads; j++) {
         final int firstRow = j * k;
         final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
         futures[j] = ConcurrencyUtils.submit(() {
+          int idx = zero + firstRow * _rowStride;
           for (int r = firstRow; r < lastRow; r++) {
-            for (int c = 0; c < _columns; c++) {
-              set(r, c, re, im);
+            for (int i = idx,
+                c = 0; c < _columns; c++) {
+              _elements[i] = re;
+              _elements[i + 1] = im;
+              i += _columnStride;
             }
+            idx += _rowStride;
           }
         });
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
+    int idx = zero;
     for (int r = 0; r < _rows; r++) {
-      for (int c = 0; c < _columns; c++) {
-        setParts(r, c, re, im);
-        //set(r, c, value);
+      for (int i = idx,
+          c = 0; c < _columns; c++) {
+        _elements[i] = re;
+        _elements[i + 1] = im;
+        i += _columnStride;
       }
+      idx += _rowStride;
     }
     //}
     return this;
   }
 
-  /**
-   * Sets all cells to the state specified by <tt>values</tt>. <tt>values</tt>
-   * is required to have the form
-   * <tt>re = values[row*rowStride+column*columnStride]; im = values[row*rowStride+column*columnStride+1]</tt>
-   * and have exactly the same number of rows and columns as the receiver.
-   * <p>
-   * The values are copied. So subsequent changes in <tt>values</tt> are not
-   * reflected in the matrix, and vice-versa.
-   *
-   * @param values
-   *            the values to be filled into the cells.
-   * @return <tt>this</tt> (for convenience only).
-   * @throws ArgumentError
-   *             if <tt>values.length != rows()*2*columns()</tt>.
-   */
-  ComplexMatrix setAll(final Float64List values) {
+  AbstractComplexMatrix setAll(final Float64List values) {
     if (values.length != _rows * 2 * _columns) {
       throw new ArgumentError("Must have same length: length=${values.length} rows()*2*columns()=${rows * 2 * columns}");
     }
-    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-      nthreads = Math.min(nthreads, _rows);
-      List<Future> futures = new List<Future>(nthreads);
-      int k = _rows ~/ nthreads;
-      for (int j = 0; j < nthreads; j++) {
-        final int firstRow = j * k;
-        final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
-        futures[j] = ConcurrencyUtils.submit(() {
-          int idx = firstRow * _columns * 2;
-          for (int r = firstRow; r < lastRow; r++) {
-            for (int c = 0; c < _columns; c++) {
-              setParts(r, c, values[idx], values[idx + 1]);
-              idx += 2;
+    if (this._isNoView) {
+      //System.arraycopy(values, 0, this._elements, 0, values.length);
+      this._elements.setAll(0, values);
+    } else {
+      final int zero = index(0, 0);
+      /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
+      if ((nthreads > 1) && (_rows * _columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+        nthreads = Math.min(nthreads, _rows);
+        List<Future> futures = new List<Future>(nthreads);
+        int k = _rows / nthreads;
+        for (int j = 0; j < nthreads; j++) {
+          final int firstRow = j * k;
+          final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
+          futures[j] = ConcurrencyUtils.submit(() {
+            int idxOther = firstRow * _columns * 2;
+            int idx = zero + firstRow * _rowStride;
+            for (int r = firstRow; r < lastRow; r++) {
+              for (int i = idx,
+                  c = 0; c < _columns; c++) {
+                _elements[i] = values[idxOther++];
+                _elements[i + 1] = values[idxOther++];
+                i += _columnStride;
+              }
+              idx += _rowStride;
             }
-          }
-        });
+          });
+        }
+        ConcurrencyUtils.waitForCompletion(futures);
+      } else {*/
+      int idxOther = 0;
+      int idx = zero;
+      for (int r = 0; r < _rows; r++) {
+        for (int i = idx,
+            c = 0; c < _columns; c++) {
+          _elements[i] = values[idxOther++];
+          _elements[i + 1] = values[idxOther++];
+          i += _columnStride;
+        }
+        idx += _rowStride;
       }
-      ConcurrencyUtils.waitForCompletion(futures);
-    } else {*/
-    int idx = 0;
-    for (int r = 0; r < _rows; r++) {
-      for (int c = 0; c < _columns; c++) {
-        setParts(r, c, values[idx], values[idx + 1]);
-        idx += 2;
-      }
+      //}
     }
-    //}
     return this;
   }
 
-  /**
-   * Sets all cells to the state specified by <tt>values</tt>. <tt>values</tt>
-   * is required to have the form
-   * <tt>re = values[row][2*column]; im = values[row][2*column+1]</tt> and
-   * have exactly the same number of rows and columns as the receiver.
-   * <p>
-   * The values are copied. So subsequent changes in <tt>values</tt> are not
-   * reflected in the matrix, and vice-versa.
-   *
-   * @param values
-   *            the values to be filled into the cells.
-   * @return <tt>this</tt> (for convenience only).
-   * @throws ArgumentError
-   *             if
-   *             <tt>values.length != rows() || for any 0 &lt;= row &lt; rows(): values[row].length != 2*columns()</tt>
-   *             .
-   */
-  ComplexMatrix setAll2D(final List<Float64List> values) {
+  AbstractComplexMatrix setAll2D(final List<Float64List> values) {
     if (values.length != _rows) {
       throw new ArgumentError("Must have same number of rows: rows=${values.length} rows()=${rows}");
     }
-    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-      nthreads = Math.min(nthreads, _rows);
-      List<Future> futures = new List<Future>(nthreads);
-      int k = _rows ~/ nthreads;
-      for (int j = 0; j < nthreads; j++) {
-        final int firstRow = j * k;
-        final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
-        futures[j] = ConcurrencyUtils.submit(() {
-          for (int r = firstRow; r < lastRow; r++) {
-            Float64List currentRow = values[r];
-            if (currentRow.length != 2 * _columns) throw new ArgumentError("Must have same number of columns in every row: columns=" + currentRow.length + "2*columns()=" + 2 * columns());
-            for (int c = 0; c < _columns; c++) {
-              set(r, c, currentRow[2 * c], currentRow[2 * c + 1]);
+    //int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    if (this._isNoView) {
+      /*if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+        nthreads = Math.min(nthreads, _rows);
+        List<Future> futures = new List<Future>(nthreads);
+        int k = _rows / nthreads;
+        for (int j = 0; j < nthreads; j++) {
+          final int firstRow = j * k;
+          final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
+          futures[j] = ConcurrencyUtils.submit(() {
+            int idx = 2 * _columns;
+            int i = firstRow * _rowStride;
+            for (int r = firstRow; r < lastRow; r++) {
+              Float64List currentRow = values[r];
+              if (currentRow.length != idx) throw new ArgumentError("Must have same number of columns in every row: columns=" + currentRow.length + "2*columns()=" + idx);
+              System.arraycopy(currentRow, 0, _elements, i, idx);
+              i += idx;
             }
-          }
-        });
+          });
+        }
+        ConcurrencyUtils.waitForCompletion(futures);
+      } else {*/
+      int idx = 2 * _columns;
+      int i = 0;
+      for (int r = 0; r < _rows; r++) {
+        Float64List currentRow = values[r];
+        if (currentRow.length != idx) {
+          throw new ArgumentError("Must have same number of columns in every row: columns=${currentRow.length} 2*columns()=$idx");
+        }
+        //System.arraycopy(currentRow, 0, this._elements, i, idx);
+        this._elements.setAll(i, currentRow);
+        i += idx;
       }
-      ConcurrencyUtils.waitForCompletion(futures);
-    } else {*/
-    for (int r = 0; r < _rows; r++) {
-      Float64List currentRow = values[r];
-      if (currentRow.length != 2 * _columns) throw new ArgumentError("Must have same number of columns in every row: columns=${currentRow.length} 2*columns()=${2 * columns}");
-      for (int c = 0; c < _columns; c++) {
-        setParts(r, c, currentRow[2 * c], currentRow[2 * c + 1]);
+      //}
+    } else {
+      final int zero = index(0, 0);
+      /*if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+        nthreads = Math.min(nthreads, _rows);
+        List<Future> futures = new List<Future>(nthreads);
+        int k = _rows / nthreads;
+        for (int j = 0; j < nthreads; j++) {
+          final int firstRow = j * k;
+          final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
+          futures[j] = ConcurrencyUtils.submit(() {
+            int idx = zero + firstRow * _rowStride;
+            for (int r = firstRow; r < lastRow; r++) {
+              Float64List currentRow = values[r];
+              if (currentRow.length != 2 * _columns) throw new ArgumentError("Must have same number of columns in every row: columns=" + currentRow.length + "2*columns()=" + 2 * columns());
+              for (int i = idx,
+                  c = 0; c < _columns; c++) {
+                _elements[i] = currentRow[2 * c];
+                _elements[i + 1] = currentRow[2 * c + 1];
+                i += _columnStride;
+              }
+              idx += _rowStride;
+            }
+          });
+        }
+        ConcurrencyUtils.waitForCompletion(futures);
+      } else {*/
+      int idx = zero;
+      for (int r = 0; r < _rows; r++) {
+        Float64List currentRow = values[r];
+        if (currentRow.length != 2 * _columns) {
+          throw new ArgumentError("Must have same number of columns in every row: columns=${currentRow.length} 2*columns()=${2 * columns}");
+        }
+        for (int i = idx,
+            c = 0; c < _columns; c++) {
+          _elements[i] = currentRow[2 * c];
+          _elements[i + 1] = currentRow[2 * c + 1];
+          i += _columnStride;
+        }
+        idx += _rowStride;
       }
+      //}
     }
-    //}
     return this;
   }
 
-
-  /**
-   * Replaces imaginary part of the receiver with the values of another real
-   * matrix. The real part of the receiver remains unchanged. Both matrices
-   * must have the same size.
-   *
-   * @param other
-   *            the source matrix to copy from
-   * @return <tt>this</tt> (for convenience only).
-   * @throws ArgumentError
-   *             if <tt>size() != other.size()</tt>.
-   */
-  ComplexMatrix setImaginary(final DoubleMatrix other) {
+  AbstractComplexMatrix setImaginary(final AbstractDoubleMatrix other) {
     checkShape(other);
+    final int columnStrideOther = other.columnStride;
+    final int rowStrideOther = other.rowStride;
+    final int zeroOther = other.index(0, 0);
+    final int zero = index(0, 0);
+    final Float64List elemsOther = (other as DoubleMatrix).elements();
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
@@ -625,41 +976,47 @@ abstract class ComplexMatrix extends AbstractMatrix {
         final int firstRow = j * k;
         final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
         futures[j] = ConcurrencyUtils.submit(() {
+          int idx = zero + firstRow * _rowStride;
+          int idxOther = zeroOther + firstRow * rowStrideOther;
           for (int r = firstRow; r < lastRow; r++) {
-            for (int c = 0; c < _columns; c++) {
-              double re = get(r, c)[0];
-              double im = other.get(r, c);
-              set(r, c, re, im);
+            for (int i = idx,
+                j = idxOther,
+                c = 0; c < _columns; c++) {
+              _elements[i + 1] = elemsOther[j];
+              i += _columnStride;
+              j += columnStrideOther;
             }
+            idx += _rowStride;
+            idxOther += rowStrideOther;
           }
         });
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
+    int idx = zero;
+    int idxOther = zeroOther;
     for (int r = 0; r < _rows; r++) {
-      for (int c = 0; c < _columns; c++) {
-        double re = get(r, c)[0];
-        double im = other.get(r, c);
-        setParts(r, c, re, im);
+      for (int i = idx,
+          j = idxOther,
+          c = 0; c < _columns; c++) {
+        _elements[i + 1] = elemsOther[j];
+        i += _columnStride;
+        j += columnStrideOther;
       }
+      idx += _rowStride;
+      idxOther += rowStrideOther;
     }
     //}
     return this;
   }
 
-  /**
-   * Replaces real part of the receiver with the values of another real
-   * matrix. The imaginary part of the receiver remains unchanged. Both
-   * matrices must have the same size.
-   *
-   * @param other
-   *            the source matrix to copy from
-   * @return <tt>this</tt> (for convenience only).
-   * @throws ArgumentError
-   *             if <tt>size() != other.size()</tt>.
-   */
-  ComplexMatrix setReal(final DoubleMatrix other) {
+  AbstractComplexMatrix setReal(final AbstractDoubleMatrix other) {
     checkShape(other);
+    final int columnStrideOther = other.columnStride;
+    final int rowStrideOther = other.rowStride;
+    final int zeroOther = other.index(0, 0);
+    final int zero = index(0, 0);
+    final Float64List elemsOther = (other as DoubleMatrix).elements();
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
@@ -669,35 +1026,43 @@ abstract class ComplexMatrix extends AbstractMatrix {
         final int firstRow = j * k;
         final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
         futures[j] = ConcurrencyUtils.submit(() {
+          int idx = zero + firstRow * _rowStride;
+          int idxOther = zeroOther + firstRow * rowStrideOther;
           for (int r = firstRow; r < lastRow; r++) {
-            for (int c = 0; c < _columns; c++) {
-              double re = other.get(r, c);
-              double im = get(r, c)[1];
-              set(r, c, re, im);
+            for (int i = idx,
+                j = idxOther,
+                c = 0; c < _columns; c++) {
+              _elements[i] = elemsOther[j];
+              i += _columnStride;
+              j += columnStrideOther;
             }
+            idx += _rowStride;
+            idxOther += rowStrideOther;
           }
         });
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
+    int idx = zero;
+    int idxOther = zeroOther;
     for (int r = 0; r < _rows; r++) {
-      for (int c = 0; c < _columns; c++) {
-        double re = other.get(r, c);
-        double im = get(r, c)[1];
-        setParts(r, c, re, im);
+      for (int i = idx,
+          j = idxOther,
+          c = 0; c < _columns; c++) {
+        _elements[i] = elemsOther[j];
+        i += _columnStride;
+        j += columnStrideOther;
       }
+      idx += _rowStride;
+      idxOther += rowStrideOther;
     }
     //}
     return this;
   }
 
-  /**
-   * Returns the number of cells having non-zero values; ignores tolerance.
-   *
-   * @return the number of cells having non-zero values.
-   */
   int get cardinality {
     int cardinality = 0;
+    final int zero = index(0, 0);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
@@ -709,19 +1074,21 @@ abstract class ComplexMatrix extends AbstractMatrix {
         final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
         futures[j] = ConcurrencyUtils.submit(() {
           int cardinality = 0;
-          Float64List tmp = new Float64List(2);
+          int idx = zero + firstRow * _rowStride;
           for (int r = firstRow; r < lastRow; r++) {
-            for (int c = 0; c < _columns; c++) {
-              tmp = get(r, c);
-              if ((tmp[0] != 0.0) || (tmp[1] != 0.0)) cardinality++;
+            for (int i = idx,
+                c = 0; c < _columns; c++) {
+              if ((_elements[i] != 0.0) || (_elements[i + 1] != 0.0)) cardinality++;
+              i += _columnStride;
             }
+            idx += _rowStride;
           }
-          return Integer.valueOf(cardinality);
+          return cardinality;
         });
       }
       try {
         for (int j = 0; j < nthreads; j++) {
-          results[j] = futures[j].get();
+          results[j] = futures[j].get() as int;
         }
         cardinality = results[0].intValue();
         for (int j = 1; j < nthreads; j++) {
@@ -733,92 +1100,23 @@ abstract class ComplexMatrix extends AbstractMatrix {
         e.printStackTrace();
       }
     } else {*/
-    Float64List tmp = new Float64List(2);
+    int idx = zero;
     for (int r = 0; r < _rows; r++) {
-      for (int c = 0; c < _columns; c++) {
-        tmp = get(r, c);
-        if (tmp[0] != 0 || tmp[1] != 0) {
+      for (int i = idx,
+          c = 0; c < _columns; c++) {
+        if ((_elements[i] != 0.0) || (_elements[i + 1] != 0.0)) {
           cardinality++;
         }
+        i += _columnStride;
       }
+      idx += _rowStride;
     }
     //}
     return cardinality;
   }
 
-  /**
-   * Constructs and returns a deep copy of the receiver.
-   * <p>
-   * <b>Note that the returned matrix is an independent deep copy.</b> The
-   * returned matrix is not backed by this matrix, so changes in the returned
-   * matrix are not reflected in this matrix, and vice-versa.
-   *
-   * @return a deep copy of the receiver.
-   */
-  ComplexMatrix copy() {
-    return like().copyFrom(this);
-  }
-
-  /**
-   * Returns whether all cells are equal to the given value.
-   *
-   * @param value
-   *            the value to test against.
-   * @return <tt>true</tt> if all cells are equal to the given value,
-   *         <tt>false</tt> otherwise.
-   */
-  /*bool equalsValue(Float64List value) {
-    return ComplexProperty.DEFAULT.equalsValue2D(this, value);
-  }*/
-
-  /**
-   * Compares this object against the specified object. The result is
-   * <code>true</code> if and only if the argument is not <code>null</code>
-   * and is at least a <code>DoubleMatrix</code> object that has the same
-   * number of columns and rows as the receiver and has exactly the same
-   * values at the same coordinates.
-   *
-   * @param obj
-   *            the object to compare with.
-   * @return <code>true</code> if the objects are the same; <code>false</code>
-   *         otherwise.
-   */
-  bool operator ==(var obj) {
-    if (obj is num) {
-      final c = new Float64List.fromList([obj.toDouble(), 0.0]);
-      return ComplexProperty.DEFAULT.equalsValue2D(this, c);
-    }
-    if (obj is Float64List) {
-      return ComplexProperty.DEFAULT.equalsValue2D(this, obj);
-    }
-    if (identical(this, obj)) {
-      return true;
-    }
-    if (obj == null) {
-      return false;
-    }
-    if (obj is! ComplexMatrix) {
-      return false;
-    }
-
-    return ComplexProperty.DEFAULT.equalsMatrix(this, obj as ComplexMatrix);
-  }
-
-  /**
-   * Assigns the result of a function to each <i>non-zero</i> cell. Use this
-   * method for fast special-purpose iteration. If you want to modify another
-   * matrix instead of <tt>this</tt> (i.e. work in read-only mode), simply
-   * return the input value unchanged.
-   *
-   * Parameters to function are as follows: <tt>first==row</tt>,
-   * <tt>second==column</tt>, <tt>third==nonZeroValue</tt>.
-   *
-   * @param function
-   *            a function object taking as argument the current non-zero
-   *            cell's row, column and value.
-   * @return <tt>this</tt> (for convenience only).
-   */
-  ComplexMatrix forEachNonZero(final cfunc.IntIntComplexFunction function) {
+  AbstractComplexMatrix forEachNonZero(final cfunc.IntIntComplexFunction function) {
+    final int zero = index(0, 0);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
@@ -828,316 +1126,96 @@ abstract class ComplexMatrix extends AbstractMatrix {
         final int firstRow = j * k;
         final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
         futures[j] = ConcurrencyUtils.submit(() {
+          int idx = zero + firstRow * _rowStride;
+          Float64List value = new Float64List(2);
           for (int r = firstRow; r < lastRow; r++) {
-            for (int c = 0; c < _columns; c++) {
-              Float64List value = get(r, c);
+            for (int i = idx,
+                c = 0; c < _columns; c++) {
+              value[0] = _elements[i];
+              value[1] = _elements[i + 1];
               if (value[0] != 0 || value[1] != 0) {
                 Float64List v = function(r, c, value);
-                set(r, c, v);
+                _elements[i] = v[0];
+                _elements[i + 1] = v[1];
               }
+              i += _columnStride;
             }
+            idx += _rowStride;
           }
         });
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
+    int idx = zero;
+    Float64List value = new Float64List(2);
     for (int r = 0; r < _rows; r++) {
-      for (int c = 0; c < _columns; c++) {
-        Float64List value = get(r, c);
+      for (int i = idx,
+          c = 0; c < _columns; c++) {
+        value[0] = _elements[i];
+        value[1] = _elements[i + 1];
         if (value[0] != 0 || value[1] != 0) {
           Float64List v = function(r, c, value);
-          set(r, c, v);
+          _elements[i] = v[0];
+          _elements[i + 1] = v[1];
         }
+        i += _columnStride;
       }
+      idx += _rowStride;
     }
     //}
     return this;
   }
 
-  /**
-   * Returns the matrix cell value at coordinate <tt>[row,column]</tt>.
-   *
-   * @param row
-   *            the index of the row-coordinate.
-   * @param column
-   *            the index of the column-coordinate.
-   * @return the value of the specified cell.
-   * @throws IndexOutOfBoundsException
-   *             if
-   *             <tt>column&lt;0 || column&gt;=columns() || row&lt;0 || row&gt;=rows()</tt>
-   */
-  Float64List at(int row, int column) {
-    if (column < 0 || column >= _columns || row < 0 || row >= _rows) {
-      throw new RangeError("row:$row, column:$column");
-    }
-    return get(row, column);
-  }
-
-  /**
-   * Returns a new matrix that is a complex conjugate of this matrix. If
-   * unconjugated complex transposition is needed, one should use viewDice()
-   * method. This method creates a new object (not a view), so changes in the
-   * returned matrix are NOT reflected in this matrix.
-   *
-   * @return a complex conjugate matrix
-   */
-  ComplexMatrix conjugateTranspose() {
-    final ComplexMatrix transpose = this.dice().copy();
+  AbstractComplexMatrix conjugateTranspose() {
+    AbstractComplexMatrix transpose = this.dice().copy();
+    final Float64List elemsOther = (transpose as ComplexMatrix)._elements;
+    final int zeroOther = transpose.index(0, 0);
+    final int columnStrideOther = transpose.columnStride;
+    final int rowStrideOther = transpose.rowStride;
+    final int columnsOther = transpose.columns;
+    final int rowsOther = transpose.rows;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-      nthreads = Math.min(nthreads, _columns);
+      nthreads = Math.min(nthreads, rowsOther);
       List<Future> futures = new List<Future>(nthreads);
-      int k = _columns ~/ nthreads;
+      int k = rowsOther ~/ nthreads;
       for (int j = 0; j < nthreads; j++) {
         final int firstRow = j * k;
-        final int lastRow = (j == nthreads - 1) ? _columns : firstRow + k;
+        final int lastRow = (j == nthreads - 1) ? rowsOther : firstRow + k;
         futures[j] = ConcurrencyUtils.submit(() {
-          Float64List tmp = new Float64List(2);
+          int idxOther = zeroOther + firstRow * rowStrideOther;
           for (int r = firstRow; r < lastRow; r++) {
-            for (int c = 0; c < _rows; c++) {
-              tmp = transpose.get(r, c);
-              tmp[1] = -tmp[1];
-              transpose.set(r, c, tmp);
+            for (int c = 0; c < columnsOther; c++) {
+              elemsOther[idxOther + 1] = -elemsOther[idxOther + 1];
+              idxOther += columnStrideOther;
             }
           }
         });
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-    Float64List tmp = new Float64List(2);
-    for (int r = 0; r < _columns; r++) {
-      for (int c = 0; c < _rows; c++) {
-        tmp = transpose.get(r, c);
-        tmp[1] = -tmp[1];
-        transpose.set(r, c, tmp);
+    int idxOther = zeroOther;
+    for (int r = 0; r < rowsOther; r++) {
+      for (int c = 0; c < columnsOther; c++) {
+        elemsOther[idxOther + 1] = -elemsOther[idxOther + 1];
+        idxOther += columnStrideOther;
       }
     }
     //}
     return transpose;
   }
 
-  /**
-   * Returns the elements of this matrix.
-   *
-   * @return the elements
-   */
-  Object elements();
-
-  /**
-   * Returns the imaginary part of this matrix
-   *
-   * @return the imaginary part
-   */
-  DoubleMatrix imaginary();
-
-  /**
-   * Fills the coordinates and values of cells having non-zero values into the
-   * specified lists. Fills into the lists, starting at index 0. After this
-   * call returns the specified lists all have a new size, the number of
-   * non-zero values.
-   * <p>
-   * In general, fill order is <i>unspecified</i>. This implementation fills
-   * like <tt>for (row = 0..rows-1) for (column = 0..columns-1) do ... </tt>.
-   * However, subclasses are free to us any other order, even an order that
-   * may change over time as cell values are changed. (Of course, result lists
-   * indexes are guaranteed to correspond to the same cell).
-   *
-   * @param rowList
-   *            the list to be filled with row indexes, can have any size.
-   * @param columnList
-   *            the list to be filled with column indexes, can have any size.
-   * @param valueList
-   *            the list to be filled with values, can have any size.
-   */
-  void nonZeros(final List<int> rowList, final List<int> columnList, final List<Float64List> valueList) {
-    rowList.clear();
-    columnList.clear();
-    valueList.clear();
-    for (int r = 0; r < _rows; r++) {
-      for (int c = 0; c < _columns; c++) {
-        Float64List value = get(r, c);
-        if (value[0] != 0 || value[1] != 0) {
-          rowList.add(r);
-          columnList.add(c);
-          valueList.add(value);
-        }
-      }
-    }
-
+  Float64List elements() {
+    return _elements;
   }
 
-  /**
-   * Returns the matrix cell value at coordinate <tt>[row,column]</tt>.
-   *
-   * <p>
-   * Provided with invalid parameters this method may return invalid objects
-   * without throwing any exception. <b>You should only use this method when
-   * you are absolutely sure that the coordinate is within bounds.</b>
-   * Precondition (unchecked):
-   * <tt>0 &lt;= column &lt; columns() && 0 &lt;= row &lt; rows()</tt>.
-   *
-   * @param row
-   *            the index of the row-coordinate.
-   * @param column
-   *            the index of the column-coordinate.
-   * @return the value at the specified coordinate.
-   */
-  Float64List get(int row, int column);
-
-  /**
-   * Returns the real part of this matrix
-   *
-   * @return the real part
-   */
-  DoubleMatrix real();
-
-  /**
-   * Construct and returns a new empty matrix <i>of the same dynamic type</i>
-   * as the receiver, having the same number of rows and columns. For example,
-   * if the receiver is an instance of type <tt>DenseComplexMatrix</tt> the
-   * new matrix must also be of type <tt>DenseComplexMatrix</tt>. In
-   * general, the new matrix should have internal parametrization as similar
-   * as possible.
-   *
-   * @return a new empty matrix of the same dynamic type.
-   */
-  ComplexMatrix like() {
-    return like2D(_rows, _columns);
-  }
-
-  /**
-   * Construct and returns a new empty matrix <i>of the same dynamic type</i>
-   * as the receiver, having the specified number of rows and columns. For
-   * example, if the receiver is an instance of type
-   * <tt>DenseComplexMatrix</tt> the new matrix must also be of type
-   * <tt>DenseComplexMatrix</tt>. In general, the new matrix should have
-   * internal parametrization as similar as possible.
-   *
-   * @param rows
-   *            the number of rows the matrix shall have.
-   * @param columns
-   *            the number of columns the matrix shall have.
-   * @return a new empty matrix of the same dynamic type.
-   */
-  ComplexMatrix like2D(int rows, int columns);
-
-  /**
-   * Construct and returns a new 1-d matrix <i>of the corresponding dynamic
-   * type</i>, entirelly independent of the receiver. For example, if the
-   * receiver is an instance of type <tt>DenseComplexMatrix</tt> the new
-   * matrix must be of type <tt>DenseComplexVector</tt>.
-   *
-   * @param size
-   *            the number of cells the matrix shall have.
-   * @return a new matrix of the corresponding dynamic type.
-   */
-  ComplexVector like1D(int size);
-
-  /**
-   * Sets the matrix cell at coordinate <tt>[row,column]</tt> to the specified
-   * value.
-   *
-   * @param row
-   *            the index of the row-coordinate.
-   * @param column
-   *            the index of the column-coordinate.
-   * @param value
-   *            the value to be filled into the specified cell.
-   * @throws IndexOutOfBoundsException
-   *             if
-   *             <tt>column&lt;0 || column&gt;=columns() || row&lt;0 || row&gt;=rows()</tt>
-   */
-  void put(int row, int column, Float64List value) {
-    if (column < 0 || column >= _columns || row < 0 || row >= _rows) {
-      throw new RangeError("row:$row, column:$column");
-    }
-    set(row, column, value);
-  }
-
-  /**
-   * Sets the matrix cell at coordinate <tt>[row,column]</tt> to the specified
-   * value.
-   *
-   * @param row
-   *            the index of the row-coordinate.
-   * @param column
-   *            the index of the column-coordinate.
-   * @param re
-   *            the real part of the value to be filled into the specified
-   *            cell.
-   * @param im
-   *            the imaginary part of the value to be filled into the
-   *            specified cell.
-   * @throws IndexOutOfBoundsException
-   *             if
-   *             <tt>column&lt;0 || column&gt;=columns() || row&lt;0 || row&gt;=rows()</tt>
-   */
-  void putParts(int row, int column, double re, double im) {
-    if (column < 0 || column >= _columns || row < 0 || row >= _rows) {
-      throw new RangeError("row:$row, column:$column");
-    }
-    setParts(row, column, re, im);
-  }
-
-  /**
-   * Sets the matrix cell at coordinate <tt>[row,column]</tt> to the specified
-   * value.
-   *
-   * <p>
-   * Provided with invalid parameters this method may access illegal indexes
-   * without throwing any exception. <b>You should only use this method when
-   * you are absolutely sure that the coordinate is within bounds.</b>
-   * Precondition (unchecked):
-   * <tt>0 &lt;= column &lt; columns() && 0 &lt;= row &lt; rows()</tt>.
-   *
-   * @param row
-   *            the index of the row-coordinate.
-   * @param column
-   *            the index of the column-coordinate.
-   * @param re
-   *            the real part of the value to be filled into the specified
-   *            cell.
-   * @param im
-   *            the imaginary part of the value to be filled into the
-   *            specified cell.
-   *
-   */
-  void setParts(int row, int column, double re, double im);
-
-  /**
-   * Sets the matrix cell at coordinate <tt>[row,column]</tt> to the specified
-   * value.
-   *
-   * <p>
-   * Provided with invalid parameters this method may access illegal indexes
-   * without throwing any exception. <b>You should only use this method when
-   * you are absolutely sure that the coordinate is within bounds.</b>
-   * Precondition (unchecked):
-   * <tt>0 &lt;= column &lt; columns() && 0 &lt;= row &lt; rows()</tt>.
-   *
-   * @param row
-   *            the index of the row-coordinate.
-   * @param column
-   *            the index of the column-coordinate.
-   * @param value
-   *            the value to be filled into the specified cell.
-   */
-  void set(int row, int column, Float64List value);
-
-  /**
-   * Constructs and returns a 2-dimensional array containing the cell values.
-   * The returned array <tt>values</tt> has the form
-   * <tt>re = values[row][2*column]; im = values[row][2*column+1]</tt> and has
-   * the same number of rows and columns as the receiver.
-   * <p>
-   * The values are copied. So subsequent changes in <tt>values</tt> are not
-   * reflected in the matrix, and vice-versa.
-   *
-   * @return an array filled with the values of the cells.
-   */
-  List<Float64List> toList() {
-    final List<Float64List> values = new List<Float64List>.generate(_rows,
-        (_) => new Float64List(2 * _columns));
+  AbstractDoubleMatrix imaginary() {
+    final DoubleMatrix Im = new DoubleMatrix(_rows, _columns);
+    final Float64List elemsOther = Im.elements();
+    final int columnStrideOther = Im.columnStride;
+    final int rowStrideOther = Im.rowStride;
+    final int zeroOther = Im.index(0, 0);
+    final int zero = index(0, 0);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
@@ -1147,346 +1225,226 @@ abstract class ComplexMatrix extends AbstractMatrix {
         final int firstRow = j * k;
         final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
         futures[j] = ConcurrencyUtils.submit(() {
-          Float64List tmp;
+          int idx = zero + firstRow * _rowStride;
+          int idxOther = zeroOther + firstRow * rowStrideOther;
           for (int r = firstRow; r < lastRow; r++) {
-            for (int c = 0; c < _columns; c++) {
-              tmp = get(r, c);
-              values[r][2 * c] = tmp[0];
-              values[r][2 * c + 1] = tmp[1];
+            for (int i = idx,
+                j = idxOther,
+                c = 0; c < _columns; c++) {
+              elemsOther[j] = _elements[i + 1];
+              i += _columnStride;
+              j += columnStrideOther;
+            }
+            idx += _rowStride;
+            idxOther += rowStrideOther;
+          }
+        });
+      }
+      ConcurrencyUtils.waitForCompletion(futures);
+    } else {*/
+    int idx = zero;
+    int idxOther = zeroOther;
+    for (int r = 0; r < _rows; r++) {
+      for (int i = idx,
+          j = idxOther,
+          c = 0; c < _columns; c++) {
+        elemsOther[j] = _elements[i + 1];
+        i += _columnStride;
+        j += columnStrideOther;
+      }
+      idx += _rowStride;
+      idxOther += rowStrideOther;
+    }
+    //}
+    return Im;
+  }
+
+  void nonZeros(final List<int> rowList, final List<int> columnList, final List<Float64List> valueList) {
+    rowList.clear();
+    columnList.clear();
+    valueList.clear();
+    int idx = index(0, 0);
+    for (int r = 0; r < _rows; r++) {
+      for (int i = idx,
+          c = 0; c < _columns; c++) {
+        Float64List value = new Float64List(2);
+        value[0] = _elements[i];
+        value[1] = _elements[i + 1];
+        if (value[0] != 0 || value[1] != 0) {
+          rowList.add(r);
+          columnList.add(c);
+          valueList.add(value);
+        }
+        i += _columnStride;
+      }
+      idx += _rowStride;
+    }
+
+  }
+
+  Float64List get(int row, int column) {
+    int idx = _rowZero + row * _rowStride + _columnZero + column * _columnStride;
+    return new Float64List.fromList([_elements[idx], _elements[idx + 1]]);
+  }
+
+  AbstractDoubleMatrix real() {
+    final DoubleMatrix R = new DoubleMatrix(_rows, _columns);
+    final Float64List elemsOther = R.elements();
+    final int columnStrideOther = R.columnStride;
+    final int rowStrideOther = R.rowStride;
+    final int zeroOther = R.index(0, 0);
+    final int zero = index(0, 0);
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+      nthreads = Math.min(nthreads, _rows);
+      List<Future> futures = new List<Future>(nthreads);
+      int k = _rows ~/ nthreads;
+      for (int j = 0; j < nthreads; j++) {
+        final int firstRow = j * k;
+        final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
+        futures[j] = ConcurrencyUtils.submit(() {
+          int idx = zero + firstRow * _rowStride;
+          int idxOther = zeroOther + firstRow * rowStrideOther;
+          for (int r = firstRow; r < lastRow; r++) {
+            for (int i = idx,
+                j = idxOther,
+                c = 0; c < _columns; c++) {
+              elemsOther[j] = _elements[i];
+              i += _columnStride;
+              j += columnStrideOther;
+            }
+            idx += _rowStride;
+            idxOther += rowStrideOther;
+          }
+        });
+      }
+      ConcurrencyUtils.waitForCompletion(futures);
+    } else {*/
+    int idx = zero;
+    int idxOther = zeroOther;
+    for (int r = 0; r < _rows; r++) {
+      for (int i = idx,
+          j = idxOther,
+          c = 0; c < _columns; c++) {
+        elemsOther[j] = _elements[i];
+        i += _columnStride;
+        j += columnStrideOther;
+      }
+      idx += _rowStride;
+      idxOther += rowStrideOther;
+    }
+    //}
+    return R;
+  }
+
+  AbstractComplexMatrix like2D(int rows, int columns) {
+    return new ComplexMatrix(rows, columns);
+  }
+
+  AbstractComplexVector like1D(int size) {
+    return new ComplexVector(size);
+  }
+
+  void setParts(int row, int column, double re, double im) {
+    int idx = _rowZero + row * _rowStride + _columnZero + column * _columnStride;
+    _elements[idx] = re;
+    _elements[idx + 1] = im;
+  }
+
+  void set(int row, int column, Float64List value) {
+    int idx = _rowZero + row * _rowStride + _columnZero + column * _columnStride;
+    _elements[idx] = value[0];
+    _elements[idx + 1] = value[1];
+  }
+
+  List<Float64List> toList() {
+    final List<Float64List> values = new List<Float64List>.generate(_rows,
+        (_) => new Float64List(2 * _columns));
+    final int zero = index(0, 0);
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+      nthreads = Math.min(nthreads, _rows);
+      List<Future> futures = new List<Future>(nthreads);
+      int k = _rows ~/ nthreads;
+      for (int j = 0; j < nthreads; j++) {
+        final int firstRow = j * k;
+        final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
+        futures[j] = ConcurrencyUtils.submit(() {
+          int idx = zero + firstRow * _rowStride;
+          for (int r = firstRow; r < lastRow; r++) {
+            for (int i = idx,
+                c = 0; c < _columns; c++) {
+              values[r][2 * c] = _elements[i];
+              values[r][2 * c + 1] = _elements[i + 1];
+              i += _columnStride;
+            }
+            idx += _rowStride;
+          }
+        });
+      }
+      ConcurrencyUtils.waitForCompletion(futures);
+    } else {*/
+    int idx = zero;
+    for (int r = 0; r < _rows; r++) {
+      for (int i = idx,
+          c = 0; c < _columns; c++) {
+        values[r][2 * c] = _elements[i];
+        values[r][2 * c + 1] = _elements[i + 1];
+        i += _columnStride;
+      }
+      idx += _rowStride;
+    }
+    //}
+    return values;
+  }
+
+  AbstractComplexVector vectorize() {
+    final AbstractComplexVector v = new ComplexVector(this.length);
+    final int zero = index(0, 0);
+    final int zeroOther = v.index(0);
+    final int strideOther = v.stride();
+    final Float64List elemsOther = v.elements() as Float64List;
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    if ((nthreads > 1) && (_rows * _columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+      nthreads = Math.min(nthreads, _columns);
+      List<Future> futures = new List<Future>(nthreads);
+      int k = _columns ~/ nthreads;
+      for (int j = 0; j < nthreads; j++) {
+        final int firstColumn = j * k;
+        final int lastColumn = (j == nthreads - 1) ? _columns : firstColumn + k;
+        final int firstIdx = j * k * _rows;
+        futures[j] = ConcurrencyUtils.submit(() {
+          int idx = 0;
+          int idxOther = zeroOther + firstIdx * strideOther;
+          for (int c = firstColumn; c < lastColumn; c++) {
+            idx = zero + c * _columnStride;
+            for (int r = 0; r < _rows; r++) {
+              elemsOther[idxOther] = _elements[idx];
+              elemsOther[idxOther + 1] = _elements[idx + 1];
+              idx += _rowStride;
+              idxOther += strideOther;
             }
           }
         });
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-    Float64List tmp;
-    for (int r = 0; r < _rows; r++) {
-      for (int c = 0; c < _columns; c++) {
-        tmp = get(r, c);
-        values[r][2 * c] = tmp[0];
-        values[r][2 * c + 1] = tmp[1];
+    int idx = 0;
+    int idxOther = zeroOther;
+    for (int c = 0; c < _columns; c++) {
+      idx = zero + c * _columnStride;
+      for (int r = 0; r < _rows; r++) {
+        elemsOther[idxOther] = _elements[idx];
+        elemsOther[idxOther + 1] = _elements[idx + 1];
+        idx += _rowStride;
+        idxOther += strideOther;
       }
     }
     //}
-    return values;
+    return v;
   }
 
-  /**
-   * Returns a string representation using default formatting ("%.4f").
-   *
-   * @return a string representation of the matrix.
-   */
-
-  String toString() {
-    return toStringFormat("%.4f");
-  }
-
-  /**
-   * Returns a string representation using using given <tt>format</tt>
-   *
-   * @param format
-   * @return a string representation of the matrix.
-   *
-   */
-  String toStringFormat(String format) {
-    final f = new NumberFormat(format);
-    StringBuffer s = new StringBuffer("ComplexMatrix: $_rows rows, $_columns columns\n\n");
-    Float64List elem = new Float64List(2);
-    for (int r = 0; r < _rows; r++) {
-      for (int c = 0; c < _columns; c++) {
-        elem = get(r, c);
-        if (elem[1] == 0) {
-          s.write(f.format(elem[0]) + "\t");
-          continue;
-        }
-        if (elem[0] == 0) {
-          s.write(f.format(elem[1]) + "i\t");
-          continue;
-        }
-        if (elem[1] < 0) {
-          s.write(f.format(elem[0]) + " - " + f.format(-elem[1]) + "i\t");
-          continue;
-        }
-        s.write(f.format(elem[0]) + " + " + f.format(elem[1]) + "i\t");
-      }
-      s.write("\n");
-    }
-    return s.toString();
-  }
-
-  /**
-   * Returns a vector obtained by stacking the columns of this matrix on top
-   * of one another.
-   *
-   * @return a vector of columns of this matrix.
-   */
-  ComplexVector vectorize();
-
-  /**
-   * Constructs and returns a new <i>slice view</i> representing the rows of
-   * the given column. The returned view is backed by this matrix, so changes
-   * in the returned view are reflected in this matrix, and vice-versa. To
-   * obtain a slice view on subranges, construct a sub-ranging view (
-   * <tt>viewPart(...)</tt>), then apply this method to the sub-range view.
-   *
-   * @param column
-   *            the column to fix.
-   * @return a new slice view.
-   * @throws IndexOutOfBoundsException
-   *             if <tt>column < 0 || column >= columns()</tt>.
-   * @see #viewRow(int)
-   */
-  ComplexVector column(int column) {
-    _checkColumn(column);
-    int viewSize = this._rows;
-    int viewZero = index(0, column);
-    int viewStride = this._rowStride;
-    return _like1D(viewSize, viewZero, viewStride);
-  }
-
-  /**
-   * Constructs and returns a new <i>flip view</i> along the column axis. What
-   * used to be column <tt>0</tt> is now column <tt>columns()-1</tt>, ...,
-   * what used to be column <tt>columns()-1</tt> is now column <tt>0</tt>. The
-   * returned view is backed by this matrix, so changes in the returned view
-   * are reflected in this matrix, and vice-versa.
-   *
-   * @return a new flip view.
-   * @see #viewRowFlip()
-   */
-  ComplexMatrix columnFlip() {
-    return _view()._vColumnFlip() as ComplexMatrix;
-  }
-
-  /**
-   * Constructs and returns a new <i>dice (transposition) view</i>; Swaps
-   * axes; example: 3 x 4 matrix --> 4 x 3 matrix. The view has both
-   * dimensions exchanged; what used to be columns become rows, what used to
-   * be rows become columns. This is a zero-copy transposition, taking O(1),
-   * i.e. constant time. The returned view is backed by this matrix, so
-   * changes in the returned view are reflected in this matrix, and
-   * vice-versa. Use idioms like <tt>result = viewDice(A).copy()</tt> to
-   * generate an independent transposed matrix.
-   *
-   * @return a new dice view.
-   */
-  ComplexMatrix dice() {
-    return _view()._vDice() as ComplexMatrix;
-  }
-
-  /**
-   * Constructs and returns a new <i>sub-range view</i> that is a
-   * <tt>height x width</tt> sub matrix starting at <tt>[row,column]</tt>.
-   *
-   * Operations on the returned view can only be applied to the restricted
-   * range. Any attempt to access coordinates not contained in the view will
-   * throw an <tt>IndexOutOfBoundsException</tt>.
-   * <p>
-   * <b>Note that the view is really just a range restriction:</b> The
-   * returned matrix is backed by this matrix, so changes in the returned
-   * matrix are reflected in this matrix, and vice-versa.
-   * <p>
-   * The view contains the cells from <tt>[row,column]</tt> to
-   * <tt>[row+height-1,column+width-1]</tt>, all inclusive. and has
-   * <tt>view.rows() == height; view.columns() == width;</tt>. A view's legal
-   * coordinates are again zero based, as usual. In other words, legal
-   * coordinates of the view range from <tt>[0,0]</tt> to
-   * <tt>[view.rows()-1==height-1,view.columns()-1==width-1]</tt>. As usual,
-   * any attempt to access a cell at a coordinate
-   * <tt>column&lt;0 || column&gt;=view.columns() || row&lt;0 || row&gt;=view.rows()</tt>
-   * will throw an <tt>IndexOutOfBoundsException</tt>.
-   *
-   * @param row
-   *            The index of the row-coordinate.
-   * @param column
-   *            The index of the column-coordinate.
-   * @param height
-   *            The height of the box.
-   * @param width
-   *            The width of the box.
-   * @throws IndexOutOfBoundsException
-   *             if
-   *             <tt>column<0 || width<0 || column+width>columns() || row<0 || height<0 || row+height>rows()</tt>
-   * @return the new view.
-   *
-   */
-  ComplexMatrix part(int row, int column, int height, int width) {
-    return _view()._vPart(row, column, height, width) as ComplexMatrix;
-  }
-
-  /**
-   * Constructs and returns a new <i>slice view</i> representing the columns
-   * of the given row. The returned view is backed by this matrix, so changes
-   * in the returned view are reflected in this matrix, and vice-versa. To
-   * obtain a slice view on subranges, construct a sub-ranging view (
-   * <tt>viewPart(...)</tt>), then apply this method to the sub-range view.
-   *
-   * @param row
-   *            the row to fix.
-   * @return a new slice view.
-   * @throws IndexOutOfBoundsException
-   *             if <tt>row < 0 || row >= rows()</tt>.
-   * @see #viewColumn(int)
-   */
-  ComplexVector row(int row) {
-    _checkRow(row);
-    int viewSize = this._columns;
-    int viewZero = index(row, 0);
-    int viewStride = this._columnStride;
-    return _like1D(viewSize, viewZero, viewStride);
-  }
-
-  /**
-   * Constructs and returns a new <i>flip view</i> along the row axis. What
-   * used to be row <tt>0</tt> is now row <tt>rows()-1</tt>, ..., what used to
-   * be row <tt>rows()-1</tt> is now row <tt>0</tt>. The returned view is
-   * backed by this matrix, so changes in the returned view are reflected in
-   * this matrix, and vice-versa.
-   *
-   * @return a new flip view.
-   * @see #viewColumnFlip()
-   */
-  ComplexMatrix rowFlip() {
-    return _view()._vRowFlip() as ComplexMatrix;
-  }
-
-  /**
-   * Constructs and returns a new <i>selection view</i> that is a matrix
-   * holding all <b>rows</b> matching the given condition. Applies the
-   * condition to each row and takes only those row where
-   * <tt>condition(viewRow(i))</tt> yields <tt>true</tt>. To match
-   * columns, use a dice view.
-   *
-   * @param condition
-   *            The condition to be matched.
-   * @return the new view.
-   */
-  ComplexMatrix where(ComplexVectorProcedure condition) {
-    List<int> matches = new List<int>();
-    for (int i = 0; i < _rows; i++) {
-      if (condition(row(i))) {
-        matches.add(i);
-      }
-    }
-    //matches.trimToSize();
-    return select(new Int32List.fromList(matches), null); // take all columns
-  }
-
-  /**
-   * Constructs and returns a new <i>selection view</i> that is a matrix
-   * holding the indicated cells. There holds
-   * <tt>view.rows() == rowIndexes.length, view.columns() == columnIndexes.length</tt>
-   * and <tt>view.get(i,j) == this.get(rowIndexes[i],columnIndexes[j])</tt>.
-   * Indexes can occur multiple times and can be in arbitrary order.
-   *
-   * Note that modifying the index arguments after this call has returned has
-   * no effect on the view. The returned view is backed by this matrix, so
-   * changes in the returned view are reflected in this matrix, and
-   * vice-versa.
-   * <p>
-   * To indicate "all" rows or "all columns", simply set the respective
-   * parameter
-   *
-   * @param rowIndexes
-   *            The rows of the cells that shall be visible in the new view.
-   *            To indicate that <i>all</i> rows shall be visible, simply set
-   *            this parameter to <tt>null</tt>.
-   * @param columnIndexes
-   *            The columns of the cells that shall be visible in the new
-   *            view. To indicate that <i>all</i> columns shall be visible,
-   *            simply set this parameter to <tt>null</tt>.
-   * @return the new view.
-   * @throws IndexOutOfBoundsException
-   *             if <tt>!(0 <= rowIndexes[i] < rows())</tt> for any
-   *             <tt>i=0..rowIndexes.length()-1</tt>.
-   * @throws IndexOutOfBoundsException
-   *             if <tt>!(0 <= columnIndexes[i] < columns())</tt> for any
-   *             <tt>i=0..columnIndexes.length()-1</tt>.
-   */
-  ComplexMatrix select(Int32List rowIndexes, Int32List columnIndexes) {
-    // check for "all"
-    if (rowIndexes == null) {
-      rowIndexes = new Int32List(_rows);
-      for (int i = 0; i < _rows; i++) {
-        rowIndexes[i] = i;
-      }
-    }
-    if (columnIndexes == null) {
-      columnIndexes = new Int32List(_columns);
-      for (int i = 0; i < _columns; i++) {
-        columnIndexes[i] = i;
-      }
-    }
-
-    _checkRowIndexes(rowIndexes);
-    _checkColumnIndexes(columnIndexes);
-    Int32List rowOffsets = new Int32List(rowIndexes.length);
-    Int32List columnOffsets = new Int32List(columnIndexes.length);
-    for (int i = 0; i < rowIndexes.length; i++) {
-      rowOffsets[i] = _rowOffset(_rowRank(rowIndexes[i]));
-    }
-    for (int i = 0; i < columnIndexes.length; i++) {
-      columnOffsets[i] = _columnOffset(_columnRank(columnIndexes[i]));
-    }
-    return _viewSelectionLike(rowOffsets, columnOffsets);
-  }
-
-  /**
-   * Constructs and returns a new <i>stride view</i> which is a sub matrix
-   * consisting of every i-th cell. More specifically, the view has
-   * <tt>this.rows()/rowStride</tt> rows and
-   * <tt>this.columns()/columnStride</tt> columns holding cells
-   * <tt>this.get(i*rowStride,j*columnStride)</tt> for all
-   * <tt>i = 0..rows()/rowStride - 1, j = 0..columns()/columnStride - 1</tt>.
-   * The returned view is backed by this matrix, so changes in the returned
-   * view are reflected in this matrix, and vice-versa.
-   *
-   * @param rowStride
-   *            the row step factor.
-   * @param columnStride
-   *            the column step factor.
-   * @return a new view.
-   * @throws IndexOutOfBoundsException
-   *             if <tt>rowStride<=0 || columnStride<=0</tt>.
-   */
-  ComplexMatrix strides(int rowStride, int columnStride) {
-    return _view()._vStrides(rowStride, columnStride) as ComplexMatrix;
-  }
-
-  /**
-   * Linear algebraic matrix-vector multiplication; <tt>z = A * y</tt>;
-   * Equivalent to <tt>return A.zMult(y,z,1,0);</tt>
-   *
-   * @param y
-   *            the source vector.
-   * @param z
-   *            the vector where results are to be stored. Set this parameter
-   *            to <tt>null</tt> to indicate that a new result vector shall be
-   *            constructed.
-   * @return z (for convenience only).
-   */
-  /*ComplexVector zMult(ComplexVector y, ComplexVector z) {
-    return zMult(y, z, new Float64List.DenseIntVector([1.0, 0.0]), (z == null ? new Float64List.DenseIntVector([1.0, 0.0]) : new Float64List.DenseIntVector([0.0, 0.0])), false);
-  }*/
-
-  /**
-   * Linear algebraic matrix-vector multiplication;
-   * <tt>z = alpha * A * y + beta*z</tt>. Where <tt>A == this</tt>. <br>
-   * Note: Matrix shape conformance is checked <i>after</i> potential
-   * transpositions.
-   *
-   * @param y
-   *            the source vector.
-   * @param z
-   *            the vector where results are to be stored. Set this parameter
-   *            to <tt>null</tt> to indicate that a new result vector shall be
-   *            constructed.
-   * @return z (for convenience only).
-   *
-   * @throws ArgumentError
-   *             if <tt>A.columns() != y.size() || A.rows() > z.size())</tt>.
-   */
-  ComplexVector mult(final ComplexVector y, ComplexVector z, [Float64List alpha = null, Float64List beta = null, bool transposeA = false]) {
+  AbstractComplexVector mult(final AbstractComplexVector y, AbstractComplexVector z, [Float64List alpha = null, Float64List beta = null, bool transposeA = false]) {
     if (alpha == null) {
       alpha = new Float64List.fromList([1.0, 0.0]);
     }
@@ -1496,15 +1454,25 @@ abstract class ComplexMatrix extends AbstractMatrix {
     if (transposeA) {
       return conjugateTranspose().mult(y, z, alpha, beta, false);
     }
-    ComplexVector zz;
+    AbstractComplexVector zz;
     if (z == null) {
-      zz = y.like1D(this._rows);
+      zz = new ComplexVector(this._rows);
     } else {
       zz = z;
     }
     if (_columns != y.length || _rows > zz.length) {
       throw new ArgumentError("Incompatible args: " + toStringShort() + ", " + y.toStringShort() + ", " + zz.toStringShort());
     }
+    final Float64List elemsY = y.elements() as Float64List;
+    final Float64List elemsZ = zz.elements() as Float64List;
+    if (_elements == null || elemsY == null || elemsZ == null) {
+      throw new Error();
+    }
+    final int strideY = y.stride();
+    final int strideZ = zz.stride();
+    final int zero = index(0, 0);
+    final int zeroY = y.index(0);
+    final int zeroZ = zz.index(0);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
@@ -1514,229 +1482,640 @@ abstract class ComplexMatrix extends AbstractMatrix {
         final int firstRow = j * k;
         final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
         futures[j] = ConcurrencyUtils.submit(() {
-          Float64List s = new Float64List(2);
+          int idxZero = zero + firstRow * _rowStride;
+          int idxZeroZ = zeroZ + firstRow * strideZ;
+          double reS;
+          double imS;
+          double reA;
+          double imA;
+          double reY;
+          double imY;
+          double reZ;
+          double imZ;
           for (int r = firstRow; r < lastRow; r++) {
-            s[0] = 0.0;
-            s[1] = 0.0;
+            reS = 0;
+            imS = 0;
+            int idx = idxZero;
+            int idxY = zeroY;
             for (int c = 0; c < _columns; c++) {
-              s = Complex.plus(s, Complex.multiply(get(r, c), y.get(c)));
+              reA = _elements[idx];
+              imA = _elements[idx + 1];
+              reY = elemsY[idxY];
+              imY = elemsY[idxY + 1];
+              reS += reA * reY - imA * imY;
+              imS += imA * reY + reA * imY;
+              idx += _columnStride;
+              idxY += strideY;
             }
-            zz.set(r, Complex.plus(Complex.multiply(s, alpha), Complex.multiply(zz.get(r), beta)));
+            reZ = elemsZ[idxZeroZ];
+            imZ = elemsZ[idxZeroZ + 1];
+            elemsZ[idxZeroZ] = reS * alpha[0] - imS * alpha[1] + reZ * beta[0] - imZ * beta[1];
+            elemsZ[idxZeroZ + 1] = imS * alpha[0] + reS * alpha[1] + imZ * beta[0] + reZ * beta[1];
+            idxZero += _rowStride;
+            idxZeroZ += strideZ;
           }
         });
       }
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
-    Float64List s = new Float64List(2);
+    int idxZero = zero;
+    int idxZeroZ = zeroZ;
+    double reS;
+    double imS;
+    double reA;
+    double imA;
+    double reY;
+    double imY;
+    double reZ;
+    double imZ;
+
     for (int r = 0; r < _rows; r++) {
-      s[0] = 0.0;
-      s[1] = 0.0;
+      reS = 0.0;
+      imS = 0.0;
+      int idx = idxZero;
+      int idxY = zeroY;
       for (int c = 0; c < _columns; c++) {
-        s = Complex.plus(s, Complex.multiply(get(r, c), y.get(c)));
+        reA = _elements[idx];
+        imA = _elements[idx + 1];
+        reY = elemsY[idxY];
+        imY = elemsY[idxY + 1];
+        reS += reA * reY - imA * imY;
+        imS += imA * reY + reA * imY;
+        idx += _columnStride;
+        idxY += strideY;
       }
-      zz.set(r, Complex.plus(Complex.multiply(s, alpha), Complex.multiply(zz.get(r), beta)));
+      reZ = elemsZ[idxZeroZ];
+      imZ = elemsZ[idxZeroZ + 1];
+      elemsZ[idxZeroZ] = reS * alpha[0] - imS * alpha[1] + reZ * beta[0] - imZ * beta[1];
+      elemsZ[idxZeroZ + 1] = imS * alpha[0] + reS * alpha[1] + imZ * beta[0] + reZ * beta[1];
+      idxZero += _rowStride;
+      idxZeroZ += strideZ;
     }
     //}
     return zz;
   }
 
-  /**
-   * Linear algebraic matrix-matrix multiplication; <tt>C = A x B</tt>;
-   * Equivalent to <tt>A.zMult(B,C,1,0,false,false)</tt>.
-   *
-   * @param B
-   *            the second source matrix.
-   * @param C
-   *            the matrix where results are to be stored. Set this parameter
-   *            to <tt>null</tt> to indicate that a new result matrix shall be
-   *            constructed.
-   * @return C (for convenience only).
-   */
-  /*ComplexMatrix zMult(ComplexMatrix B, ComplexMatrix C) {
-    return zMult(B, C, new Float64List.DenseIntVector([1.0, 0.0]), (C == null ? new Float64List.DenseIntVector([1.0, 0.0]) : new Float64List.DenseIntVector([0.0, 0.0])), false, false);
-  }*/
-
-  /**
-   * Linear algebraic matrix-matrix multiplication;
-   * <tt>C = alpha * A x B + beta*C</tt>. Matrix shapes:
-   * <tt>A(m x n), B(n x p), C(m x p)</tt>. <br>
-   * Note: Matrix shape conformance is checked <i>after</i> potential
-   * transpositions.
-   *
-   * @param B
-   *            the second source matrix.
-   * @param C
-   *            the matrix where results are to be stored. Set this parameter
-   *            to <tt>null</tt> to indicate that a new result matrix shall be
-   *            constructed.
-   * @return C (for convenience only).
-   *
-   * @throws ArgumentError
-   *             if <tt>B.rows() != A.columns()</tt>.
-   * @throws ArgumentError
-   *             if
-   *             <tt>C.rows() != A.rows() || C.columns() != B.columns()</tt>.
-   * @throws ArgumentError
-   *             if <tt>A == C || B == C</tt>.
-   */
-  ComplexMatrix multiply(final ComplexMatrix B, ComplexMatrix C, [Float64List alpha = null, Float64List beta = null, bool transposeA = false, bool transposeB = false]) {
+  AbstractComplexMatrix multiply(final AbstractComplexMatrix B, AbstractComplexMatrix C, [Float64List alpha = null, Float64List beta = null, final bool transposeA = false, final bool transposeB = false]) {
     if (alpha == null) {
       alpha = new Float64List.fromList([1.0, 0.0]);
     }
     if (beta == null) {
       beta = (C == null ? new Float64List.fromList([1.0, 0.0]) : new Float64List.fromList([0.0, 0.0]));
     }
+    final int rowsA = _rows;
+    final int columnsA = _columns;
+    final int rowsB = B.rows;
+    final int columnsB = B.columns;
+    final int rowsC = transposeA ? columnsA : rowsA;
+    final int columnsC = transposeB ? rowsB : columnsB;
+
+    if (C == null) {
+      C = new ComplexMatrix(rowsC, columnsC);
+    }
+
     if (transposeA) {
       return conjugateTranspose().multiply(B, C, alpha, beta, false, transposeB);
     }
     if (transposeB) {
       return this.multiply(B.conjugateTranspose(), C, alpha, beta, transposeA, false);
     }
-    final int m = _rows;
-    final int n = _columns;
-    final int p = B._columns;
-    ComplexMatrix CC;
-    if (C == null) {
-      CC = like2D(m, p);
-    } else {
-      CC = C;
-    }
-    if (B._rows != n) {
+    if (B.rows != columnsA) {
       throw new ArgumentError("Matrix inner dimensions must agree:" + toStringShort() + ", " + B.toStringShort());
     }
-    if (CC._rows != m || CC._columns != p) {
-      throw new ArgumentError("Incompatibe result matrix: " + toStringShort() + ", " + B.toStringShort() + ", " + CC.toStringShort());
+    if (C.rows != rowsA || C.columns != columnsB) {
+      throw new ArgumentError("Incompatibe result matrix: " + toStringShort() + ", " + B.toStringShort() + ", " + C.toStringShort());
     }
-    if (this == CC || B == CC) throw new ArgumentError("Matrices must not be identical");
-    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-      nthreads = Math.min(nthreads, p);
-      List<Future> futures = new List<Future>(nthreads);
-      int k = p ~/ nthreads;
-      for (int j = 0; j < nthreads; j++) {
-        final int firstIdx = j * k;
-        final int lastIdx = (j == nthreads - 1) ? p : firstIdx + k;
-        futures[j] = ConcurrencyUtils.submit(() {
-          Float64List s = new Float64List(2);
-          for (int a = firstIdx; a < lastIdx; a++) {
-            for (int b = 0; b < m; b++) {
-              s[0] = 0;
-              s[1] = 0;
-              for (int c = 0; c < n; c++) {
-                s = Complex.plus(s, Complex.mult(get(b, c), B.get(c, a)));
-              }
-              CC.set(b, a, Complex.plus(Complex.mult(s, alpha), Complex.mult(CC.get(b, a), beta)));
-            }
+    if (this == C || B == C) {
+      throw new ArgumentError("Matrices must not be identical");
+    }
+    int flops = 2 * rowsA * columnsA * columnsB;
+    int noOfTasks = 1;//Math.min(flops / 30000, ConcurrencyUtils.getNumberOfThreads()); // each
+    /* thread should process at least 30000 flops */
+    bool splitB = (columnsB >= noOfTasks);
+    int width = splitB ? columnsB : rowsA;
+    noOfTasks = Math.min(width, noOfTasks);
+
+    if (noOfTasks < 2) {
+      return this._multiplySeq(B, C, alpha, beta, transposeA, transposeB);
+    }
+    // set up concurrent tasks
+    int span = width ~/ noOfTasks;
+    final List<Future> subTasks = new List<Future>(noOfTasks);
+    for (int i = 0; i < noOfTasks; i++) {
+      final int offset = i * span;
+      if (i == noOfTasks - 1) span = width - span * i; // last span may be a bit larger
+      AbstractComplexMatrix AA, BB, CC;
+      if (splitB) {
+        // split B along columns into blocks
+        AA = this;
+        BB = B.part(0, offset, columnsA, span);
+        CC = C.part(0, offset, rowsA, span);
+      } else {
+        // split A along rows into blocks
+        AA = this.part(offset, 0, span, columnsA);
+        BB = B;
+        CC = C.part(offset, 0, span, columnsB);
+      }
+
+      /*subTasks[i] = ConcurrencyUtils.submit(() {
+        (AA as DenseComplexMatrix)._zMultSeq(BB, CC, alpha, beta, transposeA, transposeB);
+      });*/
+      (AA as ComplexMatrix)._multiplySeq(BB, CC, alpha, beta, transposeA, transposeB);
+    }
+    //ConcurrencyUtils.waitForCompletion(subTasks);
+
+    return C;
+  }
+
+  AbstractComplexMatrix _multiplySeq(AbstractComplexMatrix B, AbstractComplexMatrix C, Float64List alpha, Float64List beta, bool transposeA, bool transposeB) {
+    if (transposeA) {
+      return conjugateTranspose().multiply(B, C, alpha, beta, false, transposeB);
+    }
+    if (transposeB) {
+      return this.multiply(B.conjugateTranspose(), C, alpha, beta, transposeA, false);
+    }
+    int m = _rows;
+    int n = _columns;
+    int p = B.columns;
+    if (C == null) {
+      C = new ComplexMatrix(m, p);
+    }
+    if (!(C is ComplexMatrix)) {
+      return super.multiply(B, C, alpha, beta, transposeA, transposeB);
+    }
+    if (B.rows != n) {
+      throw new ArgumentError("Matrix inner dimensions must agree:" + toStringShort() + ", " + B.toStringShort());
+    }
+    if (C.rows != m || C.columns != p) {
+      throw new ArgumentError("Incompatibel result matrix: " + toStringShort() + ", " + B.toStringShort() + ", " + C.toStringShort());
+    }
+    if (this == C || B == C) {
+      throw new ArgumentError("Matrices must not be identical");
+    }
+
+    ComplexMatrix BB = B as ComplexMatrix;
+    ComplexMatrix CC = C as ComplexMatrix;
+    final Float64List AElems = this._elements;
+    final Float64List BElems = BB._elements;
+    final Float64List CElems = CC._elements;
+    if (AElems == null || BElems == null || CElems == null) {
+      throw new Error();
+    }
+
+    int cA = this._columnStride;
+    int cB = BB._columnStride;
+    int cC = CC._columnStride;
+
+    int rA = this._rowStride;
+    int rB = BB._rowStride;
+    int rC = CC._rowStride;
+
+    /*
+     * A is blocked to hide memory latency xxxxxxx B xxxxxxx xxxxxxx A xxx
+     * xxxxxxx C xxx xxxxxxx --- ------- xxx xxxxxxx xxx xxxxxxx --- -------
+     * xxx xxxxxxx
+     */
+    final int BLOCK_SIZE = 30000; // * 8 == Level 2 cache in bytes
+    int m_optimal = (BLOCK_SIZE - n) ~/ (n + 1);
+    if (m_optimal <= 0) m_optimal = 1;
+    int blocks = m ~/ m_optimal;
+    int rr = 0;
+    if (m % m_optimal != 0) blocks++;
+    double reS;
+    double imS;
+    double reA;
+    double imA;
+    double reB;
+    double imB;
+    double reC;
+    double imC;
+    for ( ; --blocks >= 0; ) {
+      int jB = BB.index(0, 0);
+      int indexA = index(rr, 0);
+      int jC = CC.index(rr, 0);
+      rr += m_optimal;
+      if (blocks == 0) m_optimal += m - rr;
+
+      for (int j = p; --j >= 0; ) {
+        int iA = indexA;
+        int iC = jC;
+        for (int i = m_optimal; --i >= 0; ) {
+          int kA = iA;
+          int kB = jB;
+          reS = 0.0;
+          imS = 0.0;
+          // loop unrolled
+          kA -= cA;
+          kB -= rB;
+          for (int k = n % 4; --k >= 0; ) {
+            kA += cA;
+            kB += rB;
+            reA = AElems[kA];
+            imA = AElems[kA + 1];
+            reB = BElems[kB];
+            imB = BElems[kB + 1];
+            reS += reA * reB - imA * imB;
+            imS += imA * reB + reA * imB;
           }
+          for (int k = n ~/ 4; --k >= 0; ) {
+            kA += cA;
+            kB += rB;
+            reA = AElems[kA];
+            imA = AElems[kA + 1];
+            reB = BElems[kB];
+            imB = BElems[kB + 1];
+            reS += reA * reB - imA * imB;
+            imS += imA * reB + reA * imB;
+            kA += cA;
+            kB += rB;
+            reA = AElems[kA];
+            imA = AElems[kA + 1];
+            reB = BElems[kB];
+            imB = BElems[kB + 1];
+            reS += reA * reB - imA * imB;
+            imS += imA * reB + reA * imB;
+            kA += cA;
+            kB += rB;
+            reA = AElems[kA];
+            imA = AElems[kA + 1];
+            reB = BElems[kB];
+            imB = BElems[kB + 1];
+            reS += reA * reB - imA * imB;
+            imS += imA * reB + reA * imB;
+            kA += cA;
+            kB += rB;
+            reA = AElems[kA];
+            imA = AElems[kA + 1];
+            reB = BElems[kB];
+            imB = BElems[kB + 1];
+            reS += reA * reB - imA * imB;
+            imS += imA * reB + reA * imB;
+          }
+          reC = CElems[iC];
+          imC = CElems[iC + 1];
+          CElems[iC] = alpha[0] * reS - alpha[1] * imS + beta[0] * reC - beta[1] * imC;
+          CElems[iC + 1] = alpha[1] * reS + alpha[0] * imS + beta[1] * reC + beta[0] * imC;
+          iA += rA;
+          iC += rC;
+        }
+        jB += cB;
+        jC += cC;
+      }
+    }
+    return C;
+  }
+
+  Float64List sum() {
+    Float64List sum = new Float64List(2);
+    final int zero = this.index(0, 0);
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    if ((nthreads > 1) && (_rows * _columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+      nthreads = Math.min(nthreads, _rows);
+      List<Future> futures = new List<Future>(nthreads);
+      int k = _rows ~/ nthreads;
+      for (int j = 0; j < nthreads; j++) {
+        final int firstRow = j * k;
+        final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
+        futures[j] = ConcurrencyUtils.submit(() {
+          Float64List sum = new Float64List(2);
+          int idx = zero + firstRow * _rowStride;
+          for (int r = firstRow; r < lastRow; r++) {
+            for (int i = idx,
+                c = 0; c < _columns; c++) {
+              sum[0] += _elements[i];
+              sum[1] += _elements[i + 1];
+              i += _columnStride;
+            }
+            idx += _rowStride;
+          }
+          return sum;
         });
       }
-      ConcurrencyUtils.waitForCompletion(futures);
-    } else {*/
-    Float64List s = new Float64List(2);
-    for (int a = 0; a < p; a++) {
-      for (int b = 0; b < m; b++) {
-        s[0] = 0.0;
-        s[1] = 0.0;
-        for (int c = 0; c < n; c++) {
-          s = Complex.plus(s, Complex.multiply(get(b, c), B.get(c, a)));
+      try {
+        Float64List tmp;
+        for (int j = 0; j < nthreads; j++) {
+          tmp = futures[j].get() as Float64List;
+          sum[0] = sum[0] + tmp[0];
+          sum[1] = sum[1] + tmp[1];
         }
-        CC.set(b, a, Complex.plus(Complex.multiply(s, alpha), Complex.multiply(CC.get(b, a), beta)));
+      } on ExecutionException catch (ex) {
+        ex.printStackTrace();
+      } on InterruptedException catch (e) {
+        e.printStackTrace();
       }
+    } else {*/
+    int idx = zero;
+    for (int r = 0; r < _rows; r++) {
+      for (int i = idx,
+          c = 0; c < _columns; c++) {
+        sum[0] += _elements[i];
+        sum[1] += _elements[i + 1];
+        i += _columnStride;
+      }
+      idx += _rowStride;
     }
     //}
-    return CC;
+    return sum;
   }
 
-  /**
-   * Returns the sum of all cells.
-   *
-   * @return the sum.
-   */
-  Float64List sum() {
-    if (length == 0) {
-      return new Float64List.fromList([0.0, 0.0]);
+  bool _haveSharedCellsRaw(AbstractComplexMatrix other) {
+    if (other is SelectedDenseComplexMatrix) {
+      return this._elements == other._elements;
+    } else if (other is ComplexMatrix) {
+      return this._elements == other._elements;
     }
-    return reduce(cfunc.plus, cfunc.identity);
-  }
-
-  /**
-   * Returns the content of this matrix if it is a wrapper; or <tt>this</tt>
-   * otherwise. Override this method in wrappers.
-   *
-   * @return <tt>this</tt>
-   */
-  ComplexMatrix _getContent() {
-    return this;
-  }
-
-  /**
-   * Returns <tt>true</tt> if both matrices share at least one identical cell.
-   *
-   * @param other
-   *            matrix
-   * @return <tt>true</tt> if both matrices share at least one identical cell.
-   */
-  bool _haveSharedCells(ComplexMatrix other) {
-    if (other == null) return false;
-    if (this == other) return true;
-    return _getContent()._haveSharedCellsRaw(other._getContent());
-  }
-
-  /**
-   * Always returns false
-   *
-   * @param other
-   *            matrix
-   * @return false
-   */
-  bool _haveSharedCellsRaw(ComplexMatrix other) {
     return false;
   }
 
-  /**
-   * Construct and returns a new 1-d matrix <i>of the corresponding dynamic
-   * type</i>, sharing the same cells. For example, if the receiver is an
-   * instance of type <tt>DenseComplexMatrix</tt> the new matrix must be of
-   * type <tt>DenseComplexVector</tt>.
-   *
-   * @param size
-   *            the number of cells the matrix shall have.
-   * @param zero
-   *            the index of the first element.
-   * @param stride
-   *            the number of indexes between any two elements, i.e.
-   *            <tt>index(i+1)-index(i)</tt>.
-   * @return a new matrix of the corresponding dynamic type.
-   */
-  ComplexVector _like1D(int size, int zero, int stride);
+  int index(int row, int column) {
+    return _rowZero + row * _rowStride + _columnZero + column * _columnStride;
+  }
+
+  AbstractComplexVector _like1D(int size, int zero, int stride) {
+    return new ComplexVector(size, this._elements, zero, stride, false);
+  }
+
+  AbstractComplexMatrix _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets) {
+    return new SelectedDenseComplexMatrix.withOffsets(this._elements, rowOffsets, columnOffsets, 0);
+  }
+
+  Object clone() {
+    return new ComplexMatrix(_rows, _columns, _elements, _rowZero, _columnZero, _rowStride, _columnStride, _isNoView);
+  }
+}
+
+/**
+ * Selection view on dense 2-d matrices holding <tt>complex</tt> elements.
+ * <b>Implementation:</b>
+ * <p>
+ * Objects of this class are typically constructed via <tt>viewIndexes</tt>
+ * methods on some source matrix. The interface introduced in abstract super
+ * classes defines everything a user can do. From a user point of view there is
+ * nothing special about this class; it presents the same functionality with the
+ * same signatures and semantics as its abstract superclass(es) while
+ * introducing no additional functionality. Thus, this class need not be visible
+ * to users.
+ * <p>
+ * This class uses no delegation. Its instances point directly to the data. Cell
+ * addressing overhead is 1 additional int addition and 2 additional array index
+ * accesses per get/set.
+ * <p>
+ * Note that this implementation is not synchronized.
+ *
+ * @author Piotr Wendykier (piotr.wendykier@gmail.com)
+ */
+class SelectedDenseComplexMatrix extends AbstractComplexMatrix {
 
   /**
-   * Constructs and returns a new view equal to the receiver. The view is a
-   * shallow clone. Calls <code>clone()</code> and casts the result.
-   * <p>
-   * <b>Note that the view is not a deep copy.</b> The returned matrix is
-   * backed by this matrix, so changes in the returned matrix are reflected in
-   * this matrix, and vice-versa.
-   * <p>
-   * Use {@link #copy()} to construct an independent deep copy rather than a
-   * new view.
-   *
-   * @return a new view of the receiver.
+   * The elements of this matrix.
    */
-  ComplexMatrix _view() {
-    return clone() as ComplexMatrix;
+  Float64List _elements;
+
+  /**
+   * The offsets of the visible cells of this matrix.
+   */
+  Int32List _rowOffsets;
+
+  Int32List _columnOffsets;
+
+  /**
+   * The offset.
+   */
+  int _offset;
+
+  /**
+   * Constructs a matrix view with the given parameters.
+   *
+   * @param elements
+   *            the cells.
+   * @param rowOffsets
+   *            The row offsets of the cells that shall be visible.
+   * @param columnOffsets
+   *            The column offsets of the cells that shall be visible.
+   * @param offset
+   */
+  factory SelectedDenseComplexMatrix.withOffsets(Float64List elements, Int32List rowOffsets, Int32List columnOffsets, int offset) {
+    return new SelectedDenseComplexMatrix(rowOffsets.length, columnOffsets.length, elements, 0, 0, 1, 1, rowOffsets, columnOffsets, offset);
   }
 
   /**
-   * Construct and returns a new selection view.
+   * Constructs a matrix view with the given parameters.
    *
+   * @param rows
+   *            the number of rows the matrix shall have.
+   * @param columns
+   *            the number of columns the matrix shall have.
+   * @param elements
+   *            the cells.
+   * @param rowZero
+   *            the position of the first element.
+   * @param columnZero
+   *            the position of the first element.
+   * @param rowStride
+   *            the number of elements between two rows, i.e.
+   *            <tt>index(i+1,j)-index(i,j)</tt>.
+   * @param columnStride
+   *            the number of elements between two columns, i.e.
+   *            <tt>index(i,j+1)-index(i,j)</tt>.
    * @param rowOffsets
-   *            the offsets of the visible elements.
+   *            The row offsets of the cells that shall be visible.
    * @param columnOffsets
-   *            the offsets of the visible elements.
-   * @return a new view.
+   *            The column offsets of the cells that shall be visible.
+   * @param offset
    */
-  ComplexMatrix _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets);
+  SelectedDenseComplexMatrix(int rows, int columns, Float64List elements, int rowZero, int columnZero, int rowStride, int columnStride, Int32List rowOffsets, Int32List columnOffsets, int offset) {
+    // be sure parameters are valid, we do not check...
+    _setUp(rows, columns, rowZero, columnZero, rowStride, columnStride);
 
-  Object clone();
+    this._elements = elements;
+    this._rowOffsets = rowOffsets;
+    this._columnOffsets = columnOffsets;
+    this._offset = offset;
+
+    this._isNoView = false;
+  }
+
+  int _columnOffset(int absRank) {
+    return _columnOffsets[absRank];
+  }
+
+  int _rowOffset(int absRank) {
+    return _rowOffsets[absRank];
+  }
+
+  Float64List get(int row, int column) {
+    int idxr = _rowZero + row * _rowStride;
+    int idxc = _columnZero + column * _columnStride;
+    return new Float64List.fromList([_elements[_offset + _rowOffsets[idxr] + _columnOffsets[idxc]], _elements[_offset + _rowOffsets[idxr] + _columnOffsets[idxc] + 1]]);
+  }
+
+  Float64List elements() {
+    throw new UnsupportedError("This method is not supported.");
+
+  }
+
+  /**
+   * Returns <tt>true</tt> if both matrices share common cells. More formally,
+   * returns <tt>true</tt> if <tt>other != null</tt> and at least one of the
+   * following conditions is met
+   * <ul>
+   * <li>the receiver is a view of the other matrix
+   * <li>the other matrix is a view of the receiver
+   * <li><tt>this == other</tt>
+   * </ul>
+   */
+  bool _haveSharedCellsRaw(AbstractComplexMatrix other) {
+    if (other is SelectedDenseComplexMatrix) {
+      return this._elements == other._elements;
+    } else if (other is ComplexMatrix) {
+      return this._elements == other._elements;
+    }
+    return false;
+  }
+
+  int index(int row, int column) {
+    return this._offset + _rowOffsets[_rowZero + row * _rowStride] + _columnOffsets[_columnZero + column * _columnStride];
+  }
+
+  AbstractComplexMatrix like2D(int rows, int columns) {
+    return new ComplexMatrix(rows, columns);
+  }
+
+  AbstractComplexVector like1D(int size) {
+    return new ComplexVector(size);
+  }
+
+  AbstractComplexVector _like1D(int size, int zero, int stride) {
+    throw new Error(); // this method is never called since
+    // viewRow() and viewColumn are overridden
+    // properly.
+  }
+
+  void set(int row, int column, Float64List value) {
+    int idxr = _rowZero + row * _rowStride;
+    int idxc = _columnZero + column * _columnStride;
+    _elements[_offset + _rowOffsets[idxr] + _columnOffsets[idxc]] = value[0];
+    _elements[_offset + _rowOffsets[idxr] + _columnOffsets[idxc] + 1] = value[1];
+  }
+
+  AbstractComplexVector vectorize() {
+    throw new UnsupportedError("This method is not supported.");
+  }
+
+  void setParts(int row, int column, double re, double im) {
+    int idxr = _rowZero + row * _rowStride;
+    int idxc = _columnZero + column * _columnStride;
+    _elements[_offset + _rowOffsets[idxr] + _columnOffsets[idxc]] = re;
+    _elements[_offset + _rowOffsets[idxr] + _columnOffsets[idxc] + 1] = im;
+  }
+
+//  void _setUp(int rows, int columns, [int rowZero = 0, int columnZero = 0, int rowStride = null, int columnStride = 1]) {
+//    super._setUp(rows, columns);
+//    this._rowStride = 1;
+//    this._columnStride = 2;
+//    this._offset = 0;
+//  }
+
+  AbstractMatrix _vDice() {
+    super._vDice();
+    // swap
+    Int32List tmp = _rowOffsets;
+    _rowOffsets = _columnOffsets;
+    _columnOffsets = tmp;
+
+    this._isNoView = false;
+    return this;
+  }
+
+  AbstractComplexVector column(int column) {
+    _checkColumn(column);
+    int viewSize = this._rows;
+    int viewZero = this._rowZero;
+    int viewStride = this._rowStride;
+    Int32List viewOffsets = this._rowOffsets;
+    int viewOffset = this._offset + _columnOffset(_columnRank(column));
+    return new SelectedDenseComplexVector(viewSize, this._elements, viewZero, viewStride, viewOffsets, viewOffset);
+  }
+
+  AbstractComplexVector row(int row) {
+    _checkRow(row);
+    int viewSize = this._columns;
+    int viewZero = _columnZero;
+    int viewStride = this._columnStride;
+    Int32List viewOffsets = this._columnOffsets;
+    int viewOffset = this._offset + _rowOffset(_rowRank(row));
+    return new SelectedDenseComplexVector(viewSize, this._elements, viewZero, viewStride, viewOffsets, viewOffset);
+  }
+
+  AbstractComplexMatrix _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets) {
+    return new SelectedDenseComplexMatrix.withOffsets(this._elements, rowOffsets, columnOffsets, this._offset);
+  }
+
+  AbstractDoubleMatrix real() {
+    final DoubleMatrix R = new DoubleMatrix(_rows, _columns);
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, _rows);
+            List<Future> futures = new List<Future>(nthreads);
+            int k = _rows / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstRow = j * k;
+                final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
+                futures[j] = ConcurrencyUtils.submit(() {
+                        Float64List tmp;
+                        for (int r = firstRow; r < lastRow; r++) {
+                            for (int c = 0; c < _columns; c++) {
+                                tmp = getQuick(r, c);
+                                R.setQuick(r, c, tmp[0]);
+                            }
+                        }
+                });
+            }
+            ConcurrencyUtils.waitForCompletion(futures);
+        } else {*/
+    for (int r = 0; r < _rows; r++) {
+      for (int c = 0; c < _columns; c++) {
+        final tmp = get(r, c);
+        R.set(r, c, tmp[0]);
+      }
+    }
+    //}
+    return R;
+  }
+
+  AbstractDoubleMatrix imaginary() {
+    final DoubleMatrix Im = new DoubleMatrix(_rows, _columns);
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+        nthreads = Math.min(nthreads, _rows);
+        List<Future> futures = new List<Future>(nthreads);
+        int k = _rows / nthreads;
+        for (int j = 0; j < nthreads; j++) {
+            final int firstRow = j * k;
+            final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
+            futures[j] = ConcurrencyUtils.submit(() {
+                    Float64List tmp;
+                    for (int r = firstRow; r < lastRow; r++) {
+                        for (int c = 0; c < _columns; c++) {
+                            tmp = getQuick(r, c);
+                            Im.setQuick(r, c, tmp[1]);
+                        }
+                    }
+            });
+        }
+        ConcurrencyUtils.waitForCompletion(futures);
+    } else {*/
+    for (int r = 0; r < _rows; r++) {
+      for (int c = 0; c < _columns; c++) {
+        final tmp = get(r, c);
+        Im.set(r, c, tmp[1]);
+      }
+    }
+    //}
+    return Im;
+  }
+
+  Object clone() {
+    return new SelectedDenseComplexMatrix(_rows, _columns, _elements, _rowZero, _columnZero, _rowStride, _columnStride, _rowOffsets, _columnOffsets, _offset);
+  }
 }

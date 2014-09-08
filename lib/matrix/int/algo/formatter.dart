@@ -295,7 +295,7 @@ class IntFormatter extends AbstractFormatter {
   /**
    * Converts a given cell to a String; no alignment considered.
    */
-  String _form(IntVector matrix, int index, Former formatter) {
+  String _form(AbstractIntVector matrix, int index, Former formatter) {
     return formatter.formInt(matrix.at(index));
   }
 
@@ -304,13 +304,13 @@ class IntFormatter extends AbstractFormatter {
    */
 
   String _form1D(AbstractVector matrix, int index, Former formatter) {
-    return this._form(matrix as IntVector, index, formatter);
+    return this._form(matrix as AbstractIntVector, index, formatter);
   }
 
   /**
    * Returns a string representations of all cells; no alignment considered.
    */
-  List<List<String>> format(IntMatrix matrix) {
+  List<List<String>> format(AbstractIntMatrix matrix) {
     final strings = new List<List<String>>.generate(matrix.rows,
         (_) => new List<String>(matrix.columns));
     for (int row = matrix.rows; --row >= 0; ) {
@@ -324,7 +324,7 @@ class IntFormatter extends AbstractFormatter {
    */
 
   List<List<String>> _format2D(AbstractMatrix matrix) {
-    return this.format(matrix as IntMatrix);
+    return this.format(matrix as AbstractIntMatrix);
   }
 
   /**
@@ -356,7 +356,7 @@ class IntFormatter extends AbstractFormatter {
    * @param matrix
    *            the matrix to format.
    */
-  String toSourceCode(IntVector matrix) {
+  String toSourceCode(AbstractIntVector matrix) {
     IntFormatter copy = this.clone() as IntFormatter;
     copy.setPrintShape(false);
     copy.setColumnSeparator(", ");
@@ -372,7 +372,7 @@ class IntFormatter extends AbstractFormatter {
    * @param matrix
    *            the matrix to format.
    */
-  String toSourceCode2D(IntMatrix matrix) {
+  String toSourceCode2D(AbstractIntMatrix matrix) {
     IntFormatter copy = this.clone() as IntFormatter;
     String b3 = _blanks(3);
     copy.setPrintShape(false);
@@ -409,8 +409,8 @@ class IntFormatter extends AbstractFormatter {
    * @param matrix
    *            the matrix to convert.
    */
-  String toString1D(IntVector matrix) {
-    IntMatrix easy = matrix.like2D(1, matrix.length);
+  String toString1D(AbstractIntVector matrix) {
+    AbstractIntMatrix easy = matrix.like2D(1, matrix.length);
     easy.row(0).copyFrom(matrix);
     return toString2D(easy);
   }
@@ -421,7 +421,7 @@ class IntFormatter extends AbstractFormatter {
    * @param matrix
    *            the matrix to convert.
    */
-  String toString2D(IntMatrix matrix) {
+  String toString2D(AbstractIntMatrix matrix) {
     return super.toString2D(matrix);
   }
 
@@ -452,7 +452,7 @@ class IntFormatter extends AbstractFormatter {
    */
 
   String _toString2D(AbstractMatrix matrix) {
-    return this.toString2D(matrix as IntMatrix);
+    return this.toString2D(matrix as AbstractIntMatrix);
   }
 
   /**

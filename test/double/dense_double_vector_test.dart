@@ -3,8 +3,8 @@ part of cern.colt.matrix.double.test;
 class DenseDoubleVectorTest extends DoubleVectorTest {
 
   void createMatrices() {
-    A = new DenseDoubleVector(SIZE);
-    B = new DenseDoubleVector(SIZE);
+    A = new DoubleVector(SIZE);
+    B = new DoubleVector(SIZE);
   }
 
 }
@@ -12,8 +12,8 @@ class DenseDoubleVectorTest extends DoubleVectorTest {
 class DenseDoubleVectorViewTest extends DenseDoubleVectorTest {
 
   void createMatrices() {
-    A = new DenseDoubleVector(SIZE).flip();
-    B = new DenseDoubleVector(SIZE).flip();
+    A = new DoubleVector(SIZE).flip();
+    B = new DoubleVector(SIZE).flip();
   }
 
 }

@@ -45,13 +45,13 @@ testComplexMatrix(String name, ComplexMatrixTest t) {
 abstract class ComplexMatrixTest {
 
   /** Matrix to test. */
-  ComplexMatrix A;
+  AbstractComplexMatrix A;
 
   /** Matrix of the same size as [A]. */
-  ComplexMatrix B;
+  AbstractComplexMatrix B;
 
   /** Matrix of the size `A.columns() x A.rows()`. */
-  ComplexMatrix Bt;
+  AbstractComplexMatrix Bt;
 
   int NROWS = 13;
 
@@ -114,7 +114,7 @@ abstract class ComplexMatrixTest {
   }
 
   void testAssign() {
-    ComplexMatrix Acopy = A.copy();
+    AbstractComplexMatrix Acopy = A.copy();
     A.forEach(acos);
     Float64List tmp;
     for (int r = 0; r < A.rows; r++) {
@@ -135,7 +135,7 @@ abstract class ComplexMatrixTest {
   }
 
   void testAssignFunc() {
-    ComplexMatrix Acopy = A.copy();
+    AbstractComplexMatrix Acopy = A.copy();
     A.forEachMatrix(B, div);
     for (int r = 0; r < A.rows; r++) {
       for (int c = 0; c < A.columns; c++) {
@@ -145,7 +145,7 @@ abstract class ComplexMatrixTest {
   }
 
   void testAssignProc() {
-    ComplexMatrix Acopy = A.copy();
+    AbstractComplexMatrix Acopy = A.copy();
     A.forEachWhere((Float64List element) {
       if (Complex.abs(element) > 3) {
         return true;
@@ -165,7 +165,7 @@ abstract class ComplexMatrixTest {
   }
 
   void testProcValue() {
-    ComplexMatrix Acopy = A.copy();
+    AbstractComplexMatrix Acopy = A.copy();
     Float64List value = new Float64List.fromList([random.nextDouble(), random.nextDouble()]);
     A.fillWhere((Float64List element) {
       if (Complex.abs(element) > 3) {
@@ -186,7 +186,7 @@ abstract class ComplexMatrixTest {
   }
 
   void testRealFunc() {
-    ComplexMatrix Acopy = A.copy();
+    AbstractComplexMatrix Acopy = A.copy();
     A.forEachReal(abs);
     Float64List tmp;
     for (int r = 0; r < A.rows; r++) {
@@ -245,8 +245,8 @@ abstract class ComplexMatrixTest {
   }
 
   void testAssignImaginary() {
-    DoubleMatrix Im = DoubleFactory2D.dense.random(A.rows, A.columns);
-    ComplexMatrix Acopy = A.copy();
+    AbstractDoubleMatrix Im = DoubleFactory2D.dense.random(A.rows, A.columns);
+    AbstractComplexMatrix Acopy = A.copy();
     A.setImaginary(Im);
     for (int r = 0; r < A.rows; r++) {
       for (int c = 0; c < A.columns; c++) {
@@ -257,8 +257,8 @@ abstract class ComplexMatrixTest {
   }
 
   void testAssignReal() {
-    DoubleMatrix Re = DoubleFactory2D.dense.random(A.rows, A.columns);
-    ComplexMatrix Acopy = A.copy();
+    AbstractDoubleMatrix Re = DoubleFactory2D.dense.random(A.rows, A.columns);
+    AbstractComplexMatrix Acopy = A.copy();
     A.setReal(Re);
     for (int r = 0; r < A.rows; r++) {
       for (int c = 0; c < A.columns; c++) {
@@ -287,7 +287,7 @@ abstract class ComplexMatrixTest {
   }
 
   void testForEachNonZero() {
-    ComplexMatrix Acopy = A.copy();
+    AbstractComplexMatrix Acopy = A.copy();
     Float64List function(int first, int second, Float64List third) {
       return Complex.sqrt(third);
     }
@@ -300,7 +300,7 @@ abstract class ComplexMatrixTest {
   }
 
   void testGetConjugateTranspose() {
-    ComplexMatrix Aconj = A.conjugateTranspose();
+    AbstractComplexMatrix Aconj = A.conjugateTranspose();
     expect(A.rows, equals(Aconj.columns));
     expect(A.columns, equals(Aconj.rows));
     for (int r = 0; r < A.rows; r++) {
@@ -312,7 +312,7 @@ abstract class ComplexMatrixTest {
   }
 
   void testGetImaginaryPart() {
-    DoubleMatrix Im = A.imaginary();
+    AbstractDoubleMatrix Im = A.imaginary();
     for (int r = 0; r < A.rows; r++) {
       for (int c = 0; c < A.columns; c++) {
         expect(A.get(r, c)[1], closeTo(Im.get(r, c), TOL));
@@ -338,7 +338,7 @@ abstract class ComplexMatrixTest {
   }
 
   void testGetRealPart() {
-    DoubleMatrix Re = A.real();
+    AbstractDoubleMatrix Re = A.real();
     for (int r = 0; r < A.rows; r++) {
       for (int c = 0; c < A.columns; c++) {
         expect(A.get(r, c)[0], closeTo(Re.get(r, c), TOL));
@@ -357,7 +357,7 @@ abstract class ComplexMatrixTest {
   }
 
   void testVectorize() {
-    ComplexVector B = A.vectorize();
+    AbstractComplexVector B = A.vectorize();
     int idx = 0;
     for (int c = 0; c < A.columns; c++) {
       for (int r = 0; r < A.rows; r++) {
@@ -367,7 +367,7 @@ abstract class ComplexMatrixTest {
   }
 
   void testViewColumn() {
-    ComplexVector B = A.column(A.columns ~/ 2);
+    AbstractComplexVector B = A.column(A.columns ~/ 2);
     expect(A.rows, equals(B.length));
     for (int r = 0; r < A.rows; r++) {
       assertEquals(A.get(r, A.columns ~/ 2), B.get(r), TOL);
@@ -375,7 +375,7 @@ abstract class ComplexMatrixTest {
   }
 
   void testViewColumnFlip() {
-    ComplexMatrix B = A.columnFlip();
+    AbstractComplexMatrix B = A.columnFlip();
     expect(A.length, equals(B.length));
     for (int r = 0; r < A.rows; r++) {
       for (int c = 0; c < A.columns; c++) {
@@ -385,7 +385,7 @@ abstract class ComplexMatrixTest {
   }
 
   void testViewDice() {
-    ComplexMatrix B = A.dice();
+    AbstractComplexMatrix B = A.dice();
     expect(A.rows, equals(B.columns));
     expect(A.columns, equals(B.rows));
     for (int r = 0; r < A.rows; r++) {
@@ -396,7 +396,7 @@ abstract class ComplexMatrixTest {
   }
 
   void testViewPart() {
-    ComplexMatrix B = A.part(A.rows ~/ 2, A.columns ~/ 2, A.rows ~/ 3, A.columns ~/ 3);
+    AbstractComplexMatrix B = A.part(A.rows ~/ 2, A.columns ~/ 2, A.rows ~/ 3, A.columns ~/ 3);
     for (int r = 0; r < A.rows / 3; r++) {
       for (int c = 0; c < A.columns / 3; c++) {
         assertEquals(A.get(A.rows ~/ 2 + r, A.columns ~/ 2 + c), B.get(r, c), TOL);
@@ -405,7 +405,7 @@ abstract class ComplexMatrixTest {
   }
 
   void testViewRow() {
-    ComplexVector B = A.row(A.rows ~/ 2);
+    AbstractComplexVector B = A.row(A.rows ~/ 2);
     expect(A.columns, equals(B.length));
     for (int c = 0; c < A.columns; c++) {
       assertEquals(A.get(A.rows ~/ 2, c), B.get(c), TOL);
@@ -413,7 +413,7 @@ abstract class ComplexMatrixTest {
   }
 
   void testViewRowFlip() {
-    ComplexMatrix B = A.rowFlip();
+    AbstractComplexMatrix B = A.rowFlip();
     expect(A.length, equals(B.length));
     for (int r = 0; r < A.rows; r++) {
       for (int c = 0; c < A.columns; c++) {
@@ -426,7 +426,7 @@ abstract class ComplexMatrixTest {
     final Float64List value = new Float64List.fromList([random.nextDouble(), random.nextDouble()]);
     A.set(A.rows ~/ 3, 0, value);
     A.set(A.rows ~/ 2, 0, value);
-    ComplexMatrix B = A.where((ComplexVector element) {
+    AbstractComplexMatrix B = A.where((ComplexVector element) {
       return Complex.isEqual(element.get(0), value, TOL);
     });
     expect(2, equals(B.rows));
@@ -438,7 +438,7 @@ abstract class ComplexMatrixTest {
   void testViewSelection() {
     Int32List rowIndexes = new Int32List.fromList([A.rows ~/ 6, A.rows ~/ 5, A.rows ~/ 4, A.rows ~/ 3, A.rows ~/ 2]);
     Int32List colIndexes = new Int32List.fromList([A.columns ~/ 6, A.columns ~/ 5, A.columns ~/ 4, A.columns ~/ 3, A.columns ~/ 2, A.columns - 1]);
-    ComplexMatrix B = A.select(rowIndexes, colIndexes);
+    AbstractComplexMatrix B = A.select(rowIndexes, colIndexes);
     expect(rowIndexes.length, equals(B.rows));
     expect(colIndexes.length, equals(B.columns));
     for (int r = 0; r < rowIndexes.length; r++) {
@@ -451,7 +451,7 @@ abstract class ComplexMatrixTest {
   void testViewStrides() {
     int rowStride = 3;
     int colStride = 5;
-    ComplexMatrix B = A.strides(rowStride, colStride);
+    AbstractComplexMatrix B = A.strides(rowStride, colStride);
     for (int r = 0; r < B.rows; r++) {
       for (int c = 0; c < B.columns; c++) {
         assertEquals(A.get(r * rowStride, c * colStride), B.get(r, c), TOL);
@@ -460,13 +460,13 @@ abstract class ComplexMatrixTest {
   }
 
   void testZMult() {
-    ComplexVector y = new DenseComplexVector(A.columns);
+    AbstractComplexVector y = new ComplexVector(A.columns);
     for (int i = 0; i < y.length; i++) {
       y.set(i, new Float64List.fromList([random.nextDouble(), random.nextDouble()]));
     }
     Float64List alpha = new Float64List.fromList([3.0, 2.0]);
     Float64List beta = new Float64List.fromList([5.0, 4.0]);
-    ComplexVector z = null;
+    AbstractComplexVector z = null;
     z = A.mult(y, z, alpha, beta, false);
     Float64List expected = new Float64List(2 * A.rows);
     Float64List tmp = new Float64List(2);
@@ -488,7 +488,7 @@ abstract class ComplexMatrixTest {
       expect(expected[2 * r + 1], closeTo(z.get(r)[1], TOL));
     }
     //transpose
-    y = new DenseComplexVector(A.rows);
+    y = new ComplexVector(A.rows);
     for (int i = 0; i < y.length; i++) {
       y.set(i, new Float64List.fromList([random.nextDouble(), random.nextDouble()]));
     }
@@ -517,7 +517,7 @@ abstract class ComplexMatrixTest {
     Float64List alpha = new Float64List.fromList([3.0, 2.0]);
     Float64List beta = new Float64List.fromList([5.0, 4.0]);
     Float64List tmp = new Float64List(2);
-    ComplexMatrix C = null;
+    AbstractComplexMatrix C = null;
     C = A.multiply(Bt, C, alpha, beta, false, false);
     List<Float64List> expected = new List<Float64List>.generate(A.rows,
         (_) => new Float64List(2 * A.rows));

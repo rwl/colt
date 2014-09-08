@@ -16,7 +16,7 @@ part of cern.colt.matrix;
  * @author Piotr Wendykier (piotr.wendykier@gmail.com)
  *
  */
-class SparseComplexMatrix extends ComplexMatrix {
+class SparseComplexMatrix extends AbstractComplexMatrix {
 
   /*
    * The elements of the matrix.
@@ -76,7 +76,7 @@ class SparseComplexMatrix extends ComplexMatrix {
     this._isNoView = isNoView;
   }
 
-  ComplexMatrix fill(double re, double im/*Float64List value*/) {
+  AbstractComplexMatrix fill(double re, double im/*Float64List value*/) {
     // overriden for performance only
     //if (this._isNoView && value[0] == 0 && value[1] == 0) {
     if (this._isNoView && re == 0 && im == 0) {
@@ -87,7 +87,7 @@ class SparseComplexMatrix extends ComplexMatrix {
     return this;
   }
 
-  ComplexMatrix copyFrom(ComplexMatrix source) {
+  AbstractComplexMatrix copyFrom(AbstractComplexMatrix source) {
     // overriden for performance only
     if (!(source is SparseComplexMatrix)) {
       return super.copyFrom(source);
@@ -106,7 +106,7 @@ class SparseComplexMatrix extends ComplexMatrix {
     return super.copyFrom(source);
   }
 
-  ComplexMatrix forEachMatrix(final ComplexMatrix y, cfunc.ComplexComplexComplexFunction function) {
+  AbstractComplexMatrix forEachMatrix(final AbstractComplexMatrix y, cfunc.ComplexComplexComplexFunction function) {
     if (!this._isNoView) return super.forEachMatrix(y, function);
 
     checkShape(y);
@@ -155,7 +155,7 @@ class SparseComplexMatrix extends ComplexMatrix {
    * </ul>
    */
 
-  bool _haveSharedCellsRaw(ComplexMatrix other) {
+  bool _haveSharedCellsRaw(AbstractComplexMatrix other) {
     if (other is SelectedSparseComplexMatrix) {
       return this._elements == other._elements;
     } else if (other is SparseComplexMatrix) {
@@ -168,15 +168,15 @@ class SparseComplexMatrix extends ComplexMatrix {
     return _rowZero + row * _rowStride + _columnZero + column * _columnStride;
   }
 
-  ComplexMatrix like2D(int rows, int columns) {
+  AbstractComplexMatrix like2D(int rows, int columns) {
     return new SparseComplexMatrix(rows, columns);
   }
 
-  ComplexVector like1D(int size) {
+  AbstractComplexVector like1D(int size) {
     return new SparseComplexVector(size);
   }
 
-  ComplexVector _like1D(int size, int offset, int stride) {
+  AbstractComplexVector _like1D(int size, int offset, int stride) {
     return new SparseComplexVector(size, this._elements, offset, stride);
   }
 
@@ -189,7 +189,7 @@ class SparseComplexMatrix extends ComplexMatrix {
     }
   }
 
-  ComplexVector vectorize() {
+  AbstractComplexVector vectorize() {
     final SparseComplexVector v = new SparseComplexVector(length);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_rows * _columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -236,12 +236,12 @@ class SparseComplexMatrix extends ComplexMatrix {
     }
   }
 
-  ComplexMatrix _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets) {
+  AbstractComplexMatrix _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets) {
     return new SelectedSparseComplexMatrix.withOffsets(this._elements, rowOffsets, columnOffsets, 0);
   }
 
-  DoubleMatrix imaginary() {
-    final DoubleMatrix Im = new SparseDoubleMatrix(_rows, _columns);
+  AbstractDoubleMatrix imaginary() {
+    final AbstractDoubleMatrix Im = new SparseDoubleMatrix(_rows, _columns);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
@@ -270,8 +270,8 @@ class SparseComplexMatrix extends ComplexMatrix {
     return Im;
   }
 
-  DoubleMatrix real() {
-    final DoubleMatrix Re = new SparseDoubleMatrix(_rows, _columns);
+  AbstractDoubleMatrix real() {
+    final AbstractDoubleMatrix Re = new SparseDoubleMatrix(_rows, _columns);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
@@ -311,7 +311,7 @@ class SparseComplexMatrix extends ComplexMatrix {
  *
  * @author Piotr Wendykier (piotr.wendykier@gmail.com)
  */
-class SelectedSparseComplexMatrix extends ComplexMatrix {
+class SelectedSparseComplexMatrix extends AbstractComplexMatrix {
 
   /* The elements of the matrix. */
   Map<int, Float64List> _elements;
@@ -402,7 +402,7 @@ class SelectedSparseComplexMatrix extends ComplexMatrix {
    * <li><tt>this == other</tt>
    * </ul>
    */
-  bool _haveSharedCellsRaw(ComplexMatrix other) {
+  bool _haveSharedCellsRaw(AbstractComplexMatrix other) {
     if (other is SelectedSparseComplexMatrix) {
       return this._elements == other._elements;
     } else if (other is SparseComplexMatrix) {
@@ -415,15 +415,15 @@ class SelectedSparseComplexMatrix extends ComplexMatrix {
     return this._offset + _rowOffsets[_rowZero + row * _rowStride] + _columnOffsets[_columnZero + column * _columnStride];
   }
 
-  ComplexMatrix like2D(int rows, int columns) {
+  AbstractComplexMatrix like2D(int rows, int columns) {
     return new SparseComplexMatrix(rows, columns);
   }
 
-  ComplexVector like1D(int size) {
+  AbstractComplexVector like1D(int size) {
     return new SparseComplexVector(size);
   }
 
-  ComplexVector _like1D(int size, int zero, int stride) {
+  AbstractComplexVector _like1D(int size, int zero, int stride) {
     throw new Error(); // this method is never called since
     // viewRow() and viewColumn are overridden
     // properly.
@@ -439,7 +439,7 @@ class SelectedSparseComplexMatrix extends ComplexMatrix {
     }
   }
 
-  ComplexVector vectorize() {
+  AbstractComplexVector vectorize() {
     throw new UnsupportedError("This method is not supported.");
   }
 
@@ -470,7 +470,7 @@ class SelectedSparseComplexMatrix extends ComplexMatrix {
     return this;
   }
 
-  ComplexVector column(int column) {
+  AbstractComplexVector column(int column) {
     _checkColumn(column);
     int viewSize = this._rows;
     int viewZero = this._rowZero;
@@ -480,7 +480,7 @@ class SelectedSparseComplexMatrix extends ComplexMatrix {
     return new SelectedSparseComplexVector(viewSize, this._elements, viewZero, viewStride, viewOffsets, viewOffset);
   }
 
-  ComplexVector row(int row) {
+  AbstractComplexVector row(int row) {
     _checkRow(row);
     int viewSize = this._columns;
     int viewZero = _columnZero;
@@ -490,15 +490,15 @@ class SelectedSparseComplexMatrix extends ComplexMatrix {
     return new SelectedSparseComplexVector(viewSize, this._elements, viewZero, viewStride, viewOffsets, viewOffset);
   }
 
-  ComplexMatrix _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets) {
+  AbstractComplexMatrix _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets) {
     return new SelectedSparseComplexMatrix.withOffsets(this._elements, rowOffsets, columnOffsets, this._offset);
   }
 
-  DoubleMatrix imaginary() {
+  AbstractDoubleMatrix imaginary() {
     throw new UnsupportedError("This method is not supported.");
   }
 
-  DoubleMatrix real() {
+  AbstractDoubleMatrix real() {
     throw new UnsupportedError("This method is not supported.");
   }
 

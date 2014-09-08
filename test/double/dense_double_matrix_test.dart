@@ -12,9 +12,9 @@ testDenseDoubleMatrix(String name, DenseDoubleMatrixTest t) {
 class DenseDoubleMatrixTest extends DoubleMatrixTest {
 
   void createMatrices() {
-    A = new DenseDoubleMatrix(NROWS, NCOLUMNS);
-    B = new DenseDoubleMatrix(NROWS, NCOLUMNS);
-    Bt = new DenseDoubleMatrix(NCOLUMNS, NROWS);
+    A = new DoubleMatrix(NROWS, NCOLUMNS);
+    B = new DoubleMatrix(NROWS, NCOLUMNS);
+    Bt = new DoubleMatrix(NCOLUMNS, NROWS);
   }
 
   void testAssignValues() {
@@ -36,9 +36,9 @@ class DenseDoubleMatrixTest extends DoubleMatrixTest {
 class DenseDoubleMatrixViewTest extends DenseDoubleMatrixTest {
 
   void createMatrices() {
-    A = new DenseDoubleMatrix(NCOLUMNS, NROWS).dice();
-    B = new DenseDoubleMatrix(NCOLUMNS, NROWS).dice();
-    Bt = new DenseDoubleMatrix(NROWS, NCOLUMNS).dice();
+    A = new DoubleMatrix(NCOLUMNS, NROWS).dice();
+    B = new DoubleMatrix(NCOLUMNS, NROWS).dice();
+    Bt = new DoubleMatrix(NROWS, NCOLUMNS).dice();
   }
 
 }

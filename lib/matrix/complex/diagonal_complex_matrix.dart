@@ -120,7 +120,7 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
     }
   }
 
-  ComplexMatrix forEach(final cfunc.ComplexComplexFunction function) {
+  AbstractComplexMatrix forEach(final cfunc.ComplexComplexFunction function) {
     if (function is cfunc.ComplexMult) { // x[i] = mult*x[i]
       final Float64List alpha = (function as cfunc.ComplexMult).multiplicator;
       if (alpha[0] == 1 && alpha[1] == 0) {
@@ -153,7 +153,7 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
     return this;
   }
 
-  ComplexMatrix fill(double re, double im) {
+  AbstractComplexMatrix fill(double re, double im) {
     for (int j = 0; j < _dlength; j++) {
       _elements[2 * j] = re;
       _elements[2 * j + 1] = im;
@@ -161,7 +161,7 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
     return this;
   }
 
-  ComplexMatrix setAll(final Float64List values) {
+  AbstractComplexMatrix setAll(final Float64List values) {
     if (values.length != 2 * _dlength) throw new ArgumentError("Must have same length: length=${values.length} 2*dlength=${2 * _dlength}");
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_dlength >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -188,7 +188,7 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
     return this;
   }
 
-  ComplexMatrix setAll2D(final List<Float64List> values) {
+  AbstractComplexMatrix setAll2D(final List<Float64List> values) {
     if (values.length != _rows) {
       throw new ArgumentError("Must have same number of rows: rows=${values.length} rows()=${rows}");
     }
@@ -212,7 +212,7 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
     return this;
   }
 
-  ComplexMatrix copyFrom(ComplexMatrix source) {
+  AbstractComplexMatrix copyFrom(AbstractComplexMatrix source) {
     // overriden for performance only
     if (source == this) return this; // nothing to do
     checkShape(source);
@@ -231,7 +231,7 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
     }
   }
 
-  ComplexMatrix forEachMatrix(final ComplexMatrix y, final cfunc.ComplexComplexComplexFunction function) {
+  AbstractComplexMatrix forEachMatrix(final AbstractComplexMatrix y, final cfunc.ComplexComplexComplexFunction function) {
     checkShape(y);
     if (y is DiagonalComplexMatrix) {
       DiagonalComplexMatrix other = y;
@@ -502,7 +502,7 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
     }
   }
 
-  ComplexMatrix forEachNonZero(final cfunc.IntIntComplexFunction function) {
+  AbstractComplexMatrix forEachNonZero(final cfunc.IntIntComplexFunction function) {
     Float64List value = new Float64List(2);
     for (int i = 0; i < _dlength; i++) {
       value[0] = _elements[2 * i];
@@ -558,11 +558,11 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
     }
   }
 
-  ComplexMatrix like2D(int rows, int columns) {
+  AbstractComplexMatrix like2D(int rows, int columns) {
     return new SparseComplexMatrix(rows, columns);
   }
 
-  ComplexVector like1D(int size) {
+  AbstractComplexVector like1D(int size) {
     return new SparseComplexVector(size);
   }
 
@@ -618,7 +618,7 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
     }
   }
 
-  ComplexVector mult(ComplexVector y, ComplexVector z, [Float64List alpha = null, Float64List beta = null, bool transposeA = false]) {
+  AbstractComplexVector mult(AbstractComplexVector y, AbstractComplexVector z, [Float64List alpha = null, Float64List beta = null, bool transposeA = false]) {
     if (alpha == null) {
       alpha = new Float64List.fromList([1.0, 0.0]);
     }
@@ -633,9 +633,9 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
     }
 
     bool ignore = (z == null);
-    if (z == null) z = new DenseComplexVector(rowsA);
+    if (z == null) z = new ComplexVector(rowsA);
 
-    if (!(this._isNoView && y is DenseComplexVector && z is DenseComplexVector)) {
+    if (!(this._isNoView && y is ComplexVector && z is ComplexVector)) {
       return super.mult(y, z, alpha, beta, transposeA);
     }
 
@@ -647,12 +647,12 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
       z.forEach(cfunc.multiply(beta));
     }
 
-    DenseComplexVector zz = z as DenseComplexVector;
+    ComplexVector zz = z as ComplexVector;
     final Float64List elementsZ = zz._elements;
     final int strideZ = zz.stride();
     final int zeroZ = z.index(0);
 
-    DenseComplexVector yy = y as DenseComplexVector;
+    ComplexVector yy = y as ComplexVector;
     final Float64List elementsY = yy._elements;
     final int strideY = yy.stride();
     final int zeroY = y.index(0);
@@ -715,7 +715,7 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
     return z;
   }
 
-  ComplexMatrix _getContent() {
+  AbstractComplexMatrix _getContent() {
     return this;
   }
 

@@ -39,10 +39,10 @@ testDoubleVector(String name, DoubleVectorTest t) {
 
 abstract class DoubleVectorTest {
   /** Matrix to test. */
-  DoubleVector A;
+  AbstractDoubleVector A;
 
   /** Matrix of the same size as [A]. */
-  DoubleVector B;
+  AbstractDoubleVector B;
 
   double TOL = 1e-10;
 
@@ -130,7 +130,7 @@ abstract class DoubleVectorTest {
   }
 
   testAssign() {
-    DoubleVector Acopy = A.copy();
+    AbstractDoubleVector Acopy = A.copy();
     A.forEach(acos);
     for (int i = 0; i < A.length; i++) {
       double expected = math.acos(Acopy.get(i));
@@ -147,7 +147,7 @@ abstract class DoubleVectorTest {
   }
 
   testAssignFunc() {
-    DoubleVector Acopy = A.copy();
+    AbstractDoubleVector Acopy = A.copy();
     A.forEachVector(B, div);
     for (int i = 0; i < A.length; i++) {
       expect(Acopy.get(i) / B.get(i), closeTo(A.get(i), TOL));
@@ -162,7 +162,7 @@ abstract class DoubleVectorTest {
         return false;
       }
     }
-    DoubleVector Acopy = A.copy();
+    AbstractDoubleVector Acopy = A.copy();
     A.fillWhere(procedure, -1.0);
     for (int i = 0; i < A.length; i++) {
       if (Acopy.get(i).abs() > 0.1) {
@@ -181,7 +181,7 @@ abstract class DoubleVectorTest {
         return false;
       }
     }
-    DoubleVector Acopy = A.copy();
+    AbstractDoubleVector Acopy = A.copy();
     A.forEachWhere(procedure, tan);
     for (int i = 0; i < A.length; i++) {
       if (Acopy.get(i).abs() > 0.1) {
@@ -291,7 +291,7 @@ abstract class DoubleVectorTest {
   testReshape() {
     int rows = 10;
     int columns = 17;
-    DoubleMatrix B = A.reshape(rows, columns);
+    AbstractDoubleMatrix B = A.reshape(rows, columns);
     int idx = 0;
     for (int c = 0; c < columns; c++) {
       for (int r = 0; r < rows; r++) {
@@ -316,8 +316,8 @@ abstract class DoubleVectorTest {
   }*/
 
   testSwap() {
-    DoubleVector Acopy = A.copy();
-    DoubleVector Bcopy = B.copy();
+    AbstractDoubleVector Acopy = A.copy();
+    AbstractDoubleVector Bcopy = B.copy();
     A.swap(B);
     for (int i = 0; i < A.length; i++) {
       expect(Bcopy.get(i), closeTo(A.get(i), TOL));
@@ -326,7 +326,7 @@ abstract class DoubleVectorTest {
   }
 
   testViewFlip() {
-    DoubleVector b = A.flip();
+    AbstractDoubleVector b = A.flip();
     expect(A.length, equals(b.length));
     for (int i = 0; i < A.length; i++) {
       expect(A.get(i), closeTo(b.get(A.length - 1 - i), TOL));
@@ -334,14 +334,14 @@ abstract class DoubleVectorTest {
   }
 
   testViewPart() {
-    DoubleVector b = A.part(15, 11);
+    AbstractDoubleVector b = A.part(15, 11);
     for (int i = 0; i < 11; i++) {
       expect(A.get(15 + i), closeTo(b.get(i), TOL));
     }
   }
 
   testViewSelection() {
-    DoubleVector b = A.where((double element) {
+    AbstractDoubleVector b = A.where((double element) {
       return element % 2 == 0;
     });
     for (int i = 0; i < b.length; i++) {
@@ -354,7 +354,7 @@ abstract class DoubleVectorTest {
 
   testViewSelectionIndex() {
     Int32List indexes = new Int32List.fromList([5, 11, 22, 37, 101]);
-    DoubleVector b = A.select(indexes);
+    AbstractDoubleVector b = A.select(indexes);
     for (int i = 0; i < indexes.length; i++) {
       expect(A.get(indexes[i]), closeTo(b.get(i), TOL));
     }
@@ -369,7 +369,7 @@ abstract class DoubleVectorTest {
 
   testViewStrides() {
     int stride = 3;
-    DoubleVector b = A.strides(stride);
+    AbstractDoubleVector b = A.strides(stride);
     for (int i = 0; i < b.length; i++) {
       expect(A.get(i * stride), closeTo(b.get(i), TOL));
     }

@@ -44,13 +44,13 @@ testIntMatrix(String name, IntMatrixTest t) {
 
 abstract class IntMatrixTest {
   /** Matrix to test. */
-  IntMatrix A;
+  AbstractIntMatrix A;
 
   /** Matrix of the same size as [A]. */
-  IntMatrix B;
+  AbstractIntMatrix B;
 
   /** Matrix of the size `A.columns` x `A.rows`. */
-  IntMatrix Bt;
+  AbstractIntMatrix Bt;
 
   int NROWS = 13;
 
@@ -184,7 +184,7 @@ abstract class IntMatrixTest {
   }
 
   void testForEach() {
-    IntMatrix Acopy = A.copy();
+    AbstractIntMatrix Acopy = A.copy();
     A.forEach(ifunc.neg);
     for (int r = 0; r < A.rows; r++) {
       for (int c = 0; c < A.columns; c++) {
@@ -204,7 +204,7 @@ abstract class IntMatrixTest {
   }
 
   void testForEachWith() {
-    IntMatrix Acopy = A.copy();
+    AbstractIntMatrix Acopy = A.copy();
     A.forEachWith(B, ifunc.plus);
     for (int r = 0; r < A.rows; r++) {
       for (int c = 0; c < A.columns; c++) {
@@ -222,7 +222,7 @@ abstract class IntMatrixTest {
         columnList.add(c);
       }
     }
-    IntMatrix Acopy = A.copy();
+    AbstractIntMatrix Acopy = A.copy();
     A.forEachWithRange(B, ifunc.plus,
         new Int32List.fromList(rowList),
         new Int32List.fromList(columnList));
@@ -241,7 +241,7 @@ abstract class IntMatrixTest {
         return false;
       }
     }
-    IntMatrix Acopy = A.copy();
+    AbstractIntMatrix Acopy = A.copy();
     A.fillWhere(procedure, -1);
     for (int r = 0; r < A.rows; r++) {
       for (int c = 0; c < A.columns; c++) {
@@ -262,7 +262,7 @@ abstract class IntMatrixTest {
         return false;
       }
     }
-    IntMatrix Acopy = A.copy();
+    AbstractIntMatrix Acopy = A.copy();
     A.forEachWhere(procedure, ifunc.neg);
     for (int r = 0; r < A.rows; r++) {
       for (int c = 0; c < A.columns; c++) {
@@ -299,7 +299,7 @@ abstract class IntMatrixTest {
   }
 
   void testForEachNonZero() {
-    IntMatrix Acopy = A.copy();
+    AbstractIntMatrix Acopy = A.copy();
     int function(int first, int second, int third) {
       return -third;
     }
@@ -400,7 +400,7 @@ abstract class IntMatrixTest {
   }
 
   void testVectorize() {
-    IntVector Avec = A.vectorize();
+    AbstractIntVector Avec = A.vectorize();
     int idx = 0;
     for (int c = 0; c < A.columns; c++) {
       for (int r = 0; r < A.rows; r++) {
@@ -410,7 +410,7 @@ abstract class IntMatrixTest {
   }
 
   void testColumn() {
-    IntVector col = A.column(A.columns ~/ 2);
+    AbstractIntVector col = A.column(A.columns ~/ 2);
     expect(A.rows, col.length);
     for (int r = 0; r < A.rows; r++) {
       expect(A.get(r, A.columns ~/ 2), equals(col.get(r)));
@@ -418,7 +418,7 @@ abstract class IntMatrixTest {
   }
 
   void testColumnFlip() {
-    IntMatrix B = A.columnFlip();
+    AbstractIntMatrix B = A.columnFlip();
     expect(A.length, equals(B.length));
     for (int r = 0; r < A.rows; r++) {
       for (int c = 0; c < A.columns; c++) {
@@ -428,7 +428,7 @@ abstract class IntMatrixTest {
   }
 
   void testDice() {
-    IntMatrix B = A.dice();
+    AbstractIntMatrix B = A.dice();
     expect(A.rows, equals(B.columns));
     expect(A.columns, equals(B.rows));
     for (int r = 0; r < A.rows; r++) {
@@ -439,7 +439,7 @@ abstract class IntMatrixTest {
   }
 
   void testPart() {
-    IntMatrix B = A.part(A.rows ~/ 2, A.columns ~/ 2, A.rows ~/ 3, A.columns ~/ 3);
+    AbstractIntMatrix B = A.part(A.rows ~/ 2, A.columns ~/ 2, A.rows ~/ 3, A.columns ~/ 3);
     expect(A.rows ~/ 3, equals(B.rows));
     expect(A.columns ~/ 3, equals(B.columns));
     for (int r = 0; r < A.rows / 3; r++) {
@@ -450,7 +450,7 @@ abstract class IntMatrixTest {
   }
 
   void testRow() {
-    IntVector B = A.row(A.rows ~/ 2);
+    AbstractIntVector B = A.row(A.rows ~/ 2);
     expect(A.columns, equals(B.length));
     for (int r = 0; r < A.columns; r++) {
       expect(A.get(A.rows ~/ 2, r), equals(B.get(r)));
@@ -458,7 +458,7 @@ abstract class IntMatrixTest {
   }
 
   void testRowFlip() {
-    IntMatrix B = A.rowFlip();
+    AbstractIntMatrix B = A.rowFlip();
     expect(A.length, equals(B.length));
     for (int r = 0; r < A.rows; r++) {
       for (int c = 0; c < A.columns; c++) {
@@ -472,7 +472,7 @@ abstract class IntMatrixTest {
     A.fill(0);
     A.set(A.rows ~/ 4, 0, value);
     A.set(A.rows ~/ 2, 0, value);
-    IntMatrix B = A.where((IntVector element) {
+    AbstractIntMatrix B = A.where((IntVector element) {
       if ((element.get(0) - value).abs() == 0) {
         return true;
       } else {
@@ -488,7 +488,7 @@ abstract class IntMatrixTest {
   void testSelect() {
     final rowIndexes = [A.rows ~/ 6, A.rows ~/ 5, A.rows ~/ 4, A.rows ~/ 3, A.rows ~/ 2];
     final colIndexes = [A.columns ~/ 6, A.columns ~/ 5, A.columns ~/ 4, A.columns ~/ 3, A.columns ~/ 2, A.columns - 1];
-    IntMatrix B = A.select(new Int32List.fromList(rowIndexes),
+    AbstractIntMatrix B = A.select(new Int32List.fromList(rowIndexes),
         new Int32List.fromList(colIndexes));
     expect(rowIndexes.length, equals(B.rows));
     expect(colIndexes.length, equals(B.columns));
@@ -509,7 +509,7 @@ abstract class IntMatrixTest {
   void testStrides() {
     int rowStride = 3;
     int colStride = 5;
-    IntMatrix B = A.strides(rowStride, colStride);
+    AbstractIntMatrix B = A.strides(rowStride, colStride);
     for (int r = 0; r < B.rows; r++) {
       for (int c = 0; c < B.columns; c++) {
         expect(A.get(r * rowStride, c * colStride), equals(B.get(r, c)));
@@ -518,13 +518,13 @@ abstract class IntMatrixTest {
   }
 
   void testMult() {
-    IntVector y = new DenseIntVector(A.columns);
+    AbstractIntVector y = new IntVector(A.columns);
     for (int i = 0; i < y.length; i++) {
       y.set(i, random.nextInt(MAX_INT) % A.rows);
     }
     int alpha = 3;
     int beta = 5;
-    IntVector z = IntFactory1D.dense.random(A.rows);
+    AbstractIntVector z = IntFactory1D.dense.random(A.rows);
     z.forEach(ifunc.modulus(A.rows));
     Int32List expected = z.toList();
     z = A.mult(y, z, alpha, beta, false);
@@ -555,7 +555,7 @@ abstract class IntMatrixTest {
     }
 
     //transpose
-    y = new DenseIntVector(A.rows);
+    y = new IntVector(A.rows);
     for (int i = 0; i < y.length; i++) {
       y.set(i, random.nextInt(MAX_INT) % A.rows);
     }
@@ -592,7 +592,7 @@ abstract class IntMatrixTest {
   void testMultiply() {
     int alpha = 3;
     int beta = 5;
-    IntMatrix C = IntFactory2D.dense.random(A.rows, A.rows);
+    AbstractIntMatrix C = IntFactory2D.dense.random(A.rows, A.rows);
     C.forEach(ifunc.modulus(A.rows));
     List<Int32List> expected = C.toList();
     C = A.multiply(Bt, C, alpha, beta, false, false);

@@ -56,7 +56,7 @@ part of cern.colt.matrix;
  * @author Piotr Wendykier (piotr.wendykier@gmail.com)
  * @version 1.1, 08/22/2007
  */
-class SparseDoubleVector extends DoubleVector {
+class SparseDoubleVector extends AbstractDoubleVector {
 
   /*
    * The elements of the matrix.
@@ -147,7 +147,7 @@ class SparseDoubleVector extends DoubleVector {
    *            the value to be filled into the cells.
    * @return <tt>this</tt> (for convenience only).
    */
-  DoubleVector fill(double value) {
+  AbstractDoubleVector fill(double value) {
     // overriden for performance only
     if (this._isNoView && value == 0) {
       this._elements.clear();
@@ -246,7 +246,7 @@ class SparseDoubleVector extends DoubleVector {
    *            the number of cell the matrix shall have.
    * @return a new empty matrix of the same dynamic type.
    */
-  DoubleVector like1D(int size) {
+  AbstractDoubleVector like1D(int size) {
     return new SparseDoubleVector(size);
   }
 
@@ -264,15 +264,15 @@ class SparseDoubleVector extends DoubleVector {
    *            the number of columns the matrix shall have.
    * @return a new matrix of the corresponding dynamic type.
    */
-  DoubleMatrix like2D(int rows, int columns) {
+  AbstractDoubleMatrix like2D(int rows, int columns) {
     return new SparseDoubleMatrix(rows, columns);
   }
 
-  DoubleMatrix reshape(int rows, int columns) {
+  AbstractDoubleMatrix reshape(int rows, int columns) {
     if (rows * columns != _size) {
       throw new ArgumentError("rows*columns != size");
     }
-    DoubleMatrix M = new SparseDoubleMatrix(rows, columns);
+    AbstractDoubleMatrix M = new SparseDoubleMatrix(rows, columns);
     int idx = 0;
     for (int c = 0; c < columns; c++) {
       for (int r = 0; r < rows; r++) {
@@ -360,7 +360,7 @@ class SparseDoubleVector extends DoubleVector {
   /**
    * Returns <tt>true</tt> if both matrices share at least one identical cell.
    */
-  bool _haveSharedCellsRaw(DoubleVector other) {
+  bool _haveSharedCellsRaw(AbstractDoubleVector other) {
     if (other is SelectedSparseDoubleVector) {
       return this._elements == other._elements;
     } else if (other is SparseDoubleVector) {
@@ -376,7 +376,7 @@ class SparseDoubleVector extends DoubleVector {
    *            the offsets of the visible elements.
    * @return a new view.
    */
-  DoubleVector _viewSelectionLike(Int32List offsets) {
+  AbstractDoubleVector _viewSelectionLike(Int32List offsets) {
     return new SelectedSparseDoubleVector(this._elements, offsets);
   }
 
@@ -423,7 +423,7 @@ class SparseDoubleVector extends DoubleVector {
  * @author wolfgang.hoschek@cern.ch
  * @version 1.0, 09/24/99
  */
-class SelectedSparseDoubleVector extends DoubleVector {
+class SelectedSparseDoubleVector extends AbstractDoubleVector {
 
   /*
    * The elements of the matrix.
@@ -531,7 +531,7 @@ class SelectedSparseDoubleVector extends DoubleVector {
    *            the number of cell the matrix shall have.
    * @return a new empty matrix of the same dynamic type.
    */
-  DoubleVector like1D(int size) {
+  AbstractDoubleVector like1D(int size) {
     return new SparseDoubleVector(size);
   }
 
@@ -549,15 +549,15 @@ class SelectedSparseDoubleVector extends DoubleVector {
    *            the number of columns the matrix shall have.
    * @return a new matrix of the corresponding dynamic type.
    */
-  DoubleMatrix like2D(int rows, int columns) {
+  AbstractDoubleMatrix like2D(int rows, int columns) {
     return new SparseDoubleMatrix(rows, columns);
   }
 
-  DoubleMatrix reshape(int rows, int columns) {
+  AbstractDoubleMatrix reshape(int rows, int columns) {
     if (rows * columns != _size) {
       throw new ArgumentError("rows*columns != size");
     }
-    DoubleMatrix M = new SparseDoubleMatrix(rows, columns);
+    AbstractDoubleMatrix M = new SparseDoubleMatrix(rows, columns);
     int idx = 0;
     for (int c = 0; c < columns; c++) {
       for (int r = 0; r < rows; r++) {
@@ -625,7 +625,7 @@ class SelectedSparseDoubleVector extends DoubleVector {
   /**
    * Returns <tt>true</tt> if both matrices share at least one identical cell.
    */
-  bool _haveSharedCellsRaw(DoubleVector other) {
+  bool _haveSharedCellsRaw(AbstractDoubleVector other) {
     if (other is SelectedSparseDoubleVector) {
       return this._elements == other._elements;
     } else if (other is SparseDoubleVector) {
@@ -653,7 +653,7 @@ class SelectedSparseDoubleVector extends DoubleVector {
    *            the offsets of the visible elements.
    * @return a new view.
    */
-  DoubleVector _viewSelectionLike(Int32List offsets) {
+  AbstractDoubleVector _viewSelectionLike(Int32List offsets) {
     return new SelectedSparseDoubleVector(this._elements, offsets);
   }
 

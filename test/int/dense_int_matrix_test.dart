@@ -12,9 +12,9 @@ testDenseIntMatrix(String name, DenseIntMatrixTest t) {
 class DenseIntMatrixTest extends IntMatrixTest {
 
   void createMatrices() {
-    A = new DenseIntMatrix(NROWS, NCOLUMNS);
-    B = new DenseIntMatrix(NROWS, NCOLUMNS);
-    Bt = new DenseIntMatrix(NCOLUMNS, NROWS);
+    A = new IntMatrix(NROWS, NCOLUMNS);
+    B = new IntMatrix(NROWS, NCOLUMNS);
+    Bt = new IntMatrix(NCOLUMNS, NROWS);
   }
 
   testSetAll() {
@@ -35,8 +35,8 @@ class DenseIntMatrixTest extends IntMatrixTest {
 class DenseIntMatrixViewTest extends DenseIntMatrixTest {
 
   void createMatrices() {
-    A = new DenseIntMatrix(NCOLUMNS, NROWS).dice();
-    B = new DenseIntMatrix(NCOLUMNS, NROWS).dice();
-    Bt = new DenseIntMatrix(NROWS, NCOLUMNS).dice();
+    A = new IntMatrix(NCOLUMNS, NROWS).dice();
+    B = new IntMatrix(NCOLUMNS, NROWS).dice();
+    Bt = new IntMatrix(NROWS, NCOLUMNS).dice();
   }
 }
