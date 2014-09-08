@@ -920,7 +920,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
    */
   bool operator ==(var obj) {
     if (obj is num) {
-      return DoubleProperty.DEFAULT.equalsMatrixValue(this, obj.toDouble());
+      return dprop.equalsMatrixValue(this, obj.toDouble());
     }
     if (identical(this, obj)) {
       return true;
@@ -932,7 +932,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
       return false;
     }
 
-    return DoubleProperty.DEFAULT.equalsMatrix(this, obj as AbstractDoubleMatrix);
+    return dprop.equalsMatrix(this, obj as AbstractDoubleMatrix);
   }
 
   /**

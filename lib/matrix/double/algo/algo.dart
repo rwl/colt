@@ -1,11 +1,10 @@
 library cern.colt.matrix.tdouble.algo;
 
 import 'dart:math' as Math;
-import 'dart:async';
 
 import '../../matrix.dart';
 import '../../former.dart';
-import '../../../util.dart';
+import '../../../math.dart';
 import '../../../function/double.dart';
 
 part 'property.dart';

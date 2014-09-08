@@ -98,7 +98,7 @@ class WrapperComplexMatrix extends AbstractComplexMatrix {
     if (obj is Float64List) {
       final value = obj;
       if (_content is DiagonalComplexMatrix) {
-        double epsilon = ComplexProperty.DEFAULT.tolerance();
+        double epsilon = EPSILON;
         Float64List elements = _content.elements() as Float64List;
         int dlength = (_content as DiagonalComplexMatrix)._dlength;
         Float64List x = new Float64List(2);
@@ -124,7 +124,7 @@ class WrapperComplexMatrix extends AbstractComplexMatrix {
     if (_content is DiagonalComplexMatrix && obj is DiagonalComplexMatrix) {
       DiagonalComplexMatrix other = obj;
       int dlength = (_content as DiagonalComplexMatrix)._dlength;
-      double epsilon = ComplexProperty.DEFAULT.tolerance();
+      double epsilon = EPSILON;
       if (identical(this, obj)) {
         return true;
       }

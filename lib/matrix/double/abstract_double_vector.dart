@@ -691,7 +691,7 @@ abstract class AbstractDoubleVector extends AbstractVector {
    */
   bool operator ==(var obj) {
     if (obj is num) {
-      return DoubleProperty.DEFAULT.equals(this, obj.toDouble());
+      return dprop.equals(this, obj.toDouble());
     }
     if (identical(this, obj)) {
       return true;
@@ -703,7 +703,7 @@ abstract class AbstractDoubleVector extends AbstractVector {
       return false;
     }
 
-    return DoubleProperty.DEFAULT.equalsVector(this, obj as AbstractDoubleVector);
+    return dprop.equalsVector(this, obj as AbstractDoubleVector);
   }
 
   /**

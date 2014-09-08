@@ -776,10 +776,10 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
   bool operator ==(var obj) {
     if (obj is num) {
       final c = new Float64List.fromList([obj.toDouble(), 0.0]);
-      return ComplexProperty.DEFAULT.equalsValue2D(this, c);
+      return cprop.equalsValue2D(this, c);
     }
     if (obj is Float64List) {
-      return ComplexProperty.DEFAULT.equalsValue2D(this, obj);
+      return cprop.equalsValue2D(this, obj);
     }
     if (identical(this, obj)) {
       return true;
@@ -791,7 +791,7 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
       return false;
     }
 
-    return ComplexProperty.DEFAULT.equalsMatrix(this, obj as AbstractComplexMatrix);
+    return cprop.equalsMatrix(this, obj as AbstractComplexMatrix);
   }
 
   /**

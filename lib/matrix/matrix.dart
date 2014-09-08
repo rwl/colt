@@ -17,8 +17,8 @@ import '../function/complex.dart' as cfunc;
 import '../function/int.dart' as ifunc;
 import '../math.dart';
 //import '../util.dart';
-import 'double/algo/algo.dart';
-import 'complex/algo/algo.dart';
+import 'double/algo/algo.dart' as dprop;
+import 'complex/algo/algo.dart' as cprop;
 import 'int/algo/algo.dart' as iprop;
 import 'former.dart';
 

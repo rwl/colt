@@ -115,7 +115,7 @@ class WrapperDoubleMatrix extends AbstractDoubleMatrix {
     if (obj is num) {
       final value = obj;
       if (_content is DiagonalDoubleMatrix) {
-        double epsilon = DoubleProperty.DEFAULT.tolerance();
+        double epsilon = EPSILON;
         Float64List elements = _content.elements() as Float64List;
         for (int r = 0; r < elements.length; r++) {
           double x = elements[r];
@@ -133,7 +133,7 @@ class WrapperDoubleMatrix extends AbstractDoubleMatrix {
     }
 
     if (_content is DiagonalDoubleMatrix && obj is DiagonalDoubleMatrix) {
-      double epsilon = DoubleProperty.DEFAULT.tolerance();
+      double epsilon = EPSILON;
       if (identical(this, obj)) {
         return true;
       }

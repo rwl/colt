@@ -360,7 +360,7 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
   bool operator ==(var obj) {
     if (obj is num) {
       final value = obj;
-      double epsilon = DoubleProperty.DEFAULT.tolerance();
+      double epsilon = EPSILON;
       for (int r = 0; r < _dlength; r++) {
         double x = _elements[r];
         double diff = (value - x).abs();
@@ -375,7 +375,7 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
     }
     if (obj is DiagonalDoubleMatrix) {
       DiagonalDoubleMatrix other = obj;
-      double epsilon = DoubleProperty.DEFAULT.tolerance();
+      double epsilon = EPSILON;
       if (identical(this, obj)) {
         return true;
       }

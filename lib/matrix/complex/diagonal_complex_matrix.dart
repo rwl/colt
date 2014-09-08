@@ -446,7 +446,7 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
   bool operator ==(var obj) {
     if (obj is Float64List) {
       final value = obj;
-      double epsilon = ComplexProperty.DEFAULT.tolerance();
+      double epsilon = EPSILON;
       Float64List x = new Float64List(2);
       Float64List diff = new Float64List(2);
       for (int i = 0; i < _dlength; i++) {
@@ -466,7 +466,7 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
     }
     if (obj is DiagonalComplexMatrix) {
       DiagonalComplexMatrix other = obj;
-      double epsilon = ComplexProperty.DEFAULT.tolerance();
+      double epsilon = EPSILON;
       if (identical(this, obj)) {
         return true;
       }

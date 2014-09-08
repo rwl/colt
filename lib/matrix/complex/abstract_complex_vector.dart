@@ -608,10 +608,10 @@ abstract class AbstractComplexVector extends AbstractVector {
   bool operator ==(var obj) {
     if (obj is num) {
       final c = new Float64List.fromList([obj.toDouble, 0.0]);
-      return ComplexProperty.DEFAULT.equalsValue1D(this, c);
+      return cprop.equalsValue1D(this, c);
     }
     if (obj is Float64List) {
-      return ComplexProperty.DEFAULT.equalsValue1D(this, obj);
+      return cprop.equalsValue1D(this, obj);
     }
     if (identical(this, obj)) {
       return true;
@@ -623,7 +623,7 @@ abstract class AbstractComplexVector extends AbstractVector {
       return false;
     }
 
-    return ComplexProperty.DEFAULT.equalsVector(this, obj as AbstractComplexVector);
+    return cprop.equalsVector(this, obj as AbstractComplexVector);
   }
 
   /**
