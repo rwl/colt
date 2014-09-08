@@ -300,45 +300,49 @@ class SparseDoubleMatrix extends AbstractDoubleMatrix {
     } else {
       super.assign(function);
     }
-    return this;
   }*/
 
-  AbstractDoubleMatrix fill(double value) {
+  void fill(double value) {
     // overriden for performance only
     if (this._isNoView && value == 0) {
       this._elements.clear();
     } else {
       super.fill(value);
     }
-    return this;
   }
 
-  AbstractDoubleMatrix copyFrom(AbstractDoubleMatrix source) {
+  void copyFrom(AbstractDoubleMatrix source) {
     // overriden for performance only
     if (!(source is SparseDoubleMatrix)) {
-      return super.copyFrom(source);
+      super.copyFrom(source);
+      return;
     }
     SparseDoubleMatrix other = source as SparseDoubleMatrix;
-    if (other == this) return this; // nothing to do
+    if (other == this) {
+      return; // nothing to do
+    }
     checkShape(other);
 
     /*if (this._isNoView && other._isNoView) { // quickest
       this._elements.assign(other._elements);
       return this;
     }*/
-    return super.copyFrom(source);
+    super.copyFrom(source);
   }
 
-  AbstractDoubleMatrix forEachMatrix(final AbstractDoubleMatrix y, func.DoubleDoubleFunction function) {
+  void forEachMatrix(final AbstractDoubleMatrix y, func.DoubleDoubleFunction function) {
     if (!this._isNoView) {
-      return super.forEachMatrix(y, function);
+      super.forEachMatrix(y, function);
+      return;
     }
 
     checkShape(y);
 
     if (function is DoublePlusMultSecond) { // x[i] = x[i] + alpha*y[i]
       final double alpha = (function as DoublePlusMultSecond).multiplicator;
-      if (alpha == 0) return this; // nothing to do
+      if (alpha == 0) {
+        return; // nothing to do
+      }
       y.forEachNonZero((int i, int j, double value) {
         set(i, j, get(i, j) + alpha * value);
         return value;
@@ -362,7 +366,6 @@ class SparseDoubleMatrix extends AbstractDoubleMatrix {
     } else {
       super.forEachMatrix(y, function);
     }
-    return this;
 
   }
 
@@ -383,7 +386,7 @@ class SparseDoubleMatrix extends AbstractDoubleMatrix {
    *            cell's value of <tt>y</tt>,
    * @return <tt>this</tt> (for convenience only).
    */
-  SparseDoubleMatrix assignIndexValueFunc(final Int32List rowIndexes, final Int32List columnIndexes, final double value, final func.DoubleDoubleFunction function) {
+  void assignIndexValueFunc(final Int32List rowIndexes, final Int32List columnIndexes, final double value, final func.DoubleDoubleFunction function) {
     int size = rowIndexes.length;
     if (function == func.plus) { // x[i] = x[i] + y[i]
       for (int i = 0; i < size; i++) {
@@ -418,7 +421,6 @@ class SparseDoubleMatrix extends AbstractDoubleMatrix {
         }
       }
     }
-    return this;
   }
 
   /**
@@ -438,7 +440,7 @@ class SparseDoubleMatrix extends AbstractDoubleMatrix {
    *            cell's value of <tt>y</tt>,
    * @return <tt>this</tt> (for convenience only).
    */
-  SparseDoubleMatrix assignIndexValuesFunc(final Int32List rowIndexes, final Int32List columnIndexes, final Float64List values, final func.DoubleDoubleFunction function) {
+  void assignIndexValuesFunc(final Int32List rowIndexes, final Int32List columnIndexes, final Float64List values, final func.DoubleDoubleFunction function) {
     int size = rowIndexes.length;
     if (function == func.plus) { // x[i] = x[i] + y[i]
       for (int i = 0; i < size; i++) {
@@ -475,7 +477,6 @@ class SparseDoubleMatrix extends AbstractDoubleMatrix {
         }
       }
     }
-    return this;
   }
 
   int get cardinality {
@@ -587,7 +588,7 @@ class SparseDoubleMatrix extends AbstractDoubleMatrix {
     this._elements.ensureCapacity(minCapacity);
   }*/
 
-  AbstractDoubleMatrix forEachNonZero(final func.IntIntDoubleFunction function) {
+  void forEachNonZero(final func.IntIntDoubleFunction function) {
     if (this._isNoView) {
       this._elements.forEach((int key, double value) {
         int i = key ~/ _columns;
@@ -599,7 +600,6 @@ class SparseDoubleMatrix extends AbstractDoubleMatrix {
     } else {
       super.forEachNonZero(function);
     }
-    return this;
   }
 
   double get(int row, int column) {
@@ -1260,7 +1260,7 @@ class SelectedSparseDoubleMatrix extends AbstractDoubleMatrix {
   /**
    * Self modifying version of viewDice().
    */
-  AbstractMatrix _vDice() {
+  void _vDice() {
     super._vDice();
     // swap
     Int32List tmp = _rowOffsets;
@@ -1270,7 +1270,6 @@ class SelectedSparseDoubleMatrix extends AbstractDoubleMatrix {
     // flips stay unaffected
 
     this._isNoView = false;
-    return this;
   }
 
   /**

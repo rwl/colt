@@ -68,7 +68,7 @@ class IntFactory1D {
    * purposes. Example: <tt>0 1 2</tt>
    */
   AbstractIntVector ascending(int size) {
-    return descending(size).forEach(ifunc.chain2(ifunc.neg, ifunc.subtract(size)));
+    return descending(size)..forEach(ifunc.chain2(ifunc.neg, ifunc.subtract(size)));
   }
 
   /**
@@ -140,7 +140,7 @@ class IntFactory1D {
    * given value.
    */
   AbstractIntVector fill(int size, int initialValue) {
-    return make(size).fill(initialValue);
+    return make(size)..fill(initialValue);
   }
 
   /**
@@ -166,7 +166,7 @@ class IntFactory1D {
    * (exclusive).
    */
   AbstractIntVector random(int size) {
-    return make(size).forEach(ifunc.random());
+    return make(size)..forEach(ifunc.random());
   }
 
   /**
@@ -454,7 +454,7 @@ class IntFactory2D {
    * </pre>
    */
   AbstractIntMatrix ascending(int rows, int columns) {
-    return descending(rows, columns).forEach(ifunc.chain2(ifunc.neg, ifunc.subtract(columns * rows)));
+    return descending(rows, columns)..forEach(ifunc.chain2(ifunc.neg, ifunc.subtract(columns * rows)));
   }
 
   /**
@@ -1072,7 +1072,7 @@ class IntFactory2D {
     if (this == sparse) {
       return new SparseIntMatrix(values);
     } else {
-      return new IntMatrix.DenseIntMatrix(values);
+      return new IntMatrix.fromList(values);
     }
   }
 
@@ -1127,7 +1127,7 @@ class IntFactory2D {
    */
   AbstractIntMatrix fill(int rows, int columns, int initialValue) {
     if (initialValue == 0) return make(rows, columns);
-    return make(rows, columns).fill(initialValue);
+    return make(rows, columns)..fill(initialValue);
   }
 
   /**
@@ -1142,7 +1142,7 @@ class IntFactory2D {
    * (exclusive).
    */
   AbstractIntMatrix random(int rows, int columns) {
-    return make(rows, columns).forEach(ifunc.random());
+    return make(rows, columns)..forEach(ifunc.random());
   }
 
   /**

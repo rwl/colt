@@ -256,7 +256,7 @@ class ComplexMatrix extends AbstractComplexMatrix {
     return a;
   }
 
-  AbstractComplexMatrix forEach(final cfunc.ComplexComplexFunction function) {
+  void forEach(final cfunc.ComplexComplexFunction function) {
     final int zero = index(0, 0);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -333,10 +333,9 @@ class ComplexMatrix extends AbstractComplexMatrix {
       }
     }
     //}
-    return this;
   }
 
-  AbstractComplexMatrix forEachWhere(final cfunc.ComplexProcedure cond, final cfunc.ComplexComplexFunction function) {
+  void forEachWhere(final cfunc.ComplexProcedure cond, final cfunc.ComplexComplexFunction function) {
     final int zero = index(0, 0);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -384,10 +383,9 @@ class ComplexMatrix extends AbstractComplexMatrix {
       idx += _rowStride;
     }
     //}
-    return this;
   }
 
-  AbstractComplexMatrix fillWhere(final cfunc.ComplexProcedure cond, final Float64List value) {
+  void fillWhere(final cfunc.ComplexProcedure cond, final Float64List value) {
     final int zero = index(0, 0);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -433,10 +431,9 @@ class ComplexMatrix extends AbstractComplexMatrix {
       idx += _rowStride;
     }
     //}
-    return this;
   }
 
-  AbstractComplexMatrix forEachReal(final cfunc.ComplexRealFunction function) {
+  void forEachReal(final cfunc.ComplexRealFunction function) {
     final int zero = index(0, 0);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -528,28 +525,27 @@ class ComplexMatrix extends AbstractComplexMatrix {
       }
     }
     //}
-    return this;
   }
 
-  AbstractComplexMatrix copyFrom(final AbstractComplexMatrix source) {
+  void copyFrom(final AbstractComplexMatrix source) {
     // overriden for performance only
     if (!(source is ComplexMatrix)) {
       super.copyFrom(source);
-      return this;
+      return;
     }
     ComplexMatrix other = source as ComplexMatrix;
-    if (other == this) return this; // nothing to do
+    if (other == this) return; // nothing to do
     checkShape(other);
     if (this._isNoView && other._isNoView) { // quickest
       //System.arraycopy(other._elements, 0, this._elements, 0, this._elements.length);
       this._elements.setAll(0, other._elements);
-      return this;
+      return;
     }
     if (_haveSharedCells(other)) {
       AbstractComplexMatrix c = other.copy();
       if (!(c is ComplexMatrix)) { // should not happen
         super.copyFrom(other);
-        return this;
+        return;
       }
       other = c as ComplexMatrix;
     }
@@ -604,14 +600,13 @@ class ComplexMatrix extends AbstractComplexMatrix {
       idxOther += rowStrideOther;
     }
     //}
-    return this;
   }
 
-  AbstractComplexMatrix forEachMatrix(final AbstractComplexMatrix y, final cfunc.ComplexComplexComplexFunction function) {
+  void forEachMatrix(final AbstractComplexMatrix y, final cfunc.ComplexComplexComplexFunction function) {
     // overriden for performance only
     if (!(y is ComplexMatrix)) {
       super.forEachMatrix(y, function);
-      return this;
+      return;
     }
     checkShape(y);
     final Float64List elemsOther = (y as ComplexMatrix)._elements;
@@ -786,10 +781,9 @@ class ComplexMatrix extends AbstractComplexMatrix {
       }
     }
     //}
-    return this;
   }
 
-  AbstractComplexMatrix fill(final double re, final double im) {
+  void fill(final double re, final double im) {
     final int zero = index(0, 0);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -825,10 +819,9 @@ class ComplexMatrix extends AbstractComplexMatrix {
       idx += _rowStride;
     }
     //}
-    return this;
   }
 
-  AbstractComplexMatrix setAll(final Float64List values) {
+  void setAll(final Float64List values) {
     if (values.length != _rows * 2 * _columns) {
       throw new ArgumentError("Must have same length: length=${values.length} rows()*2*columns()=${rows * 2 * columns}");
     }
@@ -874,10 +867,9 @@ class ComplexMatrix extends AbstractComplexMatrix {
       }
       //}
     }
-    return this;
   }
 
-  AbstractComplexMatrix setAll2D(final List<Float64List> values) {
+  void setAll2D(final List<Float64List> values) {
     if (values.length != _rows) {
       throw new ArgumentError("Must have same number of rows: rows=${values.length} rows()=${rows}");
     }
@@ -957,10 +949,9 @@ class ComplexMatrix extends AbstractComplexMatrix {
       }
       //}
     }
-    return this;
   }
 
-  AbstractComplexMatrix setImaginary(final AbstractDoubleMatrix other) {
+  void setImaginary(final AbstractDoubleMatrix other) {
     checkShape(other);
     final int columnStrideOther = other.columnStride;
     final int rowStrideOther = other.rowStride;
@@ -1007,10 +998,9 @@ class ComplexMatrix extends AbstractComplexMatrix {
       idxOther += rowStrideOther;
     }
     //}
-    return this;
   }
 
-  AbstractComplexMatrix setReal(final AbstractDoubleMatrix other) {
+  void setReal(final AbstractDoubleMatrix other) {
     checkShape(other);
     final int columnStrideOther = other.columnStride;
     final int rowStrideOther = other.rowStride;
@@ -1057,7 +1047,6 @@ class ComplexMatrix extends AbstractComplexMatrix {
       idxOther += rowStrideOther;
     }
     //}
-    return this;
   }
 
   int get cardinality {
@@ -1115,7 +1104,7 @@ class ComplexMatrix extends AbstractComplexMatrix {
     return cardinality;
   }
 
-  AbstractComplexMatrix forEachNonZero(final cfunc.IntIntComplexFunction function) {
+  void forEachNonZero(final cfunc.IntIntComplexFunction function) {
     final int zero = index(0, 0);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -1163,7 +1152,6 @@ class ComplexMatrix extends AbstractComplexMatrix {
       idx += _rowStride;
     }
     //}
-    return this;
   }
 
   AbstractComplexMatrix conjugateTranspose() {
@@ -2016,7 +2004,7 @@ class SelectedDenseComplexMatrix extends AbstractComplexMatrix {
 //    this._offset = 0;
 //  }
 
-  AbstractMatrix _vDice() {
+  void _vDice() {
     super._vDice();
     // swap
     Int32List tmp = _rowOffsets;
@@ -2024,7 +2012,6 @@ class SelectedDenseComplexMatrix extends AbstractComplexMatrix {
     _columnOffsets = tmp;
 
     this._isNoView = false;
-    return this;
   }
 
   AbstractComplexVector column(int column) {

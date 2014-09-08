@@ -141,7 +141,7 @@ abstract class DoubleMatrixTest {
       }
     }
     double result = A.reduceRange(plus, square,
-        new Int32List.fromList(rowList), 
+        new Int32List.fromList(rowList),
         new Int32List.fromList(columnList));
     expect(expected, closeTo(result, TOL));
   }
@@ -467,7 +467,7 @@ abstract class DoubleMatrixTest {
     A.fill(0.0);
     A.set(A.rows ~/ 4, 0, value);
     A.set(A.rows ~/ 2, 0, value);
-    AbstractDoubleMatrix B = A.where((DoubleVector element) {
+    AbstractDoubleMatrix B = A.where((AbstractDoubleVector element) {
       if ((element.get(0) - value).abs() < TOL) {
         return true;
       } else {

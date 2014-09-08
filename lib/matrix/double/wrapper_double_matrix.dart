@@ -35,7 +35,7 @@ class WrapperDoubleMatrix extends AbstractDoubleMatrix {
     this._content = newContent;
   }
 
-  AbstractDoubleMatrix setAll(final Float64List values) {
+  void setAll(final Float64List values) {
     if (_content is DiagonalDoubleMatrix) {
       int dlength = (_content as DiagonalDoubleMatrix)._dlength;
       final Float64List elems = (_content as DiagonalDoubleMatrix)._elements;
@@ -62,13 +62,13 @@ class WrapperDoubleMatrix extends AbstractDoubleMatrix {
           elems[i] = values[i];
         }
       //}
-      return this;
+      return;
     } else {
-      return super.setAll(values);
+      super.setAll(values);
     }
   }
 
-  AbstractDoubleMatrix forEachMatrix(final AbstractDoubleMatrix y, final func.DoubleDoubleFunction function) {
+  void forEachMatrix(final AbstractDoubleMatrix y, final func.DoubleDoubleFunction function) {
     checkShape(y);
     if (y is WrapperDoubleMatrix) {
       final rowList = new List<int>();
@@ -81,7 +81,6 @@ class WrapperDoubleMatrix extends AbstractDoubleMatrix {
     } else {
       super.forEachMatrix(y, function);
     }
-    return this;
   }
 
   Object elements() {
@@ -129,10 +128,10 @@ class WrapperDoubleMatrix extends AbstractDoubleMatrix {
           }
         }
         return true;
-      } 
+      }
       return super ==(value);
     }
-    
+
     if (_content is DiagonalDoubleMatrix && obj is DiagonalDoubleMatrix) {
       double epsilon = DoubleProperty.DEFAULT.tolerance();
       if (identical(this, obj)) {

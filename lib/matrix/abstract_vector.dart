@@ -195,13 +195,12 @@ abstract class AbstractVector {
    * now index <tt>size()-1</tt>, ..., what used to be index <tt>size()-1</tt>
    * is now index <tt>0</tt>.
    */
-  AbstractVector _vFlip() {
+  void _vFlip() {
     if (_size > 0) {
       this._zero += (this.length - 1) * this._stride;
       this._stride = -this._stride;
       this._isNoView = false;
-    }
-    return this;
+    }
   }
 
   /**
@@ -210,12 +209,11 @@ abstract class AbstractVector {
    * @throws IndexOutOfBoundsException
    *             if <tt>index<0 || index+width>size()</tt>.
    */
-  AbstractVector _vPart(int index, int width) {
+  void _vPart(int index, int width) {
     _checkRange(index, width);
     this._zero += this._stride * index;
     this._size = width;
-    this._isNoView = false;
-    return this;
+    this._isNoView = false;
   }
 
   /**
@@ -224,7 +222,7 @@ abstract class AbstractVector {
    * @throws IndexOutOfBoundsException
    *             if <tt>stride <= 0</tt>.
    */
-  AbstractVector _vStrides(int stride) {
+  void _vStrides(int stride) {
     if (stride <= 0) {
       throw new RangeError("illegal stride: $stride");
     }
@@ -232,7 +230,6 @@ abstract class AbstractVector {
     if (this._size != 0) {
       this._size = (this._size - 1) ~/ stride + 1;
     }
-    this._isNoView = false;
-    return this;
+    this._isNoView = false;
   }
 }

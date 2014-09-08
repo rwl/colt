@@ -290,19 +290,18 @@ abstract class AbstractMatrix {
   /**
    * Self modifying version of viewColumnFlip().
    */
-  AbstractMatrix _vColumnFlip() {
+  void _vColumnFlip() {
     if (_columns > 0) {
       _columnZero += (_columns - 1) * _columnStride;
       _columnStride = -_columnStride;
       this._isNoView = false;
     }
-    return this;
   }
 
   /**
    * Self modifying version of viewDice().
    */
-  AbstractMatrix _vDice() {
+  void _vDice() {
     int tmp;
     // swap;
     tmp = _rows;
@@ -318,7 +317,6 @@ abstract class AbstractMatrix {
     // flips stay unaffected
 
     this._isNoView = false;
-    return this;
   }
 
   /**
@@ -328,26 +326,24 @@ abstract class AbstractMatrix {
    *             if
    *             <tt>column<0 || width<0 || column+width>columns() || row<0 || height<0 || row+height>rows()</tt>
    */
-  AbstractMatrix _vPart(int row, int column, int height, int width) {
+  void _vPart(int row, int column, int height, int width) {
     _checkBox(row, column, height, width);
     this._rowZero += this._rowStride * row;
     this._columnZero += this._columnStride * column;
     this._rows = height;
     this._columns = width;
     this._isNoView = false;
-    return this;
   }
 
   /**
    * Self modifying version of viewRowFlip().
    */
-  AbstractMatrix _vRowFlip() {
+  void _vRowFlip() {
     if (_rows > 0) {
       _rowZero += (_rows - 1) * _rowStride;
       _rowStride = -_rowStride;
       this._isNoView = false;
     }
-    return this;
   }
 
   /**
@@ -356,13 +352,12 @@ abstract class AbstractMatrix {
    * @throws IndexOutOfBoundsException
    *             if <tt>rowStride<=0 || columnStride<=0</tt>.
    */
-  AbstractMatrix _vStrides(int rowStride, int columnStride) {
+  void _vStrides(int rowStride, int columnStride) {
     if (rowStride <= 0 || columnStride <= 0) throw new RangeError("illegal strides: $rowStride, $columnStride");
     this._rowStride *= rowStride;
     this._columnStride *= columnStride;
     if (this._rows != 0) this._rows = (this._rows - 1) ~/ rowStride + 1;
     if (this._columns != 0) this._columns = (this._columns - 1) ~/ columnStride + 1;
     this._isNoView = false;
-    return this;
   }
 }

@@ -262,17 +262,19 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
     return m;
   }
 
-  AbstractComplexMatrix forEach(final cfunc.ComplexComplexFunction function) {
+  void forEach(final cfunc.ComplexComplexFunction function) {
     if (function is cfunc.ComplexMult) { // x[i] = mult*x[i]
       final Float64List alpha = (function as cfunc.ComplexMult).multiplicator;
       if (alpha[0] == 1 && alpha[1] == 0) {
-        return this;
+        return;
       }
       if (alpha[0] == 0 && alpha[1] == 0) {
-        return fill(0.0, 0.0);
+        fill(0.0, 0.0);
+        return;
       }
       if (alpha[0] != alpha[0] || alpha[1] != alpha[1]) {
-        return fill(alpha[0], alpha[1]); // the funny definition of isNaN(). This should better not happen.
+        fill(alpha[0], alpha[1]); // the funny definition of isNaN(). This should better not happen.
+        return;
       }
 
       final Float64List valuesE = _values;
@@ -290,10 +292,9 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
         return function(value);
       });
     }
-    return this;
   }
 
-  AbstractComplexMatrix fill(double re, double im) {
+  void fill(double re, double im) {
     if (re == 0 && im == 0) {
       //Arrays.fill(_rowIndexes, 0);
       //Arrays.fill(_columnPointers, 0);
@@ -308,11 +309,12 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
         _values[2 * i + 1] = im;
       }
     }
-    return this;
   }
 
-  AbstractComplexMatrix copyFrom(AbstractComplexMatrix source) {
-    if (source == this) return this; // nothing to do
+  void copyFrom(AbstractComplexMatrix source) {
+    if (source == this) {
+      return; // nothing to do
+    }
     checkShape(source);
 
     if (source is SparseCCComplexMatrix) {
@@ -340,10 +342,9 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
         return value;
       });
     }
-    return this;
   }
 
-  AbstractComplexMatrix forEachMatrix(final AbstractComplexMatrix y, cfunc.ComplexComplexComplexFunction function) {
+  void forEachMatrix(final AbstractComplexMatrix y, cfunc.ComplexComplexComplexFunction function) {
     checkShape(y);
 
     if ((y is SparseCCComplexMatrix) && (function == cfunc.plus)) { // x[i] = x[i] + y[i]
@@ -387,31 +388,32 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
       _rowIndexes = Ci;
       _columnPointers = Cp;
       _values = Cx;
-      return this;
+      return;
     }
 
     if (function is cfunc.ComplexPlusMultSecond) { // x[i] = x[i] + alpha*y[i]
       final Float64List alpha = (function as cfunc.ComplexPlusMultSecond).multiplicator;
       if (alpha[0] == 0 && alpha[1] == 0) {
-        return this; // nothing to do
+        return; // nothing to do
       }
       y.forEachNonZero((int i, int j, Float64List value) {
         set(i, j, Complex.plus(get(i, j), Complex.multiply(alpha, value)));
         return value;
       });
-      return this;
+      return;
     }
 
     if (function is cfunc.ComplexPlusMultFirst) { // x[i] = alpha*x[i] + y[i]
       final Float64List alpha = (function as cfunc.ComplexPlusMultFirst).multiplicator;
       if (alpha[0] == 0 && alpha[1] == 0) {
-        return copyFrom(y);
+        copyFrom(y);
+        return;
       }
       y.forEachNonZero((int i, int j, Float64List value) {
         set(i, j, Complex.plus(Complex.multiply(alpha, get(i, j)), value));
         return value;
       });
-      return this;
+      return;
     }
 
     if (function == cfunc.mult) { // x[i] = x[i] * y[i]
@@ -431,7 +433,7 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
           if (valuesA[2 * k] == 0 && valuesA[2 * k + 1] == 0) _remove(i, j);
         }
       }
-      return this;
+      return;
     }
 
     if (function == cfunc.div) { // x[i] = x[i] / y[i]
@@ -452,16 +454,16 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
           if (valuesA[2 * k] == 0 && valuesA[2 * k + 1] == 0) _remove(i, j);
         }
       }
-      return this;
+      return;
     }
-    return super.forEachMatrix(y, function);
+    super.forEachMatrix(y, function);
   }
 
   int get cardinality {
     return _columnPointers[_columns];
   }
 
-  AbstractComplexMatrix forEachNonZero(final cfunc.IntIntComplexFunction function) {
+  void forEachNonZero(final cfunc.IntIntComplexFunction function) {
     final Int32List rowIndexesA = _rowIndexes;
     final Int32List columnPointersA = _columnPointers;
     final Float64List valuesA = _values;
@@ -477,7 +479,6 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
         valuesA[2 * k + 1] = valA[1];
       }
     }
-    return this;
   }
 
   /**

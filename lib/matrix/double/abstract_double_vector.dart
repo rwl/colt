@@ -58,7 +58,7 @@ abstract class AbstractDoubleVector extends AbstractVector {
    *
    * </pre>
    *
-   * For further examples, see the <a
+//   * For further examples, see the <a
    * href="package-summary.html#FunctionObjects">package doc</a>.
    *
    * @param aggr
@@ -240,7 +240,7 @@ abstract class AbstractDoubleVector extends AbstractVector {
    * @return <tt>this</tt> (for convenience only).
    * @see cern.jet.math.tdouble.DoubleFunctions
    */
-  AbstractDoubleVector forEach(final DoubleFunction f) {
+  void forEach(final DoubleFunction f) {
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
         nthreads = Math.min(nthreads, _size);
@@ -261,7 +261,6 @@ abstract class AbstractDoubleVector extends AbstractVector {
       set(i, f(get(i)));
     }
     //}
-    return this;
   }
 
   /**
@@ -275,7 +274,7 @@ abstract class AbstractDoubleVector extends AbstractVector {
    * @return <tt>this</tt> (for convenience only).
    * @see cern.jet.math.tdouble.DoubleFunctions
    */
-  AbstractDoubleVector forEachWhere(final DoubleProcedure cond, DoubleFunction f) {
+  void forEachWhere(final DoubleProcedure cond, DoubleFunction f) {
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
@@ -304,7 +303,6 @@ abstract class AbstractDoubleVector extends AbstractVector {
         }
       }
     //}
-    return this;
   }
 
   /**
@@ -318,7 +316,7 @@ abstract class AbstractDoubleVector extends AbstractVector {
    * @return <tt>this</tt> (for convenience only).
    *
    */
-  AbstractDoubleVector fillWhere(DoubleProcedure cond, double value) {
+  void fillWhere(DoubleProcedure cond, double value) {
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
@@ -347,7 +345,6 @@ abstract class AbstractDoubleVector extends AbstractVector {
         }
       }
     //}
-    return this;
   }
 
   /**
@@ -357,7 +354,7 @@ abstract class AbstractDoubleVector extends AbstractVector {
    *            the value to be filled into the cells.
    * @return <tt>this</tt> (for convenience only).
    */
-  AbstractDoubleVector fill(final double value) {
+  void fill(final double value) {
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
@@ -378,7 +375,6 @@ abstract class AbstractDoubleVector extends AbstractVector {
         set(i, value);
       }
     //}
-    return this;
   }
 
   /**
@@ -394,7 +390,7 @@ abstract class AbstractDoubleVector extends AbstractVector {
    * @throws IllegalArgumentException
    *             if <tt>values.length != size()</tt>.
    */
-  AbstractDoubleVector setValues(List<double> values) {
+  void setValues(List<double> values) {
     if (values.length != _size) {
       throw new ArgumentError("Must have same number of cells: length=${values.length} size()=${length}");
     }
@@ -418,7 +414,6 @@ abstract class AbstractDoubleVector extends AbstractVector {
         set(i, values[i]);
       }
     //}
-    return this;
   }
 
   /**
@@ -435,8 +430,10 @@ abstract class AbstractDoubleVector extends AbstractVector {
    * @throws IllegalArgumentException
    *             if <tt>size() != other.size()</tt>.
    */
-  AbstractDoubleVector setAll(AbstractDoubleVector other) {
-    if (other == this) return this;
+  void setAll(AbstractDoubleVector other) {
+    if (other == this) {
+      return;
+    }
     checkSize(other);
     AbstractDoubleVector source;
     if (_haveSharedCells(other)) {
@@ -464,7 +461,6 @@ abstract class AbstractDoubleVector extends AbstractVector {
         set(i, source.get(i));
       }
     //}
-    return this;
   }
 
   /**
@@ -497,7 +493,7 @@ abstract class AbstractDoubleVector extends AbstractVector {
    *             if <tt>size() != y.size()</tt>.
    * @see cern.jet.math.tdouble.DoubleFunctions
    */
-  AbstractDoubleVector forEachVector(AbstractDoubleVector y, DoubleDoubleFunction function) {
+  void forEachVector(AbstractDoubleVector y, DoubleDoubleFunction function) {
     checkSize(y);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
@@ -519,7 +515,6 @@ abstract class AbstractDoubleVector extends AbstractVector {
         set(i, function(get(i), y.get(i)));
       }
     //}
-    return this;
   }
 
   /**
@@ -562,7 +557,7 @@ abstract class AbstractDoubleVector extends AbstractVector {
    *             if <tt>size() != y.size()</tt>.
    * @see cern.jet.math.tdouble.DoubleFunctions
    */
-  AbstractDoubleVector forEachVectorNonZero(AbstractDoubleVector y, DoubleDoubleFunction function, /*IntArrayList*/Int32List nonZeroIndexes) {
+  void forEachVectorNonZero(AbstractDoubleVector y, DoubleDoubleFunction function, /*IntArrayList*/Int32List nonZeroIndexes) {
     checkSize(y);
     Int32List nonZeroElements = nonZeroIndexes;//.elements();
 
@@ -578,7 +573,7 @@ abstract class AbstractDoubleVector extends AbstractVector {
     } else if (function is DoublePlusMultSecond) {
       double multiplicator = (function as DoublePlusMultSecond).multiplicator;
       if (multiplicator == 0) { // x[i] = x[i] + 0*y[i]
-        return this;
+        return;
       } else if (multiplicator == 1) { // x[i] = x[i] + y[i]
         for (int index = nonZeroIndexes.length; --index >= 0; ) {
           int i = nonZeroElements[index];
@@ -596,9 +591,8 @@ abstract class AbstractDoubleVector extends AbstractVector {
         }
       }
     } else { // the general case x[i] = f(x[i],y[i])
-      return forEachVector(y, function);
+      forEachVector(y, function);
     }
-    return this;
   }
 
   /**
@@ -697,7 +691,7 @@ abstract class AbstractDoubleVector extends AbstractVector {
    */
   bool operator ==(var obj) {
     if (obj is num) {
-      return DoubleProperty.DEFAULT.equals(this, obj.toDouble());      
+      return DoubleProperty.DEFAULT.equals(this, obj.toDouble());
     }
     if (identical(this, obj)) {
       return true;
@@ -1327,7 +1321,7 @@ abstract class AbstractDoubleVector extends AbstractVector {
    * @return a new flip view.
    */
   AbstractDoubleVector flip() {
-    return _view()._vFlip() as AbstractDoubleVector;
+    return _view().._vFlip();
   }
 
   /**
@@ -1359,7 +1353,7 @@ abstract class AbstractDoubleVector extends AbstractVector {
    *
    */
   AbstractDoubleVector part(int index, int width) {
-    return _view()._vPart(index, width) as AbstractDoubleVector;
+    return _view().._vPart(index, width);
   }
 
   /**
@@ -1475,7 +1469,7 @@ abstract class AbstractDoubleVector extends AbstractVector {
    *
    */
   AbstractDoubleVector strides(int stride) {
-    return _view()._vStrides(stride) as AbstractDoubleVector;
+    return _view().._vStrides(stride);
   }
 
   /**

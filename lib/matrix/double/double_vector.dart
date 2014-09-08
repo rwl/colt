@@ -213,13 +213,13 @@ class DoubleVector extends AbstractDoubleVector {
     return a;
   }
 
-  AbstractDoubleVector forEach(final DoubleFunction function) {
+  void forEach(final DoubleFunction function) {
     double multiplicator;
     if (function is DoubleMult) {
       // x[i] = mult*x[i]
       multiplicator = (function as DoubleMult).multiplicator;
       if (multiplicator == 1) {
-        return this;
+        return;
       }
     } else {
       multiplicator = 0.0;
@@ -266,10 +266,9 @@ class DoubleVector extends AbstractDoubleVector {
       }
     }
     //}
-    return this;
   }
 
-  AbstractDoubleVector forEachWhere(final DoubleProcedure cond, final DoubleFunction function) {
+  void forEachWhere(final DoubleProcedure cond, final DoubleFunction function) {
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
@@ -298,10 +297,9 @@ class DoubleVector extends AbstractDoubleVector {
       idx += _stride;
     }
     //}
-    return this;
   }
 
-  AbstractDoubleVector fillWhere(final DoubleProcedure cond, final double value) {
+  void fillWhere(final DoubleProcedure cond, final double value) {
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
@@ -330,10 +328,9 @@ class DoubleVector extends AbstractDoubleVector {
       idx += _stride;
     }
     //}
-    return this;
   }
 
-  AbstractDoubleVector fill(final double value) {
+  void fill(final double value) {
     final Float64List elems = this._elements;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
@@ -359,10 +356,9 @@ class DoubleVector extends AbstractDoubleVector {
         idx += _stride;
       }
     //}
-    return this;
   }
 
-  AbstractDoubleVector setValues(final Float64List values) {
+  void setValues(final Float64List values) {
     if (values.length != _size) {
       throw new ArgumentError("Must have same number of cells: length=${values.length} size()=${length}");
     }
@@ -395,30 +391,31 @@ class DoubleVector extends AbstractDoubleVector {
       }
       //}
     }
-    return this;
   }
 
-  AbstractDoubleVector setAll(AbstractDoubleVector source) {
+  void setAll(AbstractDoubleVector source) {
     // overriden for performance only
     if (!(source is DoubleVector)) {
       super.setAll(source);
-      return this;
+      return;
     }
     DoubleVector other = source as DoubleVector;
-    if (other == this) return this;
+    if (other == this) {
+      return;
+    }
     checkSize(other);
     if (_isNoView && other._isNoView) {
       // quickest
       this._elements.setAll(0, other._elements);
       //System.arraycopy(other._elements, 0, this._elements, 0, this._elements.length);
-      return this;
+      return;
     }
     if (_haveSharedCells(other)) {
       AbstractDoubleVector c = other.copy();
       if (!(c is DoubleVector)) {
         // should not happen
         super.setAll(source);
-        return this;
+        return;
       }
       other = c as DoubleVector;
     }
@@ -457,14 +454,13 @@ class DoubleVector extends AbstractDoubleVector {
       idxOther += strideOther;
     }
     //}
-    return this;
   }
 
-  AbstractDoubleVector forEachVector(final AbstractDoubleVector y, final DoubleDoubleFunction function) {
+  void forEachVector(final AbstractDoubleVector y, final DoubleDoubleFunction function) {
     // overriden for performance only
     if (!(y is DoubleVector)) {
       super.forEachVector(y, function);
-      return this;
+      return;
     }
     checkSize(y);
     final int zeroOther = y.index(0);
@@ -589,7 +585,7 @@ class DoubleVector extends AbstractDoubleVector {
       double multiplicator = (function as DoublePlusMultSecond).multiplicator;
       if (multiplicator == 0) {
         // x[i] = x[i] + 0*y[i]
-        return this;
+        return;
       } else if (multiplicator == 1) {
         // x[i] = x[i] + y[i]
         for (int k = 0; k < _size; k++) {
@@ -621,7 +617,6 @@ class DoubleVector extends AbstractDoubleVector {
       }
     }
     //}
-    return this;
   }
 
   int get cardinality {

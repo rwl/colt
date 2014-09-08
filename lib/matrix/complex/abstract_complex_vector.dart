@@ -136,7 +136,7 @@ abstract class AbstractComplexVector extends AbstractVector {
    * @return <tt>this</tt> (for convenience only).
    * @see cern.jet.math.tdcomplex.ComplexFunctions
    */
-  AbstractComplexVector forEach(final cfunc.ComplexComplexFunction f) {
+  void forEach(final cfunc.ComplexComplexFunction f) {
     int size = this.length;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
@@ -158,7 +158,6 @@ abstract class AbstractComplexVector extends AbstractVector {
       set(i, f(get(i)));
     }
     //}
-    return this;
   }
 
   /**
@@ -172,7 +171,7 @@ abstract class AbstractComplexVector extends AbstractVector {
    * @return <tt>this</tt> (for convenience only).
    * @see cern.jet.math.tdcomplex.ComplexFunctions
    */
-  AbstractComplexVector forEachWhere(final cfunc.ComplexProcedure cond, final cfunc.ComplexComplexFunction f) {
+  void forEachWhere(final cfunc.ComplexProcedure cond, final cfunc.ComplexComplexFunction f) {
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
@@ -200,7 +199,6 @@ abstract class AbstractComplexVector extends AbstractVector {
       }
     }
     //}
-    return this;
   }
 
   /**
@@ -214,7 +212,7 @@ abstract class AbstractComplexVector extends AbstractVector {
    * @return <tt>this</tt> (for convenience only).
    *
    */
-  AbstractComplexVector fillWhere(final cfunc.ComplexProcedure cond, final Float64List value) {
+  void fillWhere(final cfunc.ComplexProcedure cond, final Float64List value) {
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
@@ -242,7 +240,6 @@ abstract class AbstractComplexVector extends AbstractVector {
       }
     }
     //}
-    return this;
   }
 
   /**
@@ -254,7 +251,7 @@ abstract class AbstractComplexVector extends AbstractVector {
    * @return <tt>this</tt> (for convenience only).
    * @see cern.jet.math.tdcomplex.ComplexFunctions
    */
-  AbstractComplexVector forEachReal(final cfunc.ComplexRealFunction f) {
+  void forEachReal(final cfunc.ComplexRealFunction f) {
     int size = this.length;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
@@ -276,7 +273,6 @@ abstract class AbstractComplexVector extends AbstractVector {
       setParts(i, f(get(i)), 0.0);
     }
     //}
-    return this;
   }
 
   /**
@@ -293,8 +289,10 @@ abstract class AbstractComplexVector extends AbstractVector {
    * @throws ArgumentError
    *             if <tt>size() != other.size()</tt>.
    */
-  AbstractComplexVector copyFrom(AbstractComplexVector other) {
-    if (other == this) return this;
+  void copyFrom(AbstractComplexVector other) {
+    if (other == this) {
+      return;
+    }
     checkSize(other);
     AbstractComplexVector otherLoc;
     if (_haveSharedCells(other)) {
@@ -322,7 +320,6 @@ abstract class AbstractComplexVector extends AbstractVector {
         set(i, otherLoc.get(i));
       }
     //}
-    return this;
   }
 
   /**
@@ -339,7 +336,7 @@ abstract class AbstractComplexVector extends AbstractVector {
    *             if <tt>size() != y.size()</tt>.
    * @see cern.jet.math.tdcomplex.ComplexFunctions
    */
-  AbstractComplexVector forEachWith(final AbstractComplexVector y, final cfunc.ComplexComplexComplexFunction f) {
+  void forEachWith(final AbstractComplexVector y, final cfunc.ComplexComplexComplexFunction f) {
     int size = this.length;
     checkSize(y);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -362,7 +359,6 @@ abstract class AbstractComplexVector extends AbstractVector {
         set(i, f(get(i), y.get(i)));
       }
     //}
-    return this;
   }
 
   /**
@@ -375,7 +371,7 @@ abstract class AbstractComplexVector extends AbstractVector {
    *
    * @return <tt>this</tt> (for convenience only).
    */
-  AbstractComplexVector fill(final double re, final double im) {
+  void fill(final double re, final double im) {
     int size = this.length;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
@@ -397,7 +393,6 @@ abstract class AbstractComplexVector extends AbstractVector {
         setParts(i, re, im);
       }
     //}
-    return this;
   }
 
   /**
@@ -415,7 +410,7 @@ abstract class AbstractComplexVector extends AbstractVector {
    * @throws ArgumentError
    *             if <tt>values.length != 2*size()</tt>.
    */
-  AbstractComplexVector setAll(final Float64List values) {
+  void setAll(final Float64List values) {
     int size = this.length;
     if (values.length != 2 * size) {
       throw new ArgumentError("The length of values[] must be equal to 2*size()=$size");
@@ -440,7 +435,6 @@ abstract class AbstractComplexVector extends AbstractVector {
         setParts(i, values[2 * i], values[2 * i + 1]);
       }
     //}
-    return this;
   }
 
   /**
@@ -454,7 +448,7 @@ abstract class AbstractComplexVector extends AbstractVector {
    * @throws ArgumentError
    *             if <tt>size() != other.size()</tt>.
    */
-  AbstractComplexVector setImaginary(final AbstractDoubleVector other) {
+  void setImaginary(final AbstractDoubleVector other) {
     checkSize(other);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
@@ -480,7 +474,6 @@ abstract class AbstractComplexVector extends AbstractVector {
         setParts(i, re, im);
       }
     //}
-    return this;
   }
 
   /**
@@ -494,7 +487,7 @@ abstract class AbstractComplexVector extends AbstractVector {
    * @throws ArgumentError
    *             if <tt>size() != other.size()</tt>.
    */
-  AbstractComplexVector setReal(final AbstractDoubleVector other) {
+  void setReal(final AbstractDoubleVector other) {
     checkSize(other);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
@@ -520,7 +513,6 @@ abstract class AbstractComplexVector extends AbstractVector {
         setParts(i, re, im);
       }
     //}
-    return this;
   }
 
   /**
@@ -1010,7 +1002,7 @@ abstract class AbstractComplexVector extends AbstractVector {
    * @return a new flip view.
    */
   AbstractComplexVector flip() {
-    return _view()._vFlip() as AbstractComplexVector;
+    return _view().._vFlip();
   }
 
   /**
@@ -1042,7 +1034,7 @@ abstract class AbstractComplexVector extends AbstractVector {
    *
    */
   AbstractComplexVector part(int index, int width) {
-    return _view()._vPart(index, width) as AbstractComplexVector;
+    return _view().._vPart(index, width);
   }
 
   /**
@@ -1121,7 +1113,7 @@ abstract class AbstractComplexVector extends AbstractVector {
    *
    */
   AbstractComplexVector strides(int stride) {
-    return _view()._vStrides(stride) as AbstractComplexVector;
+    return _view().._vStrides(stride);
   }
 
   /**

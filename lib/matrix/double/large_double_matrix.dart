@@ -1,9 +1,9 @@
 /*
 Copyright (C) 1999 CERN - European Organization for Nuclear Research.
-Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose 
-is hereby granted without fee, provided that the above copyright notice appear in all copies and 
-that both that copyright notice and this permission notice appear in supporting documentation. 
-CERN makes no representations about the suitability of this software for any purpose. 
+Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose
+is hereby granted without fee, provided that the above copyright notice appear in all copies and
+that both that copyright notice and this permission notice appear in supporting documentation.
+CERN makes no representations about the suitability of this software for any purpose.
 It is provided "as is" without expressed or implied warranty.
  */
 part of cern.colt.matrix;
@@ -23,9 +23,9 @@ part of cern.colt.matrix;
  * <p>
  * <tt>O(1)</tt> (i.e. constant time) for the basic operations <tt>get</tt>,
  * <tt>getQuick</tt>, <tt>set</tt>, <tt>setQuick</tt> and <tt>size</tt>.
- * 
+ *
  * @author Piotr Wendykier (piotr.wendykier@gmail.com)
- * 
+ *
  */
 class LargeDoubleMatrix extends WrapperDoubleMatrix {
 

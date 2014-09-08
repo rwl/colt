@@ -359,7 +359,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
    * @return <tt>this</tt> (for convenience only).
    * @see cern.jet.math.tdouble.DoubleFunctions
    */
-  AbstractDoubleMatrix forEach(final DoubleFunction f) {
+  void forEach(final DoubleFunction f) {
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_rows * _columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
@@ -384,7 +384,6 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
         }
       }
     //}
-    return this;
   }
 
   /**
@@ -398,7 +397,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
    * @return <tt>this</tt> (for convenience only).
    * @see cern.jet.math.tdouble.DoubleFunctions
    */
-  AbstractDoubleMatrix forEachWhere(final DoubleProcedure cond, final DoubleFunction f) {
+  void forEachWhere(final DoubleProcedure cond, final DoubleFunction f) {
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_rows * _columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
@@ -431,7 +430,6 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
         }
       }
     //}
-    return this;
   }
 
   /**
@@ -445,7 +443,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
    * @return <tt>this</tt> (for convenience only).
    *
    */
-  AbstractDoubleMatrix fillWhere(final DoubleProcedure cond, final double value) {
+  void fillWhere(final DoubleProcedure cond, final double value) {
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_rows * _columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
@@ -478,7 +476,6 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
         }
       }
     //}
-    return this;
   }
 
   /**
@@ -488,7 +485,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
    *            the value to be filled into the cells.
    * @return <tt>this</tt> (for convenience only).
    */
-  AbstractDoubleMatrix fill(final num value) {
+  void fill(final num value) {
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_rows * _columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
@@ -513,7 +510,6 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
         }
       }
     //}
-    return this;
   }
 
   /**
@@ -530,7 +526,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
    * @throws ArgumentError
    *             if <tt>values.length != rows()*columns()</tt>.
    */
-  AbstractDoubleMatrix setAll(List<double> values) {
+  void setAll(List<double> values) {
     if (values.length != _rows * _columns) {
       throw new ArgumentError("Must have same length: length=${values.length}rows()*columns()=${rows * columns}");
     }
@@ -561,7 +557,6 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
       }
     //}
 
-    return this;
   }
 
   /**
@@ -580,7 +575,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
    *             <tt>values.length != rows() || for any 0 &lt;= row &lt; rows(): values[row].length != columns()</tt>
    *             .
    */
-  AbstractDoubleMatrix setAll2D(final List<Float64List> values) {
+  void setAll2D(final List<Float64List> values) {
     if (values.length != _rows) {
       throw new ArgumentError("Must have same number of rows: rows=${values.length}rows()=${rows}");
     }
@@ -614,7 +609,6 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
         }
       }
     //}
-    return this;
   }
 
   /**
@@ -633,8 +627,10 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
    *             if
    *             <tt>columns() != other.columns() || rows() != other.rows()</tt>
    */
-  AbstractDoubleMatrix copyFrom(AbstractDoubleMatrix other) {
-    if (other == this) return this;
+  void copyFrom(AbstractDoubleMatrix other) {
+    if (other == this) {
+      return;
+    }
     checkShape(other);
     AbstractDoubleMatrix source;
     if (_haveSharedCells(other)) {
@@ -666,7 +662,6 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
         }
       }
     //}
-    return this;
   }
 
   /**
@@ -708,7 +703,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
    *             <tt>columns() != other.columns() || rows() != other.rows()</tt>
    * @see cern.jet.math.tdouble.DoubleFunctions
    */
-  AbstractDoubleMatrix forEachMatrix(final AbstractDoubleMatrix y, final DoubleDoubleFunction function) {
+  void forEachMatrix(final AbstractDoubleMatrix y, final DoubleDoubleFunction function) {
     checkShape(y);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_rows * _columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -734,7 +729,6 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
         }
       }
     //}
-    return this;
   }
 
   /**
@@ -757,7 +751,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
    *             <tt>columns() != other.columns() || rows() != other.rows()</tt>
    * @see cern.jet.math.tdouble.DoubleFunctions
    */
-  AbstractDoubleMatrix forEachMatrixRange(final AbstractDoubleMatrix y, final DoubleDoubleFunction function, /*IntArrayList*/Int32List rowList, /*IntArrayList*/Int32List columnList) {
+  void forEachMatrixRange(final AbstractDoubleMatrix y, final DoubleDoubleFunction function, /*IntArrayList*/Int32List rowList, /*IntArrayList*/Int32List columnList) {
     checkShape(y);
     final int size = rowList.length;
     final Int32List rowElements = rowList;//.elements();
@@ -782,7 +776,6 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
         set(rowElements[i], columnElements[i], function(get(rowElements[i], columnElements[i]), y.get(rowElements[i], columnElements[i])));
       }
     //}
-    return this;
   }
 
   /**
@@ -891,7 +884,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
    * @return a deep copy of the receiver.
    */
   AbstractDoubleMatrix copy() {
-    return like().copyFrom(this);
+    return like()..copyFrom(this);
   }
 
   /**
@@ -957,7 +950,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
    *            cell's row, column and value.
    * @return <tt>this</tt> (for convenience only).
    */
-  AbstractDoubleMatrix forEachNonZero(final func.IntIntDoubleFunction function) {
+  void forEachNonZero(final func.IntIntDoubleFunction function) {
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
@@ -990,7 +983,6 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
         }
       }
     //}
-    return this;
   }
 
   /**
@@ -1521,7 +1513,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
    * @see #viewRowFlip()
    */
   AbstractDoubleMatrix columnFlip() {
-    return _view()._vColumnFlip() as AbstractDoubleMatrix;
+    return _view().._vColumnFlip();
   }
 
   /**
@@ -1557,7 +1549,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
    * @return a new dice view.
    */
   AbstractDoubleMatrix dice() {
-    return _view()._vDice() as AbstractDoubleMatrix;
+    return _view().._vDice();
   }
 
   /**
@@ -1597,7 +1589,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
    *
    */
   AbstractDoubleMatrix part(int row, int column, int height, int width) {
-    return _view()._vPart(row, column, height, width) as AbstractDoubleMatrix;
+    return _view().._vPart(row, column, height, width);
   }
 
   /**
@@ -1633,7 +1625,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
     int viewStride = this._columnStride;
     return _like1D(viewSize, viewZero, viewStride);
   }
-  
+
   AbstractDoubleVector operator [](int r) => row(r);
 
   /**
@@ -1664,7 +1656,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
    * @see #viewColumnFlip()
    */
   AbstractDoubleMatrix rowFlip() {
-    return _view()._vRowFlip() as AbstractDoubleMatrix;
+    return _view().._vRowFlip();
   }
 
   /**
@@ -1848,7 +1840,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
    *             if <tt>rowStride<=0 || columnStride<=0</tt>.
    */
   AbstractDoubleMatrix strides(int rowStride, int columnStride) {
-    return _view()._vStrides(rowStride, columnStride) as AbstractDoubleMatrix;
+    return _view().._vStrides(rowStride, columnStride);
   }
 
   /**

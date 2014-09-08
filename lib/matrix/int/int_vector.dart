@@ -215,13 +215,13 @@ class IntVector extends AbstractIntVector {
     return a;
   }
 
-  AbstractIntVector forEach(final ifunc.IntFunction function) {
+  void forEach(final ifunc.IntFunction function) {
     int multiplicator;
     if (function is ifunc.IntMult) {
       // x[i] = mult*x[i]
       multiplicator = (function as ifunc.IntMult).multiplicator;
       if (multiplicator == 1) {
-        return this;
+        return;
       }
     } else {
       multiplicator = 0;
@@ -268,10 +268,9 @@ class IntVector extends AbstractIntVector {
       }
     }
     //}
-    return this;
   }
 
-  AbstractIntVector forEachWhere(final ifunc.IntProcedure cond, final ifunc.IntFunction function) {
+  void forEachWhere(final ifunc.IntProcedure cond, final ifunc.IntFunction function) {
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
@@ -300,10 +299,9 @@ class IntVector extends AbstractIntVector {
       idx += _stride;
     }
     //}
-    return this;
   }
 
-  AbstractIntVector fillWhere(final ifunc.IntProcedure cond, final int value) {
+  void fillWhere(final ifunc.IntProcedure cond, final int value) {
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
@@ -332,10 +330,9 @@ class IntVector extends AbstractIntVector {
       idx += _stride;
     }
     //}
-    return this;
   }
 
-  AbstractIntVector fill(final int value) {
+  void fill(final int value) {
     final Int32List elems = this._elements;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
@@ -361,10 +358,9 @@ class IntVector extends AbstractIntVector {
       idx += _stride;
     }
     //}
-    return this;
   }
 
-  AbstractIntVector setAll(final Int32List values) {
+  void setAll(final Int32List values) {
     if (values.length != _size) {
       throw new ArgumentError("Must have same number of cells: length=${values.length} size()=$length");
     }
@@ -402,30 +398,31 @@ class IntVector extends AbstractIntVector {
       }
       //}
     }
-    return this;
   }
 
-  AbstractIntVector copyFrom(AbstractIntVector source) {
+  void copyFrom(AbstractIntVector source) {
     // overriden for performance only
     if (!(source is IntVector)) {
       super.copyFrom(source);
-      return this;
+      return;
     }
     IntVector other = source as IntVector;
-    if (other == this) return this;
+    if (other == this) {
+      return;
+    }
     checkSize(other);
     if (_isNoView && other._isNoView) {
       // quickest
       //System.arraycopy(other._elements, 0, this._elements, 0, this._elements.length);
       this._elements.setAll(0, other._elements);
-      return this;
+      return;
     }
     if (_haveSharedCells(other)) {
       AbstractIntVector c = other.copy();
       if (!(c is IntVector)) {
         // should not happen
         super.copyFrom(source);
-        return this;
+        return;
       }
       other = c as IntVector;
     }
@@ -465,14 +462,13 @@ class IntVector extends AbstractIntVector {
       idxOther += strideOther;
     }
     //}
-    return this;
   }
 
-  AbstractIntVector forEachWith(final AbstractIntVector y, final ifunc.IntIntFunction function) {
+  void forEachWith(final AbstractIntVector y, final ifunc.IntIntFunction function) {
     // overriden for performance only
     if (!(y is IntVector)) {
       super.forEachWith(y, function);
-      return this;
+      return;
     }
     checkSize(y);
     final int zeroOther = y.index(0);
@@ -598,7 +594,7 @@ class IntVector extends AbstractIntVector {
       int multiplicator = (function as ifunc.IntPlusMultSecond).multiplicator;
       if (multiplicator == 0) {
         // x[i] = x[i] + 0*y[i]
-        return this;
+        return;
       } else if (multiplicator == 1) {
         // x[i] = x[i] + y[i]
         for (int k = 0; k < _size; k++) {
@@ -630,7 +626,6 @@ class IntVector extends AbstractIntVector {
       }
     }
     //}
-    return this;
   }
 
   int cardinality() {

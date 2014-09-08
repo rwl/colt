@@ -76,7 +76,7 @@ class SparseComplexMatrix extends AbstractComplexMatrix {
     this._isNoView = isNoView;
   }
 
-  AbstractComplexMatrix fill(double re, double im/*Float64List value*/) {
+  void fill(double re, double im/*Float64List value*/) {
     // overriden for performance only
     //if (this._isNoView && value[0] == 0 && value[1] == 0) {
     if (this._isNoView && re == 0 && im == 0) {
@@ -84,44 +84,49 @@ class SparseComplexMatrix extends AbstractComplexMatrix {
     } else {
       super.fill(re, im);
     }
-    return this;
   }
 
-  AbstractComplexMatrix copyFrom(AbstractComplexMatrix source) {
+  void copyFrom(AbstractComplexMatrix source) {
     // overriden for performance only
     if (!(source is SparseComplexMatrix)) {
-      return super.copyFrom(source);
+      super.copyFrom(source);
+      return;
     }
     SparseComplexMatrix other = source as SparseComplexMatrix;
     if (other == this) {
-      return this; // nothing to do
+      return; // nothing to do
     }
     checkShape(other);
 
     if (this._isNoView && other._isNoView) { // quickest
       this._elements.clear();
       this._elements.addAll(other._elements);
-      return this;
+      return;
     }
-    return super.copyFrom(source);
+    super.copyFrom(source);
   }
 
-  AbstractComplexMatrix forEachMatrix(final AbstractComplexMatrix y, cfunc.ComplexComplexComplexFunction function) {
-    if (!this._isNoView) return super.forEachMatrix(y, function);
+  void forEachMatrix(final AbstractComplexMatrix y, cfunc.ComplexComplexComplexFunction function) {
+    if (!this._isNoView) {
+      super.forEachMatrix(y, function);
+      return;
+    }
 
     checkShape(y);
 
     if (function is cfunc.ComplexPlusMultSecond) {
       // x[i] = x[i] + alpha*y[i]
       final Float64List alpha = (function as cfunc.ComplexPlusMultSecond).multiplicator;
-      if (alpha[0] == 0 && alpha[1] == 1) return this; // nothing to do
+      if (alpha[0] == 0 && alpha[1] == 1) {
+        return; // nothing to do
+      }
       y.forEachNonZero((int i, int j, Float64List value) {
         set(i, j, Complex.plus(get(i, j), Complex.multiply(alpha, value)));
         return value;
       });
-      return this;
+      return;
     }
-    return super.forEachMatrix(y, function);
+    super.forEachMatrix(y, function);
   }
 
   int get cardinality {
@@ -457,7 +462,7 @@ class SelectedSparseComplexMatrix extends AbstractComplexMatrix {
     this._offset = 0;
   }
 
-  AbstractMatrix _vDice() {
+  void _vDice() {
     super._vDice();
     // swap
     Int32List tmp = _rowOffsets;
@@ -467,7 +472,6 @@ class SelectedSparseComplexMatrix extends AbstractComplexMatrix {
     // flips stay unaffected
 
     this._isNoView = false;
-    return this;
   }
 
   AbstractComplexVector column(int column) {

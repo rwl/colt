@@ -326,7 +326,7 @@ class DiagonalComplexMatrixTest extends ComplexMatrixTest {
     if (DINDEX >= 0) {
       A.set(NROWS ~/ 4, NROWS ~/ 4 + DINDEX, value);
       A.set(NROWS ~/ 2, NROWS ~/ 2 + DINDEX, value);
-      AbstractComplexMatrix B = A.where((ComplexVector element) {
+      AbstractComplexMatrix B = A.where((AbstractComplexVector element) {
         if (Complex.abs(Complex.minus(element.get(NROWS ~/ 4 + DINDEX), value)) < TOL) {
           return true;
         } else {

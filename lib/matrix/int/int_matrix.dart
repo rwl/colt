@@ -318,7 +318,7 @@ class IntMatrix extends AbstractIntMatrix {
     return a;
   }
 
-  AbstractIntMatrix forEach(final ifunc.IntFunction function) {
+  void forEach(final ifunc.IntFunction function) {
     final Int32List elems = this._elements;
     if (elems == null) {
       throw new Error();
@@ -378,10 +378,10 @@ class IntMatrix extends AbstractIntMatrix {
       // mult*x[i]
       int multiplicator = (function as ifunc.IntMult).multiplicator;
       if (multiplicator == 1) {
-        return this;
+        return;
       }
       if (multiplicator == 0) {
-        return fill(0);
+        fill(0);
       }
       for (int r = 0; r < _rows; r++) { // the general case
         for (int i = idx,
@@ -402,10 +402,9 @@ class IntMatrix extends AbstractIntMatrix {
       }
     }
     //}
-    return this;
   }
 
-  AbstractIntMatrix forEachWhere(final ifunc.IntProcedure cond, final ifunc.IntFunction function) {
+  void forEachWhere(final ifunc.IntProcedure cond, final ifunc.IntFunction function) {
     final int zero = index(0, 0);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -447,10 +446,9 @@ class IntMatrix extends AbstractIntMatrix {
       idx += _rowStride;
     }
     //}
-    return this;
   }
 
-  AbstractIntMatrix fillWhere(final ifunc.IntProcedure cond, final int value) {
+  void fillWhere(final ifunc.IntProcedure cond, final int value) {
     final int zero = index(0, 0);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -492,10 +490,9 @@ class IntMatrix extends AbstractIntMatrix {
       idx += _rowStride;
     }
     //}
-    return this;
   }
 
-  AbstractIntMatrix fill(final int value) {
+  void fill(final int value) {
     final Int32List elems = this._elements;
     final int zero = index(0, 0);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -530,10 +527,9 @@ class IntMatrix extends AbstractIntMatrix {
       idx += _rowStride;
     }
     //}
-    return this;
   }
 
-  AbstractIntMatrix setAll(final Int32List values) {
+  void setAll(final Int32List values) {
     if (values.length != length) {
       throw new ArgumentError("Must have same length: length=${values.length} rows()*columns()=${rows * columns}");
     }
@@ -578,10 +574,9 @@ class IntMatrix extends AbstractIntMatrix {
       }
       //}
     }
-    return this;
   }
 
-  AbstractIntMatrix setAll2D(final List<Int32List> values) {
+  void setAll2D(final List<Int32List> values) {
     if (values.length != _rows) {
       throw new ArgumentError("Must have same number of rows: rows=${values.length} rows()=${rows}");
     }
@@ -658,32 +653,32 @@ class IntMatrix extends AbstractIntMatrix {
         idx += _rowStride;
       }
       //}
-      return this;
     }
-    return this;
   }
 
-  AbstractIntMatrix copyFrom(final AbstractIntMatrix source) {
+  void copyFrom(final AbstractIntMatrix source) {
     // overriden for performance only
     if (!(source is IntMatrix)) {
       super.copyFrom(source);
-      return this;
+      return;
     }
     final IntMatrix other_final = source as IntMatrix;
-    if (other_final == this) return this; // nothing to do
+    if (other_final == this) {
+      return ; // nothing to do
+    }
     checkShape(other_final);
     //int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if (this._isNoView && other_final._isNoView) { // quickest
       //System.arraycopy(other_final._elements, 0, this._elements, 0, this._elements.length);
       _elements.setAll(0, other_final._elements);
-      return this;
+      return;
     }
     IntMatrix other = source as IntMatrix;
     if (_haveSharedCells(other)) {
       AbstractIntMatrix c = other.copy();
       if (!(c is IntMatrix)) { // should not happen
         super.copyFrom(other);
-        return this;
+        return;
       }
       other = c as IntMatrix;
     }
@@ -736,14 +731,13 @@ class IntMatrix extends AbstractIntMatrix {
       idxOther += rowStrideOther;
     }
     //}
-    return this;
   }
 
-  AbstractIntMatrix forEachWith(final AbstractIntMatrix y, final ifunc.IntIntFunction function) {
+  void forEachWith(final AbstractIntMatrix y, final ifunc.IntIntFunction function) {
     // overriden for performance only
     if (!(y is IntMatrix)) {
       super.forEachWith(y, function);
-      return this;
+      return;
     }
     IntMatrix other = y as IntMatrix;
     checkShape(y);
@@ -907,7 +901,7 @@ class IntMatrix extends AbstractIntMatrix {
     } else if (function is ifunc.IntPlusMultSecond) {
       int multiplicator = (function as ifunc.IntPlusMultSecond).multiplicator;
       if (multiplicator == 0) { // x[i] = x[i] + 0*y[i]
-        return this;
+        return;
       } else if (multiplicator == 1) { // x[i] = x[i] + y[i]
         idx = zero;
         idxOther = zeroOther;
@@ -969,10 +963,9 @@ class IntMatrix extends AbstractIntMatrix {
       }
     }
     //}
-    return this;
   }
 
-  AbstractIntMatrix forEachWithRange(final AbstractIntMatrix y, final ifunc.IntIntFunction function, Int32List rowList, Int32List columnList) {
+  void forEachWithRange(final AbstractIntMatrix y, final ifunc.IntIntFunction function, Int32List rowList, Int32List columnList) {
     checkShape(y);
     final int size = rowList.length;
     final Int32List rowElements = rowList;//.elements();
@@ -1010,7 +1003,6 @@ class IntMatrix extends AbstractIntMatrix {
       _elements[idx] = function(_elements[idx], elemsOther[idxOther]);
     }
     //}
-    return this;
   }
 
   int cardinality() {
@@ -1071,7 +1063,7 @@ class IntMatrix extends AbstractIntMatrix {
     return _elements;
   }
 
-  AbstractIntMatrix forEachNonZero(final ifunc.IntIntIntFunction function) {
+  void forEachNonZero(final ifunc.IntIntIntFunction function) {
     final int zero = index(0, 0);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -1112,7 +1104,6 @@ class IntMatrix extends AbstractIntMatrix {
       idx += _rowStride;
     }
     //}
-    return this;
   }
 
   void negativeValues(final List<int> rowList, final List<int> columnList, final List<int> valueList) {
@@ -2192,7 +2183,6 @@ class SelectedDenseIntMatrix extends AbstractIntMatrix {
     // flips stay unaffected
 
     this._isNoView = false;
-    return this;
   }
 
   /**

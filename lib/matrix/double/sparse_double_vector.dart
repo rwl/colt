@@ -147,14 +147,13 @@ class SparseDoubleVector extends AbstractDoubleVector {
    *            the value to be filled into the cells.
    * @return <tt>this</tt> (for convenience only).
    */
-  AbstractDoubleVector fill(double value) {
+  void fill(double value) {
     // overriden for performance only
     if (this._isNoView && value == 0) {
       this._elements.clear();
     } else {
       super.fill(value);
     }
-    return this;
   }
 
   /**

@@ -238,7 +238,7 @@ abstract class AbstractIntVector extends AbstractVector {
    * @return <tt>this</tt> (for convenience only).
    * @see IntFunctions
    */
-  AbstractIntVector forEach(final ifunc.IntFunction f) {
+  void forEach(final ifunc.IntFunction f) {
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
@@ -259,7 +259,6 @@ abstract class AbstractIntVector extends AbstractVector {
         set(i, f(get(i)));
       }
     //}
-    return this;
   }
 
   /**
@@ -273,7 +272,7 @@ abstract class AbstractIntVector extends AbstractVector {
    * @return <tt>this</tt> (for convenience only).
    * @see IntFunctions
    */
-  AbstractIntVector forEachWhere(final ifunc.IntProcedure cond, final ifunc.IntFunction f) {
+  void forEachWhere(final ifunc.IntProcedure cond, final ifunc.IntFunction f) {
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
@@ -302,7 +301,6 @@ abstract class AbstractIntVector extends AbstractVector {
         }
       }
     //}
-    return this;
   }
 
   /**
@@ -316,7 +314,7 @@ abstract class AbstractIntVector extends AbstractVector {
    * @return <tt>this</tt> (for convenience only).
    *
    */
-  AbstractIntVector fillWhere(final ifunc.IntProcedure cond, final int value) {
+  void fillWhere(final ifunc.IntProcedure cond, final int value) {
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
@@ -346,7 +344,6 @@ abstract class AbstractIntVector extends AbstractVector {
         }
       }
     //}
-    return this;
   }
 
   /**
@@ -356,7 +353,7 @@ abstract class AbstractIntVector extends AbstractVector {
    *            the value to be filled into the cells.
    * @return <tt>this</tt> (for convenience only).
    */
-  AbstractIntVector fill(final int value) {
+  void fill(final int value) {
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
@@ -378,7 +375,6 @@ abstract class AbstractIntVector extends AbstractVector {
         set(i, value);
       }
     //}
-    return this;
   }
 
   /**
@@ -394,7 +390,7 @@ abstract class AbstractIntVector extends AbstractVector {
    * @throws ArgumentError
    *             if <tt>values.length != size()</tt>.
    */
-  AbstractIntVector setAll(final Int32List values) {
+  void setAll(final Int32List values) {
     if (values.length != _size) {
       throw new ArgumentError("Must have same number of cells: length=${values.length} size()=$length");
     }
@@ -419,7 +415,6 @@ abstract class AbstractIntVector extends AbstractVector {
         set(i, values[i]);
       }
     //}
-    return this;
   }
 
   /**
@@ -436,8 +431,10 @@ abstract class AbstractIntVector extends AbstractVector {
    * @throws ArgumentError
    *             if <tt>size() != other.size()</tt>.
    */
-  AbstractIntVector copyFrom(AbstractIntVector other) {
-    if (other == this) return this;
+  void copyFrom(AbstractIntVector other) {
+    if (other == this) {
+      return;
+    }
     checkSize(other);
     AbstractIntVector other_loc;
     if (_haveSharedCells(other)) {
@@ -470,7 +467,6 @@ abstract class AbstractIntVector extends AbstractVector {
         set(i, other_loc.get(i));
       }
     //}
-    return this;
   }
 
   /**
@@ -503,7 +499,7 @@ abstract class AbstractIntVector extends AbstractVector {
    *             if <tt>size() != y.size()</tt>.
    * @see IntFunctions
    */
-  AbstractIntVector forEachWith(final AbstractIntVector y, final ifunc.IntIntFunction function) {
+  void forEachWith(final AbstractIntVector y, final ifunc.IntIntFunction function) {
     checkSize(y);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
@@ -526,7 +522,6 @@ abstract class AbstractIntVector extends AbstractVector {
         set(i, function(get(i), y.get(i)));
       }
     //}
-    return this;
   }
 
   /**
@@ -569,7 +564,7 @@ abstract class AbstractIntVector extends AbstractVector {
    *             if <tt>size() != y.size()</tt>.
    * @see IntFunctions
    */
-  AbstractIntVector forEachWithRange(AbstractIntVector y, ifunc.IntIntFunction function, List<int> nonZeroIndexes) {
+  void forEachWithRange(AbstractIntVector y, ifunc.IntIntFunction function, List<int> nonZeroIndexes) {
     checkSize(y);
     Int32List nonZeroElements = nonZeroIndexes;//.elements();
 
@@ -587,7 +582,7 @@ abstract class AbstractIntVector extends AbstractVector {
     } else if (function is ifunc.IntPlusMultSecond) {
       int multiplicator = (function as ifunc.IntPlusMultSecond).multiplicator;
       if (multiplicator == 0) { // x[i] = x[i] + 0*y[i]
-        return this;
+        return;
       } else if (multiplicator == 1) { // x[i] = x[i] + y[i]
         for (int index = nonZeroIndexes.length; --index >= 0; ) {
           int i = nonZeroElements[index];
@@ -605,9 +600,8 @@ abstract class AbstractIntVector extends AbstractVector {
         }
       }
     } else { // the general case x[i] = f(x[i],y[i])
-      return forEachWith(y, function);
+      forEachWith(y, function);
     }
-    return this;
   }
 
   /**
@@ -1321,7 +1315,7 @@ abstract class AbstractIntVector extends AbstractVector {
    * @return a new flip view.
    */
   AbstractIntVector flip() {
-    return (_view()._vFlip()) as AbstractIntVector;
+    return _view().._vFlip();
   }
 
   /**
@@ -1353,7 +1347,7 @@ abstract class AbstractIntVector extends AbstractVector {
    *
    */
   AbstractIntVector part(int index, int width) {
-    return (_view()._vPart(index, width)) as AbstractIntVector;
+    return _view().._vPart(index, width);
   }
 
   /**
@@ -1482,7 +1476,7 @@ abstract class AbstractIntVector extends AbstractVector {
    *
    */
   AbstractIntVector strides(int stride) {
-    return (_view()._vStrides(stride)) as AbstractIntVector;
+    return _view().._vStrides(stride);
   }
 
   /**

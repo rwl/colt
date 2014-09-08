@@ -56,7 +56,7 @@ class DoubleFactory1D {
    * purposes. Example: <tt>0 1 2</tt>
    */
   AbstractDoubleVector ascending(int size) {
-    return descending(size).forEach(func.chainGH(func.neg, func.subtract(size)));
+    return descending(size)..forEach(func.chainGH(func.neg, func.subtract(size)));
   }
 
   /**
@@ -101,9 +101,9 @@ class DoubleFactory1D {
    */
   AbstractDoubleVector makeValues(Float64List values) {
     if (this == sparse) {
-      return new SparseDoubleVector.SparseDoubleVector(values);
+      return new SparseDoubleVector.fromList(values);
     } else {
-      return new DoubleVector.DenseDoubleVector(values);
+      return new DoubleVector.fromList(values);
     }
   }
 
@@ -143,7 +143,7 @@ class DoubleFactory1D {
    * given value.
    */
   AbstractDoubleVector makeValue(int size, double initialValue) {
-    return make(size).fill(initialValue);
+    return make(size)..fill(initialValue);
   }
 
   /**
@@ -151,7 +151,7 @@ class DoubleFactory1D {
    * (exclusive).
    */
   AbstractDoubleVector random(int size) {
-    return make(size).forEach(func.random());
+    return make(size)..forEach(func.random());
   }
 
   /**
@@ -512,7 +512,7 @@ class DoubleFactory2D {
    * </pre>
    */
   AbstractDoubleMatrix ascending(int rows, int columns) {
-    return descending(rows, columns).forEach(func.chainGH(func.neg, func.subtract(columns * rows)));
+    return descending(rows, columns)..forEach(func.chainGH(func.neg, func.subtract(columns * rows)));
   }
 
   /**
@@ -1059,7 +1059,7 @@ class DoubleFactory2D {
     if (this == sparse) {
       return new SparseDoubleMatrix.fromList(values);
     } else {
-      return new DoubleMatrix.DenseDoubleMatrix(values);
+      return new DoubleMatrix.fromList(values);
     }
   }
 
@@ -1081,7 +1081,7 @@ class DoubleFactory2D {
    */
   AbstractDoubleMatrix makeValue(int rows, int columns, double initialValue) {
     if (initialValue == 0) return make(rows, columns);
-    return make(rows, columns).fill(initialValue);
+    return make(rows, columns)..fill(initialValue);
   }
 
   /**
@@ -1089,7 +1089,7 @@ class DoubleFactory2D {
    * (exclusive).
    */
   AbstractDoubleMatrix random(int rows, int columns) {
-    return make(rows, columns).forEach(func.random());
+    return make(rows, columns)..forEach(func.random());
   }
 
   /**

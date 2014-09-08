@@ -71,14 +71,13 @@ class SparseComplexVector extends AbstractComplexVector {
     this._isNoView = isNoView;
   }
 
-  AbstractComplexVector setAll(Float64List value) {
+  void setAll(Float64List value) {
     // overriden for performance only
     if (this._isNoView && value[0] == 0 && value[1] == 0) {
       this._elements.clear();
     } else {
       super.setAll(value);
     }
-    return this;
   }
 
   int get cardinality {

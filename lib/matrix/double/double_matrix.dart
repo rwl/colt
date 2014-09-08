@@ -348,7 +348,7 @@ class DoubleMatrix extends AbstractDoubleMatrix {
     return a;
   }
 
-  AbstractDoubleMatrix forEach(DoubleFunction function) {
+  void forEach(DoubleFunction function) {
     final Float64List elems = this._elements;
     if (elems == null) throw new Error();
     final int zero = index(0, 0);
@@ -401,8 +401,13 @@ class DoubleMatrix extends AbstractDoubleMatrix {
     if (function is DoubleMult) { // x[i] =
       // mult*x[i]
       double multiplicator = (function as DoubleMult).multiplicator;
-      if (multiplicator == 1) return this;
-      if (multiplicator == 0) return fill(0.0);
+      if (multiplicator == 1) {
+        return;
+      }
+      if (multiplicator == 0) {
+        fill(0.0);
+        return;
+      }
       for (int r = _rows; --r >= 0; ) { // the general case
         for (int i = idx,
             c = _columns; --c >= 0; ) {
@@ -422,10 +427,9 @@ class DoubleMatrix extends AbstractDoubleMatrix {
       }
     }
     //}
-    return this;
   }
 
-  AbstractDoubleMatrix forEachWhere(DoubleProcedure cond, func.DoubleFunction function) {
+  void forEachWhere(DoubleProcedure cond, func.DoubleFunction function) {
     final int zero = index(0, 0);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -467,10 +471,9 @@ class DoubleMatrix extends AbstractDoubleMatrix {
       idx += _rowStride;
     }
     //}
-    return this;
   }
 
-  AbstractDoubleMatrix fillWhere(DoubleProcedure cond, final double value) {
+  void fillWhere(DoubleProcedure cond, final double value) {
     final int zero = index(0, 0);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -512,10 +515,9 @@ class DoubleMatrix extends AbstractDoubleMatrix {
       idx += _rowStride;
     }
     //}
-    return this;
   }
 
-  AbstractDoubleMatrix fill(final double value) {
+  void fill(final double value) {
     final Float64List elems = this._elements;
     final int zero = index(0, 0);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -550,10 +552,9 @@ class DoubleMatrix extends AbstractDoubleMatrix {
       idx += _rowStride;
     }
     //}
-    return this;
   }
 
-  AbstractDoubleMatrix setAll(final Float64List values) {
+  void setAll(final Float64List values) {
     if (values.length != length) {
       throw new ArgumentError("Must have same length: length=${values.length} rows()*columns()=${rows * columns}");
     }
@@ -597,10 +598,9 @@ class DoubleMatrix extends AbstractDoubleMatrix {
       }
       //}
     }
-    return this;
   }
 
-  AbstractDoubleMatrix setAll2D(final List<Float64List> values) {
+  void setAll2D(final List<Float64List> values) {
     if (values.length != _rows) {
       throw new ArgumentError("Must have same number of rows: rows=${values.length} rows()=${rows}");
     }
@@ -675,31 +675,32 @@ class DoubleMatrix extends AbstractDoubleMatrix {
         idx += _rowStride;
       }
       //}
-      return this;
+      return;
     }
-    return this;
   }
 
-  AbstractDoubleMatrix copyFrom(final AbstractDoubleMatrix source) {
+  void copyFrom(final AbstractDoubleMatrix source) {
     // overriden for performance only
     if (!(source is DoubleMatrix)) {
       super.copyFrom(source);
-      return this;
+      return;
     }
     DoubleMatrix other = source as DoubleMatrix;
-    if (other == this) return this; // nothing to do
+    if (other == this) {
+      return; // nothing to do
+    }
     checkShape(other);
     //int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if (this._isNoView && other._isNoView) { // quickest
       this._elements.setAll(0, other._elements);
       //System.arraycopy(other._elements, 0, this._elements, 0, this._elements.length);
-      return this;
+      return;
     }
     if (_haveSharedCells(other)) {
       AbstractDoubleMatrix c = other.copy();
       if (!(c is DoubleMatrix)) { // should not happen
         super.copyFrom(other);
-        return this;
+        return;
       }
       other = c as DoubleMatrix;
     }
@@ -751,14 +752,13 @@ class DoubleMatrix extends AbstractDoubleMatrix {
       idxOther += rowStrideOther;
     }
     //}
-    return this;
   }
 
-  AbstractDoubleMatrix forEachMatrix(final AbstractDoubleMatrix y, DoubleDoubleFunction function) {
+  void forEachMatrix(final AbstractDoubleMatrix y, DoubleDoubleFunction function) {
     // overriden for performance only
     if (!(y is DoubleMatrix)) {
       super.forEachMatrix(y, function);
-      return this;
+      return;
     }
     DoubleMatrix other = y as DoubleMatrix;
     checkShape(y);
@@ -919,7 +919,7 @@ class DoubleMatrix extends AbstractDoubleMatrix {
     } else if (function is DoublePlusMultSecond) {
       double multiplicator = (function as DoublePlusMultSecond).multiplicator;
       if (multiplicator == 0) { // x[i] = x[i] + 0*y[i]
-        return this;
+        return;
       } else if (multiplicator == 1) { // x[i] = x[i] + y[i]
         idx = zero;
         idxOther = zeroOther;
@@ -981,10 +981,9 @@ class DoubleMatrix extends AbstractDoubleMatrix {
       }
     }
     //}
-    return this;
   }
 
-  AbstractDoubleMatrix forEachMatrixRange(final AbstractDoubleMatrix y, DoubleDoubleFunction function,  /*IntArrayList*/List<int> rowList,  /*IntArrayList*/List<int> columnList) {
+  void forEachMatrixRange(final AbstractDoubleMatrix y, DoubleDoubleFunction function,  /*IntArrayList*/List<int> rowList,  /*IntArrayList*/List<int> columnList) {
     checkShape(y);
     final int size = rowList.length;
     final List<int> rowElements = rowList;//.elements();
@@ -1022,7 +1021,6 @@ class DoubleMatrix extends AbstractDoubleMatrix {
       _elements[idx] = function(_elements[idx], elementsOther[idxOther]);
     }
     //}
-    return this;
   }
 
   int get cardinality {
@@ -1082,7 +1080,7 @@ class DoubleMatrix extends AbstractDoubleMatrix {
     return _elements;
   }
 
-  AbstractDoubleMatrix forEachNonZero(func.IntIntDoubleFunction function) {
+  void forEachNonZero(func.IntIntDoubleFunction function) {
     final int zero = this.index(0, 0);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -1122,7 +1120,6 @@ class DoubleMatrix extends AbstractDoubleMatrix {
       idx += _rowStride;
     }
     //}
-    return this;
   }
 
   /**
@@ -2299,7 +2296,7 @@ class SelectedDenseDoubleMatrix extends AbstractDoubleMatrix {
   /**
    * Self modifying version of viewDice().
    */
-  AbstractMatrix _vDice() {
+  void _vDice() {
     super._vDice();
     // swap
     Int32List tmp = _rowOffsets;
@@ -2309,7 +2306,6 @@ class SelectedDenseDoubleMatrix extends AbstractDoubleMatrix {
     // flips stay unaffected
 
     this._isNoView = false;
-    return this;
   }
 
   /**

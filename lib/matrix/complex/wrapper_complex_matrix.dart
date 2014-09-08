@@ -28,7 +28,7 @@ class WrapperComplexMatrix extends AbstractComplexMatrix {
     this._content = newContent;
   }
 
-  AbstractComplexMatrix setAll(final Float64List values) {
+  void setAll(final Float64List values) {
     if (_content is DiagonalComplexMatrix) {
       int dlength = (_content as DiagonalComplexMatrix)._dlength;
       final Float64List elems = (_content as DiagonalComplexMatrix)._elements;
@@ -57,9 +57,10 @@ class WrapperComplexMatrix extends AbstractComplexMatrix {
         elems[2 * i + 1] = values[2 * i + 1];
       }
       //}
-      return this;
+      return;
     } else {
-      return super.setAll(values);
+      super.setAll(values);
+      return;
     }
   }
 

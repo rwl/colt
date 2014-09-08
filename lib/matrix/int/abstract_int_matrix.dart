@@ -346,7 +346,7 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
    * @return <tt>this</tt> (for convenience only).
    * @see cern.jet.math.tint.IntFunctions
    */
-  AbstractIntMatrix forEach(final ifunc.IntFunction f) {
+  void forEach(final ifunc.IntFunction f) {
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_rows * _columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
@@ -372,7 +372,6 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
         }
       }
     //}
-    return this;
   }
 
   /**
@@ -386,7 +385,7 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
    * @return <tt>this</tt> (for convenience only).
    * @see cern.jet.math.tint.IntFunctions
    */
-  AbstractIntMatrix forEachWhere(final ifunc.IntProcedure cond, final ifunc.IntFunction f) {
+  void forEachWhere(final ifunc.IntProcedure cond, final ifunc.IntFunction f) {
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_rows * _columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
@@ -420,7 +419,6 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
         }
       }
     //}
-    return this;
   }
 
   /**
@@ -434,7 +432,7 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
    * @return <tt>this</tt> (for convenience only).
    *
    */
-  AbstractIntMatrix fillWhere(final ifunc.IntProcedure cond, final int value) {
+  void fillWhere(final ifunc.IntProcedure cond, final int value) {
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_rows * _columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
@@ -468,7 +466,6 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
         }
       }
     //}
-    return this;
   }
 
   /**
@@ -478,7 +475,7 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
    *            the value to be filled into the cells.
    * @return <tt>this</tt> (for convenience only).
    */
-  AbstractIntMatrix fill(final int value) {
+  void fill(final int value) {
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_rows * _columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
@@ -504,7 +501,6 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
         }
       }
     //}
-    return this;
   }
 
   /**
@@ -521,7 +517,7 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
    * @throws ArgumentError
    *             if <tt>values.length != rows()*columns()</tt>.
    */
-  AbstractIntMatrix setAll(final Int32List values) {
+  void setAll(final Int32List values) {
     if (values.length != _rows * _columns) {
       throw new ArgumentError("Must have same length: length=${values.length} rows()*columns()=${rows * columns}");
     }
@@ -553,7 +549,6 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
       }
     //}
 
-    return this;
   }
 
   /**
@@ -572,7 +567,7 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
    *             <tt>values.length != rows() || for any 0 &lt;= row &lt; rows(): values[row].length != columns()</tt>
    *             .
    */
-  AbstractIntMatrix setAll2D(final List<Int32List> values) {
+  void setAll2D(final List<Int32List> values) {
     if (values.length != _rows) {
       throw new ArgumentError("Must have same number of rows: rows=${values.length} rows()=${rows}");
     }
@@ -607,7 +602,6 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
         }
       }
     //}
-    return this;
   }
 
   /**
@@ -626,8 +620,10 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
    *             if
    *             <tt>columns() != other.columns() || rows() != other.rows()</tt>
    */
-  AbstractIntMatrix copyFrom(AbstractIntMatrix other) {
-    if (other == this) return this;
+  void copyFrom(AbstractIntMatrix other) {
+    if (other == this) {
+      return;
+    }
     checkShape(other);
     AbstractIntMatrix other_loc;
     if (_haveSharedCells(other)) {
@@ -660,7 +656,6 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
         }
       }
     //}
-    return this;
   }
 
   /**
@@ -702,7 +697,7 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
    *             <tt>columns() != other.columns() || rows() != other.rows()</tt>
    * @see cern.jet.math.tint.IntFunctions
    */
-  AbstractIntMatrix forEachWith(final AbstractIntMatrix y, final ifunc.IntIntFunction function) {
+  void forEachWith(final AbstractIntMatrix y, final ifunc.IntIntFunction function) {
     checkShape(y);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_rows * _columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -729,7 +724,6 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
         }
       }
     //}
-    return this;
   }
 
   /**
@@ -752,7 +746,7 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
    *             <tt>columns() != other.columns() || rows() != other.rows()</tt>
    * @see cern.jet.math.tint.IntFunctions
    */
-  AbstractIntMatrix forEachWithRange(final AbstractIntMatrix y, final ifunc.IntIntFunction function, Int32List rowList, Int32List columnList) {
+  void forEachWithRange(final AbstractIntMatrix y, final ifunc.IntIntFunction function, Int32List rowList, Int32List columnList) {
     checkShape(y);
     final int size = rowList.length;
     final Int32List rowElements = rowList;//.elements();
@@ -777,7 +771,6 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
         set(rowElements[i], columnElements[i], function(get(rowElements[i], columnElements[i]), y.get(rowElements[i], columnElements[i])));
       }
     //}
-    return this;
   }
 
   /**
@@ -840,7 +833,7 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
    * @return a deep copy of the receiver.
    */
   AbstractIntMatrix copy() {
-    return like().copyFrom(this);
+    return like()..copyFrom(this);
   }
 
   /**
@@ -907,7 +900,7 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
    *            cell's row, column and value.
    * @return <tt>this</tt> (for convenience only).
    */
-  AbstractIntMatrix forEachNonZero(final ifunc.IntIntIntFunction function) {
+  void forEachNonZero(final ifunc.IntIntIntFunction function) {
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
@@ -941,7 +934,6 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
         }
       }
     //}
-    return this;
   }
 
   /**
@@ -1514,7 +1506,7 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
    * @see #rowFlip()
    */
   AbstractIntMatrix columnFlip() {
-    return (_view()._vColumnFlip()) as AbstractIntMatrix;
+    return (_view().._vColumnFlip());
   }
 
   /**
@@ -1550,7 +1542,7 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
    * @return a new dice view.
    */
   AbstractIntMatrix dice() {
-    return (_view()._vDice()) as AbstractIntMatrix;
+    return _view().._vDice();
   }
 
   /**
@@ -1590,7 +1582,7 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
    *
    */
   AbstractIntMatrix part(int row, int column, int height, int width) {
-    return (_view()._vPart(row, column, height, width)) as AbstractIntMatrix;
+    return _view().._vPart(row, column, height, width);
   }
 
   /**
@@ -1655,7 +1647,7 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
    * @see #columnFlip()
    */
   AbstractIntMatrix rowFlip() {
-    return (_view()._vRowFlip()) as AbstractIntMatrix;
+    return _view().._vRowFlip();
   }
 
   /**
@@ -1854,7 +1846,7 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
    *             if <tt>rowStride<=0 || columnStride<=0</tt>.
    */
   AbstractIntMatrix strides(int rowStride, int columnStride) {
-    return (_view()._vStrides(rowStride, columnStride)) as AbstractIntMatrix;
+    return _view().._vStrides(rowStride, columnStride);
   }
 
   /**

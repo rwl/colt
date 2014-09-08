@@ -426,7 +426,7 @@ abstract class ComplexMatrixTest {
     final Float64List value = new Float64List.fromList([random.nextDouble(), random.nextDouble()]);
     A.set(A.rows ~/ 3, 0, value);
     A.set(A.rows ~/ 2, 0, value);
-    AbstractComplexMatrix B = A.where((ComplexVector element) {
+    AbstractComplexMatrix B = A.where((AbstractComplexVector element) {
       return Complex.isEqual(element.get(0), value, TOL);
     });
     expect(2, equals(B.rows));

@@ -194,14 +194,14 @@ class ComplexVector extends AbstractComplexVector {
     return a;
   }
 
-  AbstractComplexVector forEach(final cfunc.ComplexComplexFunction function) {
+  void forEach(final cfunc.ComplexComplexFunction function) {
     if (this._elements == null) {
       throw new Error();
     }
     if (function is cfunc.ComplexMult) {
       Float64List multiplicator = (function as cfunc.ComplexMult).multiplicator;
       if (multiplicator[0] == 1 && multiplicator[1] == 0) {
-        return this;
+        return;
       }
     }
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -256,10 +256,9 @@ class ComplexVector extends AbstractComplexVector {
       }
     }
     //}
-    return this;
   }
 
-  AbstractComplexVector forEachWhere(final cfunc.ComplexProcedure cond, final cfunc.ComplexComplexFunction function) {
+  void forEachWhere(final cfunc.ComplexProcedure cond, final cfunc.ComplexComplexFunction function) {
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
@@ -298,10 +297,9 @@ class ComplexVector extends AbstractComplexVector {
       idx += _stride;
     }
     //}
-    return this;
   }
 
-  AbstractComplexVector fillWhere(final cfunc.ComplexProcedure cond, final Float64List value) {
+  void fillWhere(final cfunc.ComplexProcedure cond, final Float64List value) {
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
@@ -338,10 +336,9 @@ class ComplexVector extends AbstractComplexVector {
       idx += _stride;
     }
     //}
-    return this;
   }
 
-  AbstractComplexVector forEachReal(final cfunc.ComplexRealFunction function) {
+  void forEachReal(final cfunc.ComplexRealFunction function) {
     if (this._elements == null) {
       throw new Error();
     }
@@ -415,25 +412,28 @@ class ComplexVector extends AbstractComplexVector {
       }
     }
     //}
-    return this;
   }
 
-  AbstractComplexVector copyFrom(AbstractComplexVector source) {
+  void copyFrom(AbstractComplexVector source) {
     if (!(source is ComplexVector)) {
-      return super.copyFrom(source);
+      super.copyFrom(source);
+      return;
     }
     ComplexVector other = source as ComplexVector;
-    if (other == this) return this;
+    if (other == this) {
+      return;
+    }
     checkSize(other);
     if (_isNoView && other._isNoView) { // quickest
       //System.arraycopy(other._elements, 0, this._elements, 0, this._elements.length);
       this._elements.setAll(0, other._elements);
-      return this;
+      return;
     }
     if (_haveSharedCells(other)) {
       AbstractComplexVector c = other.copy();
       if (!(c is ComplexVector)) { // should not happen
-        return super.copyFrom(source);
+        super.copyFrom(source);
+        return;
       }
       other = c as ComplexVector;
     }
@@ -475,12 +475,12 @@ class ComplexVector extends AbstractComplexVector {
       idxOther += strideOther;
     }
     //}
-    return this;
   }
 
-  AbstractComplexVector forEachWith(AbstractComplexVector y, final cfunc.ComplexComplexComplexFunction function) {
+  void forEachWith(AbstractComplexVector y, final cfunc.ComplexComplexComplexFunction function) {
     if (!(y is ComplexVector)) {
-      return super.forEachWith(y, function);
+      super.forEachWith(y, function);
+      return;
     }
     checkSize(y);
     final Float64List elemsOther = y.elements() as Float64List;
@@ -666,10 +666,9 @@ class ComplexVector extends AbstractComplexVector {
       }
     }
     //}
-    return this;
   }
 
-  AbstractComplexVector fill(final double re, final double im) {
+  void fill(final double re, final double im) {
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
@@ -696,10 +695,9 @@ class ComplexVector extends AbstractComplexVector {
       idx += _stride;
     }
     //}
-    return this;
   }
 
-  AbstractComplexVector setAll(Float64List values) {
+  void setAll(Float64List values) {
     if (_isNoView) {
       if (values.length != 2 * _size) {
         throw new ArgumentError("The length of values[] must be equal to 2*size()=${2 * length}");
@@ -709,12 +707,12 @@ class ComplexVector extends AbstractComplexVector {
     } else {
       super.setAll(values);
     }
-    return this;
   }
 
-  AbstractComplexVector setImaginary(final AbstractDoubleVector other) {
+  void setImaginary(final AbstractDoubleVector other) {
     if (!(other is DoubleVector)) {
-      return super.setImaginary(other);
+      super.setImaginary(other);
+      return;
     }
     checkSize(other);
     final int zeroOther = other.index(0);
@@ -748,12 +746,12 @@ class ComplexVector extends AbstractComplexVector {
       idxOther += strideOther;
     }
     //}
-    return this;
   }
 
-  AbstractComplexVector setReal(final AbstractDoubleVector other) {
+  void setReal(final AbstractDoubleVector other) {
     if (!(other is DoubleVector)) {
-      return super.setReal(other);
+      super.setReal(other);
+      return;
     }
     checkSize(other);
     final int zeroOther = other.index(0);
@@ -787,7 +785,6 @@ class ComplexVector extends AbstractComplexVector {
       idxOther += strideOther;
     }
     //}
-    return this;
   }
 
   Float64List elements() {

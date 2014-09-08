@@ -393,7 +393,7 @@ class DiagonalDoubleMatrixTest extends DoubleMatrixTest {
     if (DINDEX >= 0) {
       A.set(NROWS ~/ 4, NROWS ~/ 4 + DINDEX, value);
       A.set(NROWS ~/ 2, NROWS ~/ 2 + DINDEX, value);
-      AbstractDoubleMatrix B = A.where((DoubleVector element) {
+      AbstractDoubleMatrix B = A.where((AbstractDoubleVector element) {
         if ((element.get(NROWS ~/ 4 + DINDEX) - value).abs() < TOL) {
           return true;
         } else {
@@ -406,7 +406,7 @@ class DiagonalDoubleMatrixTest extends DoubleMatrixTest {
     } else {
       A.set(NROWS ~/ 4 - DINDEX, NROWS ~/ 4, value);
       A.set(NROWS ~/ 2 - DINDEX, NROWS ~/ 2, value);
-      AbstractDoubleMatrix B = A.where((DoubleVector element) {
+      AbstractDoubleMatrix B = A.where((AbstractDoubleVector element) {
         if ((element.get(NROWS ~/ 4) - value).abs() < TOL) {
           return true;
         } else {
@@ -518,7 +518,7 @@ class DiagonalDoubleMatrixTest extends DoubleMatrixTest {
     //---
     C = null;
     C = A.multiply(B, C, alpha, beta, true, false);
-    expected = new List<Float64List>.generate(NCOLUMNS, 
+    expected = new List<Float64List>.generate(NCOLUMNS,
         (_) => new Float64List(NCOLUMNS));
     for (int j = 0; j < NCOLUMNS; j++) {
       for (int i = 0; i < NCOLUMNS; i++) {
@@ -559,7 +559,7 @@ class DiagonalDoubleMatrixTest extends DoubleMatrixTest {
     //---
     C = null;
     C = A.multiply(B, C, alpha, beta, false, true);
-    expected = new List<Float64List>.generate(NROWS, 
+    expected = new List<Float64List>.generate(NROWS,
         (_) => new Float64List(NROWS));
     for (int j = 0; j < NROWS; j++) {
       for (int i = 0; i < NROWS; i++) {
@@ -599,7 +599,7 @@ class DiagonalDoubleMatrixTest extends DoubleMatrixTest {
     //---
     C = null;
     C = A.multiply(Bt, C, alpha, beta, true, true);
-    expected = new List<Float64List>.generate(NCOLUMNS, 
+    expected = new List<Float64List>.generate(NCOLUMNS,
         (_) => new Float64List(NCOLUMNS));
     for (int j = 0; j < NCOLUMNS; j++) {
       for (int i = 0; i < NCOLUMNS; i++) {

@@ -354,17 +354,19 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
     this._values = values;
   }
 
-  AbstractDoubleMatrix forEach(final func.DoubleFunction function) {
+  void forEach(final func.DoubleFunction function) {
     if (function is DoubleMult) { // x[i] = mult*x[i]
       final double alpha = (function as DoubleMult).multiplicator;
       if (alpha == 1) {
-        return this;
+        return;
       }
       if (alpha == 0.0) {
-        return fill(0.0);
+        fill(0.0);
+        return;
       }
       if (alpha != alpha) {
-        return fill(alpha); // the funny definition of isNaN(). This should better not happen.
+        fill(alpha); // the funny definition of isNaN(). This should better not happen.
+        return;
       }
 
       int nz = cardinality;
@@ -376,10 +378,9 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
         return function(value);
       });
     }
-    return this;
   }
 
-  AbstractDoubleMatrix fill(double value) {
+  void fill(double value) {
     if (value == 0.0) {
       _rowPointers.fillRange(0, _rowPointers.length, 0);
       _columnIndexes.fillRange(0, _columnIndexes.length, 0);
@@ -390,11 +391,12 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
         _values[i] = value;
       }
     }
-    return this;
   }
 
-  AbstractDoubleMatrix copyFrom(AbstractDoubleMatrix source) {
-    if (source == this) return this; // nothing to do
+  void copyFrom(AbstractDoubleMatrix source) {
+    if (source == this) {
+      return; // nothing to do
+    }
     checkShape(source);
 
     if (source is SparseRCDoubleMatrix) {
@@ -424,10 +426,9 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
         return value;
       });
     }
-    return this;
   }
 
-  AbstractDoubleMatrix forEachMatrix(final AbstractDoubleMatrix y, func.DoubleDoubleFunction function) {
+  void forEachMatrix(final AbstractDoubleMatrix y, func.DoubleDoubleFunction function) {
     checkShape(y);
     if ((y is SparseRCDoubleMatrix) && (function == func.plus)) { // x[i] = x[i] + y[i]
       SparseRCDoubleMatrix yy = y;
@@ -489,30 +490,33 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
         this._rowPointers = rowPointersC;
         this._columnIndexes = columnIndexesC;
         this._values = valuesC;
-        return this;
+        return;
       }
     }
 
     if (function is DoublePlusMultSecond) { // x[i] = x[i] + alpha*y[i]
       final double alpha = (function as DoublePlusMultSecond).multiplicator;
-      if (alpha == 0) return this; // nothing to do
+      if (alpha == 0) {
+        return; // nothing to do
+      }
       y.forEachNonZero((int i, int j, double value) {
         set(i, j, get(i, j) + alpha * value);
         return value;
       });
-      return this;
+      return;
     }
 
     if (function is DoublePlusMultFirst) { // x[i] = alpha*x[i] + y[i]
       final double alpha = (function as DoublePlusMultFirst).multiplicator;
       if (alpha == 0) {
-        return copyFrom(y);
+        copyFrom(y);
+        return;
       }
       y.forEachNonZero((int i, int j, double value) {
         set(i, j, alpha * get(i, j) + value);
         return value;
       });
-      return this;
+      return;
     }
 
     if (function == func.mult) { // x[i] = x[i] * y[i]
@@ -524,7 +528,7 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
           if (_values[k] == 0) _remove(i, j);
         }
       }
-      return this;
+      return;
     }
 
     if (function == func.div) { // x[i] = x[i] / y[i]
@@ -537,18 +541,17 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
           if (_values[k] == 0) _remove(i, j);
         }
       }
-      return this;
+      return;
     }
-    return super.forEachMatrix(y, function);
-
+    super.forEachMatrix(y, function);
+    return;
   }
 
   int get cardinality {
     return _rowPointers[_rows];
   }
 
-  AbstractDoubleMatrix forEachNonZero(final func.IntIntDoubleFunction function) {
-
+  void forEachNonZero(final func.IntIntDoubleFunction function) {
     for (int i = _rows; --i >= 0; ) {
       int low = _rowPointers[i];
       for (int k = _rowPointers[i + 1]; --k >= low; ) {
@@ -560,7 +563,6 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
         }
       }
     }
-    return this;
   }
 
   /**

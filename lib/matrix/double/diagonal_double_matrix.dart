@@ -121,17 +121,19 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
     }
   }
 
-  AbstractDoubleMatrix forEach(final func.DoubleFunction function) {
+  void forEach(final func.DoubleFunction function) {
     if (function is DoubleMult) { // x[i] = mult*x[i]
       final double alpha = (function as DoubleMult).multiplicator;
       if (alpha == 1) {
-        return this;
+        return;
       }
       if (alpha == 0) {
-        return fill(0.0);
+        fill(0.0);
+        return;
       }
       if (alpha != alpha) {
-        return fill(alpha); // the funny definition of isNaN(). This should better not happen.
+        fill(alpha); // the funny definition of isNaN(). This should better not happen.
+        return;
       }
       for (int j = _dlength; --j >= 0; ) {
         _elements[j] *= alpha;
@@ -141,15 +143,13 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
         _elements[j] = function(_elements[j]);
       }
     }
-    return this;
   }
 
-  AbstractDoubleMatrix fill(double value) {
+  void fill(double value) {
     for (int i = _dlength; --i >= 0; ) _elements[i] = value;
-    return this;
   }
 
-  AbstractDoubleMatrix setAll(final Float64List values) {
+  void setAll(final Float64List values) {
     if (values.length != _dlength) {
       throw new ArgumentError("Must have same length: length=${values.length} dlength=$_dlength");
     }
@@ -173,10 +173,9 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
         _elements[r] = values[r];
       }
     //}
-    return this;
   }
 
-  AbstractDoubleMatrix setAll2D(final List<Float64List> values) {
+  void setAll2D(final List<Float64List> values) {
     if (values.length != _rows) {
       throw new ArgumentError("Must have same number of rows: rows=${values.length} rows()=${rows}");
     }
@@ -194,12 +193,13 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
       }
       _elements[i] = values[r++][c++];
     }
-    return this;
   }
 
-  AbstractDoubleMatrix copyFrom(AbstractDoubleMatrix source) {
+  void copyFrom(AbstractDoubleMatrix source) {
     // overriden for performance only
-    if (source == this) return this; // nothing to do
+    if (source == this) {
+      return; // nothing to do
+    }
     checkShape(source);
 
     if (source is DiagonalDoubleMatrix) {
@@ -210,13 +210,13 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
       // quickest
       this._elements.setAll(0, other._elements);
       //System.arraycopy(other._elements, 0, this._elements, 0, this._elements.length);
-      return this;
+      return;
     } else {
-      return super.copyFrom(source);
+      super.copyFrom(source);
     }
   }
 
-  AbstractDoubleMatrix forEachMatrix(final AbstractDoubleMatrix y, final func.DoubleDoubleFunction function) {
+  void forEachMatrix(final AbstractDoubleMatrix y, final func.DoubleDoubleFunction function) {
     checkShape(y);
     if (y is DiagonalDoubleMatrix) {
       DiagonalDoubleMatrix other = y;
@@ -226,7 +226,7 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
       if (function is DoublePlusMultSecond) { // x[i] = x[i] + alpha*y[i]
         final double alpha = (function as DoublePlusMultSecond).multiplicator;
         if (alpha == 0) {
-          return this; // nothing to do
+          return; // nothing to do
         }
       }
       final Float64List otherElements = other._elements;
@@ -292,9 +292,9 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
           }
         }
       //}
-      return this;
+      return;
     } else {
-      return super.forEachMatrix(y, function);
+      super.forEachMatrix(y, function);
     }
   }
 
@@ -408,14 +408,13 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
     }
   }
 
-  AbstractDoubleMatrix forEachNonZero(final func.IntIntDoubleFunction function) {
+  void forEachNonZero(final func.IntIntDoubleFunction function) {
     for (int j = _dlength; --j >= 0; ) {
       double value = _elements[j];
       if (value != 0) {
         _elements[j] = function(j, j, value);
       }
     }
-    return this;
   }
 
   /**
