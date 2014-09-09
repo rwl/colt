@@ -733,8 +733,10 @@ abstract class AbstractIntVector extends AbstractVector {
    * @throws IndexOutOfBoundsException
    *             if <tt>index&lt;0 || index&gt;=size()</tt>.
    */
-  int at(int index) {
-    if (index < 0 || index >= _size) _checkIndex(index);
+  int operator [](int index) {
+    if (index < 0 || index >= _size) {
+      _checkIndex(index);
+    }
     return get(index);
   }
 
@@ -1165,8 +1167,10 @@ abstract class AbstractIntVector extends AbstractVector {
    * @throws IndexOutOfBoundsException
    *             if <tt>index&lt;0 || index&gt;=size()</tt>.
    */
-  void put(int index, int value) {
-    if (index < 0 || index >= _size) _checkIndex(index);
+  void operator []=(int index, int value) {
+    if (index < 0 || index >= _size) {
+      _checkIndex(index);
+    }
     set(index, value);
   }
 

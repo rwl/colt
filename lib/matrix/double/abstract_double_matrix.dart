@@ -703,7 +703,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
    *             <tt>columns() != other.columns() || rows() != other.rows()</tt>
    * @see cern.jet.math.tdouble.DoubleFunctions
    */
-  void forEachMatrix(final AbstractDoubleMatrix y, final DoubleDoubleFunction function) {
+  void forEachWith(final AbstractDoubleMatrix y, final DoubleDoubleFunction function) {
     checkShape(y);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_rows * _columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -751,7 +751,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
    *             <tt>columns() != other.columns() || rows() != other.rows()</tt>
    * @see cern.jet.math.tdouble.DoubleFunctions
    */
-  void forEachMatrixRange(final AbstractDoubleMatrix y, final DoubleDoubleFunction function, /*IntArrayList*/Int32List rowList, /*IntArrayList*/Int32List columnList) {
+  void forEachWithNonZero(final AbstractDoubleMatrix y, final DoubleDoubleFunction function, /*IntArrayList*/Int32List rowList, /*IntArrayList*/Int32List columnList) {
     checkShape(y);
     final int size = rowList.length;
     final Int32List rowElements = rowList;//.elements();
@@ -978,7 +978,9 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
           double value = get(r, c);
           if (value != 0) {
             double a = function(r, c, value);
-            if (a != value) set(r, c, a);
+            if (a != value) {
+              set(r, c, a);
+            }
           }
         }
       }
@@ -2173,4 +2175,20 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
   AbstractDoubleMatrix _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets);
 
   Object clone();
+
+  AbstractDoubleMatrix operator *(AbstractDoubleMatrix y) {
+    return this.copy()..forEachWith(y, func.mult);
+  }
+
+  AbstractDoubleMatrix operator /(AbstractDoubleMatrix y) {
+    return this.copy()..forEachWith(y, func.div);
+  }
+
+  AbstractDoubleMatrix operator +(AbstractDoubleMatrix y) {
+    return this.copy()..forEachWith(y, func.plus);
+  }
+
+  AbstractDoubleMatrix operator -(AbstractDoubleMatrix y) {
+    return this.copy()..forEachWith(y, func.minus);
+  }
 }

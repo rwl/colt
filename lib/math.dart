@@ -16,6 +16,8 @@ const MAX_INT = 2147483647; // 2^31-1
 
 const EPSILON = 1e-9;
 
+const DEG_RAD = Math.PI / 180.0;
+
 /**
  * Only for performance tuning of compute intensive linear algebraic
  * computations. Constructs functions that return one of

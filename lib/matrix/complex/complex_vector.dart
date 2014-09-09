@@ -104,6 +104,31 @@ class ComplexVector extends AbstractComplexVector {
     this._isNoView = isNoView;
   }
 
+  /**
+   *
+   * @param r polar radius.
+   * @param theta polar angle.
+   * @param radians is 'theta' expressed in radians.
+   * @return complex polar representation.
+   */
+  factory ComplexVector.fromPolar(DoubleVector r, DoubleVector theta, [bool radians=true]) {
+    final real = theta.copy();
+    final imag = theta.copy();
+    if (!radians) {
+      real.forEach(func.multiply(DEG_RAD));
+      imag.forEach(func.multiply(DEG_RAD));
+    }
+    real.forEach(func.cos);
+    real.forEachWith(r, func.mult);
+    imag.forEach(func.sin);
+    imag.forEachWith(r, func.mult);
+
+//    real.forEachWith(r, func.chain(func.sin, func.mult));
+//    imag.forEachWith(r, func.chain(func.cos, func.mult));
+
+    return new ComplexVector.fromParts(real, imag);
+  }
+
   Float64List reduce(final cfunc.ComplexComplexComplexFunction aggr, final cfunc.ComplexComplexFunction f) {
     Float64List b = new Float64List(2);
     if (_size == 0) {

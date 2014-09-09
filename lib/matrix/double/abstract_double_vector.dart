@@ -493,7 +493,7 @@ abstract class AbstractDoubleVector extends AbstractVector {
    *             if <tt>size() != y.size()</tt>.
    * @see cern.jet.math.tdouble.DoubleFunctions
    */
-  void forEachVector(AbstractDoubleVector y, DoubleDoubleFunction function) {
+  void forEachWith(AbstractDoubleVector y, DoubleDoubleFunction function) {
     checkSize(y);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
@@ -557,7 +557,7 @@ abstract class AbstractDoubleVector extends AbstractVector {
    *             if <tt>size() != y.size()</tt>.
    * @see cern.jet.math.tdouble.DoubleFunctions
    */
-  void forEachVectorNonZero(AbstractDoubleVector y, DoubleDoubleFunction function, /*IntArrayList*/Int32List nonZeroIndexes) {
+  void forEachWithNonZero(AbstractDoubleVector y, DoubleDoubleFunction function, /*IntArrayList*/Int32List nonZeroIndexes) {
     checkSize(y);
     Int32List nonZeroElements = nonZeroIndexes;//.elements();
 
@@ -566,7 +566,9 @@ abstract class AbstractDoubleVector extends AbstractVector {
       int j = 0;
       for (int index = nonZeroIndexes.length; --index >= 0; ) {
         int i = nonZeroElements[index];
-        for ( ; j < i; j++) set(j, 0.0); // x[i] = 0 for all zeros
+        for ( ; j < i; j++) {
+          set(j, 0.0); // x[i] = 0 for all zeros
+        }
         set(i, get(i) * y.get(i)); // x[i] * y[i] for all nonZeros
         j++;
       }
@@ -591,7 +593,7 @@ abstract class AbstractDoubleVector extends AbstractVector {
         }
       }
     } else { // the general case x[i] = f(x[i],y[i])
-      forEachVector(y, function);
+      forEachWith(y, function);
     }
   }
 
@@ -1695,4 +1697,20 @@ abstract class AbstractDoubleVector extends AbstractVector {
   }*/
 
   Object clone();
+
+  AbstractDoubleVector operator *(AbstractDoubleVector y) {
+    return this.copy()..forEachWith(y, func.mult);
+  }
+
+  AbstractDoubleVector operator /(AbstractDoubleVector y) {
+    return this.copy()..forEachWith(y, func.div);
+  }
+
+  AbstractDoubleVector operator +(AbstractDoubleVector y) {
+    return this.copy()..forEachWith(y, func.plus);
+  }
+
+  AbstractDoubleVector operator -(AbstractDoubleVector y) {
+    return this.copy()..forEachWith(y, func.minus);
+  }
 }

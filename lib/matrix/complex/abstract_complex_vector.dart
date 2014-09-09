@@ -1395,4 +1395,24 @@ abstract class AbstractComplexVector extends AbstractVector {
   }*/
 
   Object clone();
+
+  AbstractComplexVector operator *(AbstractComplexVector y) {
+    return this.copy()..forEachWith(y, cfunc.mult);
+  }
+
+  AbstractComplexVector operator /(AbstractComplexVector y) {
+    return this.copy()..forEachWith(y, cfunc.div);
+  }
+
+  AbstractComplexVector operator +(AbstractComplexVector y) {
+    return this.copy()..forEachWith(y, cfunc.plus);
+  }
+
+  AbstractComplexVector operator -(AbstractComplexVector y) {
+    return this.copy()..forEachWith(y, cfunc.minus);
+  }
+
+  AbstractComplexVector conj() {
+    return this.copy()..forEach(cfunc.conj);
+  }
 }

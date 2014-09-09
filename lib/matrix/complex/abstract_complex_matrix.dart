@@ -381,7 +381,7 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
    *             <tt>columns() != other.columns() || rows() != other.rows()</tt>
    * @see cern.jet.math.tdcomplex.ComplexFunctions
    */
-  void forEachMatrix(final AbstractComplexMatrix y, final cfunc.ComplexComplexComplexFunction f) {
+  void forEachWith(final AbstractComplexMatrix y, final cfunc.ComplexComplexComplexFunction f) {
     checkShape(y);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -429,7 +429,7 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
    *             <tt>columns() != other.columns() || rows() != other.rows()</tt>
    * @see cern.jet.math.tdouble.DoubleFunctions
    */
-  void forEachMatrixRange(final AbstractComplexMatrix y, final cfunc.ComplexComplexComplexFunction function, Int32List rowList, Int32List columnList) {
+  void forEachWithRange(final AbstractComplexMatrix y, final cfunc.ComplexComplexComplexFunction function, Int32List rowList, Int32List columnList) {
     checkShape(y);
     final int size = rowList.length;
     final Int32List rowElements = rowList;
@@ -1728,4 +1728,20 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
   AbstractComplexMatrix _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets);
 
   Object clone();
+
+  AbstractComplexMatrix operator *(AbstractComplexMatrix y) {
+    return this.copy()..forEachWith(y, cfunc.mult);
+  }
+
+  AbstractComplexMatrix operator /(AbstractComplexMatrix y) {
+    return this.copy()..forEachWith(y, cfunc.div);
+  }
+
+  AbstractComplexMatrix operator +(AbstractComplexMatrix y) {
+    return this.copy()..forEachWith(y, cfunc.plus);
+  }
+
+  AbstractComplexMatrix operator -(AbstractComplexMatrix y) {
+    return this.copy()..forEachWith(y, cfunc.minus);
+  }
 }

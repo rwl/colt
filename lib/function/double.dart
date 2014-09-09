@@ -538,7 +538,7 @@ void demo2(int size) {
  * Constructs a function that returns <tt>a / b</tt>. <tt>a</tt> is a
  * variable, <tt>b</tt> is fixed.
  */
-DoubleFunction divBy(double b) {
+DoubleFunction divide(double b) {
     return multiply(1.0 / b);
 }
 
