@@ -47,6 +47,7 @@ part 'complex/sparse_complex_vector.dart';
 part 'complex/sparse_complex_matrix.dart';
 part 'complex/complex_vector.dart';
 part 'complex/complex_matrix.dart';
+part 'complex/large_complex_matrix.dart';
 part 'complex/wrapper_complex_matrix.dart';
 part 'complex/diagonal_complex_matrix.dart';
 part 'complex/sparse_cc_complex_matrix.dart';
