@@ -148,7 +148,7 @@ class DiagonalIntMatrix extends WrapperIntMatrix {
     if (values.length != _dlength) {
       throw new ArgumentError("Must have same length: length=${values.length} dlength=$_dlength");
     }
-    int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_dlength >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _dlength);
       List<Future> futures = new List<Future>(nthreads);
@@ -163,11 +163,11 @@ class DiagonalIntMatrix extends WrapperIntMatrix {
         });
       }
       ConcurrencyUtils.waitForCompletion(futures);
-    } else {
+    } else {*/
       for (int r = _dlength; --r >= 0; ) {
         _elements[r] = values[r];
       }
-    }
+    //}
     return;
   }
 
@@ -200,7 +200,7 @@ class DiagonalIntMatrix extends WrapperIntMatrix {
     checkShape(source);
 
     if (source is DiagonalIntMatrix) {
-      DiagonalIntMatrix other = source as DiagonalIntMatrix;
+      DiagonalIntMatrix other = source;
       if ((_dindex != other._dindex) || (_dlength != other._dlength)) {
         throw new ArgumentError("source is DiagonalIntMatrix2D with different diagonal stored.");
       }
@@ -217,7 +217,7 @@ class DiagonalIntMatrix extends WrapperIntMatrix {
   void forEachWith(final AbstractIntMatrix y, final ifunc.IntIntFunction function) {
     checkShape(y);
     if (y is DiagonalIntMatrix) {
-      DiagonalIntMatrix other = y as DiagonalIntMatrix;
+      DiagonalIntMatrix other = y;
       if ((_dindex != other._dindex) || (_dlength != other._dlength)) {
         throw new ArgumentError("y is DiagonalIntMatrix2D with different diagonal stored.");
       }
@@ -228,7 +228,7 @@ class DiagonalIntMatrix extends WrapperIntMatrix {
         }
       }
       final Int32List otherElements = other._elements;
-      int nthreads = ConcurrencyUtils.getNumberOfThreads();
+      /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
       if ((nthreads > 1) && (_dlength >= ConcurrencyUtils.getThreadsBeginN_2D())) {
         nthreads = Math.min(nthreads, _dlength);
         List<Future> futures = new List<Future>(nthreads);
@@ -264,7 +264,7 @@ class DiagonalIntMatrix extends WrapperIntMatrix {
           });
         }
         ConcurrencyUtils.waitForCompletion(futures);
-      } else {
+      } else {*/
         if (function is ifunc.IntPlusMultSecond) { // x[i] = x[i] + alpha*y[i]
           final int alpha = (function as ifunc.IntPlusMultSecond).multiplicator;
           if (alpha == 1) {
@@ -289,7 +289,7 @@ class DiagonalIntMatrix extends WrapperIntMatrix {
             _elements[j] = function(_elements[j], otherElements[j]);
           }
         }
-      }
+      //}
       return;
     } else {
       super.forEachWith(y, function);
@@ -299,7 +299,7 @@ class DiagonalIntMatrix extends WrapperIntMatrix {
 
   int get cardinality {
     int cardinality = 0;
-    int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_dlength >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _dlength);
       List<Future> futures = new List<Future>(nthreads);
@@ -329,11 +329,11 @@ class DiagonalIntMatrix extends WrapperIntMatrix {
       } on InterruptedException catch (e) {
         e.printStackTrace();
       }
-    } else {
+    } else {*/
       for (int r = 0; r < _dlength; r++) {
         if (_elements[r] != 0) cardinality++;
       }
-    }
+    //}
     return cardinality;
   }
 
@@ -354,9 +354,13 @@ class DiagonalIntMatrix extends WrapperIntMatrix {
 
   bool equals(Object obj) {
     if (obj is DiagonalIntMatrix) {
-      DiagonalIntMatrix other = obj as DiagonalIntMatrix;
-      if (this == obj) return true;
-      if (!(this != null && obj != null)) return false;
+      DiagonalIntMatrix other = obj;
+      if (this == obj) {
+        return true;
+      }
+      if (!(this != null && obj != null)) {
+        return false;
+      }
       final int rows = this.rows;
       final int columns = this.columns;
       if (columns != other.columns || rows != other.rows) {
@@ -408,10 +412,10 @@ class DiagonalIntMatrix extends WrapperIntMatrix {
     return _dindex;
   }
 
-  Int32List max() {
+  IntMatrixLocation max() {
     int location = 0;
     int maxValue = 0;
-    int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_dlength >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _dlength);
       List<Future> futures = new List<Future>(nthreads);
@@ -451,7 +455,7 @@ class DiagonalIntMatrix extends WrapperIntMatrix {
       } on InterruptedException catch (e) {
         e.printStackTrace();
       }
-    } else {
+    } else {*/
       maxValue = _elements[0];
       int elem;
       for (int r = 1; r < _dlength; r++) {
@@ -461,7 +465,7 @@ class DiagonalIntMatrix extends WrapperIntMatrix {
           location = r;
         }
       }
-    }
+    //}
     int rowLocation;
     int columnLocation;
     if (_dindex > 0) {
@@ -474,13 +478,13 @@ class DiagonalIntMatrix extends WrapperIntMatrix {
       rowLocation = location;
       columnLocation = location;
     }
-    return [maxValue, rowLocation, columnLocation];
+    return new IntMatrixLocation(maxValue, rowLocation, columnLocation);
   }
 
-  Int32List min() {
+  IntMatrixLocation min() {
     int location = 0;
     int minValue = 0;
-    int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_dlength >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _dlength);
       List<Future> futures = new List<Future>(nthreads);
@@ -520,7 +524,7 @@ class DiagonalIntMatrix extends WrapperIntMatrix {
       } on InterruptedException catch (e) {
         e.printStackTrace();
       }
-    } else {
+    } else {*/
       minValue = _elements[0];
       int elem;
       for (int r = 1; r < _dlength; r++) {
@@ -530,7 +534,7 @@ class DiagonalIntMatrix extends WrapperIntMatrix {
           location = r;
         }
       }
-    }
+    //}
     int rowLocation;
     int columnLocation;
     if (_dindex > 0) {
@@ -543,7 +547,7 @@ class DiagonalIntMatrix extends WrapperIntMatrix {
       rowLocation = location;
       columnLocation = location;
     }
-    return [minValue, rowLocation, columnLocation];
+    return new IntMatrixLocation(minValue, rowLocation, columnLocation);
   }
 
   int get(int row, int column) {
