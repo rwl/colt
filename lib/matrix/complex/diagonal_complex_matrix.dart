@@ -372,7 +372,7 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
       //}
       return;
     } else {
-      super.forEachMatrix(y, function);
+      super.forEachWith(y, function);
       return;
     }
   }
@@ -621,7 +621,7 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
     }
   }
 
-  AbstractComplexVector mult(AbstractComplexVector y, AbstractComplexVector z, [Float64List alpha = null, Float64List beta = null, bool transposeA = false]) {
+  AbstractComplexVector mult(AbstractComplexVector y, [AbstractComplexVector z = null, Float64List alpha = null, Float64List beta = null, bool transposeA = false]) {
     if (alpha == null) {
       alpha = new Float64List.fromList([1.0, 0.0]);
     }

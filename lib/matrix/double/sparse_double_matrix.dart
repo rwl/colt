@@ -332,7 +332,7 @@ class SparseDoubleMatrix extends AbstractDoubleMatrix {
 
   void forEachMatrix(final AbstractDoubleMatrix y, func.DoubleDoubleFunction function) {
     if (!this._isNoView) {
-      super.forEachMatrix(y, function);
+      super.forEachWith(y, function);
       return;
     }
 
@@ -364,7 +364,7 @@ class SparseDoubleMatrix extends AbstractDoubleMatrix {
         return true;
       });
     } else {
-      super.forEachMatrix(y, function);
+      super.forEachWith(y, function);
     }
 
   }
@@ -675,7 +675,7 @@ class SparseDoubleMatrix extends AbstractDoubleMatrix {
     return v;
   }
 
-  AbstractDoubleVector mult(AbstractDoubleVector y, AbstractDoubleVector z, [final double alpha = 1.0, double beta = 0.0, final bool transposeA = false]) {
+  AbstractDoubleVector mult(AbstractDoubleVector y, [AbstractDoubleVector z = null, final double alpha = 1.0, double beta = 0.0, final bool transposeA = false]) {
     int rowsA = _rows;
     int columnsA = _columns;
     if (transposeA) {
@@ -727,7 +727,7 @@ class SparseDoubleMatrix extends AbstractDoubleMatrix {
     return z;
   }
 
-  AbstractDoubleMatrix multiply(AbstractDoubleMatrix B, AbstractDoubleMatrix C, [final double alpha = 1.0, double beta = 0.0, final bool transposeA = false, bool transposeB = false]) {
+  AbstractDoubleMatrix multiply(AbstractDoubleMatrix B, [AbstractDoubleMatrix C = null, final double alpha = 1.0, double beta = 0.0, final bool transposeA = false, bool transposeB = false]) {
     if (!(this._isNoView)) {
       return super.multiply(B, C, alpha, beta, transposeA, transposeB);
     }
@@ -769,9 +769,9 @@ class SparseDoubleMatrix extends AbstractDoubleMatrix {
       int j = key % _columns;
       fun.multiplicator = value * alpha;
       if (!transposeA) {
-        Crows[i].forEachVector(Brows[j], fun);
+        Crows[i].forEachWith(Brows[j], fun);
       } else {
-        Crows[j].forEachVector(Brows[i], fun);
+        Crows[j].forEachWith(Brows[i], fun);
       }
       return true;
     });

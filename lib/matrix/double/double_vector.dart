@@ -459,7 +459,7 @@ class DoubleVector extends AbstractDoubleVector {
   void forEachVector(final AbstractDoubleVector y, final DoubleDoubleFunction function) {
     // overriden for performance only
     if (!(y is DoubleVector)) {
-      super.forEachVector(y, function);
+      super.forEachWith(y, function);
       return;
     }
     checkSize(y);

@@ -54,8 +54,12 @@ class ComplexVector extends AbstractComplexVector {
    * @throws IllegalArgumentException
    *             if <tt>size<0</tt>.
    */
-  factory ComplexVector.fromRealPart(AbstractDoubleVector realPart) {
+  factory ComplexVector.fromReal(AbstractDoubleVector realPart) {
     return new ComplexVector(realPart.length)..setReal(realPart);
+  }
+
+  factory ComplexVector.fromImaginary(AbstractDoubleVector imagPart) {
+    return new ComplexVector(imagPart.length)..setImaginary(imagPart);
   }
 
   /**

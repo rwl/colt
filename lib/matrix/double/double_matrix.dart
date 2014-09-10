@@ -757,7 +757,7 @@ class DoubleMatrix extends AbstractDoubleMatrix {
   void forEachMatrix(final AbstractDoubleMatrix y, DoubleDoubleFunction function) {
     // overriden for performance only
     if (!(y is DoubleMatrix)) {
-      super.forEachMatrix(y, function);
+      super.forEachWith(y, function);
       return;
     }
     DoubleMatrix other = y as DoubleMatrix;
@@ -1563,7 +1563,7 @@ class DoubleMatrix extends AbstractDoubleMatrix {
     }
   }*/
 
-  AbstractDoubleVector mult(final AbstractDoubleVector y, AbstractDoubleVector z, [final double alpha = 1.0, final double beta = 0.0, final bool transposeA = false]) {
+  AbstractDoubleVector mult(final AbstractDoubleVector y, [AbstractDoubleVector z = null, final double alpha = 1.0, final double beta = 0.0, final bool transposeA = false]) {
     if (transposeA) {
       return dice().mult(y, z, alpha, beta, false);
     }
@@ -1631,7 +1631,7 @@ class DoubleMatrix extends AbstractDoubleMatrix {
     return z;
   }
 
-  AbstractDoubleMatrix multiply(final AbstractDoubleMatrix B, AbstractDoubleMatrix C, [final double alpha = 1.0, final double beta = 0.0, final bool transposeA = false, bool transposeB = false]) {
+  AbstractDoubleMatrix multiply(final AbstractDoubleMatrix B, [AbstractDoubleMatrix C = null, final double alpha = 1.0, final double beta = 0.0, final bool transposeA = false, bool transposeB = false]) {
     final int rowsA = _rows;
     final int columnsA = _columns;
     final int rowsB = B.rows;

@@ -629,7 +629,7 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
     }
   }
 
-  AbstractDoubleVector mult(AbstractDoubleVector y, AbstractDoubleVector z, [double alpha=1.0, double beta=0.0, final bool transposeA=false]) {
+  AbstractDoubleVector mult(AbstractDoubleVector y, [AbstractDoubleVector z = null, double alpha=1.0, double beta=0.0, final bool transposeA=false]) {
     int rowsA = _rows;
     int columnsA = _columns;
     if (transposeA) {

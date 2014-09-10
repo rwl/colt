@@ -905,6 +905,9 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
     return transpose;
   }
 
+  /** Synonym for [conjugateTranspose]. */
+  AbstractComplexMatrix get H => conjugateTranspose();
+
   /**
    * Returns the elements of this matrix.
    *
@@ -1263,6 +1266,9 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
     return _view().._vDice();
   }
 
+  /** Synonym for [dice]. */
+  AbstractComplexMatrix get T => dice();
+
   /**
    * Constructs and returns a new <i>sub-range view</i> that is a
    * <tt>height x width</tt> sub matrix starting at <tt>[row,column]</tt>.
@@ -1475,7 +1481,7 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
    * @throws ArgumentError
    *             if <tt>A.columns() != y.size() || A.rows() > z.size())</tt>.
    */
-  AbstractComplexVector mult(final AbstractComplexVector y, AbstractComplexVector z, [Float64List alpha = null, Float64List beta = null, bool transposeA = false]) {
+  AbstractComplexVector mult(final AbstractComplexVector y, [AbstractComplexVector z = null, Float64List alpha = null, Float64List beta = null, bool transposeA = false]) {
     if (alpha == null) {
       alpha = new Float64List.fromList([1.0, 0.0]);
     }
@@ -1568,7 +1574,7 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
    * @throws ArgumentError
    *             if <tt>A == C || B == C</tt>.
    */
-  AbstractComplexMatrix multiply(final AbstractComplexMatrix B, AbstractComplexMatrix C, [Float64List alpha = null, Float64List beta = null, bool transposeA = false, bool transposeB = false]) {
+  AbstractComplexMatrix multiply(final AbstractComplexMatrix B, [AbstractComplexMatrix C = null, Float64List alpha = null, Float64List beta = null, bool transposeA = false, bool transposeB = false]) {
     if (alpha == null) {
       alpha = new Float64List.fromList([1.0, 0.0]);
     }
@@ -1743,5 +1749,9 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
 
   AbstractComplexMatrix operator -(AbstractComplexMatrix y) {
     return this.copy()..forEachWith(y, cfunc.minus);
+  }
+
+  AbstractComplexMatrix conj() {
+    return this.copy()..forEach(cfunc.conj);
   }
 }

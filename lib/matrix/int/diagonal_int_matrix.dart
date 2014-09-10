@@ -399,7 +399,7 @@ class DiagonalIntMatrix extends WrapperIntMatrix {
    *
    * @return the length of the diagonal
    */
-  int diagonalLength() {
+  int get diagonalLength {
     return _dlength;
   }
 
@@ -408,7 +408,7 @@ class DiagonalIntMatrix extends WrapperIntMatrix {
    *
    * @return the index of the diagonal
    */
-  int diagonalIndex() {
+  int get diagonalIndex {
     return _dindex;
   }
 
@@ -606,7 +606,7 @@ class DiagonalIntMatrix extends WrapperIntMatrix {
     }
   }
 
-  AbstractIntVector mult(AbstractIntVector y, AbstractIntVector z, [final int alpha = 1, int beta = null, final bool transposeA = false]) {
+  AbstractIntVector mult(AbstractIntVector y, [AbstractIntVector z = null, final int alpha = 1, int beta = null, final bool transposeA = false]) {
     if (beta == null) {
       beta = z == null ? 1 : 0;
     }

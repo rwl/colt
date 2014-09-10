@@ -477,7 +477,7 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
       }
       return;
     }
-    super.forEachMatrix(y, function);
+    super.forEachWith(y, function);
   }
 
   int get cardinality {
@@ -770,7 +770,7 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
     _realloc(0);
   }
 
-  AbstractComplexVector mult(AbstractComplexVector y, AbstractComplexVector z, [Float64List alpha = null, Float64List beta = null, bool transposeA = false]) {
+  AbstractComplexVector mult(AbstractComplexVector y, [AbstractComplexVector z = null, Float64List alpha = null, Float64List beta = null, bool transposeA = false]) {
     if (alpha == null) {
       alpha = new Float64List.fromList([1.0, 0.0]);
     }
@@ -974,7 +974,7 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
     return z;
   }
 
-  AbstractComplexMatrix multiply(AbstractComplexMatrix B, AbstractComplexMatrix C, [Float64List alpha = null, Float64List beta = null, bool transposeA = false, bool transposeB = false]) {
+  AbstractComplexMatrix multiply(AbstractComplexMatrix B, [AbstractComplexMatrix C = null, Float64List alpha = null, Float64List beta = null, bool transposeA = false, bool transposeB = false]) {
     if (alpha == null) {
       alpha = new Float64List.fromList([1.0, 0.0]);
     }

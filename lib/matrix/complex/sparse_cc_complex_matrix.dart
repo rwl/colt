@@ -227,7 +227,7 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
    * @param removeZeroes
    *            if true, then zeroes (if any) are removed
    */
-  factory SparseCCComplexMatrix.withValues(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, Float64List values, bool removeDuplicates, bool removeZeroes) {
+  factory SparseCCComplexMatrix.withValues(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, Float64List values, [bool removeDuplicates=false, bool removeZeroes=false]) {
     /*try {
       _setUp(rows, columns);
     } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
@@ -456,7 +456,7 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
       }
       return;
     }
-    super.forEachMatrix(y, function);
+    super.forEachWith(y, function);
   }
 
   int get cardinality {
@@ -770,7 +770,7 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
     return builder.toString();
   }
 
-  AbstractComplexVector mult(AbstractComplexVector y, AbstractComplexVector z, [Float64List alpha = null, Float64List beta = null, bool transposeA = false]) {
+  AbstractComplexVector mult(AbstractComplexVector y, [AbstractComplexVector z = null, Float64List alpha = null, Float64List beta = null, bool transposeA = false]) {
     if (alpha == null) {
       alpha = new Float64List.fromList([1.0, 0.0]);
     }
@@ -938,7 +938,7 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
     return z;
   }
 
-  AbstractComplexMatrix multiply(AbstractComplexMatrix B, AbstractComplexMatrix C, [Float64List alpha = null, Float64List beta = null, bool transposeA = false, bool transposeB = false]) {
+  AbstractComplexMatrix multiply(AbstractComplexMatrix B, [AbstractComplexMatrix C = null, Float64List alpha = null, Float64List beta = null, bool transposeA = false, bool transposeB = false]) {
     if (alpha == null) {
       alpha = new Float64List.fromList([1.0, 0.0]);
     }

@@ -693,7 +693,7 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
     return builder.toString();
   }
 
-  AbstractDoubleVector mult(AbstractDoubleVector y, AbstractDoubleVector z, [final double alpha=1.0, final double beta=0.0, final bool transposeA=false]) {
+  AbstractDoubleVector mult(AbstractDoubleVector y, [AbstractDoubleVector z = null, final double alpha=1.0, final double beta=0.0, final bool transposeA=false]) {
     final int rowsA = transposeA ? _columns : _rows;
     final int columnsA = transposeA ? _rows : _columns;
 
@@ -834,7 +834,7 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
     return z;
   }
 
-  AbstractDoubleMatrix multiply(AbstractDoubleMatrix B, AbstractDoubleMatrix C, [final double alpha=1.0, double beta=0.0, final bool transposeA=false, bool transposeB=false]) {
+  AbstractDoubleMatrix multiply(AbstractDoubleMatrix B, [AbstractDoubleMatrix C = null, final double alpha=1.0, double beta=0.0, final bool transposeA=false, bool transposeB=false]) {
     int rowsA = _rows;
     int columnsA = _columns;
     if (transposeA) {
@@ -953,9 +953,9 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
           int j = rowIndexesA[k];
           fun.multiplicator = valuesA[k] * alpha;
           if (!transposeA) {
-            Crows[j].forEachVector(Brows[i], fun);
+            Crows[j].forEachWith(Brows[i], fun);
           } else {
-            Crows[i].forEachVector(Brows[j], fun);
+            Crows[i].forEachWith(Brows[j], fun);
           }
         }
       }

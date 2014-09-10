@@ -1418,7 +1418,7 @@ class IntMatrix extends AbstractIntMatrix {
     return v;
   }
 
-  AbstractIntVector mult(final AbstractIntVector y, AbstractIntVector z, [final int alpha = 1, int beta = null, final bool transposeA = false]) {
+  AbstractIntVector mult(final AbstractIntVector y, [AbstractIntVector z = null, final int alpha = 1, int beta = null, final bool transposeA = false]) {
     if (beta == null) {
       beta = z == null ? 1 : 0;
     }
@@ -1493,7 +1493,7 @@ class IntMatrix extends AbstractIntMatrix {
     return z;
   }
 
-  AbstractIntMatrix multiply(final AbstractIntMatrix B, AbstractIntMatrix C, [final int alpha = 1, int beta = null, final bool transposeA = false, final bool transposeB = false]) {
+  AbstractIntMatrix multiply(final AbstractIntMatrix B, [AbstractIntMatrix C = null, final int alpha = 1, int beta = null, final bool transposeA = false, final bool transposeB = false]) {
     if (beta == null) {
       beta = C == null ? 1 : 0;
     }

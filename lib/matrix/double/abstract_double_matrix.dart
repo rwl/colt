@@ -1971,8 +1971,10 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
    * @throws ArgumentError
    *             if <tt>A.columns() != y.size() || A.rows() > z.size())</tt>.
    */
-  AbstractDoubleVector mult(final AbstractDoubleVector y, AbstractDoubleVector z, [double alpha = 1.0, double beta = 0.0, bool transposeA = false]) {
-    if (transposeA) return dice().mult(y, z, alpha, beta, false);
+  AbstractDoubleVector mult(final AbstractDoubleVector y, [AbstractDoubleVector z = null, double alpha = 1.0, double beta = 0.0, bool transposeA = false]) {
+    if (transposeA) {
+      return dice().mult(y, z, alpha, beta, false);
+    }
     AbstractDoubleVector zz;
     if (z == null) {
       zz = y.like1D(_rows);
@@ -2038,7 +2040,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
    * @throws ArgumentError
    *             if <tt>A == C || B == C</tt>.
    */
-  AbstractDoubleMatrix multiply(final AbstractDoubleMatrix B, AbstractDoubleMatrix C, [double alpha = 1.0, double beta = 0.0, bool transposeA = false, bool transposeB = false]) {
+  AbstractDoubleMatrix multiply(final AbstractDoubleMatrix B, [AbstractDoubleMatrix C = null, double alpha = 1.0, double beta = 0.0, bool transposeA = false, bool transposeB = false]) {
     if (transposeA) {
       return dice().multiply(B, C, alpha, beta, false, transposeB);
     }

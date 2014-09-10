@@ -522,7 +522,7 @@ class SparseIntMatrix extends AbstractIntMatrix {
       rowIndexes[k] = key ~/ _columns;
       columnIndexes[k] = key % _columns;
     }
-    return new SparseCCIntMatrix(_rows, _columns, rowIndexes, columnIndexes, values, false, false, sortRowIndexes);
+    return new SparseCCIntMatrix.withValues(_rows, _columns, rowIndexes, columnIndexes, values, false, false, sortRowIndexes);
   }
 
   /**
@@ -568,7 +568,7 @@ class SparseIntMatrix extends AbstractIntMatrix {
       rowIndexes[k] = key ~/ _columns;
       columnIndexes[k] = key % _columns;
     }
-    return new SparseRCIntMatrix(_rows, _columns, rowIndexes, columnIndexes, values, false, false, sortColumnIndexes);
+    return new SparseRCIntMatrix.withValues(_rows, _columns, rowIndexes, columnIndexes, values, false, false, sortColumnIndexes);
   }
 
   /**
@@ -686,7 +686,7 @@ class SparseIntMatrix extends AbstractIntMatrix {
     return v;
   }
 
-  AbstractIntVector mult(AbstractIntVector y, AbstractIntVector z, [final int alpha = 1, int beta = null, final bool transposeA = false]) {
+  AbstractIntVector mult(AbstractIntVector y, [AbstractIntVector z = null, final int alpha = 1, int beta = null, final bool transposeA = false]) {
     if (beta == null) {
       beta = z == null ? 1 : 0;
     }
@@ -743,7 +743,7 @@ class SparseIntMatrix extends AbstractIntMatrix {
     return z;
   }
 
-  AbstractIntMatrix multiply(AbstractIntMatrix B, AbstractIntMatrix C, [final int alpha = 1, int beta = null, final bool transposeA = false, final bool transposeB = false]) {
+  AbstractIntMatrix multiply(AbstractIntMatrix B, [AbstractIntMatrix C = null, final int alpha = 1, int beta = null, final bool transposeA = false, final bool transposeB = false]) {
     if (beta == null) {
       beta = C == null ? 1 : 0;
     }

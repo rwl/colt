@@ -605,7 +605,7 @@ class ComplexMatrix extends AbstractComplexMatrix {
   void forEachMatrix(final AbstractComplexMatrix y, final cfunc.ComplexComplexComplexFunction function) {
     // overriden for performance only
     if (!(y is ComplexMatrix)) {
-      super.forEachMatrix(y, function);
+      super.forEachWith(y, function);
       return;
     }
     checkShape(y);
@@ -1432,7 +1432,7 @@ class ComplexMatrix extends AbstractComplexMatrix {
     return v;
   }
 
-  AbstractComplexVector mult(final AbstractComplexVector y, AbstractComplexVector z, [Float64List alpha = null, Float64List beta = null, bool transposeA = false]) {
+  AbstractComplexVector mult(final AbstractComplexVector y, [AbstractComplexVector z = null, Float64List alpha = null, Float64List beta = null, bool transposeA = false]) {
     if (alpha == null) {
       alpha = new Float64List.fromList([1.0, 0.0]);
     }
@@ -1543,7 +1543,7 @@ class ComplexMatrix extends AbstractComplexMatrix {
     return zz;
   }
 
-  AbstractComplexMatrix multiply(final AbstractComplexMatrix B, AbstractComplexMatrix C, [Float64List alpha = null, Float64List beta = null, final bool transposeA = false, final bool transposeB = false]) {
+  AbstractComplexMatrix multiply(final AbstractComplexMatrix B, [AbstractComplexMatrix C = null, Float64List alpha = null, Float64List beta = null, final bool transposeA = false, final bool transposeB = false]) {
     if (alpha == null) {
       alpha = new Float64List.fromList([1.0, 0.0]);
     }

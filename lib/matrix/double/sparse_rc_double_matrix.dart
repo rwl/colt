@@ -811,7 +811,7 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
     _realloc(0);
   }
 
-  AbstractDoubleVector mult(AbstractDoubleVector y, AbstractDoubleVector z, [final double alpha = 1.0, final double beta = 0.0, final bool transposeA = false]) {
+  AbstractDoubleVector mult(AbstractDoubleVector y, [AbstractDoubleVector z = null, final double alpha = 1.0, final double beta = 0.0, final bool transposeA = false]) {
     final int rowsA = transposeA ? _columns : _rows;
     final int columnsA = transposeA ? _rows : _columns;
 
@@ -980,7 +980,7 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
     return z;
   }
 
-  AbstractDoubleMatrix multiply(AbstractDoubleMatrix B, AbstractDoubleMatrix C, [final double alpha=1.0, double beta=0.0, final bool transposeA=false, bool transposeB=false]) {
+  AbstractDoubleMatrix multiply(AbstractDoubleMatrix B, [AbstractDoubleMatrix C = null, final double alpha=1.0, double beta=0.0, final bool transposeA=false, bool transposeB=false]) {
     int rowsA = _rows;
     int columnsA = _columns;
     if (transposeA) {
@@ -1035,7 +1035,7 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
         for (int ka = rowPointersA[ii]; ka < highA; ka++) {
           double scal = valuesA[ka] * alpha;
           int jj = columnIndexesA[ka];
-          CC.row(ii).forEachVector(BB.row(jj), func.plusMultSecond(scal));
+          CC.row(ii).forEachWith(BB.row(jj), func.plusMultSecond(scal));
         }
       }
     } else if ((B is SparseRCDoubleMatrix) && (C is SparseRCDoubleMatrix)) {
@@ -1129,9 +1129,9 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
           int j = columnIndexesA[k];
           fun.multiplicator = valuesA[k] * alpha;
           if (!transposeA) {
-            Crows[i].forEachVector(Brows[j], fun);
+            Crows[i].forEachWith(Brows[j], fun);
           } else {
-            Crows[j].forEachVector(Brows[i], fun);
+            Crows[j].forEachWith(Brows[i], fun);
           }
         }
       }

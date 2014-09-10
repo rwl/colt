@@ -75,11 +75,11 @@ class WrapperDoubleMatrix extends AbstractDoubleMatrix {
       final columnList = new List<int>();
       final valueList = new List<double>();
       y.nonZeros(rowList, columnList, valueList);
-      forEachMatrixRange(y, function,
+      forEachWithNonZero(y, function,
           new Int32List.fromList(rowList),
           new Int32List.fromList(columnList));
     } else {
-      super.forEachMatrix(y, function);
+      super.forEachWith(y, function);
     }
   }
 

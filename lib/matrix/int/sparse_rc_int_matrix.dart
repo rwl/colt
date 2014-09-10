@@ -806,7 +806,7 @@ class SparseRCIntMatrix extends WrapperIntMatrix {
     _realloc(0);
   }
 
-  AbstractIntVector mult(AbstractIntVector y, AbstractIntVector z, [final int alpha = 1, int beta = null, final bool transposeA = false]) {
+  AbstractIntVector mult(AbstractIntVector y, [AbstractIntVector z = null, final int alpha = 1, int beta = null, final bool transposeA = false]) {
     if (beta == null) {
       beta = z == null ? 1 : 0;
     }
@@ -980,7 +980,7 @@ class SparseRCIntMatrix extends WrapperIntMatrix {
     return z;
   }
 
-  AbstractIntMatrix multiply(AbstractIntMatrix B, AbstractIntMatrix C, [final int alpha = 1, int beta = null, final bool transposeA = false, final bool transposeB = false]) {
+  AbstractIntMatrix multiply(AbstractIntMatrix B, [AbstractIntMatrix C = null, final int alpha = 1, int beta = null, final bool transposeA = false, final bool transposeB = false]) {
     if (beta == null) {
       beta = C == null ? 1 : 0;
     }

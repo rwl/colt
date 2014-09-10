@@ -1536,4 +1536,10 @@ class SelectedDenseIntVector extends AbstractIntVector {
   Object clone() {
     return new SelectedDenseIntVector(length, _elements, _zero, _stride, _offsets, __offset);
   }
+
+  DoubleVector toDouble() {
+    return new DoubleVector(length, new Float64List.fromList(new List<double>.generate(length,
+        (int i) => this.get(i).toDouble()
+    )));
+  }
 }

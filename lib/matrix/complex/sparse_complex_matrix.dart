@@ -108,7 +108,7 @@ class SparseComplexMatrix extends AbstractComplexMatrix {
 
   void forEachMatrix(final AbstractComplexMatrix y, cfunc.ComplexComplexComplexFunction function) {
     if (!this._isNoView) {
-      super.forEachMatrix(y, function);
+      super.forEachWith(y, function);
       return;
     }
 
@@ -126,7 +126,7 @@ class SparseComplexMatrix extends AbstractComplexMatrix {
       });
       return;
     }
-    super.forEachMatrix(y, function);
+    super.forEachWith(y, function);
   }
 
   int get cardinality {
