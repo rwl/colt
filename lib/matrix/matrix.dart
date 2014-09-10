@@ -67,3 +67,4 @@ part 'int/sparse_rc_int_matrix.dart';
 
 part 'double/factory.dart';
 part 'int/factory.dart';
+part 'complex/factory.dart';
