@@ -56,7 +56,7 @@ class WrapperIntMatrix extends AbstractIntMatrix {
       if (values.length != dlength) {
         throw new ArgumentError("Must have same length: length=${values.length} dlength=$dlength");
       }
-      int nthreads = ConcurrencyUtils.getNumberOfThreads();
+      /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
       if ((nthreads > 1) && (dlength >= ConcurrencyUtils.getThreadsBeginN_2D())) {
         nthreads = Math.min(nthreads, dlength);
         List<Future> futures = new List<Future>(nthreads);
@@ -71,11 +71,11 @@ class WrapperIntMatrix extends AbstractIntMatrix {
           });
         }
         ConcurrencyUtils.waitForCompletion(futures);
-      } else {
+      } else {*/
         for (int i = 0; i < dlength; i++) {
           elems[i] = values[i];
         }
-      }
+      //}
       return;
     } else {
       super.setAll(values);
@@ -109,11 +109,15 @@ class WrapperIntMatrix extends AbstractIntMatrix {
 
   bool equals(Object obj) {
     if (_content is DiagonalIntMatrix && obj is DiagonalIntMatrix) {
-      if (this == obj) return true;
-      if (!(this != null && obj != null)) return false;
+      if (this == obj) {
+        return true;
+      }
+      if (!(this != null && obj != null)) {
+        return false;
+      }
       DiagonalIntMatrix A = _content as DiagonalIntMatrix;
-      DiagonalIntMatrix B = obj as DiagonalIntMatrix;
-      if (A.columns() != B.columns() || A.rows() != B.rows() || A.diagonalIndex() != B.diagonalIndex() || A.diagonalLength() != B.diagonalLength()) {
+      DiagonalIntMatrix B = obj;
+      if (A.columns != B.columns || A.rows != B.rows || A.diagonalIndex != B.diagonalIndex || A.diagonalLength != B.diagonalLength) {
         return false;
       }
       Int32List AElements = A.elements();
@@ -146,7 +150,7 @@ class WrapperIntMatrix extends AbstractIntMatrix {
 
   AbstractIntVector vectorize() {
     final IntVector v = new IntVector(length);
-    int nthreads = ConcurrencyUtils.getNumberOfThreads();
+    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (length >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _columns);
       List<Future> futures = new List<Future>(nthreads);
@@ -165,14 +169,14 @@ class WrapperIntMatrix extends AbstractIntMatrix {
         });
       }
       ConcurrencyUtils.waitForCompletion(futures);
-    } else {
+    } else {*/
       int idx = 0;
       for (int c = 0; c < _columns; c++) {
         for (int r = 0; r < _rows; r++) {
           v.set(idx++, get(r, c));
         }
       }
-    }
+    //}
     return v;
   }
 
