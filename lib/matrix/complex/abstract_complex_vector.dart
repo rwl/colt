@@ -41,7 +41,7 @@ abstract class AbstractComplexVector extends AbstractVector {
    * @return the aggregated measure.
    * @see cern.jet.math.tdcomplex.ComplexFunctions
    */
-  Float64List reduce(final cfunc.ComplexComplexComplexFunction aggr, final cfunc.ComplexComplexFunction f) {
+  List<double> reduce(final cfunc.ComplexComplexComplexFunction aggr, final cfunc.ComplexComplexFunction f) {
     Float64List b = new Float64List(2);
     int size = this.length;
     if (size == 0) {
@@ -93,7 +93,7 @@ abstract class AbstractComplexVector extends AbstractVector {
    *             if <tt>size() != other.size()</tt>.
    * @see cern.jet.math.tdcomplex.ComplexFunctions
    */
-  Float64List reduceVector(final AbstractComplexVector other, final cfunc.ComplexComplexComplexFunction aggr, final cfunc.ComplexComplexComplexFunction f) {
+  List<double> reduceWith(final AbstractComplexVector other, final cfunc.ComplexComplexComplexFunction aggr, final cfunc.ComplexComplexComplexFunction f) {
     checkSize(other);
     int size = this.length;
     if (size == 0) {
@@ -212,7 +212,7 @@ abstract class AbstractComplexVector extends AbstractVector {
    * @return <tt>this</tt> (for convenience only).
    *
    */
-  void fillWhere(final cfunc.ComplexProcedure cond, final Float64List value) {
+  void fillWhere(final cfunc.ComplexProcedure cond, final List<double> value) {
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
@@ -410,7 +410,7 @@ abstract class AbstractComplexVector extends AbstractVector {
    * @throws ArgumentError
    *             if <tt>values.length != 2*size()</tt>.
    */
-  void setAll(final Float64List values) {
+  void setAll(final List<double> values) {
     int size = this.length;
     if (values.length != 2 * size) {
       throw new ArgumentError("The length of values[] must be equal to 2*size()=$size");
@@ -589,7 +589,7 @@ abstract class AbstractComplexVector extends AbstractVector {
    * @return <tt>true</tt> if all cells are equal to the given value,
    *         <tt>false</tt> otherwise.
    */
-  bool all(Float64List value) {
+  bool all(List<double> value) {
     return cprop.equalsValue1D(this, value);
   }
 
@@ -635,7 +635,7 @@ abstract class AbstractComplexVector extends AbstractVector {
    * @throws IndexOutOfBoundsException
    *             if <tt>index&lt;0 || index&gt;=size()</tt>.
    */
-  Float64List operator [](int index) {
+  List<double> operator [](int index) {
     int size = this.length;
     if (index < 0 || index >= size) {
       _checkIndex(index);
@@ -674,7 +674,7 @@ abstract class AbstractComplexVector extends AbstractVector {
    * @param valueList
    *            the list to be filled with values, can have any size.
    */
-  void nonZeros({List<int> indexList: null, final List<Float64List> valueList: null}) {
+  void nonZeros({List<int> indexList: null, final List<List<double>> valueList: null}) {
     bool fillIndexList = indexList != null;
     bool fillValueList = valueList != null;
     if (fillIndexList) {
@@ -713,7 +713,7 @@ abstract class AbstractComplexVector extends AbstractVector {
    *            the index of the cell.
    * @return the value of the specified cell.
    */
-  Float64List get(int index);
+  List<double> get(int index);
 
   /**
    * Returns the real part of this matrix
@@ -820,7 +820,7 @@ abstract class AbstractComplexVector extends AbstractVector {
    * @throws IndexOutOfBoundsException
    *             if <tt>index&lt;0 || index&gt;=size()</tt>.
    */
-  void operator []=(int index, Float64List value) {
+  void operator []=(int index, List<double> value) {
     int size = this.length;
     if (index < 0 || index >= size) _checkIndex(index);
     set(index, value);
@@ -861,7 +861,7 @@ abstract class AbstractComplexVector extends AbstractVector {
    *            the value to be filled into the specified cell (re=value[0],
    *            im=value[1]).
    */
-  void set(int index, Float64List value);
+  void set(int index, List<double> value);
 
   /**
    * Swaps each element <tt>this[i]</tt> with <tt>other[i]</tt>.
@@ -913,9 +913,8 @@ abstract class AbstractComplexVector extends AbstractVector {
    *
    * @return an array filled with the values of the cells.
    */
-  Float64List toList() {
-    int size = this.length;
-    Float64List values = new Float64List(2 * size);
+  List<double> toList() {
+    Float64List values = new Float64List(2 * length);
     fillList(values);
     return values;
   }
@@ -934,7 +933,7 @@ abstract class AbstractComplexVector extends AbstractVector {
    * @throws ArgumentError
    *             if <tt>values.length < 2*size()</tt>.
    */
-  void fillList(final Float64List values) {
+  void fillList(final List<double> values) {
     int size = this.length;
     if (values.length < 2 * size) throw new ArgumentError("values too small");
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -1095,12 +1094,14 @@ abstract class AbstractComplexVector extends AbstractVector {
    *             if <tt>!(0 <= indexes[i] < size())</tt> for any
    *             <tt>i=0..indexes.length()-1</tt>.
    */
-  AbstractComplexVector select(Int32List indexes) {
+  AbstractComplexVector select(List<int> indexes) {
     // check for "all"
     int size = this.length;
     if (indexes == null) {
       indexes = new Int32List(size);
-      for (int i = size - 1; --i >= 0; ) indexes[i] = i;
+      for (int i = size - 1; --i >= 0; ) {
+        indexes[i] = i;
+      }
     }
 
     _checkIndexes(indexes);
@@ -1153,16 +1154,22 @@ abstract class AbstractComplexVector extends AbstractVector {
    *            the number of cells to be considered.
    * @return the sum of products; zero if <tt>from<0 || length<0</tt>.
    */
-  Float64List dot(final AbstractComplexVector y, [final int from = 0, int length = null]) {
+  List<double> dot(final AbstractComplexVector y, [final int from = 0, int length = null]) {
     if (length == null) {
       length = this.length;
     }
     int size = this.length;
-    if (from < 0 || length <= 0) return new Float64List.fromList([0.0, 0.0]);
+    if (from < 0 || length <= 0) {
+      return new Float64List.fromList([0.0, 0.0]);
+    }
 
     int tail = from + length;
-    if (size < tail) tail = size;
-    if (y._size < tail) tail = y._size;
+    if (size < tail) {
+      tail = size;
+    }
+    if (y._size < tail) {
+      tail = y._size;
+    }
     length = tail - from;
     Float64List sum = new Float64List(2);
 
@@ -1223,7 +1230,7 @@ abstract class AbstractComplexVector extends AbstractVector {
    *            the indexes of cells in <tt>y</tt>having a non-zero value.
    * @return the sum of products.
    */
-  Float64List dotNonZero(AbstractComplexVector y, Int32List nonZeroIndexes, [int from = 0, int length = null]) {
+  List<double> dotNonZero(AbstractComplexVector y, List<int> nonZeroIndexes, [int from = 0, int length = null]) {
     if (length == null) {
       length = this.length;
     }
@@ -1273,7 +1280,7 @@ abstract class AbstractComplexVector extends AbstractVector {
    *
    * @return the sum.
    */
-  Float64List sum() {
+  List<double> sum() {
     Float64List sum = new Float64List(2);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
@@ -1351,8 +1358,12 @@ abstract class AbstractComplexVector extends AbstractVector {
    * @return <tt>true</tt> if both matrices share at least one identical cell
    */
   bool _haveSharedCells(AbstractComplexVector other) {
-    if (other == null) return false;
-    if (this == other) return true;
+    if (other == null) {
+      return false;
+    }
+    if (this == other) {
+      return true;
+    }
     return _getContent()._haveSharedCellsRaw(other._getContent());
   }
 

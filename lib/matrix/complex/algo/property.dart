@@ -117,7 +117,7 @@ void checkSparse(AbstractComplexMatrix A) {
  * @return <tt>true</tt> if the matrix is equal to the value; <tt>false</tt>
  *         otherwise.
  */
-bool equalsValue1D(final AbstractComplexVector A, final Float64List value, [double epsilon = EPSILON]) {
+bool equalsValue1D(final AbstractComplexVector A, final List<double> value, [double epsilon = EPSILON]) {
   if (A == null) {
     return false;
   }
@@ -275,7 +275,7 @@ bool equalsVector(final AbstractComplexVector A, final AbstractComplexVector B, 
  * @return <tt>true</tt> if the matrix is equal to the value; <tt>false</tt>
  *         otherwise.
  */
-bool equalsValue2D(final AbstractComplexMatrix A, final Float64List value, [double epsilon = EPSILON]) {
+bool equalsValue2D(final AbstractComplexMatrix A, final List<double> value, [double epsilon = EPSILON]) {
   if (A == null) {
     return false;
   }

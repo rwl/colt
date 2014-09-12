@@ -29,7 +29,7 @@ class SparseComplexVector extends AbstractComplexVector {
    * @param values
    *            The values to be filled into the new matrix.
    */
-  factory SparseComplexVector.fromList(Float64List values) {
+  factory SparseComplexVector.fromList(List<double> values) {
     return new SparseComplexVector(values.length)
       ..setAll(values);
   }
@@ -71,7 +71,7 @@ class SparseComplexVector extends AbstractComplexVector {
     this._isNoView = isNoView;
   }
 
-  void setAll(Float64List value) {
+  void setAll(List<double> value) {
     // overriden for performance only
     if (this._isNoView && value[0] == 0 && value[1] == 0) {
       this._elements.clear();
@@ -88,7 +88,7 @@ class SparseComplexVector extends AbstractComplexVector {
     }
   }
 
-  Float64List get(int index) {
+  List<double> get(int index) {
     Float64List elem = _elements[_zero + index * _stride];
     if (elem != null) {
       return new Float64List.fromList([elem[0], elem[1]]);
@@ -209,7 +209,7 @@ class SparseComplexVector extends AbstractComplexVector {
     return M;
   }*/
 
-  void set(int index, Float64List value) {
+  void set(int index, List<double> value) {
     int i = _zero + index * _stride;
     if (value[0] == 0 && value[1] == 0) {
       this._elements.remove(i);
@@ -227,7 +227,7 @@ class SparseComplexVector extends AbstractComplexVector {
     }
   }
 
-  AbstractComplexVector _viewSelectionLike(Int32List offsets) {
+  AbstractComplexVector _viewSelectionLike(List<int> offsets) {
     return new SelectedSparseComplexVector.withOffsets(this._elements, offsets);
   }
 
@@ -302,7 +302,7 @@ class SelectedSparseComplexVector extends AbstractComplexVector {
   /**
    * The offsets of visible indexes of this matrix.
    */
-  Int32List _offsets;
+  List<int> _offsets;
 
   /**
    * The offset.
@@ -325,7 +325,7 @@ class SelectedSparseComplexVector extends AbstractComplexVector {
    *            the offsets of the cells that shall be visible.
    * @param offset
    */
-  SelectedSparseComplexVector(int size, Map<int, Float64List> elements, int zero, int stride, Int32List offsets, int offset) {
+  SelectedSparseComplexVector(int size, Map<int, Float64List> elements, int zero, int stride, List<int> offsets, int offset) {
     _setUp(size, zero, stride);
 
     this._elements = elements;
@@ -342,7 +342,7 @@ class SelectedSparseComplexVector extends AbstractComplexVector {
    * @param indexes
    *            The indexes of the cells that shall be visible.
    */
-  factory SelectedSparseComplexVector.withOffsets(Map<int, Float64List> elements, Int32List offsets) {
+  factory SelectedSparseComplexVector.withOffsets(Map<int, Float64List> elements, List<int> offsets) {
     return new SelectedSparseComplexVector(offsets.length, elements, 0, 1, offsets, 0);
   }
 
@@ -407,7 +407,7 @@ class SelectedSparseComplexVector extends AbstractComplexVector {
    * @param value
    *            the value to be filled into the specified cell.
    */
-  void set(int index, Float64List value) {
+  void set(int index, List<double> value) {
     int i = __offset + _offsets[_zero + index * _stride];
     if (value[0] == 0 && value[1] == 0) {
       this._elements.remove(i);
@@ -432,7 +432,11 @@ class SelectedSparseComplexVector extends AbstractComplexVector {
    */
   void setParts(int index, double re, double im) {
     int i = __offset + _offsets[_zero + index * _stride];
-    if (re == 0 && im == 0) this._elements.remove(i); else this._elements[i] = new Float64List.fromList([re, im]);
+    if (re == 0 && im == 0) {
+      this._elements.remove(i);
+    } else {
+      this._elements[i] = new Float64List.fromList([re, im]);
+    }
   }
 
   /**

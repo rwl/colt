@@ -83,7 +83,7 @@ abstract class ComplexVectorTest {
   }
 
   void testAggregateMatrix() {
-    Float64List actual = A.reduceVector(B, plus, mult);
+    Float64List actual = A.reduceWith(B, plus, mult);
     Float64List expected = new Float64List(2);
     for (int i = 0; i < A.length; i++) {
       expected = Complex.plus(expected, Complex.multiply(A.get(i), B.get(i)));

@@ -70,19 +70,19 @@ abstract class ComplexMatrixTest {
     //ConcurrencyUtils.setThreadsBeginN_2D(1);
     for (int r = 0; r < A.rows; r++) {
       for (int c = 0; c < A.columns; c++) {
-        A.set(r, c, new Float64List.fromList([random.nextDouble(), random.nextDouble()]));
+        A.set(r, c, [random.nextDouble(), random.nextDouble()]);
       }
     }
 
     for (int r = 0; r < B.rows; r++) {
       for (int c = 0; c < B.columns; c++) {
-        B.set(r, c, new Float64List.fromList([random.nextDouble(), random.nextDouble()]));
+        B.set(r, c, [random.nextDouble(), random.nextDouble()]);
       }
     }
 
     for (int r = 0; r < Bt.rows; r++) {
       for (int c = 0; c < Bt.columns; c++) {
-        Bt.set(r, c, new Float64List.fromList([random.nextDouble(), random.nextDouble()]));
+        Bt.set(r, c, [random.nextDouble(), random.nextDouble()]);
       }
     }
   }
@@ -103,7 +103,7 @@ abstract class ComplexMatrixTest {
   }
 
   void testAggregateMatrix() {
-    Float64List actual = A.reduceMatrix(B, plus, mult);
+    Float64List actual = A.reduceWith(B, plus, mult);
     Float64List expected = new Float64List(2);
     for (int r = 0; r < A.rows; r++) {
       for (int c = 0; c < A.columns; c++) {
@@ -166,7 +166,7 @@ abstract class ComplexMatrixTest {
 
   void testProcValue() {
     AbstractComplexMatrix Acopy = A.copy();
-    Float64List value = new Float64List.fromList([random.nextDouble(), random.nextDouble()]);
+    final value = [random.nextDouble(), random.nextDouble()];
     A.fillWhere((Float64List element) {
       if (Complex.abs(element) > 3) {
         return true;
@@ -234,7 +234,7 @@ abstract class ComplexMatrixTest {
   }
 
   void testAssignValue() {
-    Float64List value = new Float64List.fromList([random.nextDouble(), random.nextDouble()]);
+    final value = [random.nextDouble(), random.nextDouble()];
     A.fill(value[0], value[1]);
     for (int r = 0; r < A.rows; r++) {
       for (int c = 0; c < A.columns; c++) {
@@ -274,10 +274,10 @@ abstract class ComplexMatrixTest {
   }
 
   void testAll() {
-    Float64List value = new Float64List.fromList([random.nextDouble(), random.nextDouble()]);
+    final value = [random.nextDouble(), random.nextDouble()];
     A.fill(value[0], value[1]);
     expect(A.all(value), isTrue);
-    final eq = A.all(new Float64List.fromList([value[0] + 1, value[1] + 1]));
+    final eq = A.all([value[0] + 1, value[1] + 1]);
     expect(eq, isFalse);
   }
 
@@ -423,7 +423,7 @@ abstract class ComplexMatrixTest {
   }
 
   void testViewSelectionProc() {
-    final Float64List value = new Float64List.fromList([random.nextDouble(), random.nextDouble()]);
+    final value = [random.nextDouble(), random.nextDouble()];
     A.set(A.rows ~/ 3, 0, value);
     A.set(A.rows ~/ 2, 0, value);
     AbstractComplexMatrix B = A.where((AbstractComplexVector element) {
@@ -436,8 +436,8 @@ abstract class ComplexMatrixTest {
   }
 
   void testViewSelection() {
-    Int32List rowIndexes = new Int32List.fromList([A.rows ~/ 6, A.rows ~/ 5, A.rows ~/ 4, A.rows ~/ 3, A.rows ~/ 2]);
-    Int32List colIndexes = new Int32List.fromList([A.columns ~/ 6, A.columns ~/ 5, A.columns ~/ 4, A.columns ~/ 3, A.columns ~/ 2, A.columns - 1]);
+    final rowIndexes = [A.rows ~/ 6, A.rows ~/ 5, A.rows ~/ 4, A.rows ~/ 3, A.rows ~/ 2];
+    final colIndexes = [A.columns ~/ 6, A.columns ~/ 5, A.columns ~/ 4, A.columns ~/ 3, A.columns ~/ 2, A.columns - 1];
     AbstractComplexMatrix B = A.select(rowIndexes, colIndexes);
     expect(rowIndexes.length, equals(B.rows));
     expect(colIndexes.length, equals(B.columns));
@@ -462,10 +462,10 @@ abstract class ComplexMatrixTest {
   void testZMult() {
     AbstractComplexVector y = new ComplexVector(A.columns);
     for (int i = 0; i < y.length; i++) {
-      y.set(i, new Float64List.fromList([random.nextDouble(), random.nextDouble()]));
+      y.set(i, [random.nextDouble(), random.nextDouble()]);
     }
-    Float64List alpha = new Float64List.fromList([3.0, 2.0]);
-    Float64List beta = new Float64List.fromList([5.0, 4.0]);
+    final alpha = [3.0, 2.0];
+    final beta = [5.0, 4.0];
     AbstractComplexVector z = null;
     z = A.mult(y, z, alpha, beta, false);
     Float64List expected = new Float64List(2 * A.rows);
@@ -490,7 +490,7 @@ abstract class ComplexMatrixTest {
     //transpose
     y = new ComplexVector(A.rows);
     for (int i = 0; i < y.length; i++) {
-      y.set(i, new Float64List.fromList([random.nextDouble(), random.nextDouble()]));
+      y.set(i, [random.nextDouble(), random.nextDouble()]);
     }
     z = null;
     z = A.mult(y, z, alpha, beta, true);
@@ -514,8 +514,8 @@ abstract class ComplexMatrixTest {
   }
 
   void testZMult2D() {
-    Float64List alpha = new Float64List.fromList([3.0, 2.0]);
-    Float64List beta = new Float64List.fromList([5.0, 4.0]);
+    final alpha = [3.0, 2.0];
+    final beta = [5.0, 4.0];
     Float64List tmp = new Float64List(2);
     AbstractComplexMatrix C = null;
     C = A.multiply(Bt, C, alpha, beta, false, false);
@@ -631,7 +631,7 @@ abstract class ComplexMatrixTest {
     assertEquals(expected, actual, TOL);
   }
 
-  void assertEquals(Float64List expected, Float64List actual, double tol) {
+  void assertEquals(List<double> expected, List<double> actual, double tol) {
     for (int i = 0; i < actual.length; i++) {
       expect(expected[i], closeTo(actual[i], tol));
     }

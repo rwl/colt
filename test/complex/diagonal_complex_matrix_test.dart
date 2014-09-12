@@ -177,7 +177,7 @@ class DiagonalComplexMatrixTest extends ComplexMatrixTest {
         columnList.add(r + DINDEX);
       }
       AbstractComplexMatrix Acopy = A.copy();
-      A.forEachWithRange(B, div, rowList, columnList);
+      A.forEachWithNonZero(B, div, rowList, columnList);
       for (int r = 0; r < DLENGTH; r++) {
         expect(Complex.div_(Acopy.get(r, r + DINDEX), B.get(r, r + DINDEX))[0], closeTo(A.get(r, r + DINDEX)[0], TOL));
         expect(Complex.div_(Acopy.get(r, r + DINDEX), B.get(r, r + DINDEX))[1], closeTo(A.get(r, r + DINDEX)[1], TOL));
@@ -188,7 +188,7 @@ class DiagonalComplexMatrixTest extends ComplexMatrixTest {
         columnList.add(r);
       }
       AbstractComplexMatrix Acopy = A.copy();
-      A.forEachWithRange(B, div, rowList, columnList);
+      A.forEachWithNonZero(B, div, rowList, columnList);
       for (int r = 0; r < DLENGTH; r++) {
         expect(Complex.div_(Acopy.get(r - DINDEX, r), B.get(r - DINDEX, r))[0], closeTo(A.get(r - DINDEX, r)[0], TOL));
         expect(Complex.div_(Acopy.get(r - DINDEX, r), B.get(r - DINDEX, r))[1], closeTo(A.get(r - DINDEX, r)[1], TOL));

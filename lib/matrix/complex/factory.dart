@@ -69,7 +69,7 @@ class DComplexFactory1D {
    * @param values
    *            The values to be filled into the new matrix.
    */
-  AbstractComplexVector withValues(Float64List values) {
+  AbstractComplexVector withValues(List<double> values) {
     if (this == sparse) {
       return new SparseComplexVector.fromList(values);
     } else {
@@ -117,7 +117,7 @@ class DComplexFactory1D {
    * Constructs a matrix with the given shape, each cell initialized with the
    * given value.
    */
-  AbstractComplexVector fill(int size, Float64List initialValue) {
+  AbstractComplexVector fill(int size, List<double> initialValue) {
     return make(size)..fill(initialValue[0], initialValue[1]);
   }
 
@@ -130,7 +130,7 @@ class DComplexFactory1D {
    *            The values to be filled into the new matrix.
    * @return a new matrix.
    */
-  AbstractComplexVector fromList(List<Float64List> values) {
+  AbstractComplexVector fromList(List<List<double>> values) {
     int size = values.length;
     AbstractComplexVector vector = make(size);
     for (int i = 0; i < size; i++) {
@@ -209,7 +209,7 @@ class DComplexFactory1D {
    *            The values to be filled into the new list.
    * @return a new list.
    */
-  List<Float64List> toList(AbstractComplexVector values) {
+  List<List<double>> toList(AbstractComplexVector values) {
     int size = values.length;
     List<Float64List> list = new List<Float64List>(size);
     for (int i = 0; i < size; i++) {
@@ -427,7 +427,7 @@ class DComplexFactory2D {
    * @throws ArgumentError
    *             if the array is not rectangular.
    */
-  static void _checkRectangularShape(List<Float64List> array) {
+  static void _checkRectangularShape(List<List<double>> array) {
     int columns = -1;
     for (int r = 0; r < array.length; r++) {
       if (array[r] != null) {
@@ -678,7 +678,9 @@ class DComplexFactory2D {
    */
   void demo1() {
     print("\n\n");
-    List<List<AbstractComplexMatrix>> parts1 = [[null, fill(2, 2, new Float64List.fromList([1, 2])), null], [fill(4, 4, new Float64List.fromList([3, 4])), null, fill(4, 3, new Float64List.fromList([5, 6]))], [null, fill(2, 2, new Float64List.fromList([7, 8])), null]];
+    List<List<AbstractComplexMatrix>> parts1 = [[null, fill(2, 2, [1.0, 2.0]), null],
+                                                [fill(4, 4, [3.0, 4.0]), null, fill(4, 3, [5.0, 6.0])],
+                                                [null, fill(2, 2, [7.0, 8.0]), null]];
     print("\n${compose(parts1)}");
   }
 
@@ -771,7 +773,7 @@ class DComplexFactory2D {
    *             <tt>for any 1 &lt;= row &lt; values.length: values[row].length != values[row-1].length</tt>
    *             .
    */
-  AbstractComplexMatrix fromList(List<Float64List> values) {
+  AbstractComplexMatrix fromList(List<List<double>> values) {
     if (this == sparse) {
       return new SparseComplexMatrix.fromList(values);
     } else {
@@ -795,7 +797,7 @@ class DComplexFactory2D {
    * Constructs a matrix with the given shape, each cell initialized with the
    * given value.
    */
-  AbstractComplexMatrix fill(int rows, int columns, Float64List initialValue) {
+  AbstractComplexMatrix fill(int rows, int columns, List<double> initialValue) {
     if (initialValue[0] == 0 && initialValue[1] == 0) {
       return make(rows, columns);
     }

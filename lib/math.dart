@@ -220,7 +220,7 @@ class DoubleConstants {
  */
 class Complex extends DoubleConstants {
 
-    static double abs(Float64List x) {
+    static double abs(List<double> x) {
         double absX = x[0].abs();
         double absY = x[1].abs();
         if (absX == 0.0 && absY == 0.0) {
@@ -248,7 +248,7 @@ class Complex extends DoubleConstants {
         }
     }
 
-    static Float64List acos(Float64List x) {
+    static List<double> acos(List<double> x) {
         Float64List z = new Float64List(2);
 
         double re, im;
@@ -274,7 +274,7 @@ class Complex extends DoubleConstants {
         return z;
     }
 
-    static double arg(Float64List x) {
+    static double arg(List<double> x) {
         return Math.atan2(x[1], x[0]);
     }
 
@@ -282,7 +282,7 @@ class Complex extends DoubleConstants {
         return Math.atan2(im, re);
     }
 
-    static Float64List asin(Float64List x) {
+    static List<double> asin(List<double> x) {
         Float64List z = new Float64List(2);
 
         double re, im;
@@ -308,7 +308,7 @@ class Complex extends DoubleConstants {
         return z;
     }
 
-    static Float64List atan(Float64List x) {
+    static List<double> atan(List<double> x) {
         Float64List z = new Float64List(2);
 
         double re, im;
@@ -330,14 +330,14 @@ class Complex extends DoubleConstants {
         return z;
     }
 
-    static Float64List conj(Float64List x) {
+    static List<double> conj(List<double> x) {
         Float64List z = new Float64List(2);
         z[0] = x[0];
         z[1] = -x[1];
         return z;
     }
 
-    static Float64List cos(Float64List x) {
+    static List<double> cos(List<double> x) {
         Float64List z = new Float64List(2);
 
         double re1, im1, re2, im2;
@@ -364,7 +364,7 @@ class Complex extends DoubleConstants {
         return z;
     }
 
-    static Float64List div(Float64List x, double re, double im) {
+    static List<double> div(List<double> x, double re, double im) {
         Float64List z = new Float64List(2);
         double scalar;
 
@@ -384,11 +384,11 @@ class Complex extends DoubleConstants {
         return z;
     }
 
-    static Float64List div_(Float64List x, Float64List y) {
+    static List<double> div_(List<double> x, List<double> y) {
         return div(x, y[0], y[1]);
     }
 
-    static double equals(Float64List x, Float64List y, double tol) {
+    static double equals(List<double> x, List<double> y, double tol) {
         if (abs_(x[0] - y[0], x[1] - y[1]) <= tol.abs()) {
             return 1.0;
         } else {
@@ -396,7 +396,7 @@ class Complex extends DoubleConstants {
         }
     }
 
-    static bool isEqual(Float64List x, Float64List y, double tol) {
+    static bool isEqual(List<double> x, List<double> y, double tol) {
         if (abs_(x[0] - y[0], x[1] - y[1]) <= tol.abs()) {
             return true;
         } else {
@@ -404,7 +404,7 @@ class Complex extends DoubleConstants {
         }
     }
 
-    static Float64List exp(Float64List x) {
+    static List<double> exp(List<double> x) {
         Float64List z = new Float64List(2);
         double scalar = Math.exp(x[0]);
         z[0] = scalar * Math.cos(x[1]);
@@ -412,7 +412,7 @@ class Complex extends DoubleConstants {
         return z;
     }
 
-    static Float64List inv(Float64List x) {
+    static List<double> inv(List<double> x) {
         Float64List z = new Float64List(2);
         if (x[1] != 0.0) {
             double scalar;
@@ -432,56 +432,56 @@ class Complex extends DoubleConstants {
         return z;
     }
 
-    static Float64List log(Float64List x) {
+    static List<double> log(List<double> x) {
         Float64List z = new Float64List(2);
         z[0] = Math.log(abs(x));
         z[1] = arg(x);
         return z;
     }
 
-    static Float64List minus(Float64List x, Float64List y) {
+    static List<double> minus(List<double> x, List<double> y) {
         Float64List z = new Float64List(2);
         z[0] = x[0] - y[0];
         z[1] = x[1] - y[1];
         return z;
     }
 
-    static Float64List minusAbs(Float64List x, Float64List y) {
+    static List<double> minusAbs(List<double> x, List<double> y) {
         Float64List z = new Float64List(2);
         z[0] = (x[0] - y[0]).abs();
         z[1] = (x[1] - y[1]).abs();
         return z;
     }
 
-    static Float64List mult(Float64List x, double y) {
+    static List<double> mult(List<double> x, double y) {
         Float64List z = new Float64List(2);
         z[0] = x[0] * y;
         z[1] = x[1] * y;
         return z;
     }
 
-    static Float64List multiply(Float64List x, Float64List y) {
+    static List<double> multiply(List<double> x, List<double> y) {
         Float64List z = new Float64List(2);
         z[0] = x[0] * y[0] - x[1] * y[1];
         z[1] = x[1] * y[0] + x[0] * y[1];
         return z;
     }
 
-    static Float64List neg(Float64List x) {
+    static List<double> neg(List<double> x) {
         Float64List z = new Float64List(2);
         z[0] = -x[0];
         z[1] = -x[1];
         return z;
     }
 
-    static Float64List plus(Float64List x, Float64List y) {
+    static List<double> plus(List<double> x, List<double> y) {
         Float64List z = new Float64List(2);
         z[0] = x[0] + y[0];
         z[1] = x[1] + y[1];
         return z;
     }
 
-    static Float64List pow(Float64List x, double y) {
+    static List<double> pow(List<double> x, double y) {
         Float64List z = new Float64List(2);
         double re = y * Math.log(abs(x));
         double im = y * arg(x);
@@ -491,7 +491,7 @@ class Complex extends DoubleConstants {
         return z;
     }
 
-    static Float64List power_(double x, Float64List y) {
+    static List<double> power_(double x, List<double> y) {
         Float64List z = new Float64List(2);
         double re = Math.log(x.abs());
         double im = Math.atan2(0.0, x);
@@ -506,7 +506,7 @@ class Complex extends DoubleConstants {
         return z;
     }
 
-    static Float64List power(Float64List x, Float64List y) {
+    static List<double> power(List<double> x, List<double> y) {
         Float64List z = new Float64List(2);
         double re = Math.log(abs(x));
         double im = arg(x);
@@ -521,7 +521,7 @@ class Complex extends DoubleConstants {
         return z;
     }
 
-    static Float64List sin(Float64List x) {
+    static List<double> sin(List<double> x) {
         Float64List z = new Float64List(2);
         double re1, im1, re2, im2;
         double scalar;
@@ -547,7 +547,7 @@ class Complex extends DoubleConstants {
         return z;
     }
 
-    static Float64List sqrt(Float64List x) {
+    static List<double> sqrt(List<double> x) {
         Float64List z = new Float64List(2);
         double absx = abs(x);
         double tmp;
@@ -571,11 +571,11 @@ class Complex extends DoubleConstants {
         return z;
     }
 
-    static Float64List square(Float64List x) {
+    static List<double> square(List<double> x) {
         return multiply(x, x);
     }
 
-    static Float64List tan(Float64List x) {
+    static List<double> tan(List<double> x) {
         Float64List z = new Float64List(2);
         double scalar;
         double iz_re, iz_im;

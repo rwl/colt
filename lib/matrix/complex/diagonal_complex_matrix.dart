@@ -53,7 +53,7 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
    *             <tt>for any 1 &lt;= row &lt; values.length: values[row].length != values[row-1].length || index < -rows+1 || index > columns - 1</tt>
    *             .
    */
-  factory DiagonalComplexMatrix.fromList(List<Float64List> values, int dindex) {
+  factory DiagonalComplexMatrix.fromList(List<List<double>> values, int dindex) {
     return new DiagonalComplexMatrix(values.length, values.length == 0 ? 0 : values[0].length, dindex)
       ..setAll2D(values);
   }
@@ -161,7 +161,7 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
     }
   }
 
-  void setAll(final Float64List values) {
+  void setAll(final List<double> values) {
     if (values.length != 2 * _dlength) {
       throw new ArgumentError("Must have same length: length=${values.length} 2*dlength=${2 * _dlength}");
     }
@@ -189,7 +189,7 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
     //}
   }
 
-  void setAll2D(final List<Float64List> values) {
+  void setAll2D(final List<List<double>> values) {
     if (values.length != _rows) {
       throw new ArgumentError("Must have same number of rows: rows=${values.length} rows()=${rows}");
     }
@@ -419,9 +419,9 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
     return cardinality;
   }
 
-  Float64List get elements => _elements;
+  Object get elements => _elements;
 
-  bool all(Float64List value) {
+  bool all(List<double> value) {
     double epsilon = EPSILON;
     Float64List x = new Float64List(2);
     Float64List diff = new Float64List(2);
@@ -567,7 +567,7 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
     return new SparseComplexVector(size);
   }
 
-  void set(int row, int column, Float64List value) {
+  void set(int row, int column, List<double> value) {
     if (_dindex >= 0) {
       if (column < _dindex) {
         //do nothing
@@ -619,7 +619,7 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
     }
   }
 
-  AbstractComplexVector mult(AbstractComplexVector y, [AbstractComplexVector z = null, Float64List alpha = null, Float64List beta = null, bool transposeA = false]) {
+  AbstractComplexVector mult(AbstractComplexVector y, [AbstractComplexVector z = null, List<double> alpha = null, List<double> beta = null, bool transposeA = false]) {
     if (alpha == null) {
       alpha = new Float64List.fromList([1.0, 0.0]);
     }
