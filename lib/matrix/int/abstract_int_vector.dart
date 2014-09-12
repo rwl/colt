@@ -115,7 +115,7 @@ abstract class AbstractIntVector extends AbstractVector {
       throw new ArgumentError("size == 0");
     }
     final int size = indexList.length;
-    final Int32List indexElements = indexList;//.elements();
+    final Int32List indexElements = indexList;//.elements;
     int a = 0;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
@@ -390,7 +390,7 @@ abstract class AbstractIntVector extends AbstractVector {
    * @throws ArgumentError
    *             if <tt>values.length != size()</tt>.
    */
-  void setAll(final Int32List values) {
+  void setAll(final List<int> values) {
     if (values.length != _size) {
       throw new ArgumentError("Must have same number of cells: length=${values.length} size()=$length");
     }
@@ -564,9 +564,9 @@ abstract class AbstractIntVector extends AbstractVector {
    *             if <tt>size() != y.size()</tt>.
    * @see IntFunctions
    */
-  void forEachWithRange(AbstractIntVector y, ifunc.IntIntFunction function, List<int> nonZeroIndexes) {
+  void forEachWithNonZero(AbstractIntVector y, ifunc.IntIntFunction function, List<int> nonZeroIndexes) {
     checkSize(y);
-    Int32List nonZeroElements = nonZeroIndexes;//.elements();
+    Int32List nonZeroElements = nonZeroIndexes;//.elements;
 
     // specialized for speed
     if (function == ifunc.mult) { // x[i] = x[i] *
@@ -682,7 +682,7 @@ abstract class AbstractIntVector extends AbstractVector {
    *
    * @return the elements
    */
-  Object elements();
+  Object get elements;
 
   /**
    * Returns whether all cells are equal to the given value.
@@ -692,9 +692,9 @@ abstract class AbstractIntVector extends AbstractVector {
    * @return <tt>true</tt> if all cells are equal to the given value,
    *         <tt>false</tt> otherwise.
    */
-  /*bool equals(int value) {
-        return IntProperty.DEFAULT.equalsVectorValue(this, value);
-    }*/
+  bool all(int value) {
+    return iprop.equalsVectorValue(this, value);
+  }
 
   /**
    * Compares this object against the specified object. The result is
@@ -707,10 +707,7 @@ abstract class AbstractIntVector extends AbstractVector {
    * @return <code>true</code> if the objects are the same; <code>false</code>
    *         otherwise.
    */
-  bool operator ==(var obj) {
-    if (obj is int) {
-      return iprop.equalsVectorValue(this, obj);
-    }
+  bool equals(AbstractIntVector obj) {
     if (identical(this, obj)) {
       return true;
     }
@@ -721,7 +718,7 @@ abstract class AbstractIntVector extends AbstractVector {
       return false;
     }
 
-    return iprop.equalsVector(this, obj as AbstractIntVector);
+    return iprop.equalsVector(this, obj/* as AbstractIntVector*/);
   }
 
   /**
@@ -832,7 +829,7 @@ abstract class AbstractIntVector extends AbstractVector {
    * @param valueList
    *            the list to be filled with values, can have any size.
    */
-  void nonZeros({Int32List indexList: null, final Int32List valueList: null}) {
+  void _nonZeros(List<int> indexList, List<int> valueList) {
     bool fillIndexList = indexList != null;
     bool fillValueList = valueList != null;
     if (fillIndexList) {
@@ -907,7 +904,10 @@ abstract class AbstractIntVector extends AbstractVector {
    * @param maxCardinality
    *            maximal cardinality
    */
-  void nonZerosCardinality(int maxCardinality, {Int32List indexList: null, Int32List valueList: null}) {
+  void nonZeros({List<int> indexList: null, List<int> valueList: null, int maxCardinality: null}) {
+    if (maxCardinality == null) {
+      return _nonZeros(indexList, valueList);
+    }
     bool fillIndexList = indexList != null;
     bool fillValueList = valueList != null;
     if (fillIndexList) {
@@ -946,7 +946,7 @@ abstract class AbstractIntVector extends AbstractVector {
    * @param valueList
    *            the list to be filled with values, can have any size.
    */
-  void positiveValues({Int32List indexList: null, Int32List valueList: null}) {
+  void positiveValues({List<int> indexList: null, List<int> valueList: null}) {
     bool fillIndexList = indexList != null;
     bool fillValueList = valueList != null;
     if (fillIndexList) {
@@ -1304,7 +1304,7 @@ abstract class AbstractIntVector extends AbstractVector {
    *
    * @return an array filled with the values of the cells.
    */
-  Int32List toList() {
+  List<int> toList() {
     Int32List values = new Int32List(_size);
     fillList(values);
     return values;
@@ -1320,8 +1320,10 @@ abstract class AbstractIntVector extends AbstractVector {
    * @throws ArgumentError
    *             if <tt>values.length < size()</tt>.
    */
-  void fillList(final Int32List values) {
-    if (values.length < _size) throw new ArgumentError("values too small");
+  void fillList(final List<int> values) {
+    if (values.length < _size) {
+      throw new ArgumentError("values too small");
+    }
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
@@ -1352,7 +1354,7 @@ abstract class AbstractIntVector extends AbstractVector {
 
   String toString() {
     //return new IntFormatter().toString1D(this);
-    return this.elements().toString();
+    return this.elements.toString();
   }
 
   /**
@@ -1489,7 +1491,7 @@ abstract class AbstractIntVector extends AbstractVector {
    *             if <tt>!(0 <= indexes[i] < size())</tt> for any
    *             <tt>i=0..indexes.length()-1</tt>.
    */
-  AbstractIntVector select(Int32List indexes) {
+  AbstractIntVector select(List<int> indexes) {
     // check for "all"
     if (indexes == null) {
       indexes = new Int32List(_size);
@@ -1513,7 +1515,7 @@ abstract class AbstractIntVector extends AbstractVector {
    *            the offsets of the visible elements.
    * @return a new view.
    */
-  AbstractIntVector _viewSelectionLike(Int32List offsets);
+  AbstractIntVector _viewSelectionLike(List<int> offsets);
 
   /**
    * Sorts the vector into ascending order, according to the <i>natural
@@ -1576,7 +1578,9 @@ abstract class AbstractIntVector extends AbstractVector {
     if (length == null) {
       length = _size;
     }
-    if (from < 0 || length <= 0) return 0;
+    if (from < 0 || length <= 0) {
+      return 0;
+    }
 
     int tail = from + length;
     if (_size < tail) tail = _size;
@@ -1636,7 +1640,7 @@ abstract class AbstractIntVector extends AbstractVector {
    *            the indexes of cells in <tt>y</tt>having a non-zero value.
    * @return the sum of products.
    */
-  int dotNonZero(AbstractIntVector y, Int32List nonZeroIndexes, [int from = 0, int length = null]) {
+  int dotNonZero(AbstractIntVector y, List<int> nonZeroIndexes, [int from = 0, int length = null]) {
     if (length == null) {
       length = _size;
     }
@@ -1659,7 +1663,7 @@ abstract class AbstractIntVector extends AbstractVector {
     Int32List indexesCopy = new Int32List.fromList(nonZeroIndexes);
     //indexesCopy.trimToSize();
     indexesCopy.sort();
-    Int32List nonZeroIndexElements = indexesCopy;//.elements();
+    Int32List nonZeroIndexElements = indexesCopy;//.elements;
     int index = 0;
     int s = indexesCopy.length;
     // skip to start

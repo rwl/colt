@@ -1099,9 +1099,9 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
         //                DoubleVector valuesCPart = valuesC.viewPart(rowPointersC[ii], length).viewSelection(indexes);
         //                valuesC.viewPart(rowPointersC[ii], length).assign(valuesCPart);
       }
-      //            CC.columnIndexes.elements((Int32List) columnIndexesC.elements());
+      //            CC.columnIndexes.elements((Int32List) columnIndexesC.elements);
       //            CC.columnIndexes.setSize(columnIndexesSize);
-      //            CC.values.elements((Float64List) valuesC.elements());
+      //            CC.values.elements((Float64List) valuesC.elements);
       //            CC.values.setSize(columnIndexesSize);
     } else {
       if (transposeB) {

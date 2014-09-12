@@ -124,9 +124,9 @@ class CSparseDoubleLUDecomposition implements SparseDoubleLUDecomposition {
     Dcs dcs;
     if (A is SparseRCDoubleMatrix) {
       _rcMatrix = true;
-      dcs = A.getColumnCompressed().elements();
+      dcs = A.getColumnCompressed().elements;
     } else {
-      dcs = A.elements() as Dcs;
+      dcs = A.elements as Dcs;
     }
     _n = A.rows;
 
@@ -228,9 +228,9 @@ class CSparseDoubleLUDecomposition implements SparseDoubleLUDecomposition {
     Float64List y = new Float64List(_n);
     Float64List x;
     if (b.isView) {
-      x = b.copy().elements() as Float64List;
+      x = b.copy().elements as Float64List;
     } else {
-      x = b.elements() as Float64List;
+      x = b.elements as Float64List;
     }
     cs_ipvec(_N.pinv, x, y, _n);
     /* y = b(p) */
@@ -303,9 +303,9 @@ class SparseDoubleKLUDecomposition implements SparseDoubleLUDecomposition {
     Dcs dcs;
     if (A is SparseRCDoubleMatrix) {
       _rcMatrix = true;
-      dcs = A.getColumnCompressed().elements();
+      dcs = A.getColumnCompressed().elements;
     } else {
-      dcs = A.elements() as Dcs;
+      dcs = A.elements as Dcs;
     }
     _n = A.rows;
     Int32List Ap = dcs.p,
@@ -420,9 +420,9 @@ class SparseDoubleKLUDecomposition implements SparseDoubleLUDecomposition {
     DoubleProperty.DEFAULT.checkDense(b);
     Float64List x;
     if (b.isView) {
-      x = b.copy().elements() as Float64List;
+      x = b.copy().elements as Float64List;
     } else {
-      x = b.elements() as Float64List;
+      x = b.elements as Float64List;
     }
     klu.solve(_S, _N, _n, 1, x, 0, _Common);
 

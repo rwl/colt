@@ -200,8 +200,8 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
       throw new ArgumentError("size == 0");
     }
     final int size = rowList.length;
-    final Int32List rowElements = rowList;//.elements();
-    final Int32List columnElements = columnList;//.elements();
+    final Int32List rowElements = rowList;//.elements;
+    final Int32List columnElements = columnList;//.elements;
     int a = 0;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -517,7 +517,7 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
    * @throws ArgumentError
    *             if <tt>values.length != rows()*columns()</tt>.
    */
-  void setAll(final Int32List values) {
+  void setAll(final List<int> values) {
     if (values.length != _rows * _columns) {
       throw new ArgumentError("Must have same length: length=${values.length} rows()*columns()=${rows * columns}");
     }
@@ -567,7 +567,7 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
    *             <tt>values.length != rows() || for any 0 &lt;= row &lt; rows(): values[row].length != columns()</tt>
    *             .
    */
-  void setAll2D(final List<Int32List> values) {
+  void setAll2D(final List<List<int>> values) {
     if (values.length != _rows) {
       throw new ArgumentError("Must have same number of rows: rows=${values.length} rows()=${rows}");
     }
@@ -749,8 +749,8 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
   void forEachWithRange(final AbstractIntMatrix y, final ifunc.IntIntFunction function, Int32List rowList, Int32List columnList) {
     checkShape(y);
     final int size = rowList.length;
-    final Int32List rowElements = rowList;//.elements();
-    final Int32List columnElements = columnList;//.elements();
+    final Int32List rowElements = rowList;//.elements;
+    final Int32List columnElements = columnList;//.elements;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, size);
@@ -841,7 +841,7 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
    *
    * @return the elements
    */
-  Object elements();
+  Object get elements;
 
   /**
    * Returns whether all cells are equal to the given value.
@@ -851,9 +851,9 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
    * @return <tt>true</tt> if all cells are equal to the given value,
    *         <tt>false</tt> otherwise.
    */
-  /*bool equals(int value) {
-    return IntProperty.DEFAULT.equalsMatrixValue(this, value);
-  }*/
+  bool all(int value) {
+    return iprop.equalsMatrixValue(this, value);
+  }
 
   /**
    * Compares this object against the specified object. The result is
@@ -867,22 +867,18 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
    * @return <code>true</code> if the objects are the same; <code>false</code>
    *         otherwise.
    */
-
-  bool operator ==(var obj) {
-    if (obj is int) {
-      return iprop.equalsMatrixValue(this, obj);
-    }
+  bool equals(AbstractIntMatrix obj) {
     if (identical(this, obj)) {
       return true;
     }
     if (obj == null) {
       return false;
     }
-    if (!(obj is AbstractIntMatrix)) {
-      return false;
-    }
+//    if (!(obj is AbstractIntMatrix)) {
+//      return false;
+//    }
 
-    return iprop.equalsMatrix(this, obj as AbstractIntMatrix);
+    return iprop.equalsMatrix(this, obj/* as AbstractIntMatrix*/);
   }
 
   /**
@@ -976,7 +972,7 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
    * @param valueList
    *            the list to be filled with values, can have any size.
    */
-  void negativeValues(final Int32List rowList, final Int32List columnList, final Int32List valueList) {
+  void negativeValues(final List<int> rowList, final List<int> columnList, final List<int> valueList) {
     rowList.clear();
     columnList.clear();
     valueList.clear();
@@ -1027,7 +1023,7 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
    * @param valueList
    *            the list to be filled with values, can have any size.
    */
-  void nonZeros(final Int32List rowList, final Int32List columnList, final Int32List valueList) {
+  void nonZeros(final List<int> rowList, final List<int> columnList, final List<int> valueList) {
     rowList.clear();
     columnList.clear();
     valueList.clear();
@@ -1056,7 +1052,7 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
    * @param valueList
    *            the list to be filled with values, can have any size.
    */
-  void positiveValues(final Int32List rowList, final Int32List columnList, final Int32List valueList) {
+  void positiveValues(final List<int> rowList, final List<int> columnList, final List<int> valueList) {
     rowList.clear();
     columnList.clear();
     valueList.clear();
@@ -1094,8 +1090,12 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
    * Returns <tt>true</tt> if both matrices share at least one identical cell.
    */
   bool _haveSharedCells(AbstractIntMatrix other) {
-    if (other == null) return false;
-    if (this == other) return true;
+    if (other == null) {
+      return false;
+    }
+    if (this == other) {
+      return true;
+    }
     return _getContent()._haveSharedCellsRaw(other._getContent());
   }
 
@@ -1377,8 +1377,9 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
    *
    * @return an array filled with the values of the cells.
    */
-  List<Int32List> toList() {
-    final List<Int32List> values = new List<Int32List>.generate(_rows, (_) => new Int32List(_columns));
+  List<List<int>> toList() {
+    final List<Int32List> values = new List<Int32List>.generate(_rows,
+        (_) => new Int32List(_columns));
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
@@ -1747,7 +1748,7 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
    *             if <tt>!(0 <= columnIndexes[i] < columns())</tt> for any
    *             <tt>i=0..columnIndexes.length()-1</tt>.
    */
-  AbstractIntMatrix select(Int32List rowIndexes, Int32List columnIndexes) {
+  AbstractIntMatrix select(List<int> rowIndexes, List<int> columnIndexes) {
     // check for "all"
     if (rowIndexes == null) {
       rowIndexes = new Int32List(_rows);
@@ -1775,7 +1776,7 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
     return _viewSelectionLike(rowOffsets, columnOffsets);
   }
 
-  AbstractIntMatrix selectIterable(Set<Int32List> indexes) {
+  AbstractIntMatrix selectIterable(Iterable<List<int>> indexes) {
     int n = indexes.length;
     Int32List rowIndexes = new Int32List(n);
     Int32List columnIndexes = new Int32List(n);
@@ -1809,7 +1810,7 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
    *            the offsets of the visible elements.
    * @return a new view.
    */
-  AbstractIntMatrix _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets);
+  AbstractIntMatrix _viewSelectionLike(List<int> rowOffsets, List<int> columnOffsets);
 
   /**
    * Sorts the matrix rows into ascending order, according to the <i>natural

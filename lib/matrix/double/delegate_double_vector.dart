@@ -62,7 +62,7 @@ class DelegateDoubleVector extends AbstractDoubleVector {
   }
 
   Object get elements {
-    return _content.elements();
+    return _content.elements;
   }
 
   AbstractDoubleMatrix reshape(int rows, int columns) {

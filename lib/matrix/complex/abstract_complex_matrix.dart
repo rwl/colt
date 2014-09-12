@@ -757,9 +757,9 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
    * @return <tt>true</tt> if all cells are equal to the given value,
    *         <tt>false</tt> otherwise.
    */
-  /*bool equalsValue(Float64List value) {
-    return ComplexProperty.DEFAULT.equalsValue2D(this, value);
-  }*/
+  bool all(Float64List value) {
+    return cprop.equalsValue2D(this, value);
+  }
 
   /**
    * Compares this object against the specified object. The result is
@@ -773,25 +773,25 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
    * @return <code>true</code> if the objects are the same; <code>false</code>
    *         otherwise.
    */
-  bool operator ==(var obj) {
-    if (obj is num) {
+  bool equals(AbstractComplexMatrix obj) {
+    /*if (obj is num) {
       final c = new Float64List.fromList([obj.toDouble(), 0.0]);
       return cprop.equalsValue2D(this, c);
     }
     if (obj is Float64List) {
       return cprop.equalsValue2D(this, obj);
-    }
+    }*/
     if (identical(this, obj)) {
       return true;
     }
     if (obj == null) {
       return false;
     }
-    if (obj is! AbstractComplexMatrix) {
+    /*if (obj is! AbstractComplexMatrix) {
       return false;
-    }
+    }*/
 
-    return cprop.equalsMatrix(this, obj as AbstractComplexMatrix);
+    return cprop.equalsMatrix(this, obj/* as AbstractComplexMatrix*/);
   }
 
   /**
@@ -913,7 +913,7 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
    *
    * @return the elements
    */
-  Object elements();
+  Object get elements;
 
   /**
    * Returns the imaginary part of this matrix

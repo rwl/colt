@@ -17,8 +17,8 @@ testIntMatrix(String name, IntMatrixTest t) {
     test('fillWhere', t.testFillWhere);
     test('forEachWhere', t.testForEachWhere);
     test('cardinality', t.testCardinality);
-    test('==', t.testEqualsInt);
-    test('==', t.testEqualsObject);
+    test('all', t.testAll);
+    test('equals', t.testEquals);
     test('forEachNonZero', t.testForEachNonZero);
     test('max', t.testMax);
     test('min', t.testMin);
@@ -286,16 +286,16 @@ abstract class IntMatrixTest {
     expect(expected, equals(card));
   }
 
-  void testEqualsInt() {
+  void testAll() {
     int value = 1;
     A.fill(value);
-    expect(A == value, isTrue);
-    expect(A == 2, isFalse);
+    expect(A.all(value), isTrue);
+    expect(A.all(2), isFalse);
   }
 
-  void testEqualsObject() {
-    expect(A == A, isTrue);
-    expect(A == B, isFalse);
+  void testEquals() {
+    expect(A.equals(A), isTrue);
+    expect(A.equals(B), isFalse);
   }
 
   void testForEachNonZero() {

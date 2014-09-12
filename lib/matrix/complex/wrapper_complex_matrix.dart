@@ -64,14 +64,12 @@ class WrapperComplexMatrix extends AbstractComplexMatrix {
     }
   }
 
-  Object elements() {
-    return _content.elements();
-  }
+  Object get elements => _content.elements;
 
-  /*bool equalsValue(Float64List value) {
+  bool all(Float64List value) {
     if (_content is DiagonalComplexMatrix) {
-      double epsilon = ComplexProperty.DEFAULT.tolerance();
-      Float64List elements = _content.elements() as Float64List;
+      double epsilon = EPSILON;
+      Float64List elements = _content.elements as Float64List;
       int dlength = (_content as DiagonalComplexMatrix)._dlength;
       Float64List x = new Float64List(2);
       Float64List diff = new Float64List(2);
@@ -90,16 +88,16 @@ class WrapperComplexMatrix extends AbstractComplexMatrix {
       }
       return true;
     } else {
-      return super ==(value);
+      return super.all(value);
     }
-  }*/
+  }
 
-  bool operator ==(var obj) {
-    if (obj is Float64List) {
+  bool equals(AbstractComplexMatrix obj) {
+    /*if (obj is Float64List) {
       final value = obj;
       if (_content is DiagonalComplexMatrix) {
         double epsilon = EPSILON;
-        Float64List elements = _content.elements() as Float64List;
+        Float64List elements = _content.elements as Float64List;
         int dlength = (_content as DiagonalComplexMatrix)._dlength;
         Float64List x = new Float64List(2);
         Float64List diff = new Float64List(2);
@@ -120,7 +118,7 @@ class WrapperComplexMatrix extends AbstractComplexMatrix {
       } else {
         return super == (value);
       }
-    }
+    }*/
     if (_content is DiagonalComplexMatrix && obj is DiagonalComplexMatrix) {
       DiagonalComplexMatrix other = obj;
       int dlength = (_content as DiagonalComplexMatrix)._dlength;
@@ -158,7 +156,7 @@ class WrapperComplexMatrix extends AbstractComplexMatrix {
       }
       return true;
     } else {
-      return super == (obj);
+      return super.equals(obj);
     }
   }
 

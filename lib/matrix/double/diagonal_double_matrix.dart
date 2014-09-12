@@ -340,8 +340,8 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
 
   Object get elements => _elements;
 
-  /*bool equalsValue(double value) {
-    double epsilon = DoubleProperty.DEFAULT.tolerance();
+  bool all(double value) {
+    double epsilon = EPSILON;
     for (int r = 0; r < _dlength; r++) {
       double x = _elements[r];
       double diff = (value - x).abs();
@@ -353,10 +353,10 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
       }
     }
     return true;
-  }*/
+  }
 
-  bool operator ==(var obj) {
-    if (obj is num) {
+  bool equals(AbstractDoubleMatrix obj) {
+    /*if (obj is num) {
       final value = obj;
       double epsilon = EPSILON;
       for (int r = 0; r < _dlength; r++) {
@@ -370,7 +370,7 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
         }
       }
       return true;
-    }
+    }*/
     if (obj is DiagonalDoubleMatrix) {
       DiagonalDoubleMatrix other = obj;
       double epsilon = EPSILON;
@@ -402,7 +402,7 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
       }
       return true;
     } else {
-      return super ==(obj);
+      return super.equals(obj);
     }
   }
 

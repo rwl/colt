@@ -18,7 +18,7 @@ testComplexMatrix(String name, ComplexMatrixTest t) {
     test('assignImaginary', t.testAssignImaginary);
     test('assignReal', t.testAssignReal);
     test('cardinality', t.testCardinality);
-    test('equalsValue', t.testEqualsValue);
+    test('all', t.testAll);
     test('equals', t.testEquals);
     test('forEachNonZero', t.testForEachNonZero);
     test('getConjugateTranspose', t.testGetConjugateTranspose);
@@ -273,17 +273,17 @@ abstract class ComplexMatrixTest {
     expect(A.length, equals(card));
   }
 
-  void testEqualsValue() {
+  void testAll() {
     Float64List value = new Float64List.fromList([random.nextDouble(), random.nextDouble()]);
     A.fill(value[0], value[1]);
-    expect(A == value, isTrue);
-    final eq = A == new Float64List.fromList([value[0] + 1, value[1] + 1]);
+    expect(A.all(value), isTrue);
+    final eq = A.all(new Float64List.fromList([value[0] + 1, value[1] + 1]));
     expect(eq, isFalse);
   }
 
   void testEquals() {
-    expect(A == A, isTrue);
-    expect(A == B, isFalse);
+    expect(A.equals(A), isTrue);
+    expect(A.equals(B), isFalse);
   }
 
   void testForEachNonZero() {

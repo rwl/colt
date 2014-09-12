@@ -63,9 +63,7 @@ class DelegateComplexVector extends AbstractComplexVector {
     _content.setParts(_row, index, re, im);
   }
 
-  Object elements() {
-    return _content.elements();
-  }
+  Object get elements => _content.elements;
 
   AbstractComplexMatrix reshape(int rows, int columns) {
     throw new ArgumentError("This method is not supported.");
@@ -200,7 +198,7 @@ class DelegateComplexVector extends AbstractComplexVector {
   }
 
   Object elements() {
-    return _content.elements();
+    return _content.elements;
   }
 
   ComplexMatrix _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets) {

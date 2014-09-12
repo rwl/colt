@@ -99,7 +99,7 @@ class SparseIntMatrix extends AbstractIntMatrix {
    *             <tt>for any 1 &lt;= row &lt; values.length: values[row].length != values[row-1].length</tt>
    *             .
    */
-  factory SparseIntMatrix.fromList(List<Int32List> values) {
+  factory SparseIntMatrix.fromList(List<List<int>> values) {
     return new SparseIntMatrix(values.length, values.length == 0 ? 0 : values[0].length)..setAll2D(values);
   }
 
@@ -170,7 +170,7 @@ class SparseIntMatrix extends AbstractIntMatrix {
    * @param value
    *            numerical value
    */
-  factory SparseIntMatrix.withValue(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, int value) {
+  factory SparseIntMatrix.withValue(int rows, int columns, List<int> rowIndexes, List<int> columnIndexes, int value) {
     /*try {
       _setUp(rows, columns);
     } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
@@ -194,7 +194,7 @@ class SparseIntMatrix extends AbstractIntMatrix {
    * @param values
    *            numerical values
    */
-  factory SparseIntMatrix.withValues(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, Int32List values) {
+  factory SparseIntMatrix.withValues(int rows, int columns, List<int> rowIndexes, List<int> columnIndexes, List<int> values) {
     /*try {
       _setUp(rows, columns);
     } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
@@ -396,7 +396,7 @@ class SparseIntMatrix extends AbstractIntMatrix {
    *            cell's value of <tt>y</tt>,
    * @return <tt>this</tt> (for convenience only).
    */
-  SparseIntMatrix assign(final Int32List rowIndexes, final Int32List columnIndexes, final int value, final ifunc.IntIntFunction function) {
+  SparseIntMatrix assign(final List<int> rowIndexes, final List<int> columnIndexes, final int value, final ifunc.IntIntFunction function) {
     int size = rowIndexes.length;
     if (function == ifunc.plus) { // x[i] = x[i] + y[i]
       for (int i = 0; i < size; i++) {
@@ -451,7 +451,7 @@ class SparseIntMatrix extends AbstractIntMatrix {
    *            cell's value of <tt>y</tt>,
    * @return <tt>this</tt> (for convenience only).
    */
-  SparseIntMatrix setValues(final Int32List rowIndexes, final Int32List columnIndexes, final Int32List values, final ifunc.IntIntFunction function) {
+  SparseIntMatrix setValues(final List<int> rowIndexes, final List<int> columnIndexes, final List<int> values, final ifunc.IntIntFunction function) {
     int size = rowIndexes.length;
     if (function == ifunc.plus) { // x[i] = x[i] + y[i]
       for (int i = 0; i < size; i++) {
@@ -510,7 +510,7 @@ class SparseIntMatrix extends AbstractIntMatrix {
    *
    * @return this matrix in a column-compressed form
    */
-  SparseCCIntMatrix columnCompressed(bool sortRowIndexes) {
+  SparseCCIntMatrix columnCompressed([bool sortRowIndexes=false]) {
     int nnz = cardinality;
     Int32List keys = _elements.keys;
     Int32List values = _elements.values;
@@ -557,7 +557,7 @@ class SparseIntMatrix extends AbstractIntMatrix {
    *
    * @return this matrix in a row-compressed form
    */
-  SparseRCIntMatrix rowCompressed(bool sortColumnIndexes) {
+  SparseRCIntMatrix rowCompressed([bool sortColumnIndexes=false]) {
     int nnz = cardinality;
     Int32List keys = _elements.keys;
     Int32List values = _elements.values;
@@ -592,9 +592,7 @@ class SparseIntMatrix extends AbstractIntMatrix {
     return A;
   }
 
-  Map<int, int> elements() {
-    return _elements;
-  }
+  Object get elements => _elements;
 
   /*void ensureCapacity(int minCapacity) {
     this._elements.ensureCapacity(minCapacity);
@@ -800,7 +798,7 @@ class SparseIntMatrix extends AbstractIntMatrix {
     return C;
   }
 
-  void _insert(Int32List rowIndexes, Int32List columnIndexes, int value) {
+  void _insert(List<int> rowIndexes, List<int> columnIndexes, int value) {
     int size = rowIndexes.length;
     for (int i = 0; i < size; i++) {
       int row = rowIndexes[i];
@@ -825,7 +823,7 @@ class SparseIntMatrix extends AbstractIntMatrix {
     }
   }
 
-  void _insertValues(Int32List rowIndexes, Int32List columnIndexes, Int32List values) {
+  void _insertValues(List<int> rowIndexes, List<int> columnIndexes, List<int> values) {
     int size = rowIndexes.length;
     for (int i = 0; i < size; i++) {
       int value = values[i];
@@ -864,7 +862,7 @@ class SparseIntMatrix extends AbstractIntMatrix {
     return new SparseIntVector._internal(size, this._elements, offset, stride);
   }
 
-  AbstractIntMatrix _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets) {
+  AbstractIntMatrix _viewSelectionLike(List<int> rowOffsets, List<int> columnOffsets) {
     return new SelectedSparseIntMatrix(this._elements, rowOffsets, columnOffsets, 0);
   }
 
@@ -919,9 +917,9 @@ class SelectedSparseIntMatrix extends AbstractIntMatrix {
   /**
    * The offsets of the visible cells of this matrix.
    */
-  Int32List _rowOffsets;
+  List<int> _rowOffsets;
 
-  Int32List _columnOffsets;
+  List<int> _columnOffsets;
 
   /**
    * The offset.
@@ -939,7 +937,7 @@ class SelectedSparseIntMatrix extends AbstractIntMatrix {
    *            The column offsets of the cells that shall be visible.
    * @param offset
    */
-  factory SelectedSparseIntMatrix(Map<int, int> elements, Int32List rowOffsets, Int32List columnOffsets, int offset) {
+  factory SelectedSparseIntMatrix(Map<int, int> elements, List<int> rowOffsets, List<int> columnOffsets, int offset) {
     return new SelectedSparseIntMatrix._internal(rowOffsets.length, columnOffsets.length, elements, 0, 0, 1, 1, rowOffsets, columnOffsets, offset);
   }
 
@@ -968,7 +966,7 @@ class SelectedSparseIntMatrix extends AbstractIntMatrix {
    *            The column offsets of the cells that shall be visible.
    * @param offset
    */
-  SelectedSparseIntMatrix._internal(int rows, int columns, Map<int, int> elements, int rowZero, int columnZero, int rowStride, int columnStride, Int32List rowOffsets, Int32List columnOffsets, int offset) {
+  SelectedSparseIntMatrix._internal(int rows, int columns, Map<int, int> elements, int rowZero, int columnZero, int rowStride, int columnStride, List<int> rowOffsets, List<int> columnOffsets, int offset) {
     // be sure parameters are valid, we do not check...
     _setUp(rows, columns, rowZero, columnZero, rowStride, columnStride);
 
@@ -980,7 +978,7 @@ class SelectedSparseIntMatrix extends AbstractIntMatrix {
     this._isNoView = false;
   }
 
-  Map<int, int> elements() {
+  Object get elements {
     throw new ArgumentError("This method is not supported.");
   }
 
@@ -1288,7 +1286,7 @@ class SelectedSparseIntMatrix extends AbstractIntMatrix {
    *            the offsets of the visible elements.
    * @return a new view.
    */
-  AbstractIntMatrix _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets) {
+  AbstractIntMatrix _viewSelectionLike(List<int> rowOffsets, List<int> columnOffsets) {
     return new SelectedSparseIntMatrix(this._elements, rowOffsets, columnOffsets, this._offset);
   }
 }

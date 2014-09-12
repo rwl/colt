@@ -120,7 +120,7 @@ part of cern.colt.matrix;
  */
 class SparseRCIntMatrix extends WrapperIntMatrix {
 
-  static int _searchFromTo(Int32List list, int key, int from, int to) {
+  static int _searchFromTo(List<int> list, int key, int from, int to) {
     while (from <= to) {
       if (list[from] == key) {
         return from;
@@ -158,7 +158,7 @@ class SparseRCIntMatrix extends WrapperIntMatrix {
    *             <tt>for any 1 &lt;= row &lt; values.length: values[row].length != values[row-1].length</tt>
    *             .
    */
-  factory SparseRCIntMatrix.fromList(List<Int32List> values) {
+  factory SparseRCIntMatrix.fromList(List<List<int>> values) {
     return new SparseRCIntMatrix(values.length, values.length == 0 ? 0 : values[0].length)
       ..setAll2D(values);
   }
@@ -229,7 +229,7 @@ class SparseRCIntMatrix extends WrapperIntMatrix {
    * @param sortColumnIndexes
    *            if true, then column indexes are sorted
    */
-  factory SparseRCIntMatrix.withValue(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, int value, bool removeDuplicates, bool sortColumnIndexes) {
+  factory SparseRCIntMatrix.withValue(int rows, int columns, List<int> rowIndexes, List<int> columnIndexes, int value, bool removeDuplicates, bool sortColumnIndexes) {
     /*try {
       _setUp(rows, columns);
     } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
@@ -289,7 +289,7 @@ class SparseRCIntMatrix extends WrapperIntMatrix {
    * @param sortColumnIndexes
    *            if true, then column indexes are sorted
    */
-  factory SparseRCIntMatrix.withValues(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, Int32List values, bool removeDuplicates, bool removeZeroes, bool sortColumnIndexes) {
+  factory SparseRCIntMatrix.withValues(int rows, int columns, List<int> rowIndexes, List<int> columnIndexes, List<int> values, bool removeDuplicates, bool removeZeroes, bool sortColumnIndexes) {
     /*try {
       _setUp(rows, columns);
     } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
@@ -1114,9 +1114,9 @@ class SparseRCIntMatrix extends WrapperIntMatrix {
         //                IntMatrix1D valuesCPart = valuesC.viewPart(rowPointersC[ii], length).viewSelection(indexes);
         //                valuesC.viewPart(rowPointersC[ii], length).assign(valuesCPart);
       }
-      //            CC.columnIndexes.elements((Int32List) columnIndexesC.elements());
+      //            CC.columnIndexes.elements((Int32List) columnIndexesC.elements);
       //            CC.columnIndexes.setSize(columnIndexesSize);
-      //            CC.values.elements((Int32List) valuesC.elements());
+      //            CC.values.elements((Int32List) valuesC.elements);
       //            CC.values.setSize(columnIndexesSize);
     } else {
       if (transposeB) {
@@ -1148,7 +1148,7 @@ class SparseRCIntMatrix extends WrapperIntMatrix {
     return C;
   }
 
-  static int _cumsum(Int32List p, Int32List c, int n) {
+  static int _cumsum(List<int> p, List<int> c, int n) {
     int nz = 0;
     int nz2 = 0;
     for (int k = 0; k < n; k++) {

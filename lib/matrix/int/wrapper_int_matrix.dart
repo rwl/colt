@@ -20,8 +20,8 @@ part of cern.colt.matrix;
 class WrapperIntMatrix extends AbstractIntMatrix {
 
   /*
-     * The elements of the matrix.
-     */
+   * The elements of the matrix.
+   */
   AbstractIntMatrix _content;
 
   WrapperIntMatrix(AbstractIntMatrix newContent) {
@@ -49,7 +49,7 @@ class WrapperIntMatrix extends AbstractIntMatrix {
     return;
   }
 
-  void setAll(final Int32List values) {
+  void setAll(final List<int> values) {
     if (_content is DiagonalIntMatrix) {
       int dlength = (_content as DiagonalIntMatrix)._dlength;
       final Int32List elems = (_content as DiagonalIntMatrix)._elements;
@@ -83,17 +83,15 @@ class WrapperIntMatrix extends AbstractIntMatrix {
     }
   }
 
-  Object elements() {
-    return _content.elements();
-  }
+  Object get elements => _content.elements;
 
   int get(int row, int column) {
     return _content.get(row, column);
   }
 
-  bool equalsValue(int value) {
+  bool all(int value) {
     if (_content is DiagonalIntMatrix) {
-      Int32List elements = _content.elements() as Int32List;
+      Int32List elements = _content.elements as Int32List;
       for (int r = 0; r < elements.length; r++) {
         int x = elements[r];
         int diff = value - x;
@@ -103,11 +101,11 @@ class WrapperIntMatrix extends AbstractIntMatrix {
       }
       return true;
     } else {
-      return super.equalsValue(value);
+      return super.all(value);
     }
   }
 
-  bool equals(Object obj) {
+  bool equals(AbstractIntMatrix obj) {
     if (_content is DiagonalIntMatrix && obj is DiagonalIntMatrix) {
       if (this == obj) {
         return true;
@@ -120,8 +118,8 @@ class WrapperIntMatrix extends AbstractIntMatrix {
       if (A.columns != B.columns || A.rows != B.rows || A.diagonalIndex != B.diagonalIndex || A.diagonalLength != B.diagonalLength) {
         return false;
       }
-      Int32List AElements = A.elements();
-      Int32List BElements = B.elements();
+      Int32List AElements = A.elements;
+      Int32List BElements = B.elements;
       for (int r = 0; r < AElements.length; r++) {
         int x = AElements[r];
         int value = BElements[r];
@@ -223,7 +221,7 @@ class WrapperIntMatrix extends AbstractIntMatrix {
     return view;
   }
 
-  AbstractIntMatrix select(Int32List rowIndexes, Int32List columnIndexes) {
+  AbstractIntMatrix select(List<int> rowIndexes, List<int> columnIndexes) {
     // check for "all"
     if (rowIndexes == null) {
       rowIndexes = new Int32List(_rows);
@@ -275,7 +273,7 @@ class WrapperIntMatrix extends AbstractIntMatrix {
     throw new Error(); // should never get called
   }
 
-  AbstractIntMatrix _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets) {
+  AbstractIntMatrix _viewSelectionLike(List<int> rowOffsets, List<int> columnOffsets) {
     throw new Error(); // should never be called
   }
 }

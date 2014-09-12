@@ -589,9 +589,9 @@ abstract class AbstractComplexVector extends AbstractVector {
    * @return <tt>true</tt> if all cells are equal to the given value,
    *         <tt>false</tt> otherwise.
    */
-  /*bool equalsValue(Float64List value) {
-    return ComplexProperty.DEFAULT.equalsValue1D(this, value);
-  }*/
+  bool all(Float64List value) {
+    return cprop.equalsValue1D(this, value);
+  }
 
   /**
    * Compares this object against the specified object. The result is
@@ -605,25 +605,25 @@ abstract class AbstractComplexVector extends AbstractVector {
    * @return <code>true</code> if the objects are the same; <code>false</code>
    *         otherwise.
    */
-  bool operator ==(var obj) {
-    if (obj is num) {
-      final c = new Float64List.fromList([obj.toDouble, 0.0]);
-      return cprop.equalsValue1D(this, c);
-    }
-    if (obj is Float64List) {
-      return cprop.equalsValue1D(this, obj);
-    }
+  bool equals(AbstractComplexVector obj) {
+//    if (obj is num) {
+//      final c = new Float64List.fromList([obj.toDouble, 0.0]);
+//      return cprop.equalsValue1D(this, c);
+//    }
+//    if (obj is Float64List) {
+//      return cprop.equalsValue1D(this, obj);
+//    }
     if (identical(this, obj)) {
       return true;
     }
     if (obj == null) {
       return false;
     }
-    if (obj is! AbstractComplexVector) {
-      return false;
-    }
+//    if (obj is! AbstractComplexVector) {
+//      return false;
+//    }
 
-    return cprop.equalsVector(this, obj as AbstractComplexVector);
+    return cprop.equalsVector(this, obj/* as AbstractComplexVector*/);
   }
 
   /**
@@ -648,7 +648,7 @@ abstract class AbstractComplexVector extends AbstractVector {
    *
    * @return the elements
    */
-  Object elements();
+  Object get elements;
 
   /**
    * Returns the imaginary part of this matrix
@@ -1245,7 +1245,7 @@ abstract class AbstractComplexVector extends AbstractVector {
     Int32List indexesCopy = new Int32List.fromList(nonZeroIndexes);
     //indexesCopy.trimToSize();
     indexesCopy.sort();
-    Int32List nonZeroIndexElements = indexesCopy;//.elements();
+    Int32List nonZeroIndexElements = indexesCopy;//.elements;
     int index = 0;
     int s = indexesCopy.length;
 

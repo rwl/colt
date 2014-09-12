@@ -15,7 +15,7 @@ testDoubleVector(String name, DoubleVectorTest t) {
     test('assignProcValue', t.testAssignProceValue);
     test('assignProc', t.testAssignProc);
     test('cardinality', t.testCardinality);
-    test('equalsValue', t.testEqualsValue);
+    test('all', t.testAll);
     test('equals', t.testEquals);
     test('maxLocation', t.testMaxLocation);
     test('minLocation', t.testMinLocation);
@@ -106,7 +106,7 @@ abstract class DoubleVectorTest {
       double elemB = B.get(i);
       expected += elemA * elemB;
     }
-    double result = A.reduceVector(B, plus, mult);
+    double result = A.reduceWith(B, plus, mult);
     expect(result, closeTo(expected, TOL));
   }
 
@@ -197,16 +197,16 @@ abstract class DoubleVectorTest {
     expect(A.length, equals(card));
   }
 
-  testEqualsValue() {
+  testAll() {
     double value = 1.0;
     A.fill(value);
-    expect(A == value, isTrue);
-    expect(A == 2, isFalse);
+    expect(A.all(value), isTrue);
+    expect(A.all(2.0), isFalse);
   }
 
   testEquals() {
-    expect(A == A, isTrue);
-    expect(A == B, isFalse);
+    expect(A.equals(A), isTrue);
+    expect(A.equals(B), isFalse);
   }
 
   testMaxLocation() {

@@ -11,7 +11,7 @@ class DiagonalDoubleMatrixTest extends DoubleMatrixTest {
     A = new DiagonalDoubleMatrix(NROWS, NCOLUMNS, DINDEX);
     B = new DiagonalDoubleMatrix(NROWS, NCOLUMNS, DINDEX);
     Bt = new DiagonalDoubleMatrix(NCOLUMNS, NROWS, -DINDEX);
-    DLENGTH = (A as DiagonalDoubleMatrix).diagonalLength();
+    DLENGTH = (A as DiagonalDoubleMatrix).diagonalLength;
   }
 
   void populateMatrices() {
@@ -624,7 +624,7 @@ class DiagonalDoubleMatrixViewTest extends DiagonalDoubleMatrixTest {
   void createMatrices() {
     DINDEX = 3;
     A = new DiagonalDoubleMatrix(NCOLUMNS, NROWS, -DINDEX);
-    DLENGTH = (A as DiagonalDoubleMatrix).diagonalLength();
+    DLENGTH = (A as DiagonalDoubleMatrix).diagonalLength;
     A = A.dice();
     B = new DiagonalDoubleMatrix(NCOLUMNS, NROWS, -DINDEX).dice();
     Bt = new DiagonalDoubleMatrix(NROWS, NCOLUMNS, DINDEX).dice();

@@ -109,9 +109,9 @@ class CSparseComplexLUDecomposition implements SparseComplexLUDecomposition {
     DZcs dcs;
     if (A is SparseRCComplexMatrix) {
       _rcMatrix = true;
-      dcs = (A).columnCompressed().elements();
+      dcs = (A).columnCompressed().elements;
     } else {
-      dcs = A.elements() as DZcs;
+      dcs = A.elements as DZcs;
     }
     n = A.rows;
 
@@ -211,9 +211,9 @@ class CSparseComplexLUDecomposition implements SparseComplexLUDecomposition {
     DZcsa y = new DZcsa(n);
     DZcsa x;
     if (b.isView) {
-      x = new DZcsa(b.copy().elements() as Float64List);
+      x = new DZcsa(b.copy().elements as Float64List);
     } else {
-      x = new DZcsa(b.elements() as Float64List);
+      x = new DZcsa(b.elements as Float64List);
     }
     cs_ipvec(_N.pinv, x, y, n);
     /* y = b(p) */

@@ -269,8 +269,8 @@ class DoubleMatrix extends AbstractDoubleMatrix {
     if (this.length == 0) return double.NAN;
     final int zero = index(0, 0);
     final int size = rowList.length;
-    final List<int> rowElements = rowList;//.elements();
-    final List<int> columnElements = columnList;//.elements();
+    final List<int> rowElements = rowList;//.elements;
+    final List<int> columnElements = columnList;//.elements;
     double a = 0.0;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -312,7 +312,7 @@ class DoubleMatrix extends AbstractDoubleMatrix {
     final int zeroOther = other.index(0, 0);
     final int rowStrideOther = other.rowStride;
     final int colStrideOther = other.columnStride;
-    final Float64List elementsOther = other.elements() as Float64List;
+    final Float64List elementsOther = other.elements as Float64List;
     double a = 0.0;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -986,9 +986,9 @@ class DoubleMatrix extends AbstractDoubleMatrix {
   void forEachWithNonZero(final AbstractDoubleMatrix y, DoubleDoubleFunction function,  /*IntArrayList*/List<int> rowList,  /*IntArrayList*/List<int> columnList) {
     checkShape(y);
     final int size = rowList.length;
-    final List<int> rowElements = rowList;//.elements();
-    final List<int> columnElements = columnList;//.elements();
-    final Float64List elementsOther = y.elements() as Float64List;
+    final List<int> rowElements = rowList;//.elements;
+    final List<int> columnElements = columnList;//.elements;
+    final Float64List elementsOther = y.elements as Float64List;
     final int zeroOther = y.index(0, 0);
     final int zero = this.index(0, 0);
     final int columnStrideOther = y.columnStride;
@@ -1133,7 +1133,7 @@ class DoubleMatrix extends AbstractDoubleMatrix {
     final int zeroR = R.index(0, 0) as int;
     final int rowStrideR = R.rowStride();
     final int columnStrideR = R.columnStride();
-    final Float64List elementsR = R.elements();
+    final Float64List elementsR = R.elements;
     final int zero = this.index(0, 0);
     int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -1448,7 +1448,7 @@ class DoubleMatrix extends AbstractDoubleMatrix {
     final int zero = index(0, 0);
     final int zeroOther = v.index(0);
     final int strideOther = v.stride();
-    final Float64List elementsOther = v.elements();
+    final Float64List elementsOther = v.elements;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _columns);
@@ -1572,8 +1572,8 @@ class DoubleMatrix extends AbstractDoubleMatrix {
 
     if (_columns != y.length || _rows > z.length) throw new ArgumentError("Incompatible args: " + toStringShort() + ", " + y.toStringShort() + ", " + z.toStringShort());
 
-    final Float64List elemsY = y.elements() as Float64List;
-    final Float64List elemsZ = z.elements() as Float64List;
+    final Float64List elemsY = y.elements as Float64List;
+    final Float64List elemsZ = z.elements as Float64List;
     if (_elements == null || elemsY == null || elemsZ == null) {
       throw new Error();
     }
@@ -1951,9 +1951,7 @@ class SelectedDenseDoubleMatrix extends AbstractDoubleMatrix {
   /**
    * The offsets of the visible cells of this matrix.
    */
-  Int32List _rowOffsets;
-
-  Int32List _columnOffsets;
+  List<int> _rowOffsets, _columnOffsets;
 
   /**
    * The offset.
@@ -2005,8 +2003,8 @@ class SelectedDenseDoubleMatrix extends AbstractDoubleMatrix {
     _setUp(rows, columns, rowZero, columnZero, rowStride, columnStride);
 
     this._elements = elements;
-    this._rowOffsets = new Int32List.fromList(rowOffsets);
-    this._columnOffsets = new Int32List.fromList(columnOffsets);
+    this._rowOffsets = rowOffsets;
+    this._columnOffsets = columnOffsets;
     this._offset = offset;
 
     this._isNoView = !isView;

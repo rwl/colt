@@ -185,7 +185,7 @@ class ComplexVector extends AbstractComplexVector {
     }
     final int zeroOther = other.index(0);
     final int strideOther = other.stride();
-    final Float64List elemsOther = other.elements() as Float64List;
+    final Float64List elemsOther = other.elements as Float64List;
     Float64List a = null;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
@@ -512,7 +512,7 @@ class ComplexVector extends AbstractComplexVector {
       return;
     }
     checkSize(y);
-    final Float64List elemsOther = y.elements() as Float64List;
+    final Float64List elemsOther = y.elements as Float64List;
     final int zeroOther = y.index(0);
     final int strideOther = y.stride();
 
@@ -746,7 +746,7 @@ class ComplexVector extends AbstractComplexVector {
     checkSize(other);
     final int zeroOther = other.index(0);
     final int strideOther = other.stride();
-    final Float64List elemsOther = other.elements() as Float64List;
+    final Float64List elemsOther = other.elements as Float64List;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
@@ -785,7 +785,7 @@ class ComplexVector extends AbstractComplexVector {
     checkSize(other);
     final int zeroOther = other.index(0);
     final int strideOther = other.stride();
-    final Float64List elemsOther = other.elements() as Float64List;
+    final Float64List elemsOther = other.elements as Float64List;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
@@ -816,13 +816,11 @@ class ComplexVector extends AbstractComplexVector {
     //}
   }
 
-  Float64List elements() {
-    return _elements;
-  }
+  Object get elements => _elements;
 
   AbstractDoubleVector imaginary() {
     final DoubleVector Im = new DoubleVector(_size);
-    final Float64List elemsOther = Im.elements();
+    final Float64List elemsOther = Im.elements;
     final int zeroOther = Im.index(0);
     final int strideOther = Im.stride();
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -891,7 +889,7 @@ class ComplexVector extends AbstractComplexVector {
 
   AbstractDoubleVector real() {
     final DoubleVector R = new DoubleVector(_size);
-    final Float64List elemsOther = R.elements();
+    final Float64List elemsOther = R.elements;
     final int zeroOther = R.index(0);
     final int strideOther = R.stride();
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -938,7 +936,7 @@ class ComplexVector extends AbstractComplexVector {
       throw new ArgumentError("rows*columns != size");
     }
     AbstractComplexMatrix M = new ComplexMatrix(rows, columns);
-    final Float64List elemsOther = M.elements() as Float64List;
+    final Float64List elemsOther = M.elements as Float64List;
     final int zeroOther = M.index(0, 0);
     final int rowStrideOther = M.rowStride;
     final int columnStrideOther = M.columnStride;
@@ -987,7 +985,7 @@ class ComplexVector extends AbstractComplexVector {
       throw new IllegalArgumentException("slices*rows*columns != size");
     }
     ComplexMatrix3D M = new DenseComplexMatrix3D(slices, rows, columns);
-    final Float64List elemsOther = M.elements() as Float64List;
+    final Float64List elemsOther = M.elements as Float64List;
     final int zeroOther = M.index(0, 0, 0);
     final int sliceStrideOther = M.sliceStride();
     final int rowStrideOther = M.rowStride();
@@ -1136,7 +1134,7 @@ class ComplexVector extends AbstractComplexVector {
       tail = y.length;
     }
     length = tail - from;
-    final Float64List elemsOther = y.elements() as Float64List;
+    final Float64List elemsOther = y.elements as Float64List;
     if (_elements == null || elemsOther == null) {
       throw new Error();
     }
@@ -1416,7 +1414,7 @@ class SelectedDenseComplexVector extends AbstractComplexVector {
     return Im;
   }
 
-  Float64List elements() {
+  Object get elements {
     throw new UnsupportedError("This method is not supported.");
   }
 

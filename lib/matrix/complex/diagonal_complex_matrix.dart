@@ -419,12 +419,10 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
     return cardinality;
   }
 
-  Float64List elements() {
-    return _elements;
-  }
+  Float64List get elements => _elements;
 
-  /*bool equalsValue(Float64List value) {
-    double epsilon = ComplexProperty.DEFAULT.tolerance();
+  bool all(Float64List value) {
+    double epsilon = EPSILON;
     Float64List x = new Float64List(2);
     Float64List diff = new Float64List(2);
     for (int i = 0; i < _dlength; i++) {
@@ -441,10 +439,10 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
       }
     }
     return true;
-  }*/
+  }
 
-  bool operator ==(var obj) {
-    if (obj is Float64List) {
+  bool equals(AbstractComplexMatrix obj) {
+    /*if (obj is Float64List) {
       final value = obj;
       double epsilon = EPSILON;
       Float64List x = new Float64List(2);
@@ -463,7 +461,7 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
         }
       }
       return true;
-    }
+    }*/
     if (obj is DiagonalComplexMatrix) {
       DiagonalComplexMatrix other = obj;
       double epsilon = EPSILON;
@@ -502,7 +500,7 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
       }
       return true;
     } else {
-      return super ==(obj);
+      return super.equals(obj);
     }
   }
 

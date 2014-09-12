@@ -97,9 +97,7 @@ class SparseComplexVector extends AbstractComplexVector {
     }
   }
 
-  Map<int, Float64List> elements() {
-    return _elements;
-  }
+  Object get elements => _elements;
 
   /**
    * Returns <tt>true</tt> if both matrices share at least one identical cell.
@@ -356,7 +354,7 @@ class SelectedSparseComplexVector extends AbstractComplexVector {
     return _elements[__offset + _offsets[_zero + index * _stride]];
   }
 
-  Map<int, Float64List> elements() {
+  Object get elements {
     throw new UnsupportedError("This method is not supported.");
   }
 

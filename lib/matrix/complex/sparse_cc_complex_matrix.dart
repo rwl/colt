@@ -542,7 +542,7 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
     return _rowIndexes;
   }
 
-  DZcs elements() {
+  Object get elements {
     DZcs cs = new DZcs();
     cs.m = _rows;
     cs.n = _columns;

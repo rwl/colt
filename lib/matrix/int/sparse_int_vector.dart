@@ -68,8 +68,9 @@ class SparseIntVector extends AbstractIntVector {
    * @param values
    *            The values to be filled into the new matrix.
    */
-  factory SparseIntVector.fromList(Int32List values) {
-    return new SparseIntVector(values.length)..setAll(values);
+  factory SparseIntVector.fromList(List<int> values) {
+    return new SparseIntVector(values.length)
+      ..setAll(values);
   }
 
   /**
@@ -164,9 +165,7 @@ class SparseIntVector extends AbstractIntVector {
    *
    * @return the elements
    */
-  Map<int, int> elements() {
-    return _elements;
-  }
+  Object get elements => _elements;
 
   /**
    * Ensures that the receiver can hold at least the specified number of
@@ -368,7 +367,7 @@ class SparseIntVector extends AbstractIntVector {
    *            the offsets of the visible elements.
    * @return a new view.
    */
-  AbstractIntVector _viewSelectionLike(Int32List offsets) {
+  AbstractIntVector _viewSelectionLike(List<int> offsets) {
     return new SelectedSparseIntVector(this._elements, offsets);
   }
 }
@@ -420,7 +419,7 @@ class SelectedSparseIntVector extends AbstractIntVector {
   /**
    * The offsets of visible indexes of this matrix.
    */
-  Int32List _offsets;
+  List<int> _offsets;
 
   /**
    * The offset.
@@ -435,7 +434,7 @@ class SelectedSparseIntVector extends AbstractIntVector {
    * @param indexes
    *            The indexes of the cells that shall be visible.
    */
-  factory SelectedSparseIntVector(Map<int, int> elements, Int32List offsets) {
+  factory SelectedSparseIntVector(Map<int, int> elements, List<int> offsets) {
     return new SelectedSparseIntVector._internal(offsets.length, elements, 0, 1, offsets, 0);
   }
 
@@ -455,7 +454,7 @@ class SelectedSparseIntVector extends AbstractIntVector {
    *            the offsets of the cells that shall be visible.
    * @param offset
    */
-  SelectedSparseIntVector._internal(int size, Map<int, int> elements, int zero, int stride, Int32List offsets, int offset) {
+  SelectedSparseIntVector._internal(int size, Map<int, int> elements, int zero, int stride, List<int> offsets, int offset) {
     _setUp(size, zero, stride);
 
     this._elements = elements;
@@ -464,7 +463,7 @@ class SelectedSparseIntVector extends AbstractIntVector {
     this._isNoView = false;
   }
 
-  Map<int, int> elements() {
+  Object get elements {
     throw new ArgumentError("This method is not supported.");
   }
 
@@ -615,7 +614,7 @@ class SelectedSparseIntVector extends AbstractIntVector {
    *            the offsets of the visible elements.
    * @return a new view.
    */
-  AbstractIntVector _viewSelectionLike(Int32List offsets) {
+  AbstractIntVector _viewSelectionLike(List<int> offsets) {
     return new SelectedSparseIntVector(this._elements, offsets);
   }
 }

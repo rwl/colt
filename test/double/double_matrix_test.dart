@@ -17,7 +17,7 @@ void testDoubleMatrix(String name, DoubleMatrixTest t) {
     test('assignProc', t.testAssignProc);
     test('assignProcFunc', t.testAssignProcFunc);
     test('cardinality', t.testCardinality);
-    test('equalsValue', t.testEqualsValue);
+    test('all', t.testAll);
     test('equals', t.testEquals);
     test('forEachNonZero', t.testForEachNonZero);
     test('maxLocation', t.testMaxLocation);
@@ -281,16 +281,16 @@ abstract class DoubleMatrixTest {
     expect(A.rows * A.columns, equals(card));
   }
 
-  testEqualsValue() {
+  testAll() {
     double value = 1.0;
     A.fill(value);
-    expect(A == value, isTrue);
-    expect(A == 2, isFalse);
+    expect(A.all(value), isTrue);
+    expect(A.all(2.0), isFalse);
   }
 
   testEquals() {
-    expect(A == A, isTrue);
-    expect(A == B, isFalse);
+    expect(A.equals(A), isTrue);
+    expect(A.equals(B), isFalse);
   }
 
   testForEachNonZero() {

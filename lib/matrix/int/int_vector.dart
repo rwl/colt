@@ -179,7 +179,7 @@ class IntVector extends AbstractIntVector {
     }
     final int zeroOther = other.index(0);
     final int strideOther = other.stride();
-    final Int32List elemsOther = other.elements() as Int32List;
+    final Int32List elemsOther = other.elements as Int32List;
     int a = 0;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
@@ -473,7 +473,7 @@ class IntVector extends AbstractIntVector {
     checkSize(y);
     final int zeroOther = y.index(0);
     final int strideOther = y.stride();
-    final Int32List elemsOther = y.elements() as Int32List;
+    final Int32List elemsOther = y.elements as Int32List;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
@@ -673,20 +673,31 @@ class IntVector extends AbstractIntVector {
     return cardinality;
   }
 
-  Int32List elements() {
-    return _elements;
-  }
+  Object get elements => _elements;
 
-  void nonZeros({List<int> indexList: null, final List<int> valueList: null}) {
-    indexList.clear();
-    valueList.clear();
+  void nonZeros({List<int> indexList: null, final List<int> valueList: null, int maxCardinality: null}) {
+    if (maxCardinality != null) {
+      super.nonZeros(indexList: indexList, valueList: valueList, maxCardinality: maxCardinality);
+    }
+    bool fillIndexList = indexList != null;
+    bool fillValueList = valueList != null;
+    if (fillIndexList) {
+      indexList.clear();
+    }
+    if (fillValueList) {
+      valueList.clear();
+    }
     int idx = _zero;
     int rem = _size % 2;
     if (rem == 1) {
       int value = _elements[idx];
       if (value != 0) {
-        indexList.add(0);
-        valueList.add(value);
+        if (fillIndexList) {
+          indexList.add(0);
+        }
+        if (fillValueList) {
+          valueList.add(value);
+        }
       }
       idx += _stride;
 
@@ -694,29 +705,47 @@ class IntVector extends AbstractIntVector {
     for (int i = rem; i < _size; i += 2) {
       int value = _elements[idx];
       if (value != 0) {
-        indexList.add(i);
-        valueList.add(value);
+        if (fillIndexList) {
+          indexList.add(i);
+        }
+        if (fillValueList) {
+          valueList.add(value);
+        }
       }
       idx += _stride;
       value = _elements[idx];
       if (value != 0) {
-        indexList.add(i + 1);
-        valueList.add(value);
+        if (fillIndexList) {
+          indexList.add(i + 1);
+        }
+        if (fillValueList) {
+          valueList.add(value);
+        }
       }
       idx += _stride;
     }
   }
 
   void positiveValues({List<int> indexList: null, final List<int> valueList: null}) {
-    indexList.clear();
-    valueList.clear();
+    bool fillIndexList = indexList != null;
+    bool fillValueList = valueList != null;
+    if (fillIndexList) {
+      indexList.clear();
+    }
+    if (fillValueList) {
+      valueList.clear();
+    }
     int idx = _zero;
     int rem = _size % 2;
     if (rem == 1) {
       int value = _elements[idx];
       if (value > 0) {
-        indexList.add(0);
-        valueList.add(value);
+        if (fillIndexList) {
+          indexList.add(0);
+        }
+        if (fillValueList) {
+          valueList.add(value);
+        }
       }
       idx += _stride;
 
@@ -724,29 +753,47 @@ class IntVector extends AbstractIntVector {
     for (int i = rem; i < _size; i += 2) {
       int value = _elements[idx];
       if (value > 0) {
-        indexList.add(i);
-        valueList.add(value);
+        if (fillIndexList) {
+          indexList.add(i);
+        }
+        if (fillValueList) {
+          valueList.add(value);
+        }
       }
       idx += _stride;
       value = _elements[idx];
       if (value > 0) {
-        indexList.add(i + 1);
-        valueList.add(value);
+        if (fillIndexList) {
+          indexList.add(i + 1);
+        }
+        if (fillValueList) {
+          valueList.add(value);
+        }
       }
       idx += _stride;
     }
   }
 
   void negativeValues({List<int> indexList: null, final List<int> valueList: null}) {
-    indexList.clear();
-    valueList.clear();
+    bool fillIndexList = indexList != null;
+    bool fillValueList = valueList != null;
+    if (fillIndexList) {
+      indexList.clear();
+    }
+    if (fillValueList) {
+      valueList.clear();
+    }
     int idx = _zero;
     int rem = _size % 2;
     if (rem == 1) {
       int value = _elements[idx];
       if (value < 0) {
-        indexList.add(0);
-        valueList.add(value);
+        if (fillIndexList) {
+          indexList.add(0);
+        }
+        if (fillValueList) {
+          valueList.add(value);
+        }
       }
       idx += _stride;
 
@@ -754,14 +801,22 @@ class IntVector extends AbstractIntVector {
     for (int i = rem; i < _size; i += 2) {
       int value = _elements[idx];
       if (value < 0) {
-        indexList.add(i);
-        valueList.add(value);
+        if (fillIndexList) {
+          indexList.add(i);
+        }
+        if (fillValueList) {
+          valueList.add(value);
+        }
       }
       idx += _stride;
       value = _elements[idx];
       if (value < 0) {
-        indexList.add(i + 1);
-        valueList.add(value);
+        if (fillIndexList) {
+          indexList.add(i + 1);
+        }
+        if (fillValueList) {
+          valueList.add(value);
+        }
       }
       idx += _stride;
     }
@@ -902,7 +957,7 @@ class IntVector extends AbstractIntVector {
       throw new ArgumentError("rows*columns != size");
     }
     AbstractIntMatrix M = new IntMatrix(rows, columns);
-    final Int32List elemsOther = M.elements() as Int32List;
+    final Int32List elemsOther = M.elements as Int32List;
     final int zeroOther = M.index(0, 0);
     final int rowStrideOther = M.rowStride;
     final int colStrideOther = M.columnStride;
@@ -949,7 +1004,7 @@ class IntVector extends AbstractIntVector {
       throw new ArgumentError("slices*rows*columns != size");
     }
     IntMatrix3D M = new DenseIntMatrix3D(slices, rows, columns);
-    final Int32List elemsOther = M.elements() as Int32List;
+    final Int32List elemsOther = M.elements as Int32List;
     final int zeroOther = M.index(0, 0, 0);
     final int sliceStrideOther = M.sliceStride();
     final int rowStrideOther = M.rowStride();
@@ -1051,7 +1106,7 @@ class IntVector extends AbstractIntVector {
     //}
   }
 
-  void fillList(Int32List values) {
+  void fillList(List<int> values) {
     if (values.length < _size) {
       throw new ArgumentError("values too small");
     }
@@ -1287,7 +1342,7 @@ class IntVector extends AbstractIntVector {
     return _zero + rank * _stride;
   }
 
-  AbstractIntVector _viewSelectionLike(Int32List offsets) {
+  AbstractIntVector _viewSelectionLike(List<int> offsets) {
     return new SelectedDenseIntVector.offset(this._elements, offsets);
   }
 
@@ -1347,7 +1402,7 @@ class SelectedDenseIntVector extends AbstractIntVector {
   Int32List _elements;
 
   /** The offsets of visible indexes of this matrix. */
-  Int32List _offsets;
+  List<int> _offsets;
 
   /** The offset. */
   int __offset;
@@ -1360,7 +1415,7 @@ class SelectedDenseIntVector extends AbstractIntVector {
    * @param indexes
    *            The indexes of the cells that shall be visible.
    */
-  factory SelectedDenseIntVector.offset(Int32List elements, Int32List offsets) {
+  factory SelectedDenseIntVector.offset(Int32List elements, List<int> offsets) {
     return new SelectedDenseIntVector(offsets.length, elements, 0, 1, offsets, 0);
   }
 
@@ -1380,7 +1435,7 @@ class SelectedDenseIntVector extends AbstractIntVector {
    *            the offsets of the cells that shall be visible.
    * @param offset
    */
-  SelectedDenseIntVector(int size, Int32List elements, int zero, int stride, Int32List offsets, int offset) {
+  SelectedDenseIntVector(int size, Int32List elements, int zero, int stride, List<int> offsets, int offset) {
     _setUp(size, zero, stride);
 
     this._elements = elements;
@@ -1389,7 +1444,7 @@ class SelectedDenseIntVector extends AbstractIntVector {
     this._isNoView = false;
   }
 
-  Int32List elements() {
+  Object get elements {
     throw new ArgumentError("This method is not supported.");
   }
 
@@ -1535,7 +1590,7 @@ class SelectedDenseIntVector extends AbstractIntVector {
    *            the offsets of the visible elements.
    * @return a new view.
    */
-  AbstractIntVector _viewSelectionLike(Int32List offsets) {
+  AbstractIntVector _viewSelectionLike(List<int> offsets) {
     return new SelectedDenseIntVector.offset(this._elements, offsets);
   }
 

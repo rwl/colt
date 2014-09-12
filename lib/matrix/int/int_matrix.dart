@@ -237,8 +237,8 @@ class IntMatrix extends AbstractIntMatrix {
     }
     final int zero = index(0, 0);
     final int size = rowList.length;
-    final Int32List rowElements = rowList;//.elements();
-    final Int32List columnElements = columnList;//.elements();
+    final Int32List rowElements = rowList;//.elements;
+    final Int32List columnElements = columnList;//.elements;
     int a = 0;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -282,7 +282,7 @@ class IntMatrix extends AbstractIntMatrix {
     final int zeroOther = other.index(0, 0);
     final int rowStrideOther = other.rowStride;
     final int colStrideOther = other.columnStride;
-    final Int32List elemsOther = other.elements() as Int32List;
+    final Int32List elemsOther = other.elements as Int32List;
     int a = 0;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -965,12 +965,12 @@ class IntMatrix extends AbstractIntMatrix {
     //}
   }
 
-  void forEachWithRange(final AbstractIntMatrix y, final ifunc.IntIntFunction function, Int32List rowList, Int32List columnList) {
+  void forEachWithNonZero(final AbstractIntMatrix y, final ifunc.IntIntFunction function, Int32List rowList, Int32List columnList) {
     checkShape(y);
     final int size = rowList.length;
-    final Int32List rowElements = rowList;//.elements();
-    final Int32List columnElements = columnList;//.elements();
-    final Int32List elemsOther = y.elements() as Int32List;
+    final Int32List rowElements = rowList;//.elements;
+    final Int32List columnElements = columnList;//.elements;
+    final Int32List elemsOther = y.elements as Int32List;
     final int zeroOther = y.index(0, 0);
     final int zero = index(0, 0);
     final int columnStrideOther = y.columnStride;
@@ -1059,9 +1059,7 @@ class IntMatrix extends AbstractIntMatrix {
     return cardinality;
   }
 
-  Int32List elements() {
-    return _elements;
-  }
+  Object get elements => _elements;
 
   void forEachNonZero(final ifunc.IntIntIntFunction function) {
     final int zero = index(0, 0);
@@ -1332,7 +1330,7 @@ class IntMatrix extends AbstractIntMatrix {
     _elements[_rowZero + row * _rowStride + _columnZero + column * _columnStride] = value;
   }
 
-  List<Int32List> toList() {
+  List<List<int>> toList() {
     final List<Int32List> values = new List<Int32List>.generate(_rows, (_) => new Int32List(_columns));
     final int zero = index(0, 0);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -1378,7 +1376,7 @@ class IntMatrix extends AbstractIntMatrix {
     final int zero = index(0, 0);
     final int zeroOther = v.index(0);
     final int strideOther = v.stride();
-    final Int32List elemsOther = v.elements();
+    final Int32List elemsOther = v.elements;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _columns);
@@ -1436,8 +1434,8 @@ class IntMatrix extends AbstractIntMatrix {
       throw new ArgumentError("Incompatible args: " + toStringShort() + ", " + y.toStringShort() + ", " + z.toStringShort());
     }
 
-    final Int32List elemsY = y.elements() as Int32List;
-    final Int32List elemsZ = z.elements() as Int32List;
+    final Int32List elemsY = y.elements as Int32List;
+    final Int32List elemsZ = z.elements as Int32List;
     if (_elements == null || elemsY == null || elemsZ == null) {
       throw new Error();
     }
@@ -1821,9 +1819,9 @@ class SelectedDenseIntMatrix extends AbstractIntMatrix {
   /**
    * The offsets of the visible cells of this matrix.
    */
-  Int32List _rowOffsets;
+  List<int> _rowOffsets;
 
-  Int32List _columnOffsets;
+  List<int> _columnOffsets;
 
   /**
    * The offset.
@@ -1841,7 +1839,7 @@ class SelectedDenseIntMatrix extends AbstractIntMatrix {
    *            The column offsets of the cells that shall be visible.
    * @param offset
    */
-  factory SelectedDenseIntMatrix.offset(Int32List elements, Int32List rowOffsets, Int32List columnOffsets, int offset) {
+  factory SelectedDenseIntMatrix.offset(Int32List elements, List<int> rowOffsets, List<int> columnOffsets, int offset) {
     return new SelectedDenseIntMatrix(rowOffsets.length, columnOffsets.length, elements, 0, 0, 1, 1, rowOffsets, columnOffsets, offset);
   }
 
@@ -1870,7 +1868,7 @@ class SelectedDenseIntMatrix extends AbstractIntMatrix {
    *            The column offsets of the cells that shall be visible.
    * @param offset
    */
-  SelectedDenseIntMatrix(int rows, int columns, Int32List elements, int rowZero, int columnZero, int rowStride, int columnStride, Int32List rowOffsets, Int32List columnOffsets, int offset) {
+  SelectedDenseIntMatrix(int rows, int columns, Int32List elements, int rowZero, int columnZero, int rowStride, int columnStride, List<int> rowOffsets, List<int> columnOffsets, int offset) {
     // be sure parameters are valid, we do not check...
     _setUp(rows, columns, rowZero, columnZero, rowStride, columnStride);
 
@@ -1882,7 +1880,7 @@ class SelectedDenseIntMatrix extends AbstractIntMatrix {
     this._isNoView = false;
   }
 
-  Int32List elements() {
+  Object get elements {
     throw new ArgumentError("This method is not supported.");
   }
 
@@ -2173,7 +2171,7 @@ class SelectedDenseIntMatrix extends AbstractIntMatrix {
    * Self modifying version of viewDice().
    */
 
-  AbstractMatrix _vDice() {
+  void _vDice() {
     super._vDice();
     // swap
     Int32List tmp = _rowOffsets;
@@ -2194,7 +2192,7 @@ class SelectedDenseIntMatrix extends AbstractIntMatrix {
    *            the offsets of the visible elements.
    * @return a new view.
    */
-  AbstractIntMatrix _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets) {
+  AbstractIntMatrix _viewSelectionLike(List<int> rowOffsets, List<int> columnOffsets) {
     return new SelectedDenseIntMatrix.offset(this._elements, rowOffsets, columnOffsets, this._offset);
   }
 

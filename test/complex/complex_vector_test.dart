@@ -17,7 +17,7 @@ testComplexVector(String name, ComplexVectorTest t) {
     test('assignImaginary', t.testAssignImaginary);
     test('assignReal', t.testAssignReal);
     test('cardinality', t.testCardinality);
-    test('equalsValue', t.testEqualsValue);
+    test('all', t.testAll);
     test('equals', t.testEquals);
     test('getImaginaryPart', t.testGetImaginaryPart);
     test('getRealPart', t.testGetRealPart);
@@ -217,17 +217,17 @@ abstract class ComplexVectorTest {
     expect(A.length, equals(card));
   }
 
-  void testEqualsValue() {
+  void testAll() {
     Float64List value = new Float64List.fromList([1.0, 2.0]);
     A.fill(value[0], value[1]);
-    expect(A == value, isTrue);
-    final eq = A == new Float64List.fromList([2.0, 2.0]);
+    expect(A.all(value), isTrue);
+    final eq = A.all(new Float64List.fromList([2.0, 2.0]));
     expect(eq, isFalse);
   }
 
   void testEquals() {
-    expect(A == A, isTrue);
-    expect(A == B, isFalse);
+    expect(A.equals(A), isTrue);
+    expect(A.equals(B), isFalse);
   }
 
   void testGetImaginaryPart() {

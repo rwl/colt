@@ -133,7 +133,7 @@ class DoubleVector extends AbstractDoubleVector {
   double reduceRange(final DoubleDoubleFunction aggr, final DoubleFunction f, final /*IntArrayList*/List<int> indexList) {
     if (this.length == 0) return double.NAN;
     final int size = indexList.length;
-    final List<int> indexElements = indexList;//.elements();
+    final List<int> indexElements = indexList;//.elements;
     double a = 0.0;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
@@ -177,7 +177,7 @@ class DoubleVector extends AbstractDoubleVector {
     if (_size == 0) return double.NAN;
     final int zeroOther = other.index(0);
     final int strideOther = other.stride();
-    final Float64List elementsOther = other.elements() as Float64List;
+    final Float64List elementsOther = other.elements as Float64List;
     double a = 0.0;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
@@ -465,7 +465,7 @@ class DoubleVector extends AbstractDoubleVector {
     checkSize(y);
     final int zeroOther = y.index(0);
     final int strideOther = y.stride();
-    final Float64List elementsOther = y.elements() as Float64List;
+    final Float64List elementsOther = y.elements as Float64List;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
@@ -945,7 +945,7 @@ class DoubleVector extends AbstractDoubleVector {
       throw new ArgumentError("rows*columns != size");
     }
     AbstractDoubleMatrix M = new DoubleMatrix(rows, columns);
-    final Float64List elementsOther = M.elements() as Float64List;
+    final Float64List elementsOther = M.elements as Float64List;
     final int zeroOther = M.index(0, 0);
     final int rowStrideOther = M.rowStride;
     final int columnStrideOther = M.columnStride;
@@ -991,7 +991,7 @@ class DoubleVector extends AbstractDoubleVector {
       throw new ArgumentError("slices*rows*columns != size");
     }
     DoubleMatrix3D M = new DenseDoubleMatrix3D(slices, rows, columns);
-    final Float64List elementsOther = M.elements() as Float64List;
+    final Float64List elementsOther = M.elements as Float64List;
     final int zeroOther = M.index(0, 0, 0) as int;
     final int sliceStrideOther = M.sliceStride();
     final int rowStrideOther = M.rowStride();
@@ -1303,7 +1303,7 @@ class SelectedDenseDoubleVector extends AbstractDoubleVector {
   /**
    * The offsets of visible indexes of this matrix.
    */
-  Int32List _offsets;
+  List<int> _offsets;
 
   /**
    * The offset.
@@ -1318,7 +1318,7 @@ class SelectedDenseDoubleVector extends AbstractDoubleVector {
    * @param indexes
    *            The indexes of the cells that shall be visible.
    */
-  factory SelectedDenseDoubleVector.offset(Float64List elements, Int32List offsets) {
+  factory SelectedDenseDoubleVector.offset(Float64List elements, List<int> offsets) {
     return new SelectedDenseDoubleVector(offsets.length, elements, 0, 1, offsets, 0);
   }
 
@@ -1338,7 +1338,7 @@ class SelectedDenseDoubleVector extends AbstractDoubleVector {
    *            the offsets of the cells that shall be visible.
    * @param offset
    */
-  SelectedDenseDoubleVector(int size, Float64List elements, int zero, int stride, Int32List offsets, int offset) {
+  SelectedDenseDoubleVector(int size, Float64List elements, int zero, int stride, List<int> offsets, int offset) {
     _setUp(size, zero, stride);
 
     this._elements = elements;
@@ -1423,7 +1423,7 @@ class SelectedDenseDoubleVector extends AbstractDoubleVector {
       throw new ArgumentError("rows*columns != size");
     }
     AbstractDoubleMatrix M = new DoubleMatrix(rows, columns);
-    final Float64List elementsOther = M.elements() as Float64List;
+    final Float64List elementsOther = M.elements as Float64List;
     final int zeroOther = M.index(0, 0);
     final int rowStrideOther = M.rowStride;
     final int colStrideOther = M.columnStride;
@@ -1444,7 +1444,7 @@ class SelectedDenseDoubleVector extends AbstractDoubleVector {
       throw new ArgumentError("slices*rows*columns != size");
     }
     DoubleMatrix3D M = new DenseDoubleMatrix3D(slices, rows, columns);
-    final Float64List elementsOther = M.elements() as Float64List;
+    final Float64List elementsOther = M.elements as Float64List;
     final int zeroOther = M.index(0, 0, 0);
     final int sliceStrideOther = M.sliceStride();
     final int rowStrideOther = M.rowStride();

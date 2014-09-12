@@ -215,8 +215,8 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
   double reduceRange(final DoubleDoubleFunction aggr, final DoubleFunction f, final /*/*IntArrayList*/Int32List*/Int32List rowList, final /*/*IntArrayList*/Int32List*/Int32List columnList) {
     if (this.length == 0) return double.NAN;
     final int size = rowList.length;
-    final Int32List rowElements = rowList;//.elements();
-    final Int32List columnElements = columnList;//.elements();
+    final Int32List rowElements = rowList;//.elements;
+    final Int32List columnElements = columnList;//.elements;
     double a = 0.0;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -754,8 +754,8 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
   void forEachWithNonZero(final AbstractDoubleMatrix y, final DoubleDoubleFunction function, /*IntArrayList*/Int32List rowList, /*IntArrayList*/Int32List columnList) {
     checkShape(y);
     final int size = rowList.length;
-    final Int32List rowElements = rowList;//.elements();
-    final Int32List columnElements = columnList;//.elements();
+    final Int32List rowElements = rowList;//.elements;
+    final Int32List columnElements = columnList;//.elements;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
@@ -902,9 +902,9 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
    * @return <tt>true</tt> if all cells are equal to the given value,
    *         <tt>false</tt> otherwise.
    */
-  /*bool equalsValue(double value) {
-    return DoubleProperty.DEFAULT.equalsMatrixValue(this, value);
-  }*/
+  bool all(double value) {
+    return dprop.equalsMatrixValue(this, value);
+  }
 
   /**
    * Compares this object against the specified object. The result is
@@ -918,21 +918,21 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
    * @return <code>true</code> if the objects are the same; <code>false</code>
    *         otherwise.
    */
-  bool operator ==(var obj) {
-    if (obj is num) {
-      return dprop.equalsMatrixValue(this, obj.toDouble());
-    }
+  bool equals(AbstractDoubleMatrix obj) {
+//    if (obj is num) {
+//      return dprop.equalsMatrixValue(this, obj.toDouble());
+//    }
     if (identical(this, obj)) {
       return true;
     }
     if (obj == null) {
       return false;
     }
-    if (obj is! AbstractDoubleMatrix) {
-      return false;
-    }
+//    if (obj is! AbstractDoubleMatrix) {
+//      return false;
+//    }
 
-    return dprop.equalsMatrix(this, obj as AbstractDoubleMatrix);
+    return dprop.equalsMatrix(this, obj/* as AbstractDoubleMatrix*/);
   }
 
   /**
@@ -1709,7 +1709,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
     }
 
     //matches.trimToSize();
-    return select(new Int32List.fromList(matches)/*.elements()*/, null); // take all columns
+    return select(new Int32List.fromList(matches)/*.elements*/, null); // take all columns
   }
 
   /**

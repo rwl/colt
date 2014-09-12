@@ -94,7 +94,7 @@ class IntFactory1D {
    */
   AbstractIntVector withValues(Int32List values) {
     if (this == sparse) {
-      return new SparseIntVector(values);
+      return new SparseIntVector.fromList(values);
     } else {
       return new IntVector.fromList(values);
     }
@@ -156,7 +156,7 @@ class IntFactory1D {
     int size = values.length;
     AbstractIntVector vector = make(size);
     for (int i = size; --i >= 0; ) {
-      vector.put(i, values[i]);
+      vector[i] = values[i];
     }
     return vector;
   }
@@ -241,7 +241,7 @@ class IntFactory1D {
     final list = new Int32List(size);
     //list.setSize(size);
     for (int i = size; --i >= 0; ) {
-      list[i] = values.at(i);
+      list[i] = values[i];
     }
     return list;
   }
@@ -1070,7 +1070,7 @@ class IntFactory2D {
    */
   AbstractIntMatrix withValues(List<Int32List> values) {
     if (this == sparse) {
-      return new SparseIntMatrix(values);
+      return new SparseIntMatrix.fromList(values);
     } else {
       return new IntMatrix.fromList(values);
     }

@@ -83,16 +83,16 @@ class WrapperDoubleMatrix extends AbstractDoubleMatrix {
     }
   }
 
-  Object get elements => _content.elements();
+  Object get elements => _content.elements;
 
   double get(int row, int column) {
     return _content.get(row, column);
   }
 
-  /*bool equalsValue(double value) {
+  bool all(double value) {
     if (_content is DiagonalDoubleMatrix) {
-      double epsilon = DoubleProperty.DEFAULT.tolerance();
-      Float64List elements = _content.elements() as Float64List;
+      double epsilon = EPSILON;
+      Float64List elements = _content.elements as Float64List;
       for (int r = 0; r < elements.length; r++) {
         double x = elements[r];
         double diff = (value - x).abs();
@@ -105,16 +105,16 @@ class WrapperDoubleMatrix extends AbstractDoubleMatrix {
       }
       return true;
     } else {
-      return super.==(value);
+      return super.all(value);
     }
-  }*/
+  }
 
-  bool operator ==(var obj) {
-    if (obj is num) {
+  bool equals(AbstractDoubleMatrix obj) {
+    /*if (obj is num) {
       final value = obj;
       if (_content is DiagonalDoubleMatrix) {
         double epsilon = EPSILON;
-        Float64List elements = _content.elements() as Float64List;
+        Float64List elements = _content.elements as Float64List;
         for (int r = 0; r < elements.length; r++) {
           double x = elements[r];
           double diff = (value - x).abs();
@@ -128,7 +128,7 @@ class WrapperDoubleMatrix extends AbstractDoubleMatrix {
         return true;
       }
       return super ==(value);
-    }
+    }*/
 
     if (_content is DiagonalDoubleMatrix && obj is DiagonalDoubleMatrix) {
       double epsilon = EPSILON;
@@ -143,8 +143,8 @@ class WrapperDoubleMatrix extends AbstractDoubleMatrix {
       if (A.columns != B.columns || A.rows != B.rows || A.diagonalIndex != B.diagonalIndex || A.diagonalLength != B.diagonalLength) {
         return false;
       }
-      Float64List AElements = A.elements();
-      Float64List BElements = B.elements();
+      Float64List AElements = A.elements;
+      Float64List BElements = B.elements;
       for (int r = 0; r < AElements.length; r++) {
         double x = AElements[r];
         double value = BElements[r];

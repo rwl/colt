@@ -51,9 +51,7 @@ class LargeComplexMatrix extends WrapperComplexMatrix {
     _elements[row][2 * column + 1] = im;
   }
 
-  List<Float64List> elements() {
-    return _elements;
-  }
+  Object get elements => _elements;
 
   AbstractComplexMatrix _getContent() {
     return this;

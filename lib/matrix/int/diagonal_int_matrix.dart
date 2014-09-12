@@ -53,7 +53,7 @@ class DiagonalIntMatrix extends WrapperIntMatrix {
    *             <tt>for any 1 &lt;= row &lt; values.length: values[row].length != values[row-1].length || index < -rows+1 || index > columns - 1</tt>
    *             .
    */
-  factory DiagonalIntMatrix.fromList(List<Int32List> values, int dindex) {
+  factory DiagonalIntMatrix.fromList(List<List<int>> values, int dindex) {
     return new DiagonalIntMatrix(values.length, values.length == 0 ? 0 : values[0].length, dindex)
       ..setAll2D(values);
   }
@@ -144,7 +144,7 @@ class DiagonalIntMatrix extends WrapperIntMatrix {
     return;
   }
 
-  void setAll(final Int32List values) {
+  void setAll(final List<int> values) {
     if (values.length != _dlength) {
       throw new ArgumentError("Must have same length: length=${values.length} dlength=$_dlength");
     }
@@ -171,7 +171,7 @@ class DiagonalIntMatrix extends WrapperIntMatrix {
     return;
   }
 
-  void setAll2D(final List<Int32List> values) {
+  void setAll2D(final List<List<int>> values) {
     if (values.length != _rows) {
       throw new ArgumentError("Must have same number of rows: rows=${values.length} rows()=$rows");
     }
@@ -337,11 +337,9 @@ class DiagonalIntMatrix extends WrapperIntMatrix {
     return cardinality;
   }
 
-  Int32List elements() {
-    return _elements;
-  }
+  Object get elements => _elements;
 
-  bool equalsValue(int value) {
+  bool all(int value) {
     for (int r = 0; r < _dlength; r++) {
       int x = _elements[r];
       int diff = value - x;
@@ -352,7 +350,7 @@ class DiagonalIntMatrix extends WrapperIntMatrix {
     return true;
   }
 
-  bool equals(Object obj) {
+  bool equals(AbstractIntMatrix obj) {
     if (obj is DiagonalIntMatrix) {
       DiagonalIntMatrix other = obj;
       if (this == obj) {

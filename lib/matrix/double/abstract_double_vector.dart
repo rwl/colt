@@ -559,7 +559,7 @@ abstract class AbstractDoubleVector extends AbstractVector {
    */
   void forEachWithNonZero(AbstractDoubleVector y, DoubleDoubleFunction function, /*IntArrayList*/Int32List nonZeroIndexes) {
     checkSize(y);
-    Int32List nonZeroElements = nonZeroIndexes;//.elements();
+    Int32List nonZeroElements = nonZeroIndexes;//.elements;
 
     // specialized for speed
     if (function == func.mult) { // x[i] = x[i] * y[i]
@@ -675,9 +675,9 @@ abstract class AbstractDoubleVector extends AbstractVector {
    * @return <tt>true</tt> if all cells are equal to the given value,
    *         <tt>false</tt> otherwise.
    */
-  /*bool equalsValue(double value) {
-    return DoubleProperty.DEFAULT.equals(this, value);
-  }*/
+  bool all(double value) {
+    return dprop.equals(this, value);
+  }
 
   /**
    * Compares this object against the specified object. The result is
@@ -691,21 +691,21 @@ abstract class AbstractDoubleVector extends AbstractVector {
    * @return <code>true</code> if the objects are the same; <code>false</code>
    *         otherwise.
    */
-  bool operator ==(var obj) {
-    if (obj is num) {
-      return dprop.equals(this, obj.toDouble());
-    }
+  bool equals(AbstractDoubleVector obj) {
+//    if (obj is num) {
+//      return dprop.equals(this, obj.toDouble());
+//    }
     if (identical(this, obj)) {
       return true;
     }
     if (obj == null) {
       return false;
     }
-    if (obj is! AbstractDoubleVector) {
-      return false;
-    }
+//    if (obj is! AbstractDoubleVector) {
+//      return false;
+//    }
 
-    return dprop.equalsVector(this, obj as AbstractDoubleVector);
+    return dprop.equalsVector(this, obj/* as AbstractDoubleVector*/);
   }
 
   /**
@@ -1316,7 +1316,7 @@ abstract class AbstractDoubleVector extends AbstractVector {
    */
   String toString() {
     //return new DoubleFormatter().toStringDouble1D(this);
-    return this.elements().toString();
+    return this.elements.toString();
   }
 
   /**
@@ -1400,7 +1400,7 @@ abstract class AbstractDoubleVector extends AbstractVector {
       if (condition(get(i))) matches.add(i);
     }
     //matches.trimToSize();
-    return select(new Int32List.fromList(matches)/*.elements()*/);
+    return select(new Int32List.fromList(matches)/*.elements*/);
   }
 
   /**
@@ -1600,7 +1600,7 @@ abstract class AbstractDoubleVector extends AbstractVector {
     /*IntArrayList*/Int32List indexesCopy = new Int32List.fromList(nonZeroIndexes);
     //indexesCopy.trimToSize();
     indexesCopy.sort();
-    Int32List nonZeroIndexElements = indexesCopy;//.elements();
+    Int32List nonZeroIndexElements = indexesCopy;//.elements;
     int index = 0;
     int s = indexesCopy.length;
     // skip to start

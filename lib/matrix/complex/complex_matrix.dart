@@ -212,7 +212,7 @@ class ComplexMatrix extends AbstractComplexMatrix {
     final int zeroOther = other.index(0, 0);
     final int rowStrideOther = other.rowStride;
     final int columnStrideOther = other.columnStride;
-    final Float64List elemsOther = other.elements() as Float64List;
+    final Float64List elemsOther = other.elements as Float64List;
     Float64List a = null;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -957,7 +957,7 @@ class ComplexMatrix extends AbstractComplexMatrix {
     final int rowStrideOther = other.rowStride;
     final int zeroOther = other.index(0, 0);
     final int zero = index(0, 0);
-    final Float64List elemsOther = (other as DoubleMatrix).elements();
+    final Float64List elemsOther = (other as DoubleMatrix).elements;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
@@ -1006,7 +1006,7 @@ class ComplexMatrix extends AbstractComplexMatrix {
     final int rowStrideOther = other.rowStride;
     final int zeroOther = other.index(0, 0);
     final int zero = index(0, 0);
-    final Float64List elemsOther = (other as DoubleMatrix).elements();
+    final Float64List elemsOther = (other as DoubleMatrix).elements;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
@@ -1193,13 +1193,11 @@ class ComplexMatrix extends AbstractComplexMatrix {
     return transpose;
   }
 
-  Float64List elements() {
-    return _elements;
-  }
+  Float64List get elements => _elements;
 
   AbstractDoubleMatrix imaginary() {
     final DoubleMatrix Im = new DoubleMatrix(_rows, _columns);
-    final Float64List elemsOther = Im.elements();
+    final Float64List elemsOther = Im.elements;
     final int columnStrideOther = Im.columnStride;
     final int rowStrideOther = Im.rowStride;
     final int zeroOther = Im.index(0, 0);
@@ -1277,7 +1275,7 @@ class ComplexMatrix extends AbstractComplexMatrix {
 
   AbstractDoubleMatrix real() {
     final DoubleMatrix R = new DoubleMatrix(_rows, _columns);
-    final Float64List elemsOther = R.elements();
+    final Float64List elemsOther = R.elements;
     final int columnStrideOther = R.columnStride;
     final int rowStrideOther = R.rowStride;
     final int zeroOther = R.index(0, 0);
@@ -1391,7 +1389,7 @@ class ComplexMatrix extends AbstractComplexMatrix {
     final int zero = index(0, 0);
     final int zeroOther = v.index(0);
     final int strideOther = v.stride();
-    final Float64List elemsOther = v.elements() as Float64List;
+    final Float64List elemsOther = v.elements as Float64List;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_rows * _columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _columns);
@@ -1451,8 +1449,8 @@ class ComplexMatrix extends AbstractComplexMatrix {
     if (_columns != y.length || _rows > zz.length) {
       throw new ArgumentError("Incompatible args: " + toStringShort() + ", " + y.toStringShort() + ", " + zz.toStringShort());
     }
-    final Float64List elemsY = y.elements() as Float64List;
-    final Float64List elemsZ = zz.elements() as Float64List;
+    final Float64List elemsY = y.elements as Float64List;
+    final Float64List elemsZ = zz.elements as Float64List;
     if (_elements == null || elemsY == null || elemsZ == null) {
       throw new Error();
     }
@@ -1937,7 +1935,7 @@ class SelectedDenseComplexMatrix extends AbstractComplexMatrix {
     return new Float64List.fromList([_elements[_offset + _rowOffsets[idxr] + _columnOffsets[idxc]], _elements[_offset + _rowOffsets[idxr] + _columnOffsets[idxc] + 1]]);
   }
 
-  Float64List elements() {
+  Object get elements {
     throw new UnsupportedError("This method is not supported.");
 
   }

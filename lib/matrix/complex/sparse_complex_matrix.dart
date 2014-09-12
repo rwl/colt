@@ -146,9 +146,7 @@ class SparseComplexMatrix extends AbstractComplexMatrix {
     }
   }
 
-  Map<int, Float64List> elements() {
-    return _elements;
-  }
+  Object get elements => _elements;
 
   /**
    * Returns <tt>true</tt> if both matrices share common cells. More formally,
@@ -393,7 +391,7 @@ class SelectedSparseComplexMatrix extends AbstractComplexMatrix {
     return _elements[_offset + _rowOffsets[_rowZero + row * _rowStride] + _columnOffsets[_columnZero + column * _columnStride]];
   }
 
-  Map<int, Float64List> elements() {
+  Object get elements {
     throw new UnsupportedError("This method is not supported.");
   }
 
