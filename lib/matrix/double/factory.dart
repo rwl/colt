@@ -82,14 +82,14 @@ class DoubleFactory1D {
    *            The values to be filled into the new matrix.
    * @return a new matrix.
    */
-  AbstractDoubleVector makeList(List<double> values) {
+  /*AbstractDoubleVector makeList(List<double> values) {
     int size = values.length;
     AbstractDoubleVector vector = make(size);
     for (int i = size; --i >= 0; ) {
       vector.set(i, values[i]);
     }
     return vector;
-  }
+  }*/
 
   /**
    * Constructs a matrix with the given cell values. The values are copied. So
@@ -99,7 +99,7 @@ class DoubleFactory1D {
    * @param values
    *            The values to be filled into the new matrix.
    */
-  AbstractDoubleVector makeValues(Float64List values) {
+  AbstractDoubleVector fromList(List<double> values) {
     if (this == sparse) {
       return new SparseDoubleVector.fromList(values);
     } else {
@@ -111,7 +111,7 @@ class DoubleFactory1D {
    * Constructs a matrix which is the concatenation of all given parts. Cells
    * are copied.
    */
-  AbstractDoubleVector makeParts(List<AbstractDoubleVector> parts) {
+  AbstractDoubleVector concat(List<AbstractDoubleVector> parts) {
     if (parts.length == 0) return make(0);
 
     int size = 0;
@@ -142,7 +142,7 @@ class DoubleFactory1D {
    * Constructs a matrix with the given shape, each cell initialized with the
    * given value.
    */
-  AbstractDoubleVector makeValue(int size, double initialValue) {
+  AbstractDoubleVector fill(int size, double initialValue) {
     return make(size)..fill(initialValue);
   }
 
@@ -322,7 +322,7 @@ class DoubleFactory2D {
    * @throws IllegalArgumentException
    *             if the array is not rectangular.
    */
-  static void _checkRectangularShape(List<Float64List> array) {
+  static void _checkRectangularShape(List<List<double>> array) {
     int columns = -1;
     for (int row = array.length; --row >= 0; ) {
       if (array[row] != null) {
@@ -940,7 +940,7 @@ class DoubleFactory2D {
    *
    * @return a new matrix.
    */
-  AbstractDoubleMatrix diagonal(Float64List vector) {
+  AbstractDoubleMatrix diagonal(List<double> vector) {
     int size = vector.length;
     AbstractDoubleMatrix diag = make(size, size);
     for (int i = 0; i < size; i++) {
@@ -1025,7 +1025,7 @@ class DoubleFactory2D {
    *                <tt>values.length</tt> must be a multiple of <tt>rows</tt>
    *                .
    */
-  AbstractDoubleMatrix makeColumn(Float64List values, int rows) {
+  AbstractDoubleMatrix makeColumn(List<double> values, int rows) {
     int columns = (rows != 0 ? values.length / rows : 0);
     if (rows * columns != values.length) {
       throw new ArgumentError("Array length must be a multiple of m.");
@@ -1055,7 +1055,7 @@ class DoubleFactory2D {
    *             <tt>for any 1 &lt;= row &lt; values.length: values[row].length != values[row-1].length</tt>
    *             .
    */
-  AbstractDoubleMatrix makeValues(List<Float64List> values) {
+  AbstractDoubleMatrix fromList(List<List<double>> values) {
     if (this == sparse) {
       return new SparseDoubleMatrix.fromList(values);
     } else {
@@ -1079,7 +1079,7 @@ class DoubleFactory2D {
    * Constructs a matrix with the given shape, each cell initialized with the
    * given value.
    */
-  AbstractDoubleMatrix makeValue(int rows, int columns, double initialValue) {
+  AbstractDoubleMatrix fill(int rows, int columns, double initialValue) {
     if (initialValue == 0) return make(rows, columns);
     return make(rows, columns)..fill(initialValue);
   }

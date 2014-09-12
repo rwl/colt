@@ -136,7 +136,7 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
    *             <tt>for any 1 &lt;= row &lt; values.length: values[row].length != values[row-1].length</tt>
    *             .
    */
-  factory SparseCCDoubleMatrix.fromList(List<Float64List> values) {
+  factory SparseCCDoubleMatrix.fromList(List<List<double>> values) {
     return new SparseCCDoubleMatrix(values.length, values[0].length)
       ..setAll2D(values);
   }
@@ -253,7 +253,7 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
    * @param sortRowIndexes
    *            if true, then row indexes are sorted
    */
-  factory SparseCCDoubleMatrix.withValue(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, double value, bool removeDuplicates, bool sortRowIndexes) {
+  factory SparseCCDoubleMatrix.withValue(int rows, int columns, List<int> rowIndexes, List<int> columnIndexes, double value, bool removeDuplicates, bool sortRowIndexes) {
     /*try {
       _setUp(rows, columns);
     } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
@@ -279,7 +279,9 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
     int p;
     for (int k = 0; k < nz; k++) {
       Ci[p = w[columnIndexes[k]]++] = rowIndexes[k];
-      if (Cx != null) Cx[p] = value;
+      if (Cx != null) {
+        Cx[p] = value;
+      }
     }
     if (removeDuplicates) {
       if (!cs_dupl(dcs)) { //remove duplicates
@@ -321,7 +323,7 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
    * @param sortRowIndexes
    *            if true, then row indexes are sorted
    */
-  factory SparseCCDoubleMatrix.withValues(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, Float64List values, [bool removeDuplicates=false, bool removeZeroes=false, bool sortRowIndexes=false]) {
+  factory SparseCCDoubleMatrix.withValues(int rows, int columns, List<int> rowIndexes, List<int> columnIndexes, List<double> values, [bool removeDuplicates=false, bool removeZeroes=false, bool sortRowIndexes=false]) {
     /*try {
       _setUp(rows, columns);
     } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
@@ -343,7 +345,9 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
     int p;
     for (int k = 0; k < nz; k++) {
       Ci[p = w[columnIndexes[k]]++] = rowIndexes[k];
-      if (Cx != null) Cx[p] = values[k];
+      if (Cx != null) {
+        Cx[p] = values[k];
+      }
     }
     if (removeZeroes) {
       cs_dropzeros(dcs); //remove zeroes
@@ -423,14 +427,14 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
       }
       this._dcs.i.setAll(0, other.rowIndexes);
       //System.arraycopy(other.getRowIndexes(), 0, this._dcs.i, 0, nzmax);
-      this._dcs.x.setAll(0, other.values());
+      this._dcs.x.setAll(0, other.values);
       //System.arraycopy(other.getValues(), 0, this._dcs.x, 0, nzmax);
       _rowIndexesSorted = other._rowIndexesSorted;
     } else if (source is SparseRCDoubleMatrix) {
-      SparseRCDoubleMatrix other = source.getTranspose();
-      this._dcs.p = other.getRowPointers();
-      this._dcs.i = other.getColumnIndexes();
-      this._dcs.x = other.getValues();
+      SparseRCDoubleMatrix other = source.transpose();
+      this._dcs.p = other.rowPointers;
+      this._dcs.i = other.columnIndexes;
+      this._dcs.x = other.values;
       this._dcs.nzmax = this._dcs.x.length;
       _rowIndexesSorted = true;
     } else {
@@ -442,7 +446,7 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
     }
   }
 
-  void forEachMatrix(final AbstractDoubleMatrix y, func.DoubleDoubleFunction function) {
+  void forEachWith(final AbstractDoubleMatrix y, func.DoubleDoubleFunction function) {
     checkShape(y);
 
     if ((y is SparseCCDoubleMatrix) && (function == func.plus)) { // x[i] = x[i] + y[i]
@@ -506,16 +510,14 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
       }
       return;
     }
-    super.forEachMatrix(y, function);
+    super.forEachWith(y, function);
   }
 
   int get cardinality {
     return _dcs.p[_columns];
   }
 
-  Dcs elements() {
-    return _dcs;
-  }
+  Object get elements => _dcs;
 
   void forEachNonZero(final func.IntIntDoubleFunction function) {
     final Int32List rowIndexesA = _dcs.i;
@@ -538,9 +540,7 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
    *
    * @return column pointers
    */
-  Int32List get columnPointers {
-    return _dcs.p;
-  }
+  Int32List get columnPointers => _dcs.p;
 
   /**
    * Returns a new matrix that has the same elements as this matrix, but is in
@@ -588,9 +588,7 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
    *
    * @return row indexes
    */
-  Int32List get rowIndexes {
-    return _dcs.i;
-  }
+  Int32List get rowIndexes => _dcs.i;
 
   /**
    * Returns a new matrix that is the transpose of this matrix. This method
@@ -611,9 +609,7 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
    *
    * @return numerical values
    */
-  Float64List values() {
-    return _dcs.x;
-  }
+  Float64List get values => _dcs.x;
 
   /**
    * Returns true if row indexes are sorted, false otherwise
@@ -995,7 +991,7 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
     _dcs.nzmax = rowIndexes.length;
   }
 
-  static int _searchFromTo(Int32List list, int key, int from, int to) {
+  static int _searchFromTo(List<int> list, int key, int from, int to) {
     while (from <= to) {
       if (list[from] == key) {
         return from;

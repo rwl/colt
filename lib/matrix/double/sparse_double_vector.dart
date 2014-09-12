@@ -71,8 +71,9 @@ class SparseDoubleVector extends AbstractDoubleVector {
    * @param values
    *            The values to be filled into the new matrix.
    */
-  factory SparseDoubleVector.fromList(Float64List values) {
-    return new SparseDoubleVector(values.length)..setValues(values);
+  factory SparseDoubleVector.fromList(List<double> values) {
+    return new SparseDoubleVector(values.length)
+      ..setValues(values);
   }
 
   /**
@@ -172,9 +173,7 @@ class SparseDoubleVector extends AbstractDoubleVector {
    *
    * @return the elements
    */
-  Object elements() {
-    return _elements;
-  }
+  Object get elements => _elements;
 
   /**
    * Ensures that the receiver can hold at least the specified number of
@@ -375,7 +374,7 @@ class SparseDoubleVector extends AbstractDoubleVector {
    *            the offsets of the visible elements.
    * @return a new view.
    */
-  AbstractDoubleVector _viewSelectionLike(Int32List offsets) {
+  AbstractDoubleVector _viewSelectionLike(List<int> offsets) {
     return new SelectedSparseDoubleVector(this._elements, offsets);
   }
 
@@ -467,21 +466,19 @@ class SelectedSparseDoubleVector extends AbstractDoubleVector {
    *            the offsets of the cells that shall be visible.
    * @param offset
    */
-  SelectedSparseDoubleVector(Map<int, double> elements, Int32List offsets, [int size = null, int zero = 0, int stride = 1, int offset = 0]) {
+  SelectedSparseDoubleVector(Map<int, double> elements, List<int> offsets, [int size = null, int zero = 0, int stride = 1, int offset = 0]) {
     if (size == null) {
       size = offsets.length;
     }
     _setUp(size, zero, stride);
 
     this._elements = elements;
-    this._offsets = offsets;
+    this._offsets = new Int32List.fromList(offsets);
     this.__offset = offset;
     this._isNoView = false;
   }
 
-  Map<int, double> elements() {
-    return _elements;
-  }
+  Object get elements => _elements;
 
   /**
    * Returns the matrix cell value at coordinate <tt>index</tt>.
@@ -639,11 +636,11 @@ class SelectedSparseDoubleVector extends AbstractDoubleVector {
    * @param size
    *            the number of cells the matrix shall have.
    */
-  void _setUp(int size, [_, __]) {
+  /*void _setUp(int size, [_, __]) {
     super._setUp(size);
     this._stride = 1;
     this.__offset = 0;
-  }
+  }*/
 
   /**
    * Construct and returns a new selection view.
@@ -652,7 +649,7 @@ class SelectedSparseDoubleVector extends AbstractDoubleVector {
    *            the offsets of the visible elements.
    * @return a new view.
    */
-  AbstractDoubleVector _viewSelectionLike(Int32List offsets) {
+  AbstractDoubleVector _viewSelectionLike(List<int> offsets) {
     return new SelectedSparseDoubleVector(this._elements, offsets);
   }
 

@@ -55,9 +55,7 @@ class LargeDoubleMatrix extends WrapperDoubleMatrix {
     _elements[row][column] = value;
   }
 
-  List<Float64List> elements() {
-    return _elements;
-  }
+  List<List<double>> get elements => _elements;
 
   AbstractDoubleMatrix _getContent() {
     return this;

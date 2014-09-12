@@ -575,7 +575,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
    *             <tt>values.length != rows() || for any 0 &lt;= row &lt; rows(): values[row].length != columns()</tt>
    *             .
    */
-  void setAll2D(final List<Float64List> values) {
+  void setAll2D(final List<List<double>> values) {
     if (values.length != _rows) {
       throw new ArgumentError("Must have same number of rows: rows=${values.length}rows()=${rows}");
     }
@@ -892,7 +892,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
    *
    * @return the elements
    */
-  Object elements();
+  Object get elements;
 
   /**
    * Returns whether all cells are equal to the given value.
@@ -1404,7 +1404,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
    *
    * @return an array filled with the values of the cells.
    */
-  List<Float64List> toList() {
+  List<List<double>> toList() {
     final List<Float64List> values = new List<Float64List>.generate(_rows,
         (_) => new Float64List(_columns));
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -1758,7 +1758,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
    *             if <tt>!(0 <= columnIndexes[i] < columns())</tt> for any
    *             <tt>i=0..columnIndexes.length()-1</tt>.
    */
-  AbstractDoubleMatrix select(Int32List rowIndexes, Int32List columnIndexes) {
+  AbstractDoubleMatrix select(List<int> rowIndexes, List<int> columnIndexes) {
     // check for "all"
     if (rowIndexes == null) {
       rowIndexes = new Int32List(_rows);
@@ -1782,7 +1782,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
     return _viewSelectionLike(rowOffsets, columnOffsets);
   }
 
-  AbstractDoubleMatrix selectIterable(Iterable<Int32List> indexes) {
+  AbstractDoubleMatrix selectIterable(Iterable<List<int>> indexes) {
     int n = indexes.length;
     Int32List rowIndexes = new Int32List(n);
     Int32List columnIndexes = new Int32List(n);
@@ -2174,7 +2174,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
    *            the offsets of the visible elements.
    * @return a new view.
    */
-  AbstractDoubleMatrix _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets);
+  AbstractDoubleMatrix _viewSelectionLike(List<int> rowOffsets, List<int> columnOffsets);
 
   Object clone();
 

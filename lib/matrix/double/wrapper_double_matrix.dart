@@ -35,7 +35,7 @@ class WrapperDoubleMatrix extends AbstractDoubleMatrix {
     this._content = newContent;
   }
 
-  void setAll(final Float64List values) {
+  void setAll(final List<double> values) {
     if (_content is DiagonalDoubleMatrix) {
       int dlength = (_content as DiagonalDoubleMatrix)._dlength;
       final Float64List elems = (_content as DiagonalDoubleMatrix)._elements;
@@ -68,7 +68,7 @@ class WrapperDoubleMatrix extends AbstractDoubleMatrix {
     }
   }
 
-  void forEachMatrix(final AbstractDoubleMatrix y, final func.DoubleDoubleFunction function) {
+  void forEachWith(final AbstractDoubleMatrix y, final func.DoubleDoubleFunction function) {
     checkShape(y);
     if (y is WrapperDoubleMatrix) {
       final rowList = new List<int>();
@@ -83,9 +83,7 @@ class WrapperDoubleMatrix extends AbstractDoubleMatrix {
     }
   }
 
-  Object elements() {
-    return _content.elements();
-  }
+  Object get elements => _content.elements();
 
   double get(int row, int column) {
     return _content.get(row, column);
@@ -142,7 +140,7 @@ class WrapperDoubleMatrix extends AbstractDoubleMatrix {
       }
       DiagonalDoubleMatrix A = _content as DiagonalDoubleMatrix;
       DiagonalDoubleMatrix B = obj;
-      if (A.columns != B.columns || A.rows != B.rows || A.diagonalIndex() != B.diagonalIndex() || A.diagonalLength() != B.diagonalLength()) {
+      if (A.columns != B.columns || A.rows != B.rows || A.diagonalIndex != B.diagonalIndex || A.diagonalLength != B.diagonalLength) {
         return false;
       }
       Float64List AElements = A.elements();
@@ -251,7 +249,7 @@ class WrapperDoubleMatrix extends AbstractDoubleMatrix {
     return view;
   }
 
-  AbstractDoubleMatrix select(Int32List rowIndexes, Int32List columnIndexes) {
+  AbstractDoubleMatrix select(List<int> rowIndexes, List<int> columnIndexes) {
     // check for "all"
     if (rowIndexes == null) {
       rowIndexes = new Int32List(_rows);
@@ -299,7 +297,7 @@ class WrapperDoubleMatrix extends AbstractDoubleMatrix {
     throw new Error(); // should never get called
   }
 
-  AbstractDoubleMatrix _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets) {
+  AbstractDoubleMatrix _viewSelectionLike(List<int> rowOffsets, List<int> columnOffsets) {
     throw new Error(); // should never be called
   }
 

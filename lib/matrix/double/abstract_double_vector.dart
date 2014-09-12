@@ -187,7 +187,7 @@ abstract class AbstractDoubleVector extends AbstractVector {
    *             if <tt>size() != other.size()</tt>.
    * @see cern.jet.math.tdouble.DoubleFunctions
    */
-  double reduceVector(final AbstractDoubleVector other, DoubleDoubleFunction aggr, DoubleDoubleFunction f) {
+  double reduceWith(final AbstractDoubleVector other, DoubleDoubleFunction aggr, DoubleDoubleFunction f) {
     checkSize(other);
     if (_size == 0) return double.NAN;
     double a = f(get(0), other.get(0));
@@ -665,7 +665,7 @@ abstract class AbstractDoubleVector extends AbstractVector {
    *
    * @return the elements
    */
-  Object elements();
+  Object get elements;
 
   /**
    * Returns whether all cells are equal to the given value.
@@ -932,7 +932,7 @@ abstract class AbstractDoubleVector extends AbstractVector {
    * @param valueList
    *            the list to be filled with values, can have any size.
    */
-  void nonZeros({List<int> indexList: null, List<double> valueList: null}) {
+  void _nonZeros(List<int> indexList, List<double> valueList) {
     bool fillIndexList = indexList != null;
     bool fillValueList = valueList != null;
     if (fillIndexList) {
@@ -1007,7 +1007,10 @@ abstract class AbstractDoubleVector extends AbstractVector {
    * @param maxCardinality
    *            maximal cardinality
    */
-  void nonZerosCardinality(int maxCardinality, {List<int> indexList: null, List<double> valueList: null}) {
+  void nonZeros({List<int> indexList: null, List<double> valueList: null, int maxCardinality: null}) {
+    if (maxCardinality == null) {
+      return _nonZeros(indexList, valueList);
+    }
     bool fillIndexList = indexList != null;
     bool fillValueList = valueList != null;
     if (fillIndexList) {
@@ -1281,7 +1284,9 @@ abstract class AbstractDoubleVector extends AbstractVector {
    *             if <tt>values.length < size()</tt>.
    */
   void fillList(List<double> values) {
-    if (values.length < _size) throw new ArgumentError("values too small");
+    if (values.length < _size) {
+      throw new ArgumentError("values too small");
+    }
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
@@ -1429,11 +1434,13 @@ abstract class AbstractDoubleVector extends AbstractVector {
    *             if <tt>!(0 <= indexes[i] < size())</tt> for any
    *             <tt>i=0..indexes.length()-1</tt>.
    */
-  AbstractDoubleVector select(Int32List indexes) {
+  AbstractDoubleVector select(List<int> indexes) {
     // check for "all"
     if (indexes == null) {
       indexes = new Int32List(_size);
-      for (int i = 0; i < _size; i++) indexes[i] = i;
+      for (int i = 0; i < _size; i++) {
+        indexes[i] = i;
+      }
     }
 
     _checkIndexes(indexes);
@@ -1681,7 +1688,7 @@ abstract class AbstractDoubleVector extends AbstractVector {
    *            the offsets of the visible elements.
    * @return a new view.
    */
-  AbstractDoubleVector _viewSelectionLike(Int32List offsets);
+  AbstractDoubleVector _viewSelectionLike(List<int> offsets);
 
   /**
    * Returns the dot product of two vectors x and y, which is

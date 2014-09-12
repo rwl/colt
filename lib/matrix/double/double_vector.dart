@@ -53,7 +53,7 @@ class DoubleVector extends AbstractDoubleVector {
    * @param values
    *            The values to be filled into the new matrix.
    */
-  factory DoubleVector.fromList(Float64List values) {
+  factory DoubleVector.fromList(List<double> values) {
     final m = new DoubleVector(values.length);
     m.setValues(values);
     return m;
@@ -169,9 +169,9 @@ class DoubleVector extends AbstractDoubleVector {
     return a;
   }
 
-  double reduceVector(final AbstractDoubleVector other, final DoubleDoubleFunction aggr, final DoubleDoubleFunction f) {
+  double reduceWith(final AbstractDoubleVector other, final DoubleDoubleFunction aggr, final DoubleDoubleFunction f) {
     if (!(other is DoubleVector)) {
-      return super.reduceVector(other, aggr, f);
+      return super.reduceWith(other, aggr, f);
     }
     checkSize(other);
     if (_size == 0) return double.NAN;
@@ -358,7 +358,7 @@ class DoubleVector extends AbstractDoubleVector {
     //}
   }
 
-  void setValues(final Float64List values) {
+  void setValues(final List<double> values) {
     if (values.length != _size) {
       throw new ArgumentError("Must have same number of cells: length=${values.length} size()=${length}");
     }
@@ -456,7 +456,7 @@ class DoubleVector extends AbstractDoubleVector {
     //}
   }
 
-  void forEachVector(final AbstractDoubleVector y, final DoubleDoubleFunction function) {
+  void forEachWith(final AbstractDoubleVector y, final DoubleDoubleFunction function) {
     // overriden for performance only
     if (!(y is DoubleVector)) {
       super.forEachWith(y, function);
@@ -663,11 +663,12 @@ class DoubleVector extends AbstractDoubleVector {
     return cardinality;
   }
 
-  Float64List elements() {
-    return _elements;
-  }
+  Object get elements => _elements;
 
-  void nonZeros({List<int> indexList: null, List<double> valueList: null}) {
+  void nonZeros({List<int> indexList: null, List<double> valueList: null, int maxCardinality: null}) {
+    if (maxCardinality == null) {
+      return super.nonZeros(indexList: indexList, valueList: valueList, maxCardinality: maxCardinality);
+    }
     bool fillIndexList = indexList != null;
     bool fillValueList = valueList != null;
     if (fillIndexList) {
@@ -1346,9 +1347,7 @@ class SelectedDenseDoubleVector extends AbstractDoubleVector {
     this._isNoView = false;
   }
 
-  Float64List elements() {
-    return _elements;
-  }
+  Object get elements => _elements;
 
   /**
    * Returns the matrix cell value at coordinate <tt>index</tt>.
@@ -1529,7 +1528,7 @@ class SelectedDenseDoubleVector extends AbstractDoubleVector {
    *            the offsets of the visible elements.
    * @return a new view.
    */
-  AbstractDoubleVector _viewSelectionLike(Int32List offsets) {
+  AbstractDoubleVector _viewSelectionLike(List<int> offsets) {
     return new SelectedDenseDoubleVector.offset(this._elements, offsets);
   }
 

@@ -70,7 +70,7 @@ class DoubleMatrix extends AbstractDoubleMatrix {
    *             <tt>for any 1 &lt;= row &lt; values.length: values[row].length != values[row-1].length</tt>
    *             .
    */
-  factory DoubleMatrix.fromList(List<Float64List> values) {
+  factory DoubleMatrix.fromList(List<List<double>> values) {
     return new DoubleMatrix(values.length, values.length == 0 ? 0 : values[0].length)
       ..setAll2D(values);
   }
@@ -302,7 +302,7 @@ class DoubleMatrix extends AbstractDoubleMatrix {
     return a;
   }
 
-  double reduceMatrix(final AbstractDoubleMatrix other, DoubleDoubleFunction aggr, DoubleDoubleFunction f) {
+  double reduceWith(final AbstractDoubleMatrix other, DoubleDoubleFunction aggr, DoubleDoubleFunction f) {
     if (!(other is DoubleMatrix)) {
       return super.reduceMatrix(other, aggr, f);
     }
@@ -554,7 +554,7 @@ class DoubleMatrix extends AbstractDoubleMatrix {
     //}
   }
 
-  void setAll(final Float64List values) {
+  void setAll(final List<double> values) {
     if (values.length != length) {
       throw new ArgumentError("Must have same length: length=${values.length} rows()*columns()=${rows * columns}");
     }
@@ -600,7 +600,7 @@ class DoubleMatrix extends AbstractDoubleMatrix {
     }
   }
 
-  void setAll2D(final List<Float64List> values) {
+  void setAll2D(final List<List<double>> values) {
     if (values.length != _rows) {
       throw new ArgumentError("Must have same number of rows: rows=${values.length} rows()=${rows}");
     }
@@ -754,7 +754,7 @@ class DoubleMatrix extends AbstractDoubleMatrix {
     //}
   }
 
-  void forEachMatrix(final AbstractDoubleMatrix y, DoubleDoubleFunction function) {
+  void forEachWith(final AbstractDoubleMatrix y, DoubleDoubleFunction function) {
     // overriden for performance only
     if (!(y is DoubleMatrix)) {
       super.forEachWith(y, function);
@@ -983,7 +983,7 @@ class DoubleMatrix extends AbstractDoubleMatrix {
     //}
   }
 
-  void forEachMatrixRange(final AbstractDoubleMatrix y, DoubleDoubleFunction function,  /*IntArrayList*/List<int> rowList,  /*IntArrayList*/List<int> columnList) {
+  void forEachWithNonZero(final AbstractDoubleMatrix y, DoubleDoubleFunction function,  /*IntArrayList*/List<int> rowList,  /*IntArrayList*/List<int> columnList) {
     checkShape(y);
     final int size = rowList.length;
     final List<int> rowElements = rowList;//.elements();
@@ -1076,9 +1076,7 @@ class DoubleMatrix extends AbstractDoubleMatrix {
     return cardinality;
   }
 
-  Float64List elements() {
-    return _elements;
-  }
+  Object get elements => _elements;
 
   void forEachNonZero(func.IntIntDoubleFunction function) {
     final int zero = this.index(0, 0);
@@ -1404,7 +1402,7 @@ class DoubleMatrix extends AbstractDoubleMatrix {
     _elements[_rowZero + row * _rowStride + _columnZero + column * _columnStride] = value;
   }
 
-  List<Float64List> toList() {
+  List<List<double>> toList() {
     final List<Float64List> values = new List<Float64List>(_rows);//[_columns];
     final int zero = this.index(0, 0);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -1893,7 +1891,7 @@ class DoubleMatrix extends AbstractDoubleMatrix {
     return new DoubleVector(size, this._elements, zero, stride, true);
   }
 
-  AbstractDoubleMatrix _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets) {
+  AbstractDoubleMatrix _viewSelectionLike(List<int> rowOffsets, List<int> columnOffsets) {
     return new SelectedDenseDoubleMatrix.offset(this._elements, rowOffsets, columnOffsets, 0);
   }
 
@@ -1973,7 +1971,7 @@ class SelectedDenseDoubleMatrix extends AbstractDoubleMatrix {
    *            The column offsets of the cells that shall be visible.
    * @param offset
    */
-  factory SelectedDenseDoubleMatrix.offset(Float64List elements, Int32List rowOffsets, Int32List columnOffsets, int offset) {
+  factory SelectedDenseDoubleMatrix.offset(Float64List elements, List<int> rowOffsets, List<int> columnOffsets, int offset) {
     return new SelectedDenseDoubleMatrix(rowOffsets.length, columnOffsets.length, elements, 0, 0, 1, 1, rowOffsets, columnOffsets, offset, true);
   }
 
@@ -2002,21 +2000,19 @@ class SelectedDenseDoubleMatrix extends AbstractDoubleMatrix {
    *            The column offsets of the cells that shall be visible.
    * @param offset
    */
-  SelectedDenseDoubleMatrix(int rows, int columns, Float64List elements, int rowZero, int columnZero, int rowStride, int columnStride, Int32List rowOffsets, Int32List columnOffsets, int offset, bool isView) {
+  SelectedDenseDoubleMatrix(int rows, int columns, Float64List elements, int rowZero, int columnZero, int rowStride, int columnStride, List<int> rowOffsets, List<int> columnOffsets, int offset, bool isView) {
     // be sure parameters are valid, we do not check...
     _setUp(rows, columns, rowZero, columnZero, rowStride, columnStride);
 
     this._elements = elements;
-    this._rowOffsets = rowOffsets;
-    this._columnOffsets = columnOffsets;
+    this._rowOffsets = new Int32List.fromList(rowOffsets);
+    this._columnOffsets = new Int32List.fromList(columnOffsets);
     this._offset = offset;
 
     this._isNoView = !isView;
   }
 
-  Float64List elements() {
-    return _elements;
-  }
+  Object get elements => _elements;
 
   /**
    * Returns the matrix cell value at coordinate <tt>[row,column]</tt>.
@@ -2317,7 +2313,7 @@ class SelectedDenseDoubleMatrix extends AbstractDoubleMatrix {
    *            the offsets of the visible elements.
    * @return a new view.
    */
-  AbstractDoubleMatrix _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets) {
+  AbstractDoubleMatrix _viewSelectionLike(List<int> rowOffsets, List<int> columnOffsets) {
     return new SelectedDenseDoubleMatrix.offset(this._elements, rowOffsets, columnOffsets, this._offset);
   }
 

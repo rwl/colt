@@ -53,7 +53,7 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
    *             <tt>for any 1 &lt;= row &lt; values.length: values[row].length != values[row-1].length || index < -rows+1 || index > columns - 1</tt>
    *             .
    */
-  factory DiagonalDoubleMatrix.fromList(List<Float64List> values, int dindex) {
+  factory DiagonalDoubleMatrix.fromList(List<List<double>> values, int dindex) {
     return new DiagonalDoubleMatrix(values.length, values.length == 0 ? 0 : values[0].length, dindex)
       ..setAll2D(values);
   }
@@ -149,7 +149,7 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
     for (int i = _dlength; --i >= 0; ) _elements[i] = value;
   }
 
-  void setAll(final Float64List values) {
+  void setAll(final List<double> values) {
     if (values.length != _dlength) {
       throw new ArgumentError("Must have same length: length=${values.length} dlength=$_dlength");
     }
@@ -175,7 +175,7 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
     //}
   }
 
-  void setAll2D(final List<Float64List> values) {
+  void setAll2D(final List<List<double>> values) {
     if (values.length != _rows) {
       throw new ArgumentError("Must have same number of rows: rows=${values.length} rows()=${rows}");
     }
@@ -216,7 +216,7 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
     }
   }
 
-  void forEachMatrix(final AbstractDoubleMatrix y, final func.DoubleDoubleFunction function) {
+  void forEachWith(final AbstractDoubleMatrix y, final func.DoubleDoubleFunction function) {
     checkShape(y);
     if (y is DiagonalDoubleMatrix) {
       DiagonalDoubleMatrix other = y;
@@ -294,7 +294,7 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
       //}
       return;
     } else {
-      super.forEachMatrix(y, function);
+      super.forEachWith(y, function);
     }
   }
 
@@ -338,9 +338,7 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
     return cardinality;
   }
 
-  Float64List elements() {
-    return _elements;
-  }
+  Object get elements => _elements;
 
   /*bool equalsValue(double value) {
     double epsilon = DoubleProperty.DEFAULT.tolerance();
@@ -422,18 +420,14 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
    *
    * @return the length of the diagonal
    */
-  int diagonalLength() {
-    return _dlength;
-  }
+  int get diagonalLength => _dlength;
 
   /**
    * Returns the index of the diagonal
    *
    * @return the index of the diagonal
    */
-  int diagonalIndex() {
-    return _dindex;
-  }
+  int get diagonalIndex => _dindex;
 
   DoubleMatrixLocation max() {
     int location = 0;

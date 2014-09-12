@@ -61,7 +61,7 @@ class DelegateDoubleVector extends AbstractDoubleVector {
     _content.set(_row, index, value);
   }
 
-  Object elements() {
+  Object get elements {
     return _content.elements();
   }
 
@@ -73,7 +73,7 @@ class DelegateDoubleVector extends AbstractDoubleVector {
     throw new IllegalArgumentException("This method is not supported.");
   }*/
 
-  AbstractDoubleVector _viewSelectionLike(Int32List offsets) {
+  AbstractDoubleVector _viewSelectionLike(List<int> offsets) {
     throw new Error(); // should never get called
   }
 
