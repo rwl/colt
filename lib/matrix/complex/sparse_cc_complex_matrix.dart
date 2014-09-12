@@ -227,7 +227,7 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
    * @param removeZeroes
    *            if true, then zeroes (if any) are removed
    */
-  factory SparseCCComplexMatrix.withValues(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, Float64List values, [bool removeDuplicates=false, bool removeZeroes=false]) {
+  factory SparseCCComplexMatrix.withValues(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, Float64List values, {bool removeDuplicates: false, bool removeZeroes: false}) {
     /*try {
       _setUp(rows, columns);
     } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
@@ -763,7 +763,7 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
         } else if (_values[2 * j + 1] == 0) {
           builder..write('(')..write(_rowIndexes[j])..write(',')..write(i)..write(')')..write('\t')..write(_values[2 * j])..write('\n');
         } else {
-          builder..write('(')..write(_rowIndexes[j])..write(',')..write(i)..write(')')..write('\t')..write(_values[2 * j])..write('-')..write(_values[2 * j + 1])..write('i')..write('\n');
+          builder..write('(')..write(_rowIndexes[j])..write(',')..write(i)..write(')')..write('\t')..write(_values[2 * j])/*..write('-')*/..write(_values[2 * j + 1])..write('i')..write('\n');
         }
       }
     }

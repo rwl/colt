@@ -856,9 +856,15 @@ class ComplexVector extends AbstractComplexVector {
     return Im;
   }
 
-  void nonZeros(final List<int> indexList, final List<Float64List> valueList) {
-    indexList.clear();
-    valueList.clear();
+  void nonZeros({List<int> indexList: null, List<Float64List> valueList: null}) {
+    bool fillIndexList = indexList != null;
+    bool fillValueList = valueList != null;
+    if (fillIndexList) {
+      indexList.clear();
+    }
+    if (fillValueList) {
+      valueList.clear();
+    }
     int s = length;
 
     int idx = _zero;
@@ -867,8 +873,12 @@ class ComplexVector extends AbstractComplexVector {
       value[0] = _elements[idx];
       value[1] = _elements[idx + 1];
       if (value[0] != 0 || value[1] != 0) {
-        indexList.add(k);
-        valueList.add(value);
+        if (fillIndexList) {
+          indexList.add(k);
+        }
+        if (fillValueList) {
+          valueList.add(value);
+        }
       }
       idx += _stride;
     }

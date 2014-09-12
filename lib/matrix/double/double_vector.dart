@@ -667,11 +667,15 @@ class DoubleVector extends AbstractDoubleVector {
     return _elements;
   }
 
-  void nonZeros(final /*IntArrayList*/List<int> indexList, final /*DoubleArrayList*/List<double> valueList) {
+  void nonZeros({List<int> indexList: null, List<double> valueList: null}) {
     bool fillIndexList = indexList != null;
     bool fillValueList = valueList != null;
-    if (fillIndexList) indexList.clear();
-    if (fillValueList) valueList.clear();
+    if (fillIndexList) {
+      indexList.clear();
+    }
+    if (fillValueList) {
+      valueList.clear();
+    }
     int rem = _size % 2;
     int idx = _zero;
     if (rem == 1) {
@@ -711,11 +715,15 @@ class DoubleVector extends AbstractDoubleVector {
     }
   }
 
-  void positiveValues(final /*IntArrayList*/List<int> indexList, final /*DoubleArrayList*/List<double> valueList) {
+  void positiveValues({List<int> indexList: null, List<double> valueList: null}) {
     bool fillIndexList = indexList != null;
     bool fillValueList = valueList != null;
-    if (fillIndexList) indexList.clear();
-    if (fillValueList) valueList.clear();
+    if (fillIndexList) {
+      indexList.clear();
+    }
+    if (fillValueList) {
+      valueList.clear();
+    }
     int rem = _size % 2;
     int idx = _zero;
     if (rem == 1) {
@@ -755,11 +763,15 @@ class DoubleVector extends AbstractDoubleVector {
     }
   }
 
-  void negativeValues(final /*IntArrayList*/List<int> indexList, final /*DoubleArrayList*/List<double> valueList) {
+  void negativeValues({List<int> indexList: null, List<double> valueList: null}) {
     bool fillIndexList = indexList != null;
     bool fillValueList = valueList != null;
-    if (fillIndexList) indexList.clear();
-    if (fillValueList) valueList.clear();
+    if (fillIndexList) {
+      indexList.clear();
+    }
+    if (fillValueList) {
+      valueList.clear();
+    }
     int rem = _size % 2;
     int idx = _zero;
     if (rem == 1) {

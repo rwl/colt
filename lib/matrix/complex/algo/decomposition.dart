@@ -109,7 +109,7 @@ class CSparseComplexLUDecomposition implements SparseComplexLUDecomposition {
     DZcs dcs;
     if (A is SparseRCComplexMatrix) {
       _rcMatrix = true;
-      dcs = (A).getColumnCompressed().elements();
+      dcs = (A).columnCompressed().elements();
     } else {
       dcs = A.elements() as DZcs;
     }

@@ -674,15 +674,27 @@ abstract class AbstractComplexVector extends AbstractVector {
    * @param valueList
    *            the list to be filled with values, can have any size.
    */
-  void nonZeros(final List<int> indexList, final List<Float64List> valueList) {
+  void nonZeros({List<int> indexList: null, final List<Float64List> valueList: null}) {
+    bool fillIndexList = indexList != null;
+    bool fillValueList = valueList != null;
+    if (fillIndexList) {
+      indexList.clear();
+    }
+    if (fillValueList) {
+      valueList.clear();
+    }
     indexList.clear();
     valueList.clear();
     int s = length;
     for (int i = 0; i < s; i++) {
       Float64List value = get(i);
       if (value[0] != 0 || value[1] != 0) {
-        indexList.add(i);
-        valueList.add(value);
+        if (fillIndexList) {
+          indexList.add(i);
+        }
+        if (fillValueList) {
+          valueList.add(value);
+        }
       }
     }
 
@@ -959,7 +971,7 @@ abstract class AbstractComplexVector extends AbstractVector {
    * @return a string representation of the matrix.
    */
   String toString() {
-    return toStringFormat("%.4f");
+    return toStringFormat('0.00E+00'/*"%.4f"*/);
   }
 
   /**
@@ -975,14 +987,14 @@ abstract class AbstractComplexVector extends AbstractVector {
     Float64List elem = new Float64List(2);
     for (int i = 0; i < length; i++) {
       elem = get(i);
-      if (elem[1] == 0) {
+      /*if (elem[1] == 0) {
         s.write(f.format(elem[0]) + "\n");
         continue;
       }
       if (elem[0] == 0) {
         s.write(f.format(elem[1]) + "i\n");
         continue;
-      }
+      }*/
       if (elem[1] < 0) {
         s.write(f.format(elem[0]) + " - " + f.format(-elem[1]) + "i\n");
         continue;

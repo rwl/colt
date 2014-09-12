@@ -677,7 +677,7 @@ class IntVector extends AbstractIntVector {
     return _elements;
   }
 
-  void nonZeros(final List<int> indexList, final List<int> valueList) {
+  void nonZeros({List<int> indexList: null, final List<int> valueList: null}) {
     indexList.clear();
     valueList.clear();
     int idx = _zero;
@@ -707,7 +707,7 @@ class IntVector extends AbstractIntVector {
     }
   }
 
-  void positiveValues(final List<int> indexList, final List<int> valueList) {
+  void positiveValues({List<int> indexList: null, final List<int> valueList: null}) {
     indexList.clear();
     valueList.clear();
     int idx = _zero;
@@ -737,7 +737,7 @@ class IntVector extends AbstractIntVector {
     }
   }
 
-  void negativeValues(final List<int> indexList, final List<int> valueList) {
+  void negativeValues({List<int> indexList: null, final List<int> valueList: null}) {
     indexList.clear();
     valueList.clear();
     int idx = _zero;
@@ -1294,6 +1294,12 @@ class IntVector extends AbstractIntVector {
   Object clone() {
     return new IntVector(length, _elements, _zero, _stride, !_isNoView);
   }
+
+  DoubleVector toDouble() {
+    return new DoubleVector(length, new Float64List.fromList(new List<double>.generate(length,
+        (int i) => this.get(i).toDouble()
+    )));
+  }
 }
 
 /**
@@ -1535,11 +1541,5 @@ class SelectedDenseIntVector extends AbstractIntVector {
 
   Object clone() {
     return new SelectedDenseIntVector(length, _elements, _zero, _stride, _offsets, __offset);
-  }
-
-  DoubleVector toDouble() {
-    return new DoubleVector(length, new Float64List.fromList(new List<double>.generate(length,
-        (int i) => this.get(i).toDouble()
-    )));
   }
 }

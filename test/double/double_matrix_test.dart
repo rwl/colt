@@ -208,7 +208,7 @@ abstract class DoubleMatrixTest {
 
   testAssignFunc() {
     AbstractDoubleMatrix Acopy = A.copy();
-    A.forEachMatrix(B, plus);
+    A.forEachWith(B, plus);
     for (int r = 0; r < A.rows; r++) {
       for (int c = 0; c < A.columns; c++) {
         expect(Acopy.get(r, c) + B.get(r, c), closeTo(A.get(r, c), TOL));
@@ -226,7 +226,7 @@ abstract class DoubleMatrixTest {
       }
     }
     AbstractDoubleMatrix Acopy = A.copy();
-    A.forEachMatrixRange(B, div, new Int32List.fromList(rowList), new Int32List.fromList(columnList));
+    A.forEachWithNonZero(B, div, new Int32List.fromList(rowList), new Int32List.fromList(columnList));
     for (int r = 0; r < A.rows; r++) {
       for (int c = 0; c < A.columns; c++) {
         expect(Acopy.get(r, c) / B.get(r, c), closeTo(A.get(r, c), TOL));

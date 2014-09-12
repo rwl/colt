@@ -498,7 +498,7 @@ class SparseDoubleMatrix extends AbstractDoubleMatrix {
    *
    * @return this matrix in a column-compressed form
    */
-  SparseCCDoubleMatrix getColumnCompressed(bool sortRowIndexes) {
+  SparseCCDoubleMatrix columnCompressed(bool sortRowIndexes) {
     int nnz = cardinality;
     final keys = _elements.keys;
     final values = _elements.values;
@@ -545,7 +545,7 @@ class SparseDoubleMatrix extends AbstractDoubleMatrix {
    *
    * @return this matrix in a row-compressed form
    */
-  SparseRCDoubleMatrix getRowCompressed(bool sortColumnIndexes) {
+  SparseRCDoubleMatrix rowCompressed(bool sortColumnIndexes) {
     int nnz = cardinality;
     final keys = _elements.keys;
     final values = _elements.values;
@@ -556,7 +556,8 @@ class SparseDoubleMatrix extends AbstractDoubleMatrix {
       rowIndexes[k] = key ~/ _columns;
       columnIndexes[k] = key % _columns;
     }
-    return new SparseRCDoubleMatrix.withValues(_rows, _columns, rowIndexes, columnIndexes, values, false, false, sortColumnIndexes);
+    return new SparseRCDoubleMatrix.withValues(_rows, _columns, rowIndexes, columnIndexes, values,
+        removeDuplicates: false, removeZeroes: false, sortColumnIndexes: sortColumnIndexes);
   }
 
   /**

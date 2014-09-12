@@ -136,7 +136,7 @@ abstract class ComplexMatrixTest {
 
   void testAssignFunc() {
     AbstractComplexMatrix Acopy = A.copy();
-    A.forEachMatrix(B, div);
+    A.forEachWith(B, div);
     for (int r = 0; r < A.rows; r++) {
       for (int c = 0; c < A.columns; c++) {
         assertEquals(Complex.div_(Acopy.get(r, c), B.get(r, c)), A.get(r, c), TOL);

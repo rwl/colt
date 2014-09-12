@@ -859,7 +859,7 @@ abstract class AbstractDoubleVector extends AbstractVector {
    * @param valueList
    *            the list to be filled with values, can have any size.
    */
-  void negativeValues(final /*IntArrayList*/List<int> indexList, final /*DoubleArrayList*/List<double> valueList) {
+  void negativeValues({List<int> indexList: null, List<double> valueList: null}) {
     bool fillIndexList = indexList != null;
     bool fillValueList = valueList != null;
     if (fillIndexList) {
@@ -932,7 +932,7 @@ abstract class AbstractDoubleVector extends AbstractVector {
    * @param valueList
    *            the list to be filled with values, can have any size.
    */
-  void nonZeros(final /*IntArrayList*/List<int> indexList, final /*DoubleArrayList*/List<double> valueList) {
+  void nonZeros({List<int> indexList: null, List<double> valueList: null}) {
     bool fillIndexList = indexList != null;
     bool fillValueList = valueList != null;
     if (fillIndexList) {
@@ -1007,7 +1007,7 @@ abstract class AbstractDoubleVector extends AbstractVector {
    * @param maxCardinality
    *            maximal cardinality
    */
-  void nonZerosCardinality(/*IntArrayList*/List<int> indexList, /*DoubleArrayList*/List<double> valueList, int maxCardinality) {
+  void nonZerosCardinality(int maxCardinality, {List<int> indexList: null, List<double> valueList: null}) {
     bool fillIndexList = indexList != null;
     bool fillValueList = valueList != null;
     if (fillIndexList) {
@@ -1046,7 +1046,7 @@ abstract class AbstractDoubleVector extends AbstractVector {
    * @param valueList
    *            the list to be filled with values, can have any size.
    */
-  void positiveValues(final /*IntArrayList*/List<int> indexList, final /*DoubleArrayList*/List<double> valueList) {
+  void positiveValues({List<int> indexList: null, List<double> valueList: null}) {
     bool fillIndexList = indexList != null;
     bool fillValueList = valueList != null;
     if (fillIndexList) indexList.clear();
@@ -1310,7 +1310,8 @@ abstract class AbstractDoubleVector extends AbstractVector {
    * @see cern.colt.matrix.tdouble.algo.DoubleFormatter
    */
   String toString() {
-    return new DoubleFormatter().toStringDouble1D(this);
+    //return new DoubleFormatter().toStringDouble1D(this);
+    return this.elements().toString();
   }
 
   /**

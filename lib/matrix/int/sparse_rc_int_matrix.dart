@@ -229,7 +229,7 @@ class SparseRCIntMatrix extends WrapperIntMatrix {
    * @param sortColumnIndexes
    *            if true, then column indexes are sorted
    */
-  factory SparseRCIntMatrix.withValue(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, int value, bool removeDuplicates, bool sortColumnIndexes) : super(null) {
+  factory SparseRCIntMatrix.withValue(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, int value, bool removeDuplicates, bool sortColumnIndexes) {
     /*try {
       _setUp(rows, columns);
     } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
@@ -289,7 +289,7 @@ class SparseRCIntMatrix extends WrapperIntMatrix {
    * @param sortColumnIndexes
    *            if true, then column indexes are sorted
    */
-  factory SparseRCIntMatrix.withValues(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, Int32List values, bool removeDuplicates, bool removeZeroes, bool sortColumnIndexes) : super(null) {
+  factory SparseRCIntMatrix.withValues(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, Int32List values, bool removeDuplicates, bool removeZeroes, bool sortColumnIndexes) {
     /*try {
       _setUp(rows, columns);
     } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
@@ -597,7 +597,7 @@ class SparseRCIntMatrix extends WrapperIntMatrix {
    *
    * @return column indexes
    */
-  Int32List columnIndexes() {
+  Int32List get columnIndexes {
     return _columnIndexes;
   }
 
@@ -631,7 +631,7 @@ class SparseRCIntMatrix extends WrapperIntMatrix {
    *
    * @return row pointers
    */
-  Int32List rowPointers() {
+  Int32List get rowPointers {
     return _rowPointers;
   }
 
@@ -673,7 +673,7 @@ class SparseRCIntMatrix extends WrapperIntMatrix {
    *
    * @return numerical values
    */
-  Int32List values() {
+  Int32List get values {
     return _values;
   }
 
@@ -682,7 +682,7 @@ class SparseRCIntMatrix extends WrapperIntMatrix {
    *
    * @return true if column indexes are sorted, false otherwise
    */
-  bool columnIndexesSorted() {
+  bool get columnIndexesSorted {
     return _columnIndexesSorted;
   }
 

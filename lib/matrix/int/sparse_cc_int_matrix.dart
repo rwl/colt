@@ -371,10 +371,10 @@ class SparseCCIntMatrix extends WrapperIntMatrix {
       _values.setAll(0, other.values());
       _rowIndexesSorted = other._rowIndexesSorted;
     } else if (source is SparseRCIntMatrix) {
-      SparseRCIntMatrix other = (source as SparseRCIntMatrix).transpose();
-      _columnPointers = other.rowPointers();
-      _rowIndexes = other.columnIndexes();
-      _values = other.values();
+      SparseRCIntMatrix other = source.transpose();
+      _columnPointers = other.rowPointers;
+      _rowIndexes = other.columnIndexes;
+      _values = other.values;
       _rowIndexesSorted = true;
     } else {
       fill(0);

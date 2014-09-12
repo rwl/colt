@@ -148,7 +148,7 @@ abstract class DoubleVectorTest {
 
   testAssignFunc() {
     AbstractDoubleVector Acopy = A.copy();
-    A.forEachVector(B, div);
+    A.forEachWith(B, div);
     for (int i = 0; i < A.length; i++) {
       expect(Acopy.get(i) / B.get(i), closeTo(A.get(i), TOL));
     }
@@ -233,7 +233,7 @@ abstract class DoubleVectorTest {
     A.set(A.length ~/ 2, -0.1);
     List<int> indexList = new List<int>();
     List<double> valueList = new List<double>();
-    A.negativeValues(indexList, valueList);
+    A.negativeValues(indexList: indexList, valueList: valueList);
     expect(2, indexList.length);
     expect(2, valueList.length);
     expect(indexList.contains(A.length ~/ 3), isTrue);
@@ -248,7 +248,7 @@ abstract class DoubleVectorTest {
     A.set(A.length ~/ 2, 0.1);
     List<int> indexList = new List<int>();
     List<double> valueList = new List<double>();
-    A.nonZeros(indexList, valueList);
+    A.nonZeros(indexList: indexList, valueList: valueList);
     expect(2, indexList.length);
     expect(2, valueList.length);
     expect(indexList.contains(A.length ~/ 3), isTrue);
@@ -263,7 +263,7 @@ abstract class DoubleVectorTest {
     A.set(A.length ~/ 2, 0.1);
     List<int> indexList = new List<int>();
     List<double> valueList = new List<double>();
-    A.positiveValues(indexList, valueList);
+    A.positiveValues(indexList: indexList, valueList: valueList);
     expect(2, indexList.length);
     expect(2, valueList.length);
     expect(indexList.contains(A.length ~/ 3), isTrue);
@@ -396,7 +396,7 @@ abstract class DoubleVectorTest {
   testDotNonZero() {
     List<int> indexList = new List<int>();
     List<double> valueList = new List<double>();
-    B.nonZeros(indexList, valueList);
+    B.nonZeros(indexList: indexList, valueList: valueList);
     double product = A.dotNonZero(B, new Int32List.fromList(indexList), 5, B.length - 10);
     double expected = 0.0;
     for (int i = 5; i < A.length - 5; i++) {

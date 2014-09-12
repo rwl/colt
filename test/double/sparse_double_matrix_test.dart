@@ -51,13 +51,13 @@ class SparseDoubleMatrixTest extends DoubleMatrixTest {
       values[i] = random.nextDouble();
     }
     SparseDoubleMatrix A = new SparseDoubleMatrix.withValues(NROWS, NCOLUMNS, rowindexes, columnindexes, values);
-    SparseRCDoubleMatrix B = A.getRowCompressed(false);
+    SparseRCDoubleMatrix B = A.rowCompressed(false);
     for (int r = 0; r < A.rows; r++) {
       for (int c = 0; c < A.columns; c++) {
         expect(A.get(r, c), equals(B.get(r, c)));
       }
     }
-    B = A.getRowCompressed(true);
+    B = A.rowCompressed(true);
     for (int r = 0; r < A.rows; r++) {
       for (int c = 0; c < A.columns; c++) {
         expect(A.get(r, c), equals(B.get(r, c)));
@@ -95,13 +95,13 @@ class SparseDoubleMatrixTest extends DoubleMatrixTest {
       values[i] = random.nextDouble();
     }
     SparseDoubleMatrix S = new SparseDoubleMatrix.withValues(A.rows, A.columns, rowindexes, columnindexes, values);
-    SparseCCDoubleMatrix B = S.getColumnCompressed(false);
+    SparseCCDoubleMatrix B = S.columnCompressed(false);
     for (int r = 0; r < A.rows; r++) {
       for (int c = 0; c < A.columns; c++) {
         expect(S.get(r, c), equals(B.get(r, c)));
       }
     }
-    B = S.getColumnCompressed(true);
+    B = S.columnCompressed(true);
     for (int r = 0; r < A.rows; r++) {
       for (int c = 0; c < A.columns; c++) {
         expect(S.get(r, c), equals(B.get(r, c)));

@@ -247,7 +247,7 @@ abstract class ComplexVectorTest {
   void testGetNonZeros() {
     List<int> indexList = new List<int>();
     List<Float64List> valueList = new List<Float64List>();
-    A.nonZeros(indexList, valueList);
+    A.nonZeros(indexList: indexList, valueList: valueList);
     expect(A.length, equals(indexList.length));
     expect(A.length, equals(valueList.length));
     for (int i = 0; i < A.length; i++) {
@@ -379,7 +379,7 @@ abstract class ComplexVectorTest {
   void testZDotProductIndex() {
     List<int> indexList = new List<int>();
     List<Float64List> valueList = new List<Float64List>();
-    B.nonZeros(indexList, valueList);
+    B.nonZeros(indexList: indexList, valueList: valueList);
     Float64List actual = A.dotNonZero(B,
         new Int32List.fromList(indexList), 5, B.length - 10);
     Float64List expected = new Float64List(2);

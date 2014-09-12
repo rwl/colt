@@ -79,7 +79,7 @@ abstract class AbstractFormatter {//extends cern.colt.PersistentObject {
    * The default format string for formatting a single cell value; currently
    * <tt>"%G"</tt>.
    */
-  String _format = "%G";
+  String _format = null;//"%G";
 
   /**
    * The default minimum number of characters a column may have; currently
@@ -111,7 +111,7 @@ abstract class AbstractFormatter {//extends cern.colt.PersistentObject {
    */
   bool _printShape = true;
 
-  static List<String> _blanksCache; // for efficient String manipulations
+  static List<String> _blanksCache = []; // for efficient String manipulations
 
   static final FormerFactory _factory = new FormerFactory();
 

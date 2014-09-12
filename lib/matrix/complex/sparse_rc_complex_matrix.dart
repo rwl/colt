@@ -199,7 +199,7 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
    * @param removeZeroes
    *            if true, then zeroes (if any) are removed
    */
-  factory SparseRCComplexMatrix.withValues(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, Float64List values, bool removeDuplicates, bool removeZeroes) {
+  factory SparseRCComplexMatrix.withValues(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, Float64List values, {bool removeDuplicates: false, bool removeZeroes: false}) {
     /*try {
       _setUp(rows, columns);
     } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !

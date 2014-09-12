@@ -300,7 +300,7 @@ class DoubleFormatter extends AbstractFormatter {
    * @param format
    *            the given format used to convert a single cell value.
    */
-  DoubleFormatter([String format = "%G"]) {
+  DoubleFormatter([String format = null/*"%G"*/]) {
     setFormat(format);
     setAlignment(AbstractFormatter.DECIMAL);
   }

@@ -113,7 +113,7 @@ class DiagonalDoubleMatrixTest extends DoubleMatrixTest {
 
   void testAssignFunc() {
     AbstractDoubleMatrix Acopy = A.copy();
-    A.forEachMatrix(B, div);
+    A.forEachWith(B, div);
     if (DINDEX >= 0) {
       for (int r = 0; r < DLENGTH; r++) {
         expect(Acopy.get(r, r + DINDEX) / B.get(r, r + DINDEX), closeTo(A.get(r, r + DINDEX), TOL));
@@ -134,7 +134,7 @@ class DiagonalDoubleMatrixTest extends DoubleMatrixTest {
         columnList.add(r + DINDEX);
       }
       AbstractDoubleMatrix Acopy = A.copy();
-      A.forEachMatrixRange(B, div,
+      A.forEachWithNonZero(B, div,
           new Int32List.fromList(rowList),
           new Int32List.fromList(columnList));
       for (int r = 0; r < DLENGTH; r++) {
@@ -146,7 +146,7 @@ class DiagonalDoubleMatrixTest extends DoubleMatrixTest {
         columnList.add(r);
       }
       AbstractDoubleMatrix Acopy = A.copy();
-      A.forEachMatrixRange(B, div, new Int32List.fromList(rowList),
+      A.forEachWithNonZero(B, div, new Int32List.fromList(rowList),
           new Int32List.fromList(columnList));
       for (int r = 0; r < DLENGTH; r++) {
         expect(Acopy.get(r - DINDEX, r) / B.get(r - DINDEX, r), closeTo(A.get(r - DINDEX, r), TOL));

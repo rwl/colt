@@ -288,7 +288,7 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
    * @param sortColumnIndexes
    *            if true, then column indexes are sorted
    */
-  factory SparseRCDoubleMatrix.withValues(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, Float64List values, bool removeDuplicates, bool removeZeroes, bool sortColumnIndexes) {
+  factory SparseRCDoubleMatrix.withValues(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, Float64List values, {bool removeDuplicates: true, bool removeZeroes: false, bool sortColumnIndexes: false}) {
     /*try {
       _setUp(rows, columns);
     } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !

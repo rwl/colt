@@ -759,28 +759,46 @@ abstract class AbstractIntVector extends AbstractVector {
    * @param valueList
    *            the list to be filled with values, can have any size.
    */
-  void negativeValues(final Int32List indexList, final Int32List valueList) {
-    indexList.clear();
-    valueList.clear();
+  void negativeValues({List<int> indexList: null, final List<int> valueList: null}) {
+    bool fillIndexList = indexList != null;
+    bool fillValueList = valueList != null;
+    if (fillIndexList) {
+      indexList.clear();
+    }
+    if (fillValueList) {
+      valueList.clear();
+    }
     int rem = _size % 2;
     if (rem == 1) {
       int value = get(0);
       if (value < 0) {
-        indexList.add(0);
-        valueList.add(value);
+        if (fillIndexList) {
+          indexList.add(0);
+        }
+        if (fillValueList) {
+          valueList.add(value);
+        }
       }
     }
 
     for (int i = rem; i < _size; i += 2) {
       int value = get(i);
       if (value < 0) {
-        indexList.add(i);
-        valueList.add(value);
+        if (fillIndexList) {
+          indexList.add(i);
+        }
+        if (fillValueList) {
+          valueList.add(value);
+        }
       }
       value = get(i + 1);
       if (value < 0) {
-        indexList.add(i + 1);
-        valueList.add(value);
+        if (fillIndexList) {
+          indexList.add(i + 1);
+        }
+        if (fillValueList) {
+          valueList.add(value);
+        }
       }
     }
   }
@@ -814,28 +832,46 @@ abstract class AbstractIntVector extends AbstractVector {
    * @param valueList
    *            the list to be filled with values, can have any size.
    */
-  void nonZeros(final Int32List indexList, final Int32List valueList) {
-    indexList.clear();
-    valueList.clear();
+  void nonZeros({Int32List indexList: null, final Int32List valueList: null}) {
+    bool fillIndexList = indexList != null;
+    bool fillValueList = valueList != null;
+    if (fillIndexList) {
+      indexList.clear();
+    }
+    if (fillValueList) {
+      valueList.clear();
+    }
     int rem = _size % 2;
     if (rem == 1) {
       int value = get(0);
       if (value != 0) {
-        indexList.add(0);
-        valueList.add(value);
+        if (fillIndexList) {
+          indexList.add(0);
+        }
+        if (fillValueList) {
+          valueList.add(value);
+        }
       }
     }
 
     for (int i = rem; i < _size; i += 2) {
       int value = get(i);
       if (value != 0) {
-        indexList.add(i);
-        valueList.add(value);
+        if (fillIndexList) {
+          indexList.add(i);
+        }
+        if (fillValueList) {
+          valueList.add(value);
+        }
       }
       value = get(i + 1);
       if (value != 0) {
-        indexList.add(i + 1);
-        valueList.add(value);
+        if (fillIndexList) {
+          indexList.add(i + 1);
+        }
+        if (fillValueList) {
+          valueList.add(value);
+        }
       }
     }
   }
@@ -871,18 +907,26 @@ abstract class AbstractIntVector extends AbstractVector {
    * @param maxCardinality
    *            maximal cardinality
    */
-  void nonZerosCardinality(Int32List indexList, Int32List valueList, int maxCardinality) {
+  void nonZerosCardinality(int maxCardinality, {Int32List indexList: null, Int32List valueList: null}) {
     bool fillIndexList = indexList != null;
     bool fillValueList = valueList != null;
-    if (fillIndexList) indexList.clear();
-    if (fillValueList) valueList.clear();
+    if (fillIndexList) {
+      indexList.clear();
+    }
+    if (fillValueList) {
+      valueList.clear();
+    }
     int s = _size;
     int currentSize = 0;
     for (int i = 0; i < s; i++) {
       int value = get(i);
       if (value != 0) {
-        if (fillIndexList) indexList.add(i);
-        if (fillValueList) valueList.add(value);
+        if (fillIndexList) {
+          indexList.add(i);
+        }
+        if (fillValueList) {
+          valueList.add(value);
+        }
         currentSize++;
       }
       if (currentSize >= maxCardinality) {
@@ -902,28 +946,46 @@ abstract class AbstractIntVector extends AbstractVector {
    * @param valueList
    *            the list to be filled with values, can have any size.
    */
-  void positiveValues(final Int32List indexList, final Int32List valueList) {
-    indexList.clear();
-    valueList.clear();
+  void positiveValues({Int32List indexList: null, Int32List valueList: null}) {
+    bool fillIndexList = indexList != null;
+    bool fillValueList = valueList != null;
+    if (fillIndexList) {
+      indexList.clear();
+    }
+    if (fillValueList) {
+      valueList.clear();
+    }
     int rem = _size % 2;
     if (rem == 1) {
       int value = get(0);
       if (value > 0) {
-        indexList.add(0);
-        valueList.add(value);
+        if (fillIndexList) {
+          indexList.add(0);
+        }
+        if (fillValueList) {
+          valueList.add(value);
+        }
       }
     }
 
     for (int i = rem; i < _size; i += 2) {
       int value = get(i);
       if (value > 0) {
-        indexList.add(i);
-        valueList.add(value);
+        if (fillIndexList) {
+          indexList.add(i);
+        }
+        if (fillValueList) {
+          valueList.add(value);
+        }
       }
       value = get(i + 1);
       if (value > 0) {
-        indexList.add(i + 1);
-        valueList.add(value);
+        if (fillIndexList) {
+          indexList.add(i + 1);
+        }
+        if (fillValueList) {
+          valueList.add(value);
+        }
       }
     }
   }
@@ -1289,7 +1351,8 @@ abstract class AbstractIntVector extends AbstractVector {
    */
 
   String toString() {
-    return new IntFormatter().toString1D(this);
+    //return new IntFormatter().toString1D(this);
+    return this.elements().toString();
   }
 
   /**

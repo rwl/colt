@@ -189,7 +189,7 @@ abstract class IntVectorTest {
   }
 
   void testCardinality() {
-    int card = A.cardinality();
+    int card = A.cardinality;
     int expected = 0;
     for (int i = 0; i < A.length; i++) {
       if (A.get(i) != 0) expected++;
@@ -233,7 +233,7 @@ abstract class IntVectorTest {
     A.set(A.length ~/ 2, -1);
     List<int> indexList = new List<int>();
     List<int> valueList = new List<int>();
-    A.negativeValues(indexList, valueList);
+    A.negativeValues(indexList: indexList, valueList: valueList);
     expect(2, equals(indexList.length));
     expect(2, equals(valueList.length));
     expect(indexList.contains(A.length ~/ 3), isTrue);
@@ -248,7 +248,7 @@ abstract class IntVectorTest {
     A.set(A.length ~/ 2, 1);
     List<int> indexList = new List<int>();
     List<int> valueList = new List<int>();
-    A.nonZeros(indexList, valueList);
+    A.nonZeros(indexList: indexList, valueList: valueList);
     expect(2, equals(indexList.length));
     expect(2, equals(valueList.length));
     expect(indexList.contains(A.length ~/ 3), isTrue);
@@ -263,7 +263,7 @@ abstract class IntVectorTest {
     A.set(A.length ~/ 2, 1);
     List<int> indexList = new List<int>();
     List<int> valueList = new List<int>();
-    A.positiveValues(indexList, valueList);
+    A.positiveValues(indexList: indexList, valueList: valueList);
     expect(2, equals(indexList.length));
     expect(2, equals(valueList.length));
     expect(indexList.contains(A.length ~/ 3), isTrue);
@@ -396,7 +396,7 @@ abstract class IntVectorTest {
   void testDotNonZero() {
     List<int> indexList = new List<int>();
     List<int> valueList = new List<int>();
-    B.nonZeros(indexList, valueList);
+    B.nonZeros(indexList: indexList, valueList: valueList);
     int product = A.dotNonZero(B, new Int32List.fromList(indexList), 5, B.length - 10);
     int expected = 0;
     for (int i = 5; i < A.length - 5; i++) {

@@ -276,7 +276,7 @@ abstract class IntMatrixTest {
   }
 
   void testCardinality() {
-    int card = A.cardinality();
+    int card = A.cardinality;
     int expected = 0;
     for (int r = 0; r < A.rows; r++) {
       for (int c = 0; c < A.columns; c++) {
