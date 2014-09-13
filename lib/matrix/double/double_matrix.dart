@@ -88,10 +88,10 @@ class DoubleMatrix extends AbstractDoubleMatrix {
    *             <tt>rows<0 || columns<0 || (double)columns*rows > Integer.MAX_VALUE</tt>
    *             .
    */
-  //    DenseDoubleMatrix(int rows, int columns) {
-  //        _setUp(rows, columns);
-  //        this._elements = new Float64List(rows * columns);
-  //    }
+  factory DoubleMatrix(int rows, int columns) {
+    final elements = new Float64List(rows * columns);
+    return new DoubleMatrix._internal(rows, columns, elements, 0, 0, columns, 1, false);
+  }
 
   /**
    * Constructs a matrix with the given parameters.
@@ -119,10 +119,7 @@ class DoubleMatrix extends AbstractDoubleMatrix {
    *             <tt>rows<0 || columns<0 || (double)columns*rows > Integer.MAX_VALUE</tt>
    *             or flip's are illegal.
    */
-  DoubleMatrix(int rows, int columns, [Float64List elements = null, int rowZero = 0, int columnZero = 0, int rowStride = null, int columnStride = 1, bool isView = false]) {
-    if (elements == null) {
-      elements = new Float64List(rows * columns);
-    }
+  DoubleMatrix._internal(int rows, int columns, Float64List elements, int rowZero, int columnZero, int rowStride, int columnStride, bool isView) {
     _setUp(rows, columns, rowZero, columnZero, rowStride, columnStride);
     this._elements = elements;
     this._isNoView = !isView;
@@ -1888,7 +1885,7 @@ class DoubleMatrix extends AbstractDoubleMatrix {
   }
 
   AbstractDoubleVector _like1D(int size, int zero, int stride) {
-    return new DoubleVector(size, this._elements, zero, stride, true);
+    return new DoubleVector._internal(size, this._elements, zero, stride, true);
   }
 
   AbstractDoubleMatrix _viewSelectionLike(List<int> rowOffsets, List<int> columnOffsets) {
@@ -1896,7 +1893,7 @@ class DoubleMatrix extends AbstractDoubleMatrix {
   }
 
   Object clone() {
-    return new DoubleMatrix(_rows, _columns, _elements, _rowZero, _columnZero, _rowStride, _columnStride, !_isNoView);
+    return new DoubleMatrix._internal(_rows, _columns, _elements, _rowZero, _columnZero, _rowStride, _columnStride, !_isNoView);
   }
 }
 

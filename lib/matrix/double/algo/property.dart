@@ -744,8 +744,8 @@ void generateNonSingular(AbstractDoubleMatrix A) {
     A.set(i, i, 0.0);
   }
   for (int i = min; --i >= 0; ) {
-    double rowSum = A.row(i).reduce(plus, abs);
-    double colSum = A.column(i).reduce(plus, abs);
+    double rowSum = A.row(i).aggregate(plus, abs);
+    double colSum = A.column(i).aggregate(plus, abs);
     A.set(i, i, Math.max(rowSum, colSum) + i + 1);
   }
 }
@@ -785,7 +785,9 @@ bool isDiagonallyDominantByColumn(AbstractDoubleMatrix A) {
   for (int i = min; --i >= 0; ) {
     double diag = (A.get(i, i)).abs();
     diag += diag;
-    if (diag <= A.column(i).reduce(plus, abs)) return false;
+    if (diag <= A.column(i).aggregate(plus, abs)) {
+      return false;
+    }
   }
   return true;
 }
@@ -805,7 +807,9 @@ bool isDiagonallyDominantByRow(AbstractDoubleMatrix A) {
   for (int i = min; --i >= 0; ) {
     double diag = (A.get(i, i)).abs();
     diag += diag;
-    if (diag <= A.row(i).reduce(plus, abs)) return false;
+    if (diag <= A.row(i).aggregate(plus, abs)) {
+      return false;
+    }
   }
   return true;
 }

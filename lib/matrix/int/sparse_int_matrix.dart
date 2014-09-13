@@ -533,7 +533,7 @@ class SparseIntMatrix extends AbstractIntMatrix {
    *
    * @return this matrix in a column-compressed modified form
    */
-  SparseCCMIntMatrix columnCompressedModified() {
+  /*SparseCCMIntMatrix columnCompressedModified() {
     SparseCCMIntMatrix A = new SparseCCMIntMatrix(_rows, _columns);
     int nnz = cardinality;
     Int32List keys = _elements.keys;
@@ -544,7 +544,7 @@ class SparseIntMatrix extends AbstractIntMatrix {
       A.set(row, column, values[i]);
     }
     return A;
-  }
+  }*/
 
   /**
    * Returns a new matrix that has the same elements as this matrix, but is in
@@ -579,7 +579,7 @@ class SparseIntMatrix extends AbstractIntMatrix {
    *
    * @return this matrix in a row-compressed modified form
    */
-  SparseRCMIntMatrix rowCompressedModified() {
+  /*SparseRCMIntMatrix rowCompressedModified() {
     SparseRCMIntMatrix A = new SparseRCMIntMatrix(_rows, _columns);
     int nnz = cardinality;
     Int32List keys = _elements.keys;
@@ -590,7 +590,7 @@ class SparseIntMatrix extends AbstractIntMatrix {
       A.set(row, column, values[i]);
     }
     return A;
-  }
+  }*/
 
   Object get elements => _elements;
 

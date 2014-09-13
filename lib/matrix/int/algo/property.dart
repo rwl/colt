@@ -29,7 +29,7 @@ void checkSquare(AbstractIntMatrix A) {
  * <tt>A.cardinality() / A.size()</tt>.
  */
 int density(AbstractIntMatrix A) {
-  return A.cardinality() ~/ A.length;
+  return A.cardinality ~/ A.length;
 }
 
 /**
@@ -453,8 +453,8 @@ void generateNonSingular(AbstractIntMatrix A) {
     A.set(i, i, 0);
   }
   for (int i = min; --i >= 0; ) {
-    int rowSum = A.row(i).reduce(ifunc.plus, ifunc.abs);
-    int colSum = A.column(i).reduce(ifunc.plus, ifunc.abs);
+    int rowSum = A.row(i).aggregate(ifunc.plus, ifunc.abs);
+    int colSum = A.column(i).aggregate(ifunc.plus, ifunc.abs);
     A.set(i, i, math.max(rowSum, colSum) + i + 1);
   }
 }
@@ -493,7 +493,9 @@ bool isDiagonallyDominantByColumn(AbstractIntMatrix A) {
   for (int i = min; --i >= 0; ) {
     int diag = A.get(i, i).abs();
     diag += diag;
-    if (diag <= A.column(i).reduce(ifunc.plus, ifunc.abs)) return false;
+    if (diag <= A.column(i).aggregate(ifunc.plus, ifunc.abs)) {
+      return false;
+    }
   }
   return true;
 }
@@ -512,7 +514,9 @@ bool isDiagonallyDominantByRow(AbstractIntMatrix A) {
   for (int i = min; --i >= 0; ) {
     int diag = A.get(i, i).abs();
     diag += diag;
-    if (diag <= A.row(i).reduce(ifunc.plus, ifunc.abs)) return false;
+    if (diag <= A.row(i).aggregate(ifunc.plus, ifunc.abs)) {
+      return false;
+    }
   }
   return true;
 }

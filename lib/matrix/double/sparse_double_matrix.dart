@@ -147,6 +147,10 @@ class SparseDoubleMatrix extends AbstractDoubleMatrix {
    *             <tt>rows<0 || columns<0 || (double)columns*rows > Integer.MAX_VALUE</tt>
    *             .
    */
+  factory SparseDoubleMatrix(int rows, int columns) {
+    final elements = new Map<int, double>();
+    return new SparseDoubleMatrix._internal(rows, columns, elements, 0, 0, columns, 1, false);
+  }
   /*SparseDoubleMatrix(int rows, int columns, int initialCapacity, double minLoadFactor, double maxLoadFactor) {
     try {
       _setUp(rows, columns);
@@ -283,14 +287,12 @@ class SparseDoubleMatrix extends AbstractDoubleMatrix {
    *             <tt>rows<0 || columns<0 || (double)columns*rows > Integer.MAX_VALUE</tt>
    *             or flip's are illegal.
    */
-  SparseDoubleMatrix(int rows, int columns, [Map<int, double> elements = null, int rowZero = 0, int columnZero = 0, int rowStride = null, int columnStride = 1, bool isView = false]) {
+//  SparseDoubleMatrix._internal(int rows, int columns, [Map<int, double> elements = null, int rowZero = 0, int columnZero = 0, int rowStride = null, int columnStride = 1, bool isView = false]) {
+  SparseDoubleMatrix._internal(int rows, int columns, Map<int, double> elements, int rowZero, int columnZero, int rowStride, int columnStride, bool isView) {
     try {
       _setUp(rows, columns, rowZero, columnZero, rowStride, columnStride);
     } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
       if ("matrix too large" != exc.message) throw exc;
-    }
-    if (elements == null) {
-      elements = new Map<int, double>();
     }
     this._elements = elements;
     this._isNoView = !isView;
@@ -841,15 +843,15 @@ class SparseDoubleMatrix extends AbstractDoubleMatrix {
   }
 
   AbstractDoubleVector _like1D(int size, int offset, int stride) {
-    return new SparseDoubleVector(size, this._elements, offset, stride);
+    return new SparseDoubleVector._internal(size, this._elements, offset, stride, false);
   }
 
   AbstractDoubleMatrix _viewSelectionLike(List<int> rowOffsets, List<int> columnOffsets) {
-    return new SelectedSparseDoubleMatrix.from(this._elements, rowOffsets, columnOffsets, 0);
+    return new SelectedSparseDoubleMatrix(this._elements, rowOffsets, columnOffsets, 0);
   }
 
   Object clone() {
-    return new SparseDoubleMatrix(_rows, _columns, _elements, _rowZero, _columnZero,
+    return new SparseDoubleMatrix._internal(_rows, _columns, _elements, _rowZero, _columnZero,
         _rowStride, _columnStride, !_isNoView);
   }
 
@@ -924,8 +926,8 @@ class SelectedSparseDoubleMatrix extends AbstractDoubleMatrix {
    *            The column offsets of the cells that shall be visible.
    * @param offset
    */
-  factory SelectedSparseDoubleMatrix.from(Map<int, double> elements, List<int> rowOffsets, List<int> columnOffsets, int offset) {
-    return new SelectedSparseDoubleMatrix(rowOffsets.length, columnOffsets.length, elements, 0, 0, 1, 1, rowOffsets, columnOffsets, offset);
+  factory SelectedSparseDoubleMatrix(Map<int, double> elements, List<int> rowOffsets, List<int> columnOffsets, int offset) {
+    return new SelectedSparseDoubleMatrix._internal(rowOffsets.length, columnOffsets.length, elements, 0, 0, 1, 1, rowOffsets, columnOffsets, offset);
   }
 
   /**
@@ -953,7 +955,7 @@ class SelectedSparseDoubleMatrix extends AbstractDoubleMatrix {
    *            The column offsets of the cells that shall be visible.
    * @param offset
    */
-  SelectedSparseDoubleMatrix(int rows, int columns, Map<int, double> elements, int rowZero, int columnZero, int rowStride, int columnStride, List<int> rowOffsets, List<int> columnOffsets, int offset) {
+  SelectedSparseDoubleMatrix._internal(int rows, int columns, Map<int, double> elements, int rowZero, int columnZero, int rowStride, int columnStride, List<int> rowOffsets, List<int> columnOffsets, int offset) {
     // be sure parameters are valid, we do not check...
     _setUp(rows, columns, rowZero, columnZero, rowStride, columnStride);
 
@@ -1127,7 +1129,7 @@ class SelectedSparseDoubleMatrix extends AbstractDoubleMatrix {
     int viewStride = this._rowStride;
     Int32List viewOffsets = this._rowOffsets;
     int viewOffset = this._offset + _columnOffset(_columnRank(column));
-    return new SelectedSparseDoubleVector(this._elements, viewOffsets, viewSize, viewZero, viewStride, viewOffset);
+    return new SelectedSparseDoubleVector._internal(viewSize, _elements, viewZero, viewStride, viewOffsets, viewOffset);
   }
 
   /**
@@ -1164,7 +1166,7 @@ class SelectedSparseDoubleMatrix extends AbstractDoubleMatrix {
     int viewStride = this._columnStride;
     Int32List viewOffsets = this._columnOffsets;
     int viewOffset = this._offset + _rowOffset(_rowRank(row));
-    return new SelectedSparseDoubleVector(this._elements, viewOffsets, viewSize, viewZero, viewStride, viewOffset);
+    return new SelectedSparseDoubleVector._internal(viewSize, this._elements, viewZero, viewStride, viewOffsets, viewOffset);
   }
 
   /**
@@ -1281,11 +1283,11 @@ class SelectedSparseDoubleMatrix extends AbstractDoubleMatrix {
    * @return a new view.
    */
   AbstractDoubleMatrix _viewSelectionLike(List<int> rowOffsets, List<int> columnOffsets) {
-    return new SelectedSparseDoubleMatrix.from(this._elements, rowOffsets, columnOffsets, this._offset);
+    return new SelectedSparseDoubleMatrix(this._elements, rowOffsets, columnOffsets, this._offset);
   }
 
   Object clone() {
-    return new SelectedSparseDoubleMatrix(_rows, _columns, _elements, _rowZero, _columnZero,
+    return new SelectedSparseDoubleMatrix._internal(_rows, _columns, _elements, _rowZero, _columnZero,
         _rowStride, _columnStride, _rowOffsets, _columnOffsets, _offset);
   }
 }

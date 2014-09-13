@@ -418,7 +418,7 @@ class DoubleFormatter extends AbstractFormatter {
    */
   String toStringDouble1D(AbstractDoubleVector matrix) {
     AbstractDoubleMatrix easy = matrix.like2D(1, matrix.length);
-    easy.row(0).setAll(matrix);
+    easy.row(0).copyFrom(matrix);
     return toString2D(easy);
   }
 

@@ -31,16 +31,18 @@ class LargeDoubleMatrix extends WrapperDoubleMatrix {
 
   List<Float64List> _elements;
 
-  LargeDoubleMatrix(int rows, int columns, [List<Float64List> elements=null]) : super(null) {
+  factory LargeDoubleMatrix(int rows, int columns) {
+    final elements = new List<Float64List>.generate(rows, (_) => new Float64List(columns));
+    return new LargeDoubleMatrix._internal(rows, columns, elements);
+  }
+
+  LargeDoubleMatrix._internal(int rows, int columns, List<Float64List> elements) : super(null) {
     try {
       _setUp(rows, columns);
     } on ArgumentError catch (exc) { // we can hold rows*columns>MAX_INT cells !
       if ("matrix too large" != exc.message) {
         throw exc;
       }
-    }
-    if (elements == null) {
-     elements = new List<Float64List>.generate(rows, (_) => new Float64List(columns));
     }
     _elements = elements;
     _content = this;
@@ -70,6 +72,6 @@ class LargeDoubleMatrix extends WrapperDoubleMatrix {
   }
 
   Object clone() {
-    return new LargeDoubleMatrix(_rows, _columns, _elements);
+    return new LargeDoubleMatrix._internal(_rows, _columns, _elements);
   }
 }

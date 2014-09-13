@@ -296,7 +296,7 @@ class IntFormatter extends AbstractFormatter {
    * Converts a given cell to a String; no alignment considered.
    */
   String _form(AbstractIntVector matrix, int index, Former formatter) {
-    return formatter.formInt(matrix.at(index));
+    return formatter.formInt(matrix[index]);
   }
 
   /**

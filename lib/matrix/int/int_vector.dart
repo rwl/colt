@@ -1352,9 +1352,9 @@ class IntVector extends AbstractIntVector {
   }
 
   DoubleVector toDouble() {
-    return new DoubleVector(length, new Float64List.fromList(new List<double>.generate(length,
+    return new DoubleVector(length)..setAll(0, new List<double>.generate(length,
         (int i) => this.get(i).toDouble()
-    )));
+    ));
   }
 }
 

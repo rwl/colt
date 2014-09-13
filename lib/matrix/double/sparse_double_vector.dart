@@ -111,6 +111,10 @@ class SparseDoubleVector extends AbstractDoubleVector {
    * @throws IllegalArgumentException
    *             if <tt>size<0</tt>.
    */
+  factory SparseDoubleVector(int size) {
+    final elements = new Map<int, double>();
+    return new SparseDoubleVector._internal(size, elements, 0, 1, false);
+  }
   /*SparseDoubleVector(int size/*, int initialCapacity, double minLoadFactor, double maxLoadFactor*/) {
     _setUp(size);
     //this._elements = new OpenLongDoubleHashMap(initialCapacity, minLoadFactor, maxLoadFactor);
@@ -132,10 +136,7 @@ class SparseDoubleVector extends AbstractDoubleVector {
    * @throws IllegalArgumentException
    *             if <tt>size<0</tt>.
    */
-  SparseDoubleVector(int size, [Map<int, double> elements = null, int offset = 0, int stride = 1, bool isView = false]) {
-    if (elements == null) {
-      elements = new Map<int, double>();
-    }
+  SparseDoubleVector._internal(int size, Map<int, double> elements, int offset, int stride, bool isView) {
     _setUp(size, offset, stride);
     this._elements = elements;
     this._isNoView = !isView;
@@ -379,7 +380,7 @@ class SparseDoubleVector extends AbstractDoubleVector {
   }
 
   Object clone() {
-    return new SparseDoubleVector(_size, _elements, _zero, _stride, !_isNoView);
+    return new SparseDoubleVector._internal(_size, _elements, _zero, _stride, !_isNoView);
   }
 }
 
@@ -446,9 +447,9 @@ class SelectedSparseDoubleVector extends AbstractDoubleVector {
    * @param indexes
    *            The indexes of the cells that shall be visible.
    */
-  /*SelectedSparseDoubleVector(Map<int, double> elements, Int32List offsets) {
+  factory SelectedSparseDoubleVector(Map<int, double> elements, Int32List offsets) {
     return new SelectedSparseDoubleVector._internal(offsets.length, elements, 0, 1, offsets, 0);
-  }*/
+  }
 
   /**
    * Constructs a matrix view with the given parameters.
@@ -466,10 +467,7 @@ class SelectedSparseDoubleVector extends AbstractDoubleVector {
    *            the offsets of the cells that shall be visible.
    * @param offset
    */
-  SelectedSparseDoubleVector(Map<int, double> elements, List<int> offsets, [int size = null, int zero = 0, int stride = 1, int offset = 0]) {
-    if (size == null) {
-      size = offsets.length;
-    }
+  SelectedSparseDoubleVector._internal(int size, Map<int, double> elements, int zero, int stride, List<int> offsets, int offset) {
     _setUp(size, zero, stride);
 
     this._elements = elements;
@@ -654,6 +652,6 @@ class SelectedSparseDoubleVector extends AbstractDoubleVector {
   }
 
   Object clone() {
-    return new SelectedSparseDoubleVector(_elements, _offsets, _size, _zero, _stride, __offset);
+    return new SelectedSparseDoubleVector._internal(_size, _elements, _zero, _stride, _offsets, __offset);
   }
 }

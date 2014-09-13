@@ -35,12 +35,6 @@ class DoubleVectorLocation {
 abstract class AbstractDoubleVector extends AbstractVector with ListMixin<double> {
 
   /**
-   * Makes this class non instantiable, but still let's others inherit from
-   * it.
-   */
-  AbstractDoubleVector();
-
-  /**
    * Applies a function to each cell and aggregates the results. Returns a
    * value <tt>v</tt> such that <tt>v==a(size())</tt> where
    * <tt>a(i) == aggr( a(i-1), f(get(i)) )</tt> and terminators are

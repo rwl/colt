@@ -575,7 +575,7 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
    */
   SparseRCDoubleMatrix rowCompressed() {
     Dcs dcst = cs_transpose(_dcs, true);
-    SparseRCDoubleMatrix rc = new SparseRCDoubleMatrix.sized(_rows, _columns);
+    SparseRCDoubleMatrix rc = new SparseRCDoubleMatrix(_rows, _columns);
     rc._columnIndexes = dcst.i;
     rc._rowPointers = dcst.p;
     rc._values = dcst.x;

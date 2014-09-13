@@ -160,7 +160,7 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
    *             .
    */
   factory SparseRCDoubleMatrix.fromList(List<List<double>> values) {
-    return new SparseRCDoubleMatrix.sized(values.length, values.length == 0 ? 0 : values[0].length)
+    return new SparseRCDoubleMatrix(values.length, values.length == 0 ? 0 : values[0].length)
       ..setAll2D(values);
   }
 
@@ -196,7 +196,7 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
    *             <tt>rows<0 || columns<0 || (double)columns*rows > Integer.MAX_VALUE</tt>
    *             .
    */
-  factory SparseRCDoubleMatrix.sized(int rows, int columns, [int nzmax = null]) {
+  factory SparseRCDoubleMatrix(int rows, int columns, [int nzmax = null]) {
     if (nzmax == null) {
       nzmax = 10 * rows;//Math.min(10 * rows, Integer.MAX_VALUE);
     }
@@ -208,7 +208,7 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
     final columnIndexes = new Int32List(nzmax);
     final values = new Float64List(nzmax);
     final rowPointers = new Int32List(rows + 1);
-    return new SparseRCDoubleMatrix(rows, columns, rowPointers, columnIndexes, values);
+    return new SparseRCDoubleMatrix._internal(rows, columns, rowPointers, columnIndexes, values);
   }
 
   /**
@@ -257,7 +257,7 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
       _columnIndexes[r = w[rowIndexes[k]]++] = columnIndexes[k];
       values[r] = value;
     }
-    final m = new SparseRCDoubleMatrix(rows, columns, rowPointers, _columnIndexes, values);
+    final m = new SparseRCDoubleMatrix._internal(rows, columns, rowPointers, _columnIndexes, values);
     if (removeDuplicates) {
       m.removeDuplicates();
     }
@@ -313,7 +313,7 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
       _columnIndexes[r = w[rowIndexes[k]]++] = columnIndexes[k];
       _values[r] = values[k];
     }
-    final m = new SparseRCDoubleMatrix(rows, columns, rowPointers, _columnIndexes, _values);
+    final m = new SparseRCDoubleMatrix._internal(rows, columns, rowPointers, _columnIndexes, _values);
     if (removeZeroes) {
       m.removeZeroes();
     }
@@ -340,7 +340,7 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
    * @param values
    *            numerical values
    */
-  SparseRCDoubleMatrix(int rows, int columns, Int32List rowPointers, Int32List columnIndexes, Float64List values) : super(null) {
+  SparseRCDoubleMatrix._internal(int rows, int columns, Int32List rowPointers, Int32List columnIndexes, Float64List values) : super(null) {
     try {
       _setUp(rows, columns);
     } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
@@ -648,7 +648,7 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
         valuesT[q] = _values[p];
       }
     }
-    SparseRCDoubleMatrix T = new SparseRCDoubleMatrix.sized(_columns, _rows);
+    SparseRCDoubleMatrix T = new SparseRCDoubleMatrix(_columns, _rows);
     T._rowPointers = rowPointersT;
     T._columnIndexes = columnIndexesT;
     T._values = valuesT;
@@ -672,7 +672,7 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
   }
 
   AbstractDoubleMatrix like2D(int rows, int columns) {
-    return new SparseRCDoubleMatrix.sized(rows, columns);
+    return new SparseRCDoubleMatrix(rows, columns);
   }
 
   AbstractDoubleVector like1D(int size) {
@@ -991,7 +991,7 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
     bool ignore = (C == null);
     if (C == null) {
       if (B is SparseRCDoubleMatrix) {
-        C = new SparseRCDoubleMatrix.sized(rowsA, p, rowsA * p);
+        C = new SparseRCDoubleMatrix(rowsA, p, rowsA * p);
       } else {
         C = new DoubleMatrix(rowsA, p);
       }
@@ -1193,7 +1193,7 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
   }
 
   Object clone() {
-    return new SparseRCDoubleMatrix(_rows, _columns, _rowPointers,
+    return new SparseRCDoubleMatrix._internal(_rows, _columns, _rowPointers,
         _columnIndexes, _values);
   }
 

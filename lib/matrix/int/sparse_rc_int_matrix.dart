@@ -424,9 +424,9 @@ class SparseRCIntMatrix extends WrapperIntMatrix {
       _columnIndexesSorted = other._columnIndexesSorted;
     } else if (source is SparseCCIntMatrix) {
       SparseCCIntMatrix other = source.transpose();
-      _rowPointers = other.columnPointers();
-      _columnIndexes = other.rowIndexes();
-      _values = other.values();
+      _rowPointers = other.columnPointers;
+      _columnIndexes = other.rowIndexes;
+      _values = other.values;
       _columnIndexesSorted = true;
     } else {
       fill(0);

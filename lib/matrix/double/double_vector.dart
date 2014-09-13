@@ -68,10 +68,10 @@ class DoubleVector extends AbstractDoubleVector {
    * @throws ArgumentError
    *             if <tt>size<0</tt>.
    */
-  //    DenseDoubleVector(int size) {
-  //        _setUp(size);
-  //        this._elements = new Float64List(size);
-  //    }
+  factory DoubleVector(int size) {
+    final elements = new Float64List(size);
+    return new DoubleVector._internal(size, elements, 0, 1, false);
+  }
 
   /**
    * Constructs a matrix with the given parameters.
@@ -90,7 +90,7 @@ class DoubleVector extends AbstractDoubleVector {
    * @throws ArgumentError
    *             if <tt>size<0</tt>.
    */
-  DoubleVector(int size, [Float64List elements = null, int zero = 0, int stride = 1, bool isView = false]) {
+  DoubleVector._internal(int size, Float64List elements, int zero, int stride, bool isView) {
     if (elements == null) {
       elements = new Float64List(size);
     }
@@ -1249,7 +1249,7 @@ class DoubleVector extends AbstractDoubleVector {
   }
 
   Object clone() {
-    return new DoubleVector(_size, _elements, _zero, _stride, !_isNoView);
+    return new DoubleVector._internal(_size, _elements, _zero, _stride, !_isNoView);
   }
 }
 

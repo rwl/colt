@@ -40,7 +40,7 @@ class SparseDoubleMatrixTest extends DoubleMatrixTest {
     Bt = new SparseDoubleMatrix(NCOLUMNS, NROWS);
   }
 
-  void testGetRowCompressed() {
+  void testRowCompressed() {
     int SIZE = NROWS * NCOLUMNS;
     Int32List rowindexes = new Int32List(SIZE);
     Int32List columnindexes = new Int32List(SIZE);
@@ -129,7 +129,7 @@ class SparseDoubleMatrixTest extends DoubleMatrixTest {
     }
   }*/
 
-  void testAssignIntArrayIntArrayDoubleArrayDoubleDoubleFunction() {
+  void testAssignIndexValuesFunc() {
     int SIZE = A.rows * A.columns;
     Int32List rowindexes = new Int32List(SIZE);
     Int32List columnindexes = new Int32List(SIZE);
@@ -161,16 +161,16 @@ class SparseDoubleMatrixViewTest extends SparseDoubleMatrixTest {
 
 class SparseRCDoubleMatrixTest extends DoubleMatrixTest {
   void createMatrices() {
-    A = new SparseRCDoubleMatrix.sized(NROWS, NCOLUMNS);
-    B = new SparseRCDoubleMatrix.sized(NROWS, NCOLUMNS);
-    Bt = new SparseRCDoubleMatrix.sized(NCOLUMNS, NROWS);
+    A = new SparseRCDoubleMatrix(NROWS, NCOLUMNS);
+    B = new SparseRCDoubleMatrix(NROWS, NCOLUMNS);
+    Bt = new SparseRCDoubleMatrix(NCOLUMNS, NROWS);
   }
 }
 
 class SparseRCDoubleMatrixViewTest extends SparseRCDoubleMatrixTest {
   void createMatrices() {
-    A = new SparseRCDoubleMatrix.sized(NCOLUMNS, NROWS).dice();
-    B = new SparseRCDoubleMatrix.sized(NCOLUMNS, NROWS).dice();
-    Bt = new SparseRCDoubleMatrix.sized(NROWS, NCOLUMNS).dice();
+    A = new SparseRCDoubleMatrix(NCOLUMNS, NROWS).dice();
+    B = new SparseRCDoubleMatrix(NCOLUMNS, NROWS).dice();
+    Bt = new SparseRCDoubleMatrix(NROWS, NCOLUMNS).dice();
   }
 }

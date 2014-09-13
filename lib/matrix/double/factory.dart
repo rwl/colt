@@ -46,8 +46,8 @@ class DoubleFactory1D {
   AbstractDoubleVector append(AbstractDoubleVector A, AbstractDoubleVector B) {
     // concatenate
     AbstractDoubleVector matrix = make(A.length + B.length);
-    matrix.part(0, A.length).setAll(A);
-    matrix.part(A.length, B.length).setAll(B);
+    matrix.part(0, A.length).copyFrom(A);
+    matrix.part(A.length, B.length).copyFrom(B);
     return matrix;
   }
 
@@ -120,7 +120,7 @@ class DoubleFactory1D {
     AbstractDoubleVector vector = make(size);
     size = 0;
     for (int i = 0; i < parts.length; i++) {
-      vector.part(size, parts[i].length).setAll(parts[i]);
+      vector.part(size, parts[i].length).copyFrom(parts[i]);
       size += parts[i].length;
     }
 
@@ -169,7 +169,7 @@ class DoubleFactory1D {
     int size = A.length;
     AbstractDoubleVector matrix = make(repeat * size);
     for (int i = repeat; --i >= 0; ) {
-      matrix.part(size * i, size).setAll(A);
+      matrix.part(size * i, size).copyFrom(A);
     }
     return matrix;
   }
@@ -389,7 +389,7 @@ class DoubleFactory2D {
     int r = A.rows;
     AbstractDoubleMatrix matrix = make(r, ac + bc);
     matrix.part(0, 0, r, ac).copyFrom(A);
-    matrix.column(ac).setAll(b);
+    matrix.column(ac).copyFrom(b);
     return matrix;
   }
 
@@ -459,7 +459,7 @@ class DoubleFactory2D {
     int c = A.columns;
     AbstractDoubleMatrix matrix = make(ar + br, c);
     matrix.part(0, 0, ar, c).copyFrom(A);
-    matrix.row(ar).setAll(b);
+    matrix.row(ar).copyFrom(b);
     return matrix;
   }
 
