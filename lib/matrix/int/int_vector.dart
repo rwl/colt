@@ -50,7 +50,8 @@ class IntVector extends AbstractIntVector {
    *            The values to be filled into the new matrix.
    */
   factory IntVector.fromList(Int32List values) {
-    return new IntVector(values.length)..setAll(values);
+    return new IntVector(values.length)
+      ..setAll(0, values);
   }
 
   /**
@@ -93,7 +94,7 @@ class IntVector extends AbstractIntVector {
     this._isNoView = !isView;
   }
 
-  int reduce(final ifunc.IntIntFunction aggr, final ifunc.IntFunction f) {
+  int aggregate(final ifunc.IntIntFunction aggr, final ifunc.IntFunction f) {
     if (_size == 0) {
       throw new ArgumentError("size == 0");
     }
@@ -360,45 +361,45 @@ class IntVector extends AbstractIntVector {
     //}
   }
 
-  void setAll(final Int32List values) {
-    if (values.length != _size) {
-      throw new ArgumentError("Must have same number of cells: length=${values.length} size()=$length");
-    }
-    //int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    if (_isNoView) {
-      //System.arraycopy(values, 0, this._elements, 0, values.length);
-      this._elements.setAll(0, values);
-    } else {
-      /*if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-        nthreads = Math.min(nthreads, _size);
-        List<Future> futures = new List<Future>(nthreads);
-        int k = _size / nthreads;
-        for (int j = 0; j < nthreads; j++) {
-          final int firstIdx = j * k;
-          final int lastIdx;
-          if (j == nthreads - 1) {
-            lastIdx = _size;
-          } else {
-            lastIdx = firstIdx + k;
-          }
-          futures[j] = ConcurrencyUtils.submit(() {
-            int idx = _zero + firstIdx * _stride;
-            for (int i = firstIdx; i < lastIdx; i++) {
-              _elements[idx] = values[i];
-              idx += _stride;
-            }
-          });
-        }
-        ConcurrencyUtils.waitForCompletion(futures);
-      } else {*/
-      int idx = _zero;
-      for (int i = 0; i < _size; i++) {
-        _elements[idx] = values[i];
-        idx += _stride;
-      }
-      //}
-    }
-  }
+//  void setAll(final Int32List values) {
+//    if (values.length != _size) {
+//      throw new ArgumentError("Must have same number of cells: length=${values.length} size()=$length");
+//    }
+//    //int nthreads = ConcurrencyUtils.getNumberOfThreads();
+//    if (_isNoView) {
+//      //System.arraycopy(values, 0, this._elements, 0, values.length);
+//      this._elements.setAll(0, values);
+//    } else {
+//      /*if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+//        nthreads = Math.min(nthreads, _size);
+//        List<Future> futures = new List<Future>(nthreads);
+//        int k = _size / nthreads;
+//        for (int j = 0; j < nthreads; j++) {
+//          final int firstIdx = j * k;
+//          final int lastIdx;
+//          if (j == nthreads - 1) {
+//            lastIdx = _size;
+//          } else {
+//            lastIdx = firstIdx + k;
+//          }
+//          futures[j] = ConcurrencyUtils.submit(() {
+//            int idx = _zero + firstIdx * _stride;
+//            for (int i = firstIdx; i < lastIdx; i++) {
+//              _elements[idx] = values[i];
+//              idx += _stride;
+//            }
+//          });
+//        }
+//        ConcurrencyUtils.waitForCompletion(futures);
+//      } else {*/
+//      int idx = _zero;
+//      for (int i = 0; i < _size; i++) {
+//        _elements[idx] = values[i];
+//        idx += _stride;
+//      }
+//      //}
+//    }
+//  }
 
   void copyFrom(AbstractIntVector source) {
     // overriden for performance only

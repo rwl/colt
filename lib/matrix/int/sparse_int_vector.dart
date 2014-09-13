@@ -70,7 +70,7 @@ class SparseIntVector extends AbstractIntVector {
    */
   factory SparseIntVector.fromList(List<int> values) {
     return new SparseIntVector(values.length)
-      ..setAll(values);
+      ..setAll(0, values);
   }
 
   /**

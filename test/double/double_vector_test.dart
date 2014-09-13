@@ -80,7 +80,7 @@ abstract class DoubleVectorTest {
       double elem = A.get(i);
       expected += elem * elem;
     }
-    double result = A.reduce(plus, square);
+    double result = A.aggregate(plus, square);
     expect(result, closeTo(expected, TOL));
   }
 
@@ -139,7 +139,7 @@ abstract class DoubleVectorTest {
   }
 
   testAssignMatrix() {
-    A.setAll(B);
+    A.copyFrom(B);
     expect(A.length == B.length, isTrue);
     for (int i = 0; i < A.length; i++) {
       expect(B.get(i), closeTo(A.get(i), TOL));
@@ -353,7 +353,7 @@ abstract class DoubleVectorTest {
   }
 
   testViewSelectionIndex() {
-    Int32List indexes = new Int32List.fromList([5, 11, 22, 37, 101]);
+    final indexes = [5, 11, 22, 37, 101];
     AbstractDoubleVector b = A.select(indexes);
     for (int i = 0; i < indexes.length; i++) {
       expect(A.get(indexes[i]), closeTo(b.get(i), TOL));
@@ -397,7 +397,7 @@ abstract class DoubleVectorTest {
     List<int> indexList = new List<int>();
     List<double> valueList = new List<double>();
     B.nonZeros(indexList: indexList, valueList: valueList);
-    double product = A.dotNonZero(B, new Int32List.fromList(indexList), 5, B.length - 10);
+    double product = A.dotNonZero(B, indexList, 5, B.length - 10);
     double expected = 0.0;
     for (int i = 5; i < A.length - 5; i++) {
       expected += A.get(i) * B.get(i);

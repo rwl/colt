@@ -169,6 +169,11 @@ abstract class AbstractVector {
     return _size;
   }
 
+  /** Throws an [UnsupportedError]. */
+  void set length(_) {
+    throw new UnsupportedError('vectors are fixed length');
+  }
+
   /**
    * Returns the stride of the given dimension (axis, rank).
    *

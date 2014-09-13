@@ -3,6 +3,7 @@ library cern.colt.matrix;
 import 'dart:math' as Math;
 import 'dart:async' show Future;
 import 'dart:typed_data';
+import 'dart:collection' show ListMixin;
 
 import 'package:intl/intl.dart';
 

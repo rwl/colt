@@ -238,8 +238,8 @@ class WrapperIntMatrix extends AbstractIntMatrix {
 
     _checkRowIndexes(rowIndexes);
     _checkColumnIndexes(columnIndexes);
-    final Int32List rix = rowIndexes;
-    final Int32List cix = columnIndexes;
+    final Int32List rix = new Int32List.fromList(rowIndexes);
+    final Int32List cix = new Int32List.fromList(columnIndexes);
 
     WrapperIntMatrix view = new SelectWrapperIntMatrix2D(this, cix, rix);
     view._rows = rowIndexes.length;

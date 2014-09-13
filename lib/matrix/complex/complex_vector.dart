@@ -115,7 +115,7 @@ class ComplexVector extends AbstractComplexVector {
    * @param radians is 'theta' expressed in radians.
    * @return complex polar representation.
    */
-  factory ComplexVector.fromPolar(DoubleVector r, DoubleVector theta, [bool radians=true]) {
+  factory ComplexVector.fromPolar(AbstractDoubleVector r, AbstractDoubleVector theta, [bool radians=true]) {
     final real = theta.copy();
     final imag = theta.copy();
     if (!radians) {

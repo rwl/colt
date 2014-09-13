@@ -76,7 +76,7 @@ abstract class IntVectorTest {
       int elem = A.get(i);
       expected += elem * elem;
     }
-    int result = A.reduce(ifunc.plus, ifunc.square);
+    int result = A.aggregate(ifunc.plus, ifunc.square);
     expect(expected, equals(result));
   }
 
@@ -119,7 +119,7 @@ abstract class IntVectorTest {
     for (int i = 0; i < A.length; i++) {
       expected[i] = random.nextInt(MAX_INT);
     }
-    A.setAll(expected);
+    A.setAll(0, expected);
     for (int i = 0; i < A.length; i++) {
       expect(expected[i], A.get(i));
     }
@@ -353,7 +353,7 @@ abstract class IntVectorTest {
   }
 
   void testSelect() {
-    final indexes = new Int32List.fromList([5, 11, 22, 37, 101]);
+    final indexes = [5, 11, 22, 37, 101];
     AbstractIntVector b = A.select(indexes);
     for (int i = 0; i < indexes.length; i++) {
       expect(A.get(indexes[i]), equals(b.get(i)));
@@ -397,7 +397,7 @@ abstract class IntVectorTest {
     List<int> indexList = new List<int>();
     List<int> valueList = new List<int>();
     B.nonZeros(indexList: indexList, valueList: valueList);
-    int product = A.dotNonZero(B, new Int32List.fromList(indexList), 5, B.length - 10);
+    int product = A.dotNonZero(B, indexList, 5, B.length - 10);
     int expected = 0;
     for (int i = 5; i < A.length - 5; i++) {
       expected += A.get(i) * B.get(i);

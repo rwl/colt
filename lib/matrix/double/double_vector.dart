@@ -99,7 +99,7 @@ class DoubleVector extends AbstractDoubleVector {
     this._isNoView = !isView;
   }
 
-  double reduce(final DoubleDoubleFunction aggr, final DoubleFunction f) {
+  double aggregate(final DoubleDoubleFunction aggr, final DoubleFunction f) {
     if (_size == 0) return double.NAN;
     double a = 0.0;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -393,10 +393,10 @@ class DoubleVector extends AbstractDoubleVector {
     }
   }
 
-  void setAll(AbstractDoubleVector source) {
+  void copyFrom(AbstractDoubleVector source) {
     // overriden for performance only
     if (!(source is DoubleVector)) {
-      super.setAll(source);
+      super.copyFrom(source);
       return;
     }
     DoubleVector other = source as DoubleVector;
@@ -414,7 +414,7 @@ class DoubleVector extends AbstractDoubleVector {
       AbstractDoubleVector c = other.copy();
       if (!(c is DoubleVector)) {
         // should not happen
-        super.setAll(source);
+        super.copyFrom(source);
         return;
       }
       other = c as DoubleVector;

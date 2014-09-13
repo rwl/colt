@@ -32,7 +32,7 @@ class DoubleVectorLocation {
  * @author Piotr Wendykier (piotr.wendykier@gmail.com)
  *
  */
-abstract class AbstractDoubleVector extends AbstractVector {
+abstract class AbstractDoubleVector extends AbstractVector with ListMixin<double> {
 
   /**
    * Makes this class non instantiable, but still let's others inherit from
@@ -70,7 +70,7 @@ abstract class AbstractDoubleVector extends AbstractVector {
    * @return the aggregated measure.
    * @see cern.jet.math.tdouble.DoubleFunctions
    */
-  double reduce(final DoubleDoubleFunction aggr, DoubleFunction f) {
+  double aggregate(final DoubleDoubleFunction aggr, DoubleFunction f) {
     if (_size == 0) return double.NAN;
     double a = f(get(0));
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -430,7 +430,7 @@ abstract class AbstractDoubleVector extends AbstractVector {
    * @throws IllegalArgumentException
    *             if <tt>size() != other.size()</tt>.
    */
-  void setAll(AbstractDoubleVector other) {
+  void copyFrom(AbstractDoubleVector other) {
     if (other == this) {
       return;
     }
@@ -656,7 +656,7 @@ abstract class AbstractDoubleVector extends AbstractVector {
    */
   AbstractDoubleVector copy() {
     AbstractDoubleVector copy = like();
-    copy.setAll(this);
+    copy.copyFrom(this);
     return copy;
   }
 
@@ -1204,7 +1204,9 @@ abstract class AbstractDoubleVector extends AbstractVector {
    *             if <tt>index&lt;0 || index&gt;=size()</tt>.
    */
   void operator []=(int index, double value) {
-    if (index < 0 || index >= _size) _checkIndex(index);
+    if (index < 0 || index >= _size) {
+      _checkIndex(index);
+    }
     set(index, value);
   }
 
@@ -1267,10 +1269,15 @@ abstract class AbstractDoubleVector extends AbstractVector {
    *
    * @return an array filled with the values of the cells.
    */
-  List<double> toList() {
-    Float64List values = new Float64List(_size);
-    fillList(values);
-    return values;
+  List<double> toList({bool growable: false}) {
+    List<double> result;
+    if (growable) {
+      result = new List<double>()..length = length;
+    } else {
+      result = new Float64List(length);
+    }
+    fillList(result);
+    return result;
   }
 
   /**
@@ -1624,7 +1631,7 @@ abstract class AbstractDoubleVector extends AbstractVector {
     if (length == 0) {
       return 0.0;
     }
-    return reduce(func.plus, func.identity);
+    return aggregate(func.plus, func.identity);
   }
 
   /**

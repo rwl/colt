@@ -31,7 +31,7 @@ class IntVectorLocation {
  * @author Piotr Wendykier (piotr.wendykier@gmail.com)
  *
  */
-abstract class AbstractIntVector extends AbstractVector {
+abstract class AbstractIntVector extends AbstractVector with ListMixin<int> {
 
   /**
    * Applies a function to each cell and aggregates the results. Returns a
@@ -63,7 +63,7 @@ abstract class AbstractIntVector extends AbstractVector {
    * @return the aggregated measure.
    * @see IntFunctions
    */
-  int reduce(final ifunc.IntIntFunction aggr, final ifunc.IntFunction f) {
+  int aggregate(final ifunc.IntIntFunction aggr, final ifunc.IntFunction f) {
     if (_size == 0) {
       throw new ArgumentError("size == 0");
     }
@@ -390,32 +390,32 @@ abstract class AbstractIntVector extends AbstractVector {
    * @throws ArgumentError
    *             if <tt>values.length != size()</tt>.
    */
-  void setAll(final List<int> values) {
-    if (values.length != _size) {
-      throw new ArgumentError("Must have same number of cells: length=${values.length} size()=$length");
-    }
-    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-      nthreads = Math.min(nthreads, _size);
-      List<Future> futures = new List<Future>(nthreads);
-      int k = _size / nthreads;
-      for (int j = 0; j < nthreads; j++) {
-        final int firstIdx = j * k;
-        final int lastIdx = (j == nthreads - 1) ? _size : firstIdx + k;
-
-        futures[j] = ConcurrencyUtils.submit(() {
-          for (int i = firstIdx; i < lastIdx; i++) {
-            set(i, values[i]);
-          }
-        });
-      }
-      ConcurrencyUtils.waitForCompletion(futures);
-    } else {*/
-      for (int i = 0; i < _size; i++) {
-        set(i, values[i]);
-      }
-    //}
-  }
+//  void setAll(final List<int> values) {
+//    if (values.length != _size) {
+//      throw new ArgumentError("Must have same number of cells: length=${values.length} size()=$length");
+//    }
+//    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
+//    if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+//      nthreads = Math.min(nthreads, _size);
+//      List<Future> futures = new List<Future>(nthreads);
+//      int k = _size / nthreads;
+//      for (int j = 0; j < nthreads; j++) {
+//        final int firstIdx = j * k;
+//        final int lastIdx = (j == nthreads - 1) ? _size : firstIdx + k;
+//
+//        futures[j] = ConcurrencyUtils.submit(() {
+//          for (int i = firstIdx; i < lastIdx; i++) {
+//            set(i, values[i]);
+//          }
+//        });
+//      }
+//      ConcurrencyUtils.waitForCompletion(futures);
+//    } else {*/
+//      for (int i = 0; i < _size; i++) {
+//        set(i, values[i]);
+//      }
+//    //}
+//  }
 
   /**
    * Replaces all cell values of the receiver with the values of another
@@ -1304,10 +1304,15 @@ abstract class AbstractIntVector extends AbstractVector {
    *
    * @return an array filled with the values of the cells.
    */
-  List<int> toList() {
-    Int32List values = new Int32List(_size);
-    fillList(values);
-    return values;
+  List<int> toList({bool growable: false}) {
+    List<int> result;
+    if (growable) {
+      result = new List<int>()..length = length;
+    } else {
+      result = new Int32List(length);
+    }
+    fillList(result);
+    return result;
   }
 
   /**
@@ -1703,7 +1708,7 @@ abstract class AbstractIntVector extends AbstractVector {
     if (length == 0) {
       return 0;
     }
-    return reduce(ifunc.plus, ifunc.identity);
+    return aggregate(ifunc.plus, ifunc.identity);
   }
 
   Object clone();
