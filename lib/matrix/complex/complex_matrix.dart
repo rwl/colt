@@ -89,7 +89,7 @@ class ComplexMatrix extends AbstractComplexMatrix {
    *             <tt>rows<0 || columns<0 || (double)columns*rows > Integer.MAX_VALUE</tt>
    *             .
    */
-  factory ComplexMatrix.fromRealPart(AbstractDoubleMatrix realPart) {
+  factory ComplexMatrix.fromReal(AbstractDoubleMatrix realPart) {
     return new ComplexMatrix(realPart.rows, realPart.columns)..setReal(realPart);
   }
 
@@ -106,10 +106,10 @@ class ComplexMatrix extends AbstractComplexMatrix {
    *             <tt>rows<0 || columns<0 || (double)columns*rows > Integer.MAX_VALUE</tt>
    *             .
    */
-  /*DenseComplexMatrix(int rows, int columns) {
-        _setUp(rows, columns, 0, 0, 2 * columns, 2);
-        this._elements = new Float64List(rows * 2 * columns);
-    }*/
+  factory ComplexMatrix(int rows, int columns) {
+    final elements = new Float64List(rows * 2 * columns);
+    return new ComplexMatrix._internal(rows, columns, elements, 0, 0, 2 * columns, 2, true);
+  }
 
   /**
    * Constructs a matrix with the given parameters.
@@ -138,13 +138,8 @@ class ComplexMatrix extends AbstractComplexMatrix {
    *             <tt>rows<0 || columns<0 || (double)columns*rows > Integer.MAX_VALUE</tt>
    *             or flip's are illegal.
    */
-  ComplexMatrix(int rows, int columns, [Float64List elements = null, int rowZero = 0, int columnZero = 0, int rowStride = null, int columnStride = 2, bool isNoView = true]) {
-    if (rowStride == null) {
-      rowStride = 2 * columns;
-    }
-    if (elements == null) {
-      elements = new Float64List(rows * 2 * columns);
-    }
+  //ComplexMatrix._internal(int rows, int columns, [Float64List elements = null, int rowZero = 0, int columnZero = 0, int rowStride = null, int columnStride = 2, bool isNoView = true]) {
+  ComplexMatrix._internal(int rows, int columns, Float64List elements, int rowZero, int columnZero, int rowStride, int columnStride, bool isNoView) {
     _setUp(rows, columns, rowZero, columnZero, rowStride, columnStride);
     this._elements = elements;
     this._isNoView = isNoView;
@@ -1818,15 +1813,15 @@ class ComplexMatrix extends AbstractComplexMatrix {
   }
 
   AbstractComplexVector _like1D(int size, int zero, int stride) {
-    return new ComplexVector(size, this._elements, zero, stride, false);
+    return new ComplexVector._internal(size, this._elements, zero, stride, false);
   }
 
   AbstractComplexMatrix _viewSelectionLike(List<int> rowOffsets, List<int> columnOffsets) {
-    return new SelectedDenseComplexMatrix.withOffsets(this._elements, rowOffsets, columnOffsets, 0);
+    return new SelectedDenseComplexMatrix(this._elements, rowOffsets, columnOffsets, 0);
   }
 
   Object clone() {
-    return new ComplexMatrix(_rows, _columns, _elements, _rowZero, _columnZero, _rowStride, _columnStride, _isNoView);
+    return new ComplexMatrix._internal(_rows, _columns, _elements, _rowZero, _columnZero, _rowStride, _columnStride, _isNoView);
   }
 }
 
@@ -1878,8 +1873,8 @@ class SelectedDenseComplexMatrix extends AbstractComplexMatrix {
    *            The column offsets of the cells that shall be visible.
    * @param offset
    */
-  factory SelectedDenseComplexMatrix.withOffsets(Float64List elements, List<int> rowOffsets, List<int> columnOffsets, int offset) {
-    return new SelectedDenseComplexMatrix(rowOffsets.length, columnOffsets.length, elements, 0, 0, 1, 1, rowOffsets, columnOffsets, offset);
+  factory SelectedDenseComplexMatrix(Float64List elements, List<int> rowOffsets, List<int> columnOffsets, int offset) {
+    return new SelectedDenseComplexMatrix._internal(rowOffsets.length, columnOffsets.length, elements, 0, 0, 1, 1, rowOffsets, columnOffsets, offset);
   }
 
   /**
@@ -1907,7 +1902,7 @@ class SelectedDenseComplexMatrix extends AbstractComplexMatrix {
    *            The column offsets of the cells that shall be visible.
    * @param offset
    */
-  SelectedDenseComplexMatrix(int rows, int columns, Float64List elements, int rowZero, int columnZero, int rowStride, int columnStride, List<int> rowOffsets, List<int> columnOffsets, int offset) {
+  SelectedDenseComplexMatrix._internal(int rows, int columns, Float64List elements, int rowZero, int columnZero, int rowStride, int columnStride, List<int> rowOffsets, List<int> columnOffsets, int offset) {
     // be sure parameters are valid, we do not check...
     _setUp(rows, columns, rowZero, columnZero, rowStride, columnStride);
 
@@ -2016,7 +2011,7 @@ class SelectedDenseComplexMatrix extends AbstractComplexMatrix {
     int viewStride = this._rowStride;
     Int32List viewOffsets = this._rowOffsets;
     int viewOffset = this._offset + _columnOffset(_columnRank(column));
-    return new SelectedDenseComplexVector(viewSize, this._elements, viewZero, viewStride, viewOffsets, viewOffset);
+    return new SelectedDenseComplexVector._internal(viewSize, this._elements, viewZero, viewStride, viewOffsets, viewOffset);
   }
 
   AbstractComplexVector row(int row) {
@@ -2026,11 +2021,11 @@ class SelectedDenseComplexMatrix extends AbstractComplexMatrix {
     int viewStride = this._columnStride;
     Int32List viewOffsets = this._columnOffsets;
     int viewOffset = this._offset + _rowOffset(_rowRank(row));
-    return new SelectedDenseComplexVector(viewSize, this._elements, viewZero, viewStride, viewOffsets, viewOffset);
+    return new SelectedDenseComplexVector._internal(viewSize, this._elements, viewZero, viewStride, viewOffsets, viewOffset);
   }
 
   AbstractComplexMatrix _viewSelectionLike(List<int> rowOffsets, List<int> columnOffsets) {
-    return new SelectedDenseComplexMatrix.withOffsets(this._elements, rowOffsets, columnOffsets, this._offset);
+    return new SelectedDenseComplexMatrix(this._elements, rowOffsets, columnOffsets, this._offset);
   }
 
   AbstractDoubleMatrix real() {
@@ -2098,6 +2093,6 @@ class SelectedDenseComplexMatrix extends AbstractComplexMatrix {
   }
 
   Object clone() {
-    return new SelectedDenseComplexMatrix(_rows, _columns, _elements, _rowZero, _columnZero, _rowStride, _columnStride, _rowOffsets, _columnOffsets, _offset);
+    return new SelectedDenseComplexMatrix._internal(_rows, _columns, _elements, _rowZero, _columnZero, _rowStride, _columnStride, _rowOffsets, _columnOffsets, _offset);
   }
 }

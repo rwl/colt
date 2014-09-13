@@ -83,6 +83,14 @@ class ComplexVector extends AbstractComplexVector {
   }
 
   /**
+   * Constructs a matrix with the given size.
+   */
+  factory ComplexVector(int size) {
+    final elements = new Float64List(2 * size);
+    return new ComplexVector._internal(size, elements, 0, 2, true);
+  }
+
+  /**
    * Constructs a matrix with the given parameters.
    *
    * @param size
@@ -99,10 +107,7 @@ class ComplexVector extends AbstractComplexVector {
    * @throws IllegalArgumentException
    *             if <tt>size<0</tt>.
    */
-  ComplexVector(int size, [Float64List elements = null, int zero = 0, int stride = 2, bool isNoView = true]) {
-    if (elements == null) {
-      elements = new Float64List(2 * size);
-    }
+  ComplexVector._internal(int size, Float64List elements, int zero, int stride, bool isNoView) {
     _setUp(size, zero, stride);
     this._elements = elements;
     this._isNoView = isNoView;
@@ -1269,11 +1274,11 @@ class ComplexVector extends AbstractComplexVector {
   }
 
   AbstractComplexVector _viewSelectionLike(List<int> offsets) {
-    return new SelectedDenseComplexVector.withOffsets(this._elements, offsets);
+    return new SelectedDenseComplexVector(this._elements, offsets);
   }
 
   Object clone() {
-    return new ComplexVector(_size, _elements, _zero, _stride, _isNoView);
+    return new ComplexVector._internal(_size, _elements, _zero, _stride, _isNoView);
   }
 }
 
@@ -1321,8 +1326,8 @@ class SelectedDenseComplexVector extends AbstractComplexVector {
    * @param indexes
    *            The indexes of the cells that shall be visible.
    */
-  factory SelectedDenseComplexVector.withOffsets(Float64List elements, List<int> offsets) {
-    return new SelectedDenseComplexVector(offsets.length, elements, 0, 1, offsets, 0);
+  factory SelectedDenseComplexVector(Float64List elements, List<int> offsets) {
+    return new SelectedDenseComplexVector._internal(offsets.length, elements, 0, 1, offsets, 0);
   }
 
   /**
@@ -1341,7 +1346,7 @@ class SelectedDenseComplexVector extends AbstractComplexVector {
    *            the offsets of the cells that shall be visible.
    * @param offset
    */
-  SelectedDenseComplexVector(int size, Float64List elements, int zero, int stride, List<int> offsets, int offset) {
+  SelectedDenseComplexVector._internal(int size, Float64List elements, int zero, int stride, List<int> offsets, int offset) {
     _setUp(size, zero, stride);
 
     this._elements = elements;
@@ -1473,11 +1478,11 @@ class SelectedDenseComplexVector extends AbstractComplexVector {
   }
 
   AbstractComplexVector _viewSelectionLike(List<int> offsets) {
-    return new SelectedDenseComplexVector.withOffsets(this._elements, offsets);
+    return new SelectedDenseComplexVector(this._elements, offsets);
   }
 
   Object clone() {
-    return new SelectedDenseComplexVector(_size, _elements, _zero, _stride, _offsets, __offset);
+    return new SelectedDenseComplexVector._internal(_size, _elements, _zero, _stride, _offsets, __offset);
   }
 
 }

@@ -42,10 +42,10 @@ class SparseComplexVector extends AbstractComplexVector {
    * @throws IllegalArgumentException
    *             if <tt>size<0</tt>.
    */
-  /*factory SparseComplexVector.SparseRCDoubleMatrix(int size) {
-        _setUp(size);
-        this._elements = new ConcurrentHashMap<Long, Float64List>(size / 1000);
-    }*/
+  factory SparseComplexVector(int size) {
+    final elements = new Map<int, Float64List>();
+    return new SparseComplexVector._internal(size, elements, 0, 1, true);
+  }
 
   /**
    * Constructs a matrix view with a given number of parameters.
@@ -62,10 +62,7 @@ class SparseComplexVector extends AbstractComplexVector {
    * @throws IllegalArgumentException
    *             if <tt>size<0</tt>.
    */
-  SparseComplexVector(int size, [Map<int, Float64List> elements = null, int offset = 0, int stride = 1, bool isNoView = false]) {
-    if (elements == null) {
-      elements = new Map<int, Float64List>();
-    }
+  SparseComplexVector._internal(int size, Map<int, Float64List> elements, int offset, int stride, bool isNoView) {
     _setUp(size, offset, stride);
     this._elements = elements;
     this._isNoView = isNoView;
@@ -282,7 +279,7 @@ class SparseComplexVector extends AbstractComplexVector {
   }
 
   Object clone() {
-    return new SparseComplexVector(_size, _elements, _zero, _stride, _isNoView);
+    return new SparseComplexVector._internal(_size, _elements, _zero, _stride, _isNoView);
   }
 }
 

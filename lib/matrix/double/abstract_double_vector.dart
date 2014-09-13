@@ -1584,7 +1584,7 @@ abstract class AbstractDoubleVector extends AbstractVector with ListMixin<double
    *            the indexes of cells in <tt>y</tt>having a non-zero value.
    * @return the sum of products.
    */
-  double dotNonZero(AbstractDoubleVector y,  /*IntArrayList*/Int32List nonZeroIndexes, [int from=0, int length=null]) {
+  double dotNonZero(AbstractDoubleVector y, List<int> nonZeroIndexes, [int from=0, int length=null]) {
     if (length == null) {
       length = _size;
     }
