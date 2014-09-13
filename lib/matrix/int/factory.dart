@@ -104,7 +104,7 @@ class IntFactory1D {
    * Constructs a matrix which is the concatenation of all given parts. Cells
    * are copied.
    */
-  AbstractIntVector cat(List<AbstractIntVector> parts) {
+  AbstractIntVector concat(List<AbstractIntVector> parts) {
     if (parts.length == 0) {
       return make(0);
     }

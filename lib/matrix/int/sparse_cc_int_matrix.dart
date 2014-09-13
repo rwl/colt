@@ -1141,4 +1141,8 @@ class SparseCCIntMatrix extends WrapperIntMatrix {
     }
     return nz;
   }
+
+  Object clone() {
+    return new SparseCCIntMatrix._internal(rows, columns, _rowIndexes, _columnPointers, _values);
+  }
 }

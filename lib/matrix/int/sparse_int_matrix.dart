@@ -866,6 +866,10 @@ class SparseIntMatrix extends AbstractIntMatrix {
     return new SelectedSparseIntMatrix(this._elements, rowOffsets, columnOffsets, 0);
   }
 
+  Object clone() {
+    return new SparseIntMatrix._internal(rows, columns, _elements, _rowZero, _columnZero, _rowStride, _columnStride);
+  }
+
 }
 
 
@@ -1240,9 +1244,9 @@ class SelectedSparseIntMatrix extends AbstractIntMatrix {
    * @return a new matrix of the corresponding dynamic type.
    */
   AbstractIntVector _like1D(int size, int zero, int stride) {
-    throw new Error(); // this method is never called since
-    // viewRow() and viewColumn are overridden
-    // properly.
+    // this method is never called since
+    // row() and column() are overridden properly.
+    throw new Error();
   }
 
   /**
@@ -1288,5 +1292,9 @@ class SelectedSparseIntMatrix extends AbstractIntMatrix {
    */
   AbstractIntMatrix _viewSelectionLike(List<int> rowOffsets, List<int> columnOffsets) {
     return new SelectedSparseIntMatrix(this._elements, rowOffsets, columnOffsets, this._offset);
+  }
+
+  Object clone() {
+    return new SelectedSparseIntMatrix._internal(rows, columns, _elements, _rowZero, _columnZero, _rowStride, _columnStride, _rowOffsets, _columnOffsets, _offset);
   }
 }

@@ -276,6 +276,10 @@ class WrapperIntMatrix extends AbstractIntMatrix {
   AbstractIntMatrix _viewSelectionLike(List<int> rowOffsets, List<int> columnOffsets) {
     throw new Error(); // should never be called
   }
+
+  Object clone() {
+    return new WrapperIntMatrix(_content);
+  }
 }
 
 class StridesWrapperIntMatrix2D extends WrapperIntMatrix {
@@ -296,6 +300,10 @@ class StridesWrapperIntMatrix2D extends WrapperIntMatrix {
 
   void put(int row, int column, int value) {
     _content.put(_rowStride * row, _columnStride * column, value);
+  }
+
+  Object clone() {
+    return new StridesWrapperIntMatrix2D(_content);
   }
 }
 
@@ -322,6 +330,10 @@ class SelectWrapperIntMatrix2D extends WrapperIntMatrix {
   void put(int i, int j, int value) {
     _content.put(rix[i], cix[j], value);
   }
+
+  Object clone() {
+    return new SelectWrapperIntMatrix2D(_content, cix, rix);
+  }
 }
 
 class RowFlipWrapperIntMatrix2D extends WrapperIntMatrix {
@@ -342,6 +354,10 @@ class RowFlipWrapperIntMatrix2D extends WrapperIntMatrix {
 
   void put(int row, int column, int value) {
     _content.put(_rows - 1 - row, column, value);
+  }
+
+  Object clone() {
+    return new RowFlipWrapperIntMatrix2D(_content);
   }
 }
 
@@ -369,6 +385,10 @@ class PartWrapperIntMatrix2D extends WrapperIntMatrix {
   void put(int i, int j, int value) {
     _content.put(__row + i, __column + j, value);
   }
+
+  Object clone() {
+    return new PartWrapperIntMatrix2D(_content, __column, __row);
+  }
 }
 
 class DiceWrapperIntMatrix2D extends WrapperIntMatrix {
@@ -390,6 +410,10 @@ class DiceWrapperIntMatrix2D extends WrapperIntMatrix {
   void put(int row, int column, int value) {
     _content.put(column, row, value);
   }
+
+  Object clone() {
+    return new DiceWrapperIntMatrix2D(_content);
+  }
 }
 
 class FlipWrapperIntMatrix2D extends WrapperIntMatrix {
@@ -410,5 +434,9 @@ class FlipWrapperIntMatrix2D extends WrapperIntMatrix {
 
   void put(int row, int column, int value) {
     _content.put(row, _columns - 1 - column, value);
+  }
+
+  Object clone() {
+    return new FlipWrapperIntMatrix2D(_content);
   }
 }

@@ -671,4 +671,8 @@ class DiagonalIntMatrix extends WrapperIntMatrix {
   AbstractIntMatrix _getContent() {
     return this;
   }
+
+  Object clone() {
+    return new DiagonalIntMatrix(rows, columns, _dindex);
+  }
 }

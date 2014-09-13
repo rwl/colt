@@ -98,10 +98,10 @@ class IntMatrix extends AbstractIntMatrix {
    *             <tt>rows<0 || columns<0 || (int)columns*rows > Int.MAX_VALUE</tt>
    *             .
    */
-  /*DenseIntMatrix(int rows, int columns) {
-    _setUp(rows, columns);
-    this._elements = new Int32List(rows * columns);
-  }*/
+  factory IntMatrix(int rows, int columns) {
+    final elements = new Int32List(rows * columns);
+    return new IntMatrix._internal(rows, columns, elements, 0, 0, columns, 1, false);
+  }
 
   /**
    * Constructs a view with the given parameters.
@@ -129,10 +129,7 @@ class IntMatrix extends AbstractIntMatrix {
    *             <tt>rows<0 || columns<0 || (int)columns*rows > Int.MAX_VALUE</tt>
    *             or flip's are illegal.
    */
-  IntMatrix(int rows, int columns, [Int32List elements = null, int rowZero = 0, int columnZero = 0, int rowStride = null, int columnStride = 1, bool isView = false]) {
-    if (elements == null) {
-      elements = new Int32List(rows * columns);
-    }
+  IntMatrix._internal(int rows, int columns, Int32List elements, int rowZero, int columnZero, int rowStride, int columnStride, bool isView) {
     _setUp(rows, columns, rowZero, columnZero, rowStride, columnStride);
     this._elements = elements;
     this._isNoView = !isView;
@@ -1756,7 +1753,7 @@ class IntMatrix extends AbstractIntMatrix {
   }
 
   AbstractIntVector _like1D(int size, int zero, int stride) {
-    return new IntVector(size, this._elements, zero, stride, true);
+    return new IntVector._internal(size, this._elements, zero, stride, true);
   }
 
   AbstractIntMatrix _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets) {
@@ -1764,7 +1761,7 @@ class IntMatrix extends AbstractIntMatrix {
   }
 
   Object clone() {
-    return new IntMatrix(_rows, _columns, _elements, _rowZero, _columnZero, _rowStride, _columnStride, !_isNoView);
+    return new IntMatrix._internal(_rows, _columns, _elements, _rowZero, _columnZero, _rowStride, _columnStride, !_isNoView);
   }
 }
 
@@ -2040,7 +2037,7 @@ class SelectedDenseIntMatrix extends AbstractIntMatrix {
     int viewStride = this._rowStride;
     Int32List viewOffsets = this._rowOffsets;
     int viewOffset = this._offset + _columnOffset(_columnRank(column));
-    return new SelectedDenseIntVector(viewSize, this._elements, viewZero, viewStride, viewOffsets, viewOffset);
+    return new SelectedDenseIntVector._internal(viewSize, this._elements, viewZero, viewStride, viewOffsets, viewOffset);
   }
 
   /**
@@ -2077,7 +2074,7 @@ class SelectedDenseIntMatrix extends AbstractIntMatrix {
     int viewStride = this._columnStride;
     Int32List viewOffsets = this._columnOffsets;
     int viewOffset = this._offset + _rowOffset(_rowRank(row));
-    return new SelectedDenseIntVector(viewSize, this._elements, viewZero, viewStride, viewOffsets, viewOffset);
+    return new SelectedDenseIntVector._internal(viewSize, this._elements, viewZero, viewStride, viewOffsets, viewOffset);
   }
 
   /**

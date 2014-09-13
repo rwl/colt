@@ -63,10 +63,10 @@ class IntVector extends AbstractIntVector {
    * @throws ArgumentError
    *             if <tt>size<0</tt>.
    */
-  /*factory DenseIntVector.sized(int size) {
-    _setUp(size);
-    this._elements = new Int32List(size);
-  }*/
+  factory IntVector(int size) {
+    final elements = new Int32List(size);
+    return new IntVector._internal(size, elements, 0, 1, false);
+  }
 
   /**
    * Constructs a matrix with the given parameters.
@@ -85,7 +85,7 @@ class IntVector extends AbstractIntVector {
    * @throws ArgumentError
    *             if <tt>size<0</tt>.
    */
-  IntVector(int size, [Int32List elements = null, int zero = 0, int stride = 1, bool isView = false]) {
+  IntVector._internal(int size, Int32List elements, int zero, int stride, bool isView) {
     if (elements == null) {
       elements = new Int32List(size);
     }
@@ -1344,11 +1344,11 @@ class IntVector extends AbstractIntVector {
   }
 
   AbstractIntVector _viewSelectionLike(List<int> offsets) {
-    return new SelectedDenseIntVector.offset(this._elements, offsets);
+    return new SelectedDenseIntVector(this._elements, offsets);
   }
 
   Object clone() {
-    return new IntVector(length, _elements, _zero, _stride, !_isNoView);
+    return new IntVector._internal(length, _elements, _zero, _stride, !_isNoView);
   }
 
   DoubleVector toDouble() {
@@ -1416,8 +1416,8 @@ class SelectedDenseIntVector extends AbstractIntVector {
    * @param indexes
    *            The indexes of the cells that shall be visible.
    */
-  factory SelectedDenseIntVector.offset(Int32List elements, List<int> offsets) {
-    return new SelectedDenseIntVector(offsets.length, elements, 0, 1, offsets, 0);
+  factory SelectedDenseIntVector(Int32List elements, List<int> offsets) {
+    return new SelectedDenseIntVector._internal(offsets.length, elements, 0, 1, offsets, 0);
   }
 
   /**
@@ -1436,7 +1436,7 @@ class SelectedDenseIntVector extends AbstractIntVector {
    *            the offsets of the cells that shall be visible.
    * @param offset
    */
-  SelectedDenseIntVector(int size, Int32List elements, int zero, int stride, List<int> offsets, int offset) {
+  SelectedDenseIntVector._internal(int size, Int32List elements, int zero, int stride, List<int> offsets, int offset) {
     _setUp(size, zero, stride);
 
     this._elements = elements;
@@ -1592,10 +1592,10 @@ class SelectedDenseIntVector extends AbstractIntVector {
    * @return a new view.
    */
   AbstractIntVector _viewSelectionLike(List<int> offsets) {
-    return new SelectedDenseIntVector.offset(this._elements, offsets);
+    return new SelectedDenseIntVector(this._elements, offsets);
   }
 
   Object clone() {
-    return new SelectedDenseIntVector(length, _elements, _zero, _stride, _offsets, __offset);
+    return new SelectedDenseIntVector._internal(length, _elements, _zero, _stride, _offsets, __offset);
   }
 }

@@ -1207,4 +1207,8 @@ class SparseRCIntMatrix extends WrapperIntMatrix {
     _values = new Int32List.fromList(valuesList);
   }
 
+  Object clone() {
+    return new SparseRCIntMatrix._internal(_rows, _columns, _rowPointers, _columnIndexes, _values);
+  }
+
 }

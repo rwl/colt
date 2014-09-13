@@ -65,6 +65,7 @@ part 'int/wrapper_int_matrix.dart';
 part 'int/diagonal_int_matrix.dart';
 part 'int/sparse_cc_int_matrix.dart';
 part 'int/sparse_rc_int_matrix.dart';
+part 'int/delegate_int_vector.dart';
 
 part 'double/factory.dart';
 part 'int/factory.dart';

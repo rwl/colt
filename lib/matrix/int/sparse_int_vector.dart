@@ -370,6 +370,10 @@ class SparseIntVector extends AbstractIntVector {
   AbstractIntVector _viewSelectionLike(List<int> offsets) {
     return new SelectedSparseIntVector(this._elements, offsets);
   }
+
+  Object clone() {
+    return new SparseIntVector._internal(length, _elements, _zero, _stride);
+  }
 }
 
 /**
@@ -616,5 +620,9 @@ class SelectedSparseIntVector extends AbstractIntVector {
    */
   AbstractIntVector _viewSelectionLike(List<int> offsets) {
     return new SelectedSparseIntVector(this._elements, offsets);
+  }
+
+  Object clone() {
+    return new SelectedSparseIntVector._internal(_size, _elements, _zero, _stride, _offsets, __offset);
   }
 }
