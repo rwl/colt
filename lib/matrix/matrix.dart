@@ -7,7 +7,7 @@ import 'dart:collection' show ListMixin;
 
 import 'package:intl/intl.dart';
 
-import 'package:csparse/double/csparse.dart';
+import 'package:csparse/double/csparse.dart' as cs;
 import 'package:csparse/complex/cxsparse.dart' show DZcs;
 import 'package:csparse/complex/cxsparse.dart' as cxsparse;
 

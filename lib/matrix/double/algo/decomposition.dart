@@ -85,8 +85,8 @@ abstract class SparseDoubleLUDecomposition {
  * @author Piotr Wendykier (piotr.wendykier@gmail.com)
  */
 class CSparseDoubleLUDecomposition implements SparseDoubleLUDecomposition {
-  Dcss _S;
-  Dcsn _N;
+  Symbolic _S;
+  Numeric _N;
   AbstractDoubleMatrix _L;
   AbstractDoubleMatrix _U;
   bool _rcMatrix = false;
@@ -121,25 +121,25 @@ class CSparseDoubleLUDecomposition implements SparseDoubleLUDecomposition {
     if (order < 0 || order > 3) {
       throw new ArgumentError("order must be a number between 0 and 3");
     }
-    Dcs dcs;
+    Matrix dcs;
     if (A is SparseRCDoubleMatrix) {
       _rcMatrix = true;
       dcs = A.getColumnCompressed().elements;
     } else {
-      dcs = A.elements as Dcs;
+      dcs = A.elements as Matrix;
     }
     _n = A.rows;
 
-    _S = cs_sqr(order, dcs, false);
+    _S = sqr(order, dcs, false);
     if (_S == null) {
       throw new ArgumentError("Exception occured in cs_sqr()");
     }
-    _N = cs_lu(dcs, _S, 1.0);
+    _N = lu(dcs, _S, 1.0);
     if (_N == null) {
       throw new ArgumentError("Exception occured in cs_lu()");
     }
     if (checkIfSingular) {
-      Dcsd D = cs_dmperm(dcs, 1);
+      Decomposition D = dmperm(dcs, 1);
       /* check if matrix is singular */
       if (D != null && D.rr[3] < _n) {
         _isNonSingular = false;
@@ -200,8 +200,8 @@ class CSparseDoubleLUDecomposition implements SparseDoubleLUDecomposition {
     return _U.copy();
   }
 
-  Dcss getSymbolicAnalysis() {
-    Dcss S2 = new Dcss();
+  Symbolic getSymbolicAnalysis() {
+    Symbolic S2 = new Symbolic();
     S2.cp = _S.cp != null ? _S.cp.clone() : null;
     S2.leftmost = _S.leftmost != null ? _S.leftmost.clone() : null;
     S2.lnz = _S.lnz;
@@ -232,13 +232,13 @@ class CSparseDoubleLUDecomposition implements SparseDoubleLUDecomposition {
     } else {
       x = b.elements as Float64List;
     }
-    cs_ipvec(_N.pinv, x, y, _n);
+    ipvec(_N.pinv, x, y, _n);
     /* y = b(p) */
-    cs_lsolve(_N.L, y);
+    lsolve(_N.L, y);
     /* y = L\y */
-    cs_usolve(_N.U, y);
+    usolve(_N.U, y);
     /* y = U\y */
-    cs_ipvec(_S.q, y, x, _n);
+    ipvec(_S.q, y, x, _n);
     /* b(q) = x */
 
     if (b.isView) {
@@ -300,12 +300,12 @@ class SparseDoubleKLUDecomposition implements SparseDoubleLUDecomposition {
     _Common.ordering = order;
     _Common.btf = preOrder ? 1 : 0;
 
-    Dcs dcs;
+    Matrix dcs;
     if (A is SparseRCDoubleMatrix) {
       _rcMatrix = true;
       dcs = A.getColumnCompressed().elements;
     } else {
-      dcs = A.elements as Dcs;
+      dcs = A.elements as Matrix;
     }
     _n = A.rows;
     Int32List Ap = dcs.p,

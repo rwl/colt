@@ -117,7 +117,7 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
   /*
    * Internal storage.
    */
-  Dcs _dcs;
+  cs.Matrix _dcs;
 
   bool _rowIndexesSorted = false;
 
@@ -147,7 +147,7 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
    * @param dcs
    *            internal storage.
    */
-  SparseCCDoubleMatrix._internal(Dcs dcs) : super(null) {
+  SparseCCDoubleMatrix._internal(cs.Matrix dcs) : super(null) {
     try {
       _setUp(dcs.m, dcs.n);
     } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
@@ -197,7 +197,7 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
         throw exc;
       }
     }
-    _dcs = cs_spalloc(rows, columns, nzmax, true, false);
+    _dcs = cs.spalloc(rows, columns, nzmax, true, false);
   }
 
   /**
@@ -223,7 +223,7 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
     if (columnPointers.length != columns + 1) {
       throw new ArgumentError("columnsPointers.length != columns + 1");
     }*/
-    Dcs dcs = new Dcs();
+    cs.Matrix dcs = new cs.Matrix();
     dcs.m = rows;
     dcs.n = columns;
     dcs.i = rowIndexes;
@@ -267,7 +267,7 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
     }
 
     int nz = Math.max(rowIndexes.length, 1);
-    Dcs dcs = cs_spalloc(rows, columns, nz, true, false);
+    cs.Matrix dcs = cs.spalloc(rows, columns, nz, true, false);
     Int32List w = new Int32List(columns);
     Int32List Cp = dcs.p;
     Int32List Ci = dcs.i;
@@ -275,7 +275,7 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
     for (int k = 0; k < nz; k++) {
       w[columnIndexes[k]]++;
     }
-    cs_cumsum(Cp, w, columns);
+    cs.cumsum(Cp, w, columns);
     int p;
     for (int k = 0; k < nz; k++) {
       Ci[p = w[columnIndexes[k]]++] = rowIndexes[k];
@@ -284,15 +284,15 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
       }
     }
     if (removeDuplicates) {
-      if (!cs_dupl(dcs)) { //remove duplicates
+      if (!cs.dupl(dcs)) { //remove duplicates
         throw new ArgumentError("Exception occured in cs_dupl()!");
       }
     }
     bool rowIndexesSorted = false;
     if (sortRowIndexes) {
       //sort row indexes
-      dcs = cs_transpose(dcs, true);
-      dcs = cs_transpose(dcs, true);
+      dcs = cs.transpose(dcs, true);
+      dcs = cs.transpose(dcs, true);
       if (dcs == null) {
         throw new ArgumentError("Exception occured in cs_transpose()!");
       }
@@ -335,13 +335,13 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
       throw new ArgumentError("rowIndexes.length != values.length");
     }*/
     int nz = Math.max(rowIndexes.length, 1);
-    Dcs dcs = cs_spalloc(rows, columns, nz, true, false);
+    cs.Matrix dcs = cs.spalloc(rows, columns, nz, true, false);
     Int32List w = new Int32List(columns);
     Int32List Cp = dcs.p;
     Int32List Ci = dcs.i;
     Float64List Cx = dcs.x;
     for (int k = 0; k < nz; k++) w[columnIndexes[k]]++;
-    cs_cumsum(Cp, w, columns);
+    cs.cumsum(Cp, w, columns);
     int p;
     for (int k = 0; k < nz; k++) {
       Ci[p = w[columnIndexes[k]]++] = rowIndexes[k];
@@ -350,17 +350,17 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
       }
     }
     if (removeZeroes) {
-      cs_dropzeros(dcs); //remove zeroes
+      cs.dropzeros(dcs); //remove zeroes
     }
     if (removeDuplicates) {
-      if (!cs_dupl(dcs)) { //remove duplicates
+      if (!cs.dupl(dcs)) { //remove duplicates
         throw new ArgumentError("Exception occured in cs_dupl()!");
       }
     }
     bool rowIndexesSorted = false;
     if (sortRowIndexes) {
-      dcs = cs_transpose(dcs, true);
-      dcs = cs_transpose(dcs, true);
+      dcs = cs.transpose(dcs, true);
+      dcs = cs.transpose(dcs, true);
       if (dcs == null) {
         throw new ArgumentError("Exception occured in cs_transpose()!");
       }
@@ -451,7 +451,7 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
 
     if ((y is SparseCCDoubleMatrix) && (function == func.plus)) { // x[i] = x[i] + y[i]
       SparseCCDoubleMatrix yy = y;
-      _dcs = cs_add(_dcs, yy._dcs, 1.0, 1.0);
+      _dcs = cs.add(_dcs, yy._dcs, 1.0, 1.0);
       return;
     }
 
@@ -574,7 +574,7 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
    * @return this matrix in a row-compressed form
    */
   SparseRCDoubleMatrix rowCompressed() {
-    Dcs dcst = cs_transpose(_dcs, true);
+    cs.Matrix dcst = cs.transpose(_dcs, true);
     SparseRCDoubleMatrix rc = new SparseRCDoubleMatrix(_rows, _columns);
     rc._columnIndexes = dcst.i;
     rc._rowPointers = dcst.p;
@@ -598,7 +598,7 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
    * @return the transpose of this matrix
    */
   SparseCCDoubleMatrix transpose() {
-    Dcs dcst = cs_transpose(_dcs, true);
+    cs.Matrix dcst = cs.transpose(_dcs, true);
     SparseCCDoubleMatrix tr = new SparseCCDoubleMatrix(_columns, _rows);
     tr._dcs = dcst;
     return tr;
@@ -647,8 +647,8 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
    * Sorts row indexes
    */
   void sortRowIndexes() {
-    _dcs = cs_transpose(_dcs, true);
-    _dcs = cs_transpose(_dcs, true);
+    _dcs = cs.transpose(_dcs, true);
+    _dcs = cs.transpose(_dcs, true);
     if (_dcs == null) {
       throw new ArgumentError("Exception occured in cs_transpose()!");
     }
@@ -659,7 +659,7 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
    * Removes (sums) duplicate entries (if any}
    */
   void removeDuplicates() {
-    if (!cs_dupl(_dcs)) { //remove duplicates
+    if (!cs.dupl(_dcs)) { //remove duplicates
       throw new ArgumentError("Exception occured in cs_dupl()!");
     }
   }
@@ -668,11 +668,11 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
    * Removes zero entries (if any)
    */
   void removeZeroes() {
-    cs_dropzeros(_dcs); //remove zeroes
+    cs.dropzeros(_dcs); //remove zeroes
   }
 
   void trimToSize() {
-    cs_sprealloc(_dcs, 0);
+    cs.sprealloc(_dcs, 0);
   }
 
   String toString() {
@@ -921,7 +921,7 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
         BB = BB.transpose();
       }
       SparseCCDoubleMatrix CC = C;
-      CC._dcs = cs_multiply(AA._dcs, BB._dcs);
+      CC._dcs = cs.multiply(AA._dcs, BB._dcs);
       if (CC._dcs == null) {
         throw new ArgumentError("Exception occured in cs_multiply()");
       }
