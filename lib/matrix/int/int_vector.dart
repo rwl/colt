@@ -94,6 +94,13 @@ class IntVector extends AbstractIntVector {
     this._isNoView = !isView;
   }
 
+  factory IntVector.nonZero(List<int> values) {
+    var v = new IntVector._internal(values.length, values, 0, 1, false);
+    var idx = [];
+    v.nonZeros(indexList: idx);
+    return new IntVector.fromList(idx);
+  }
+
   int aggregate(final ifunc.IntIntFunction aggr, final ifunc.IntFunction f) {
     if (_size == 0) {
       throw new ArgumentError("size == 0");

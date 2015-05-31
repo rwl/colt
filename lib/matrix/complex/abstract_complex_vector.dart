@@ -1435,7 +1435,19 @@ abstract class AbstractComplexVector extends AbstractVector {
     return this.copy()..forEachWith(y, cfunc.minus);
   }
 
+  AbstractComplexVector operator -() {
+    return this.copy()..forEach(cfunc.neg);
+  }
+
   AbstractComplexVector conj() {
     return this.copy()..forEach(cfunc.conj);
+  }
+
+  AbstractComplexVector abs() {
+    return this.copy()..forEachReal(cfunc.abs);
+  }
+
+  AbstractComplexVector arg() {
+    return this.copy()..forEachReal(cfunc.arg);
   }
 }

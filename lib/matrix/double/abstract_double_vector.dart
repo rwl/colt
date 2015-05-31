@@ -1722,4 +1722,8 @@ abstract class AbstractDoubleVector extends AbstractVector with ListMixin<double
   AbstractDoubleVector operator -(AbstractDoubleVector y) {
     return this.copy()..forEachWith(y, func.minus);
   }
+
+  AbstractDoubleVector operator -() => copy()..forEach(func.neg);
+
+  double normInfinity() => dprop.normInfinity(this);
 }

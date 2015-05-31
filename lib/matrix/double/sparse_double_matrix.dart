@@ -298,6 +298,10 @@ class SparseDoubleMatrix extends AbstractDoubleMatrix {
     this._isNoView = !isView;
   }
 
+  factory SparseDoubleMatrix.compose(List<List<AbstractDoubleMatrix>> parts) {
+    return compose(parts, (rows, columns) => new SparseRCDoubleMatrix(rows, columns));
+  }
+
   /*DoubleMatrix assign(func.DoubleFunction function) {
     if (this._isNoView && function is DoubleMult) { // x[i] = mult*x[i]
       this._elements.assign(function);

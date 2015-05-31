@@ -142,6 +142,10 @@ class SparseDoubleVector extends AbstractDoubleVector {
     this._isNoView = !isView;
   }
 
+  factory SparseDoubleVector.append(AbstractDoubleVector A, AbstractDoubleVector B) {
+    return append(A, B, (n) => new SparseDoubleVector(n));
+  }
+
   /**
    * Sets all cells to the state specified by <tt>value</tt>.
    *

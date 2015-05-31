@@ -2,8 +2,10 @@ name: colt
 description: A pub package
 dependencies:
   btf: any
-  csparse:
-    path: ../csparse
+#  csparse:
+#    path: ../csparse
   intl: any
-  klu:
-    path: ../klu
+#  klu:
+#    path: ../klu
+dev_dependencies:
+  unittest: any

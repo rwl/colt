@@ -7,9 +7,9 @@ import 'dart:collection' show ListMixin;
 
 import 'package:intl/intl.dart';
 
-import 'package:csparse/double/csparse.dart' as cs;
-import 'package:csparse/complex/cxsparse.dart' show DZcs;
-import 'package:csparse/complex/cxsparse.dart' as cxsparse;
+//import 'package:csparse/double/csparse.dart' as cs;
+//import 'package:csparse/complex/cxsparse.dart' show DZcs;
+//import 'package:csparse/complex/cxsparse.dart' as cxsparse;
 
 import '../function/double.dart' show DoubleFunction, DoubleDoubleFunction, DoubleDoubleProcedure,
   DoubleIntProcedure, DoubleProcedure;
@@ -22,6 +22,10 @@ import 'double/algo/algo.dart' as dprop;
 import 'complex/algo/algo.dart' as cprop;
 import 'int/algo/algo.dart' as iprop;
 import 'former.dart';
+
+import 'double/factory.dart' as dfactory;
+import 'int/factory.dart' as ifactory;
+import 'complex/factory.dart' as cfactory;
 
 //part 'abstract_formatter.dart';
 part 'abstract_vector.dart';
@@ -67,6 +71,6 @@ part 'int/sparse_cc_int_matrix.dart';
 part 'int/sparse_rc_int_matrix.dart';
 part 'int/delegate_int_vector.dart';
 
-part 'double/factory.dart';
-part 'int/factory.dart';
-part 'complex/factory.dart';
+//part 'double/factory.dart';
+//part 'int/factory.dart';
+//part 'complex/factory.dart';
