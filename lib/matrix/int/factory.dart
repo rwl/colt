@@ -364,7 +364,7 @@ Int32List toList(AbstractIntVector values) {
  *
  * </pre>
  */
-AbstractIntMatrix appendColumns(AbstractIntMatrix A, AbstractIntMatrix B, AbstractIntMatrix make(int, int)) {
+AbstractIntMatrix appendColumns(AbstractIntMatrix A, AbstractIntMatrix B, AbstractIntMatrix make(int r, int c)) {
   // force both to have maximal shared number of rows.
   if (B.rows > A.rows) {
     B = B.part(0, 0, A.rows, B.columns);
@@ -382,7 +382,7 @@ AbstractIntMatrix appendColumns(AbstractIntMatrix A, AbstractIntMatrix B, Abstra
   return matrix;
 }
 
-AbstractIntMatrix appendColumn(AbstractIntMatrix A, AbstractIntVector b, AbstractIntMatrix make(int, int)) {
+AbstractIntMatrix appendColumn(AbstractIntMatrix A, AbstractIntVector b, AbstractIntMatrix make(int r, int c)) {
   // force both to have maximal shared number of rows.
   if (b.length > A.rows) {
     b = b.part(0, A.rows);
@@ -420,7 +420,7 @@ AbstractIntMatrix appendColumn(AbstractIntMatrix A, AbstractIntVector b, Abstrac
  *
  * </pre>
  */
-AbstractIntMatrix appendRows(AbstractIntMatrix A, AbstractIntMatrix B, AbstractIntMatrix make(int, int)) {
+AbstractIntMatrix appendRows(AbstractIntMatrix A, AbstractIntMatrix B, AbstractIntMatrix make(int r, int c)) {
   // force both to have maximal shared number of columns.
   if (B.columns > A.columns) B = B.part(0, 0, B.rows, A.columns); else if (B.columns < A.columns) A = A.part(0, 0, A.rows, B.columns);
 
@@ -434,7 +434,7 @@ AbstractIntMatrix appendRows(AbstractIntMatrix A, AbstractIntMatrix B, AbstractI
   return matrix;
 }
 
-AbstractIntMatrix appendRow(AbstractIntMatrix A, AbstractIntVector b, AbstractIntMatrix make(int, int)) {
+AbstractIntMatrix appendRow(AbstractIntMatrix A, AbstractIntVector b, AbstractIntMatrix make(int r, int c)) {
   // force both to have maximal shared number of columns.
   if (b.length > A.columns) b = b.part(0, A.columns); else if (b.length < A.columns) A = A.part(0, 0, A.rows, b.length);
 
@@ -458,7 +458,7 @@ AbstractIntMatrix appendRow(AbstractIntMatrix A, AbstractIntVector b, AbstractIn
  *
  * </pre>
  */
-AbstractIntMatrix ascendingMatrix(int rows, int columns, AbstractIntMatrix make(int, int)) {
+AbstractIntMatrix ascendingMatrix(int rows, int columns, AbstractIntMatrix make(int r, int c)) {
   return descendingMatrix(rows, columns, make)..forEach(ifunc.chain2(ifunc.neg, ifunc.subtract(columns * rows)));
 }
 
@@ -500,7 +500,7 @@ void _checkRectShape(List<List<AbstractIntMatrix>> array) {
   }
 }
 
-AbstractIntMatrix reshape(AbstractIntVector a, int rows, int columns, AbstractIntMatrix make(int, int)) {
+AbstractIntMatrix reshape(AbstractIntVector a, int rows, int columns, AbstractIntMatrix make(int r, int c)) {
   if (a.length != rows * columns) {
     throw new ArgumentError("a.length != rows*columns");
   }
@@ -605,7 +605,7 @@ AbstractIntMatrix reshape(AbstractIntVector a, int rows, int columns, AbstractIn
  * @throws ArgumentError
  *             subject to the conditions outlined above.
  */
-AbstractIntMatrix compose(List<List<AbstractIntMatrix>> parts, AbstractIntMatrix make(int, int)) {
+AbstractIntMatrix compose(List<List<AbstractIntMatrix>> parts, AbstractIntMatrix make(int r, int c)) {
   _checkRectShape(parts);
   int rows = parts.length;
   int columns = 0;
@@ -684,7 +684,7 @@ AbstractIntMatrix compose(List<List<AbstractIntMatrix>> parts, AbstractIntMatrix
  *
  * @return a new matrix which is the direct sum.
  */
-AbstractIntMatrix composeDiagonal(AbstractIntMatrix A, AbstractIntMatrix B, AbstractIntMatrix make(int, int)) {
+AbstractIntMatrix composeDiagonal(AbstractIntMatrix A, AbstractIntMatrix B, AbstractIntMatrix make(int r, int c)) {
   int ar = A.rows;
   int ac = A.columns;
   int br = B.rows;
@@ -708,7 +708,7 @@ AbstractIntMatrix composeDiagonal(AbstractIntMatrix A, AbstractIntMatrix B, Abst
  *
  * from the given parts. Cells are copied.
  */
-AbstractIntMatrix composeDiag(AbstractIntMatrix A, AbstractIntMatrix B, AbstractIntMatrix C, AbstractIntMatrix make(int, int)) {
+AbstractIntMatrix composeDiag(AbstractIntMatrix A, AbstractIntMatrix B, AbstractIntMatrix C, AbstractIntMatrix make(int r, int c)) {
   AbstractIntMatrix diag = make(A.rows + B.rows + C.rows, A.columns + B.columns + C.columns);
   diag.part(0, 0, A.rows, A.columns).copyFrom(A);
   diag.part(A.rows, A.columns, B.rows, B.columns).copyFrom(B);
@@ -716,7 +716,7 @@ AbstractIntMatrix composeDiag(AbstractIntMatrix A, AbstractIntMatrix B, Abstract
   return diag;
 }
 
-AbstractIntMatrix composeBidiagonal(AbstractIntMatrix A, AbstractIntMatrix B, AbstractIntMatrix make(int, int)) {
+AbstractIntMatrix composeBidiagonal(AbstractIntMatrix A, AbstractIntMatrix B, AbstractIntMatrix make(int r, int c)) {
   int ar = A.rows;
   int ac = A.columns;
   int br = B.rows;
@@ -957,7 +957,7 @@ void decompose(List<List<AbstractIntMatrix>> parts, AbstractIntMatrix matrix) {
  *
  * </pre>
  */
-AbstractIntMatrix descendingMatrix(int rows, int columns, AbstractIntMatrix make(int, int)) {
+AbstractIntMatrix descendingMatrix(int rows, int columns, AbstractIntMatrix make(int r, int c)) {
   AbstractIntMatrix matrix = make(rows, columns);
   int v = 0;
   for (int row = rows; --row >= 0; ) {
@@ -983,7 +983,7 @@ AbstractIntMatrix descendingMatrix(int rows, int columns, AbstractIntMatrix make
  *
  * @return a new matrix.
  */
-AbstractIntMatrix diagonal(AbstractIntVector vector, AbstractIntMatrix make(int, int)) {
+AbstractIntMatrix diagonal(AbstractIntVector vector, AbstractIntMatrix make(int r, int c)) {
   int size = vector.length;
   AbstractIntMatrix diag = make(size, size);
   for (int i = size; --i >= 0; ) {
@@ -1007,7 +1007,7 @@ AbstractIntMatrix diagonal(AbstractIntVector vector, AbstractIntMatrix make(int,
  *
  * @return a new matrix.
  */
-AbstractIntMatrix diagonalList(Int32List vector, AbstractIntMatrix make(int, int)) {
+AbstractIntMatrix diagonalList(Int32List vector, AbstractIntMatrix make(int r, int c)) {
   int size = vector.length;
   AbstractIntMatrix diag = make(size, size);
   for (int i = 0; i < size; i++) {
@@ -1032,7 +1032,7 @@ AbstractIntMatrix diagonalList(Int32List vector, AbstractIntMatrix make(int, int
  *            the matrix, need not be square.
  * @return a new vector.
  */
-AbstractIntVector diagonal2D(AbstractIntMatrix A, AbstractIntMatrix make(int, int)) {
+AbstractIntVector diagonal2D(AbstractIntMatrix A, AbstractIntMatrix make(int r, int c)) {
   int min = Math.min(A.rows, A.columns);
   AbstractIntVector diag = _make1D(min, make);
   for (int i = min; --i >= 0; ) {
@@ -1045,7 +1045,7 @@ AbstractIntVector diagonal2D(AbstractIntMatrix A, AbstractIntMatrix make(int, in
  * Constructs an identity matrix (having ones on the diagonal and zeros
  * elsewhere).
  */
-AbstractIntMatrix identity(int rowsAndColumns, AbstractIntMatrix make(int, int)) {
+AbstractIntMatrix identity(int rowsAndColumns, AbstractIntMatrix make(int r, int c)) {
   AbstractIntMatrix matrix = make(rowsAndColumns, rowsAndColumns);
   for (int i = rowsAndColumns; --i >= 0; ) {
     matrix.set(i, i, 1);
@@ -1091,7 +1091,7 @@ AbstractIntMatrix identity(int rowsAndColumns, AbstractIntMatrix make(int, int))
  *                <tt>values.length</tt> must be a multiple of <tt>rows</tt>
  *                .
  */
-AbstractIntMatrix columnMajor(Int32List values, int rows, AbstractIntMatrix make(int, int)) {
+AbstractIntMatrix columnMajor(Int32List values, int rows, AbstractIntMatrix make(int r, int c)) {
   int columns = (rows != 0 ? values.length / rows : 0);
   if (rows * columns != values.length) {
     throw new ArgumentError("Array length must be a multiple of m.");
@@ -1125,7 +1125,7 @@ AbstractIntMatrix columnMajor(Int32List values, int rows, AbstractIntMatrix make
  * Constructs a matrix with the given shape, each cell initialized with the
  * given value.
  */
-AbstractIntMatrix fillMatrix(int rows, int columns, int initialValue, AbstractIntMatrix make(int, int)) {
+AbstractIntMatrix fillMatrix(int rows, int columns, int initialValue, AbstractIntMatrix make(int r, int c)) {
   if (initialValue == 0) return make(rows, columns);
   return make(rows, columns)..fill(initialValue);
 }
@@ -1133,7 +1133,7 @@ AbstractIntMatrix fillMatrix(int rows, int columns, int initialValue, AbstractIn
 /**
  * Constructs a 1d matrix of the right dynamic type.
  */
-AbstractIntVector _make1D(int size, AbstractIntMatrix make(int, int)) {
+AbstractIntVector _make1D(int size, AbstractIntMatrix make(int r, int c)) {
   return make(0, 0).like1D(size);
 }
 
@@ -1141,7 +1141,7 @@ AbstractIntVector _make1D(int size, AbstractIntMatrix make(int, int)) {
  * Constructs a matrix with uniformly distributed values in <tt>(0,1)</tt>
  * (exclusive).
  */
-AbstractIntMatrix randomMatrix(int rows, int columns, AbstractIntMatrix make(int, int)) {
+AbstractIntMatrix randomMatrix(int rows, int columns, AbstractIntMatrix make(int r, int c)) {
   return make(rows, columns)..forEach(ifunc.random());
 }
 
@@ -1160,7 +1160,7 @@ AbstractIntMatrix randomMatrix(int rows, int columns, AbstractIntMatrix make(int
  *
  * </pre>
  */
-AbstractIntMatrix repeatMatrix(AbstractIntMatrix A, int rowRepeat, int columnRepeat, AbstractIntMatrix make(int, int)) {
+AbstractIntMatrix repeatMatrix(AbstractIntMatrix A, int rowRepeat, int columnRepeat, AbstractIntMatrix make(int r, int c)) {
   int r = A.rows;
   int c = A.columns;
   AbstractIntMatrix matrix = make(r * rowRepeat, c * columnRepeat);

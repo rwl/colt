@@ -327,7 +327,7 @@ List<List<double>> toList(AbstractComplexVector values) {
  *
  * </pre>
  */
-AbstractComplexMatrix appendColumns(AbstractComplexMatrix A, AbstractComplexMatrix B, AbstractComplexMatrix make(int, int)) {
+AbstractComplexMatrix appendColumns(AbstractComplexMatrix A, AbstractComplexMatrix B, AbstractComplexMatrix make(int r, int c)) {
   // force both to have maximal shared number of rows.
   if (B.rows > A.rows) {
     B = B.part(0, 0, A.rows, B.columns);
@@ -361,7 +361,7 @@ AbstractComplexMatrix appendColumns(AbstractComplexMatrix A, AbstractComplexMatr
  *
  * </pre>
  */
-AbstractComplexMatrix appendColumn(AbstractComplexMatrix A, AbstractComplexVector b, AbstractComplexMatrix make(int, int)) {
+AbstractComplexMatrix appendColumn(AbstractComplexMatrix A, AbstractComplexVector b, AbstractComplexMatrix make(int r, int c)) {
   // force both to have maximal shared number of rows.
   if (b.length > A.rows) {
     b = b.part(0, A.rows);
@@ -384,7 +384,7 @@ AbstractComplexMatrix appendColumn(AbstractComplexMatrix A, AbstractComplexVecto
  * two other matrices.
  *
  */
-AbstractComplexMatrix appendRows(AbstractComplexMatrix A, AbstractComplexMatrix B, AbstractComplexMatrix make(int, int)) {
+AbstractComplexMatrix appendRows(AbstractComplexMatrix A, AbstractComplexMatrix B, AbstractComplexMatrix make(int r, int c)) {
   // force both to have maximal shared number of columns.
   if (B.columns > A.columns) {
     B = B.part(0, 0, B.rows, A.columns);
@@ -407,7 +407,7 @@ AbstractComplexMatrix appendRows(AbstractComplexMatrix A, AbstractComplexMatrix 
  * two other matrices.
  *
  */
-AbstractComplexMatrix appendRow(AbstractComplexMatrix A, AbstractComplexVector b, AbstractComplexMatrix make(int, int)) {
+AbstractComplexMatrix appendRow(AbstractComplexMatrix A, AbstractComplexVector b, AbstractComplexMatrix make(int r, int c)) {
   // force both to have maximal shared number of columns.
   if (b.length > A.columns) {
     b = b.part(0, A.columns);
@@ -475,7 +475,7 @@ void _checkRectangularShape2D(List<List<AbstractComplexMatrix>> array) {
  * @throws ArgumentError
  *             subject to the conditions outlined above.
  */
-AbstractComplexMatrix compose(List<List<AbstractComplexMatrix>> parts, AbstractComplexMatrix make(int, int)) {
+AbstractComplexMatrix compose(List<List<AbstractComplexMatrix>> parts, AbstractComplexMatrix make(int r, int c)) {
   _checkRectangularShape2D(parts);
   int rows = parts.length;
   int columns = 0;
@@ -554,7 +554,7 @@ AbstractComplexMatrix compose(List<List<AbstractComplexMatrix>> parts, AbstractC
  *
  * @return a new matrix which is the direct sum.
  */
-AbstractComplexMatrix composeDiagonal(AbstractComplexMatrix A, AbstractComplexMatrix B, AbstractComplexMatrix make(int, int)) {
+AbstractComplexMatrix composeDiagonal(AbstractComplexMatrix A, AbstractComplexMatrix B, AbstractComplexMatrix make(int r, int c)) {
   int ar = A.rows;
   int ac = A.columns;
   int br = B.rows;
@@ -578,7 +578,7 @@ AbstractComplexMatrix composeDiagonal(AbstractComplexMatrix A, AbstractComplexMa
  *
  * from the given parts. Cells are copied.
  */
-AbstractComplexMatrix composeDiagonal3(AbstractComplexMatrix A, AbstractComplexMatrix B, AbstractComplexMatrix C, AbstractComplexMatrix make(int, int)) {
+AbstractComplexMatrix composeDiagonal3(AbstractComplexMatrix A, AbstractComplexMatrix B, AbstractComplexMatrix C, AbstractComplexMatrix make(int r, int c)) {
   AbstractComplexMatrix diag = make(A.rows + B.rows + C.rows, A.columns + B.columns + C.columns);
   diag.part(0, 0, A.rows, A.columns).copyFrom(A);
   diag.part(A.rows, A.columns, B.rows, B.columns).copyFrom(B);
@@ -591,7 +591,7 @@ AbstractComplexMatrix composeDiagonal3(AbstractComplexMatrix A, AbstractComplexM
  *
  * from the given parts. Cells are copied.
  */
-AbstractComplexMatrix composeBidiagonal(AbstractComplexMatrix A, AbstractComplexMatrix B, AbstractComplexMatrix make(int, int)) {
+AbstractComplexMatrix composeBidiagonal(AbstractComplexMatrix A, AbstractComplexMatrix B, AbstractComplexMatrix make(int r, int c)) {
   int ar = A.rows;
   int ac = A.columns;
   int br = B.rows;
@@ -724,7 +724,7 @@ void decompose(List<List<AbstractComplexMatrix>> parts, AbstractComplexMatrix ma
  *
  * @return a new matrix.
  */
-AbstractComplexMatrix diag(AbstractComplexVector vector, AbstractComplexMatrix make(int, int)) {
+AbstractComplexMatrix diag(AbstractComplexVector vector, AbstractComplexMatrix make(int r, int c)) {
   int size = vector.length;
   AbstractComplexMatrix diag = make(size, size);
   for (int i = 0; i < size; i++) {
@@ -741,7 +741,7 @@ AbstractComplexMatrix diag(AbstractComplexVector vector, AbstractComplexMatrix m
  *            the matrix, need not be square.
  * @return a new vector.
  */
-AbstractComplexVector diagonal(AbstractComplexMatrix A, AbstractComplexMatrix make(int, int)) {
+AbstractComplexVector diagonal(AbstractComplexMatrix A, AbstractComplexMatrix make(int r, int c)) {
   int min = Math.min(A.rows, A.columns);
   AbstractComplexVector diag = _make1D(min, make);
   for (int i = 0; i < min; i++) {
@@ -754,7 +754,7 @@ AbstractComplexVector diagonal(AbstractComplexMatrix A, AbstractComplexMatrix ma
  * Constructs an identity matrix (having ones on the diagonal and zeros
  * elsewhere).
  */
-AbstractComplexMatrix identity(int rowsAndColumns, AbstractComplexMatrix make(int, int)) {
+AbstractComplexMatrix identity(int rowsAndColumns, AbstractComplexMatrix make(int r, int c)) {
   AbstractComplexMatrix matrix = make(rowsAndColumns, rowsAndColumns);
   Float64List one = new Float64List.fromList([1.0, 0.0]);
   for (int i = rowsAndColumns; --i >= 0; ) {
@@ -802,7 +802,7 @@ AbstractComplexMatrix identity(int rowsAndColumns, AbstractComplexMatrix make(in
  * Constructs a matrix with the given shape, each cell initialized with the
  * given value.
  */
-AbstractComplexMatrix fillMatrix(int rows, int columns, List<double> initialValue, AbstractComplexMatrix make(int, int)) {
+AbstractComplexMatrix fillMatrix(int rows, int columns, List<double> initialValue, AbstractComplexMatrix make(int r, int c)) {
   if (initialValue[0] == 0 && initialValue[1] == 0) {
     return make(rows, columns);
   }
@@ -812,7 +812,7 @@ AbstractComplexMatrix fillMatrix(int rows, int columns, List<double> initialValu
 /**
  * Constructs a 1d matrix of the right dynamic type.
  */
-AbstractComplexVector _make1D(int size, AbstractComplexMatrix make(int, int)) {
+AbstractComplexVector _make1D(int size, AbstractComplexMatrix make(int r, int c)) {
   return make(0, 0).like1D(size);
 }
 
@@ -820,7 +820,7 @@ AbstractComplexVector _make1D(int size, AbstractComplexMatrix make(int, int)) {
  * Constructs a matrix with uniformly distributed values in <tt>(0,1)</tt>
  * (exclusive).
  */
-AbstractComplexMatrix randomMatrix(int rows, int columns, AbstractComplexMatrix make(int, int)) {
+AbstractComplexMatrix randomMatrix(int rows, int columns, AbstractComplexMatrix make(int r, int c)) {
   return make(rows, columns)..forEach(cfunc.random);
 }
 
@@ -828,7 +828,7 @@ AbstractComplexMatrix randomMatrix(int rows, int columns, AbstractComplexMatrix 
  * C = A||A||..||A; Constructs a new matrix which is duplicated both along
  * the row and column dimension.
  */
-AbstractComplexMatrix repeatMatrix(AbstractComplexMatrix A, int rowRepeat, int columnRepeat, AbstractComplexMatrix make(int, int)) {
+AbstractComplexMatrix repeatMatrix(AbstractComplexMatrix A, int rowRepeat, int columnRepeat, AbstractComplexMatrix make(int r, int c)) {
   int r = A.rows;
   int c = A.columns;
   AbstractComplexMatrix matrix = make(r * rowRepeat, c * columnRepeat);

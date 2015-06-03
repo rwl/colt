@@ -380,7 +380,7 @@ void _checkRectangularShapeParts(List<List<AbstractDoubleMatrix>> array) {
  *
  * </pre>
  */
-AbstractDoubleMatrix appendColumn(AbstractDoubleMatrix A, AbstractDoubleVector b, AbstractDoubleMatrix make(int, int)) {
+AbstractDoubleMatrix appendColumn(AbstractDoubleMatrix A, AbstractDoubleVector b, AbstractDoubleMatrix make(int r, int c)) {
   // force both to have maximal shared number of rows.
   if (b.length > A.rows) {
     b = b.part(0, A.rows);
@@ -414,7 +414,7 @@ AbstractDoubleMatrix appendColumn(AbstractDoubleMatrix A, AbstractDoubleVector b
  *
  * </pre>
  */
-AbstractDoubleMatrix appendColumns(AbstractDoubleMatrix A, AbstractDoubleMatrix B, AbstractDoubleMatrix make(int, int)) {
+AbstractDoubleMatrix appendColumns(AbstractDoubleMatrix A, AbstractDoubleMatrix B, AbstractDoubleMatrix make(int r, int c)) {
   // force both to have maximal shared number of rows.
   if (B.rows > A.rows) {
     B = B.part(0, 0, A.rows, B.columns);
@@ -450,7 +450,7 @@ AbstractDoubleMatrix appendColumns(AbstractDoubleMatrix A, AbstractDoubleMatrix 
  *
  * </pre>
  */
-AbstractDoubleMatrix appendRow(AbstractDoubleMatrix A, AbstractDoubleVector b, AbstractDoubleMatrix make(int, int)) {
+AbstractDoubleMatrix appendRow(AbstractDoubleMatrix A, AbstractDoubleVector b, AbstractDoubleMatrix make(int r, int c)) {
   // force both to have maximal shared number of columns.
   if (b.length > A.columns) {
     b = b.part(0, A.columns);
@@ -488,7 +488,7 @@ AbstractDoubleMatrix appendRow(AbstractDoubleMatrix A, AbstractDoubleVector b, A
  *
  * </pre>
  */
-AbstractDoubleMatrix appendRows(AbstractDoubleMatrix A, AbstractDoubleMatrix B, AbstractDoubleMatrix make(int, int)) {
+AbstractDoubleMatrix appendRows(AbstractDoubleMatrix A, AbstractDoubleMatrix B, AbstractDoubleMatrix make(int r, int c)) {
   // force both to have maximal shared number of columns.
   if (B.columns > A.columns) {
     B = B.part(0, 0, B.rows, A.columns);
@@ -516,7 +516,7 @@ AbstractDoubleMatrix appendRows(AbstractDoubleMatrix A, AbstractDoubleMatrix B, 
  *
  * </pre>
  */
-AbstractDoubleMatrix ascendingMatrix(int rows, int columns, AbstractDoubleMatrix make(int, int)) {
+AbstractDoubleMatrix ascendingMatrix(int rows, int columns, AbstractDoubleMatrix make(int r, int c)) {
   return descendingMatrix(rows, columns, make)..forEach(func.chainGH(func.neg, func.subtract(columns * rows)));
 }
 
@@ -614,7 +614,7 @@ AbstractDoubleMatrix ascendingMatrix(int rows, int columns, AbstractDoubleMatrix
  * @throws IllegalArgumentException
  *             subject to the conditions outlined above.
  */
-AbstractDoubleMatrix compose(List<List<AbstractDoubleMatrix>> parts, AbstractDoubleMatrix make(int, int)) {
+AbstractDoubleMatrix compose(List<List<AbstractDoubleMatrix>> parts, AbstractDoubleMatrix make(int r, int c)) {
   _checkRectangularShapeParts(parts);
   int rows = parts.length;
   int columns = 0;
@@ -701,7 +701,7 @@ AbstractDoubleMatrix compose(List<List<AbstractDoubleMatrix>> parts, AbstractDou
  *            bidiagonal matrix
  * @return bidiagonal matrix
  */
-AbstractDoubleMatrix composeBidiagonal(AbstractDoubleMatrix A, AbstractDoubleMatrix B, AbstractDoubleMatrix make(int, int)) {
+AbstractDoubleMatrix composeBidiagonal(AbstractDoubleMatrix A, AbstractDoubleMatrix B, AbstractDoubleMatrix make(int r, int c)) {
   int ar = A.rows;
   int ac = A.columns;
   int br = B.rows;
@@ -727,7 +727,7 @@ AbstractDoubleMatrix composeBidiagonal(AbstractDoubleMatrix A, AbstractDoubleMat
  *
  * @return a new matrix which is the direct sum.
  */
-AbstractDoubleMatrix composeDiagonal(AbstractDoubleMatrix A, AbstractDoubleMatrix B, AbstractDoubleMatrix make(int, int)) {
+AbstractDoubleMatrix composeDiagonal(AbstractDoubleMatrix A, AbstractDoubleMatrix B, AbstractDoubleMatrix make(int r, int c)) {
   int ar = A.rows;
   int ac = A.columns;
   int br = B.rows;
@@ -751,7 +751,7 @@ AbstractDoubleMatrix composeDiagonal(AbstractDoubleMatrix A, AbstractDoubleMatri
  *
  * from the given parts. Cells are copied.
  */
-AbstractDoubleMatrix composeDiagonal3(AbstractDoubleMatrix A, AbstractDoubleMatrix B, AbstractDoubleMatrix C, AbstractDoubleMatrix make(int, int)) {
+AbstractDoubleMatrix composeDiagonal3(AbstractDoubleMatrix A, AbstractDoubleMatrix B, AbstractDoubleMatrix C, AbstractDoubleMatrix make(int r, int c)) {
   AbstractDoubleMatrix diag = make(A.rows + B.rows + C.rows, A.columns + B.columns + C.columns);
   diag.part(0, 0, A.rows, A.columns).copyFrom(A);
   diag.part(A.rows, A.columns, B.rows, B.columns).copyFrom(B);
@@ -918,7 +918,7 @@ void decompose(List<List<AbstractDoubleMatrix>> parts, AbstractDoubleMatrix matr
  *
  * </pre>
  */
-AbstractDoubleMatrix descendingMatrix(int rows, int columns, AbstractDoubleMatrix make(int, int)) {
+AbstractDoubleMatrix descendingMatrix(int rows, int columns, AbstractDoubleMatrix make(int r, int c)) {
   AbstractDoubleMatrix matrix = make(rows, columns);
   double v = 0.0;
   for (int row = rows; --row >= 0; ) {
@@ -945,7 +945,7 @@ AbstractDoubleMatrix descendingMatrix(int rows, int columns, AbstractDoubleMatri
  *
  * @return a new matrix.
  */
-AbstractDoubleMatrix diagonal(List<double> vector, AbstractDoubleMatrix make(int, int)) {
+AbstractDoubleMatrix diagonal(List<double> vector, AbstractDoubleMatrix make(int r, int c)) {
   int size = vector.length;
   AbstractDoubleMatrix diag = make(size, size);
   for (int i = 0; i < size; i++) {
@@ -969,7 +969,7 @@ AbstractDoubleMatrix diagonal(List<double> vector, AbstractDoubleMatrix make(int
  *
  * @return a new matrix.
  */
-AbstractDoubleMatrix diagonal1D(AbstractDoubleVector vector, AbstractDoubleMatrix make(int, int)) {
+AbstractDoubleMatrix diagonal1D(AbstractDoubleVector vector, AbstractDoubleMatrix make(int r, int c)) {
   int size = vector.length;
   AbstractDoubleMatrix diag = make(size, size);
   for (int i = size; --i >= 0; ) {
@@ -994,7 +994,7 @@ AbstractDoubleMatrix diagonal1D(AbstractDoubleVector vector, AbstractDoubleMatri
  *            the matrix, need not be square.
  * @return a new vector.
  */
-AbstractDoubleVector diagonal2D(AbstractDoubleMatrix A, AbstractDoubleMatrix make(int, int)) {
+AbstractDoubleVector diagonal2D(AbstractDoubleMatrix A, AbstractDoubleMatrix make(int r, int c)) {
   int min = Math.min(A.rows, A.columns);
   AbstractDoubleVector diag = _make1D(min, make);
   for (int i = min; --i >= 0; ) {
@@ -1007,7 +1007,7 @@ AbstractDoubleVector diagonal2D(AbstractDoubleMatrix A, AbstractDoubleMatrix mak
  * Constructs an identity matrix (having ones on the diagonal and zeros
  * elsewhere).
  */
-AbstractDoubleMatrix identity(int rowsAndColumns, AbstractDoubleMatrix make(int, int)) {
+AbstractDoubleMatrix identity(int rowsAndColumns, AbstractDoubleMatrix make(int r, int c)) {
   AbstractDoubleMatrix matrix = make(rowsAndColumns, rowsAndColumns);
   for (int i = rowsAndColumns; --i >= 0; ) {
     matrix.set(i, i, 1.0);
@@ -1030,7 +1030,7 @@ AbstractDoubleMatrix identity(int rowsAndColumns, AbstractDoubleMatrix make(int,
  *                <tt>values.length</tt> must be a multiple of <tt>rows</tt>
  *                .
  */
-AbstractDoubleMatrix makeColumn(List<double> values, int rows, AbstractDoubleMatrix make(int, int)) {
+AbstractDoubleMatrix makeColumn(List<double> values, int rows, AbstractDoubleMatrix make(int r, int c)) {
   int columns = (rows != 0 ? values.length / rows : 0);
   if (rows * columns != values.length) {
     throw new ArgumentError("Array length must be a multiple of m.");
@@ -1084,7 +1084,7 @@ AbstractDoubleMatrix makeColumn(List<double> values, int rows, AbstractDoubleMat
  * Constructs a matrix with the given shape, each cell initialized with the
  * given value.
  */
-AbstractDoubleMatrix fillMatrix(int rows, int columns, double initialValue, AbstractDoubleMatrix make(int, int)) {
+AbstractDoubleMatrix fillMatrix(int rows, int columns, double initialValue, AbstractDoubleMatrix make(int r, int c)) {
   if (initialValue == 0) return make(rows, columns);
   return make(rows, columns)..fill(initialValue);
 }
@@ -1093,7 +1093,7 @@ AbstractDoubleMatrix fillMatrix(int rows, int columns, double initialValue, Abst
  * Constructs a matrix with uniformly distributed values in <tt>(0,1)</tt>
  * (exclusive).
  */
-AbstractDoubleMatrix randomMatrix(int rows, int columns, AbstractDoubleMatrix make(int, int)) {
+AbstractDoubleMatrix randomMatrix(int rows, int columns, AbstractDoubleMatrix make(int r, int c)) {
   return make(rows, columns)..forEach(func.random());
 }
 
@@ -1112,7 +1112,7 @@ AbstractDoubleMatrix randomMatrix(int rows, int columns, AbstractDoubleMatrix ma
  *
  * </pre>
  */
-AbstractDoubleMatrix repeatMatrix(AbstractDoubleMatrix A, int rowRepeat, int columnRepeat, AbstractDoubleMatrix make(int, int)) {
+AbstractDoubleMatrix repeatMatrix(AbstractDoubleMatrix A, int rowRepeat, int columnRepeat, AbstractDoubleMatrix make(int r, int c)) {
   int r = A.rows;
   int c = A.columns;
   AbstractDoubleMatrix matrix = make(r * rowRepeat, c * columnRepeat);
@@ -1183,7 +1183,7 @@ AbstractDoubleMatrix repeatMatrix(AbstractDoubleMatrix A, int rowRepeat, int col
 /**
  * Constructs a 1d matrix of the right dynamic type.
  */
-AbstractDoubleVector _make1D(int size, AbstractDoubleMatrix make(int, int)) {
+AbstractDoubleVector _make1D(int size, AbstractDoubleMatrix make(int r, int c)) {
   return make(0, 0).like1D(size);
 }
 //}
