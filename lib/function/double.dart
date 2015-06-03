@@ -16,6 +16,9 @@ typedef bool IntDoubleProcedure(int first, double second);
 typedef double IntIntDoubleFunction(int first, int second, double third);
 typedef bool IntIntDoubleProcedure(int first, int second, double third);
 
+double radians(double a) => a * (Math.PI/180.0);
+
+double degrees(double a) => a * (180.0/Math.PI);
 
 /***************************************************************************
  * <H3>Unary functions</H3>

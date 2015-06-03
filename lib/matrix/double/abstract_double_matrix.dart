@@ -2187,4 +2187,8 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
   AbstractDoubleMatrix operator -(AbstractDoubleMatrix y) {
     return this.copy()..forEachWith(y, func.minus);
   }
+
+  AbstractDoubleMatrix operator -() {
+    return this.copy()..forEach(func.neg);
+  }
 }

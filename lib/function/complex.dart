@@ -339,7 +339,7 @@ List<double> neg(List<double> x) {
   return new Float64List.fromList([-x[0], -x[1]]);
 }
 
-List<double> _neg(double re, double im) {
+List<double> neg_(double re, double im) {
   return new Float64List.fromList([-re, -im]);
 }
 

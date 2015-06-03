@@ -94,10 +94,15 @@ class IntVector extends AbstractIntVector {
     this._isNoView = !isView;
   }
 
-  factory IntVector.nonZero(List<int> values) {
-    var v = new IntVector._internal(values.length, values, 0, 1, false);
-    var idx = [];
-    v.nonZeros(indexList: idx);
+  factory IntVector.nonZero(List<num> values) {
+    var idx = <int>[];
+    int i = 0;
+    values.forEach((num value) {
+      if (value != 0) {
+        idx.add(i);
+      }
+      i++;
+    });
     return new IntVector.fromList(idx);
   }
 
