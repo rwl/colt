@@ -35,7 +35,7 @@ class WrapperDoubleMatrix extends AbstractDoubleMatrix {
     this._content = newContent;
   }
 
-  void setAll(final List<double> values) {
+  void setAll(final Float64List values) {
     if (_content is DiagonalDoubleMatrix) {
       int dlength = (_content as DiagonalDoubleMatrix)._dlength;
       final Float64List elems = (_content as DiagonalDoubleMatrix)._elements;
@@ -71,9 +71,9 @@ class WrapperDoubleMatrix extends AbstractDoubleMatrix {
   void forEachWith(final AbstractDoubleMatrix y, final func.DoubleDoubleFunction function) {
     checkShape(y);
     if (y is WrapperDoubleMatrix) {
-      final rowList = new List<int>();
-      final columnList = new List<int>();
-      final valueList = new List<double>();
+      final rowList = <int>[];
+      final columnList = <int>[];
+      final valueList = <double>[];
       y.nonZeros(rowList, columnList, valueList);
       forEachWithNonZero(y, function,
           new Int32List.fromList(rowList),
@@ -249,7 +249,7 @@ class WrapperDoubleMatrix extends AbstractDoubleMatrix {
     return view;
   }
 
-  AbstractDoubleMatrix select(List<int> rowIndexes, List<int> columnIndexes) {
+  AbstractDoubleMatrix select(Int32List rowIndexes, Int32List columnIndexes) {
     // check for "all"
     if (rowIndexes == null) {
       rowIndexes = new Int32List(_rows);
@@ -297,7 +297,7 @@ class WrapperDoubleMatrix extends AbstractDoubleMatrix {
     throw new Error(); // should never get called
   }
 
-  AbstractDoubleMatrix _viewSelectionLike(List<int> rowOffsets, List<int> columnOffsets) {
+  AbstractDoubleMatrix _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets) {
     throw new Error(); // should never be called
   }
 

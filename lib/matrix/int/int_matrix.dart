@@ -135,6 +135,10 @@ class IntMatrix extends AbstractIntMatrix {
     this._isNoView = !isView;
   }
 
+  factory IntMatrix.random(int r, int c) {
+    return ifactory.randomMatrix(r, c, (rows, columns) => new IntMatrix(rows, columns));
+  }
+
   int reduce(final ifunc.IntIntFunction aggr, final ifunc.IntFunction f) {
     if (length == 0) {
       throw new ArgumentError("size == 0");
@@ -1009,7 +1013,7 @@ class IntMatrix extends AbstractIntMatrix {
     /*if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
       List<Future> futures = new List<Future>(nthreads);
-      List<int> results = new List<int>(nthreads);
+      Int32List results = new Int32List(nthreads);
       int k = _rows / nthreads;
       for (int j = 0; j < nthreads; j++) {
         final int firstRow = j * k;
@@ -1327,7 +1331,7 @@ class IntMatrix extends AbstractIntMatrix {
     _elements[_rowZero + row * _rowStride + _columnZero + column * _columnStride] = value;
   }
 
-  List<List<int>> toList() {
+  List<Int32List> toList() {
     final List<Int32List> values = new List<Int32List>.generate(_rows, (_) => new Int32List(_columns));
     final int zero = index(0, 0);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -1816,9 +1820,9 @@ class SelectedDenseIntMatrix extends AbstractIntMatrix {
   /**
    * The offsets of the visible cells of this matrix.
    */
-  List<int> _rowOffsets;
+  Int32List _rowOffsets;
 
-  List<int> _columnOffsets;
+  Int32List _columnOffsets;
 
   /**
    * The offset.
@@ -1836,7 +1840,7 @@ class SelectedDenseIntMatrix extends AbstractIntMatrix {
    *            The column offsets of the cells that shall be visible.
    * @param offset
    */
-  factory SelectedDenseIntMatrix.offset(Int32List elements, List<int> rowOffsets, List<int> columnOffsets, int offset) {
+  factory SelectedDenseIntMatrix.offset(Int32List elements, Int32List rowOffsets, Int32List columnOffsets, int offset) {
     return new SelectedDenseIntMatrix(rowOffsets.length, columnOffsets.length, elements, 0, 0, 1, 1, rowOffsets, columnOffsets, offset);
   }
 
@@ -1865,7 +1869,7 @@ class SelectedDenseIntMatrix extends AbstractIntMatrix {
    *            The column offsets of the cells that shall be visible.
    * @param offset
    */
-  SelectedDenseIntMatrix(int rows, int columns, Int32List elements, int rowZero, int columnZero, int rowStride, int columnStride, List<int> rowOffsets, List<int> columnOffsets, int offset) {
+  SelectedDenseIntMatrix(int rows, int columns, Int32List elements, int rowZero, int columnZero, int rowStride, int columnStride, Int32List rowOffsets, Int32List columnOffsets, int offset) {
     // be sure parameters are valid, we do not check...
     _setUp(rows, columns, rowZero, columnZero, rowStride, columnStride);
 
@@ -2189,7 +2193,7 @@ class SelectedDenseIntMatrix extends AbstractIntMatrix {
    *            the offsets of the visible elements.
    * @return a new view.
    */
-  AbstractIntMatrix _viewSelectionLike(List<int> rowOffsets, List<int> columnOffsets) {
+  AbstractIntMatrix _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets) {
     return new SelectedDenseIntMatrix.offset(this._elements, rowOffsets, columnOffsets, this._offset);
   }
 

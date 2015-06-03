@@ -56,7 +56,7 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
    *             <tt>for any 1 &lt;= row &lt; values.length: values[row].length != values[row-1].length</tt>
    *             .
    */
-  factory SparseCCComplexMatrix.fromList(List<List<double>> values) {
+  factory SparseCCComplexMatrix.fromList(List<Float64List> values) {
     return new SparseCCComplexMatrix(values.length, values[0].length)
       ..setAll2D(values);
   }
@@ -171,7 +171,7 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
    * @param removeDuplicates
    *            if true, then duplicates (if any) are removed
    */
-  factory SparseCCComplexMatrix.withValue(int rows, int columns, List<int> rowIndexes, List<int> columnIndexes, double re, double im, bool removeDuplicates) {
+  factory SparseCCComplexMatrix.withValue(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, double re, double im, bool removeDuplicates) {
     /*try {
       _setUp(rows, columns);
     } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
@@ -227,7 +227,7 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
    * @param removeZeroes
    *            if true, then zeroes (if any) are removed
    */
-  factory SparseCCComplexMatrix.withValues(int rows, int columns, List<int> rowIndexes, List<int> columnIndexes, List<double> values, {bool removeDuplicates: false, bool removeZeroes: false}) {
+  factory SparseCCComplexMatrix.withValues(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, Float64List values, {bool removeDuplicates: false, bool removeZeroes: false}) {
     /*try {
       _setUp(rows, columns);
     } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
@@ -506,7 +506,7 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
     return dense;
   }
 
-  List<double> get(int row, int column) {
+  Float64List get(int row, int column) {
     //        int k = cern.colt.Sorting.binarySearchFromTo(dcs.i, row, dcs.p[column], dcs.p[column + 1] - 1);
     int k = _searchFromTo(_rowIndexes, row, _columnPointers[column], _columnPointers[column + 1] - 1);
     Float64List v = new Float64List(2);
@@ -611,7 +611,7 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
     return new SparseComplexVector(size);
   }
 
-  void set(int row, int column, List<double> value) {
+  void set(int row, int column, Float64List value) {
     //int k = cern.colt.Sorting.binarySearchFromTo(dcs.i, row, dcs.p[column], dcs.p[column + 1] - 1);
     int k = _searchFromTo(_rowIndexes, row, _columnPointers[column], _columnPointers[column + 1] - 1);
 
@@ -766,7 +766,7 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
     return builder.toString();
   }
 
-  AbstractComplexVector mult(AbstractComplexVector y, [AbstractComplexVector z = null, List<double> alpha = null, List<double> beta = null, bool transposeA = false]) {
+  AbstractComplexVector mult(AbstractComplexVector y, [AbstractComplexVector z = null, Float64List alpha = null, Float64List beta = null, bool transposeA = false]) {
     if (alpha == null) {
       alpha = new Float64List.fromList([1.0, 0.0]);
     }
@@ -934,7 +934,7 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
     return z;
   }
 
-  AbstractComplexMatrix multiply(AbstractComplexMatrix B, [AbstractComplexMatrix C = null, List<double> alpha = null, List<double> beta = null, bool transposeA = false, bool transposeB = false]) {
+  AbstractComplexMatrix multiply(AbstractComplexMatrix B, [AbstractComplexMatrix C = null, Float64List alpha = null, Float64List beta = null, bool transposeA = false, bool transposeB = false]) {
     if (alpha == null) {
       alpha = new Float64List.fromList([1.0, 0.0]);
     }
@@ -1128,10 +1128,10 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
     return this;
   }
 
-  void _insert(int row, int column, int index, List<double> value) {
-    List<int> rowIndexesList = new List<int>.from(_rowIndexes);
+  void _insert(int row, int column, int index, Float64List value) {
+    var rowIndexesList = new List.from(_rowIndexes);
     //rowIndexesList._setSizeRaw(_columnPointers[_columns]);
-    List<double> valuesList = new List<double>.from(_values);
+    var valuesList = new List.from(_values);
     //valuesList._setSizeRaw(2 * _columnPointers[_columns]);
     rowIndexesList.insert(index, row);
     valuesList.insert(2 * index, value[0]);
@@ -1144,9 +1144,9 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
   }
 
   void _insertParts(int row, int column, int index, double re, double im) {
-    List<int> rowIndexesList = new List<int>.from(_rowIndexes);
+    var rowIndexesList = new List.from(_rowIndexes);
     //rowIndexesList._setSizeRaw(_columnPointers[_columns]);
-    List<double> valuesList = new List<double>.from(_values);
+    var valuesList = new List.from(_values);
     //valuesList._setSizeRaw(2 * _columnPointers[_columns]);
     rowIndexesList.insert(index, row);
     valuesList.insert(2 * index, re);
@@ -1159,8 +1159,8 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
   }
 
   void _remove(int column, int index) {
-    List<int> rowIndexesList = new List<int>.from(_rowIndexes);
-    List<double> valuesList = new List<double>.from(_values);
+    var rowIndexesList = new List.from(_rowIndexes);
+    var valuesList = new List.from(_values);
     rowIndexesList.remove(index);
     valuesList.remove(2 * index);
     valuesList.remove(2 * index + 1);
@@ -1171,7 +1171,7 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
     _values = new Float64List.fromList(valuesList);
   }
 
-  static int _searchFromTo(List<int> list, int key, int from, int to) {
+  static int _searchFromTo(Int32List list, int key, int from, int to) {
     while (from <= to) {
       if (list[from] == key) {
         return from;
@@ -1183,7 +1183,7 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
     return -(from + 1); // key not found.
   }
 
-  static int _cumsum(List<int> p, List<int> c, int n) {
+  static int _cumsum(Int32List p, Int32List c, int n) {
     int nz = 0;
     int nz2 = 0;
     for (int k = 0; k < n; k++) {
@@ -1210,7 +1210,7 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
     _values = valuesNew;
   }
 
-  int _scatter(SparseCCComplexMatrix A, int j, List<double> beta, List<int> w, List<double> x, int mark, SparseCCComplexMatrix C, int nz) {
+  int _scatter(SparseCCComplexMatrix A, int j, Float64List beta, Int32List w, Float64List x, int mark, SparseCCComplexMatrix C, int nz) {
     int i, p;
     Int32List Ap, Ai, Ci;
     Float64List Ax;

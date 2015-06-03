@@ -71,7 +71,7 @@ class SparseDoubleVector extends AbstractDoubleVector {
    * @param values
    *            The values to be filled into the new matrix.
    */
-  factory SparseDoubleVector.fromList(List<double> values) {
+  factory SparseDoubleVector.fromList(Float64List values) {
     return new SparseDoubleVector(values.length)
       ..setValues(values);
   }
@@ -379,7 +379,7 @@ class SparseDoubleVector extends AbstractDoubleVector {
    *            the offsets of the visible elements.
    * @return a new view.
    */
-  AbstractDoubleVector _viewSelectionLike(List<int> offsets) {
+  AbstractDoubleVector _viewSelectionLike(Int32List offsets) {
     return new SelectedSparseDoubleVector(this._elements, offsets);
   }
 
@@ -471,7 +471,7 @@ class SelectedSparseDoubleVector extends AbstractDoubleVector {
    *            the offsets of the cells that shall be visible.
    * @param offset
    */
-  SelectedSparseDoubleVector._internal(int size, Map<int, double> elements, int zero, int stride, List<int> offsets, int offset) {
+  SelectedSparseDoubleVector._internal(int size, Map<int, double> elements, int zero, int stride, Int32List offsets, int offset) {
     _setUp(size, zero, stride);
 
     this._elements = elements;
@@ -651,7 +651,7 @@ class SelectedSparseDoubleVector extends AbstractDoubleVector {
    *            the offsets of the visible elements.
    * @return a new view.
    */
-  AbstractDoubleVector _viewSelectionLike(List<int> offsets) {
+  AbstractDoubleVector _viewSelectionLike(Int32List offsets) {
     return new SelectedSparseDoubleVector(this._elements, offsets);
   }
 

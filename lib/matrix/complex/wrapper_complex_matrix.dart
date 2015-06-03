@@ -28,7 +28,7 @@ class WrapperComplexMatrix extends AbstractComplexMatrix {
     this._content = newContent;
   }
 
-  void setAll(final List<double> values) {
+  void setAll(final Float64List values) {
     if (_content is DiagonalComplexMatrix) {
       int dlength = (_content as DiagonalComplexMatrix)._dlength;
       final Float64List elems = (_content as DiagonalComplexMatrix)._elements;
@@ -66,7 +66,7 @@ class WrapperComplexMatrix extends AbstractComplexMatrix {
 
   Object get elements => _content.elements;
 
-  bool all(List<double> value) {
+  bool all(Float64List value) {
     if (_content is DiagonalComplexMatrix) {
       double epsilon = EPSILON;
       Float64List elements = _content.elements as Float64List;
@@ -160,7 +160,7 @@ class WrapperComplexMatrix extends AbstractComplexMatrix {
     }
   }
 
-  List<double> get(int row, int column) {
+  Float64List get(int row, int column) {
     return _content.get(row, column);
   }
 
@@ -172,7 +172,7 @@ class WrapperComplexMatrix extends AbstractComplexMatrix {
     return _content.like1D(size);
   }
 
-  void set(int row, int column, List<double> value) {
+  void set(int row, int column, Float64List value) {
     _content.set(row, column, value);
   }
 
@@ -254,7 +254,7 @@ class WrapperComplexMatrix extends AbstractComplexMatrix {
     return view;
   }
 
-  AbstractComplexMatrix select(List<int> rowIndexes, List<int> columnIndexes) {
+  AbstractComplexMatrix select(Int32List rowIndexes, Int32List columnIndexes) {
     // check for "all"
     if (rowIndexes == null) {
       rowIndexes = new Int32List(_rows);
@@ -302,7 +302,7 @@ class WrapperComplexMatrix extends AbstractComplexMatrix {
     throw new Error(); // should never get called
   }
 
-  AbstractComplexMatrix _viewSelectionLike(List<int> rowOffsets, List<int> columnOffsets) {
+  AbstractComplexMatrix _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets) {
     throw new Error(); // should never be called
   }
 
@@ -373,11 +373,11 @@ class ColumnFlipWrapperComplexMatrix extends WrapperComplexMatrix {
 
   ColumnFlipWrapperComplexMatrix(AbstractComplexMatrix newContent) : super(newContent);
 
-  List<double> get(int row, int column) {
+  Float64List get(int row, int column) {
     return _content.get(row, _columns - 1 - column);
   }
 
-  void set(int row, int column, List<double> value) {
+  void set(int row, int column, Float64List value) {
     _content.set(row, _columns - 1 - column, value);
   }
 
@@ -385,11 +385,11 @@ class ColumnFlipWrapperComplexMatrix extends WrapperComplexMatrix {
     _content.setParts(row, _columns - 1 - column, re, im);
   }
 
-  List<double> at(int row, int column) {
+  Float64List at(int row, int column) {
     return _content.at(row, _columns - 1 - column);
   }
 
-  void put(int row, int column, List<double> value) {
+  void put(int row, int column, Float64List value) {
     _content.put(row, _columns - 1 - column, value);
   }
 
@@ -406,11 +406,11 @@ class DiceWrapperComplexMatrix extends WrapperComplexMatrix {
 
   DiceWrapperComplexMatrix(AbstractComplexMatrix newContent) : super(newContent);
 
-  List<double> get(int row, int column) {
+  Float64List get(int row, int column) {
     return _content.get(column, row);
   }
 
-  void set(int row, int column, List<double> value) {
+  void set(int row, int column, Float64List value) {
     _content.set(column, row, value);
   }
 
@@ -418,11 +418,11 @@ class DiceWrapperComplexMatrix extends WrapperComplexMatrix {
     _content.setParts(column, row, re, im);
   }
 
-  List<double> at(int row, int column) {
+  Float64List at(int row, int column) {
     return _content.at(column, row);
   }
 
-  void put(int row, int column, List<double> value) {
+  void put(int row, int column, Float64List value) {
     _content.put(column, row, value);
   }
 
@@ -444,11 +444,11 @@ class PartWrapperComplexMatrix extends WrapperComplexMatrix {
         _row = row,
         _column = column;
 
-  List<double> get(int i, int j) {
+  Float64List get(int i, int j) {
     return _content.get(_row + i, _column + j);
   }
 
-  void set(int i, int j, List<double> value) {
+  void set(int i, int j, Float64List value) {
     _content.set(_row + i, _column + j, value);
   }
 
@@ -456,11 +456,11 @@ class PartWrapperComplexMatrix extends WrapperComplexMatrix {
     _content.setParts(_row + i, _column + j, re, im);
   }
 
-  List<double> at(int i, int j) {
+  Float64List at(int i, int j) {
     return _content.at(_row + i, _column + j);
   }
 
-  void put(int i, int j, List<double> value) {
+  void put(int i, int j, Float64List value) {
     _content.put(_row + i, _column + j, value);
   }
 
@@ -477,11 +477,11 @@ class RowWrapperComplexMatrix extends WrapperComplexMatrix {
 
   RowWrapperComplexMatrix(AbstractComplexMatrix newContent) : super(newContent);
 
-  List<double> get(int row, int column) {
+  Float64List get(int row, int column) {
     return _content.get(_rows - 1 - row, column);
   }
 
-  void set(int row, int column, List<double> value) {
+  void set(int row, int column, Float64List value) {
     _content.set(_rows - 1 - row, column, value);
   }
 
@@ -489,11 +489,11 @@ class RowWrapperComplexMatrix extends WrapperComplexMatrix {
     _content.setParts(_rows - 1 - row, column, re, im);
   }
 
-  List<double> at(int row, int column) {
+  Float64List at(int row, int column) {
     return _content.at(_rows - 1 - row, column);
   }
 
-  void put(int row, int column, List<double> value) {
+  void put(int row, int column, Float64List value) {
     _content.put(_rows - 1 - row, column, value);
   }
 
@@ -515,11 +515,11 @@ class SelectionWrapperComplexMatrix extends WrapperComplexMatrix {
         cix = cix,
         rix = rix;
 
-  List<double> get(int i, int j) {
+  Float64List get(int i, int j) {
     return _content.get(rix[i], cix[j]);
   }
 
-  void set(int i, int j, List<double> value) {
+  void set(int i, int j, Float64List value) {
     _content.set(rix[i], cix[j], value);
   }
 
@@ -527,11 +527,11 @@ class SelectionWrapperComplexMatrix extends WrapperComplexMatrix {
     _content.setParts(rix[i], cix[j], re, im);
   }
 
-  List<double> at(int i, int j) {
+  Float64List at(int i, int j) {
     return _content.at(rix[i], cix[j]);
   }
 
-  void put(int i, int j, List<double> value) {
+  void put(int i, int j, Float64List value) {
     _content.put(rix[i], cix[j], value);
   }
 
@@ -551,11 +551,11 @@ class StridesWrapperComplexMatrix extends WrapperComplexMatrix {
     _columnStride = columnStride;
   }
 
-  List<double> get(int row, int column) {
+  Float64List get(int row, int column) {
     return _content.get(_rowStride * row, _columnStride * column);
   }
 
-  void set(int row, int column, List<double> value) {
+  void set(int row, int column, Float64List value) {
     _content.set(_rowStride * row, _columnStride * column, value);
   }
 
@@ -563,11 +563,11 @@ class StridesWrapperComplexMatrix extends WrapperComplexMatrix {
     _content.setParts(_rowStride * row, _columnStride * column, re, im);
   }
 
-  List<double> at(int row, int column) {
+  Float64List at(int row, int column) {
     return _content.at(_rowStride * row, _columnStride * column);
   }
 
-  void put(int row, int column, List<double> value) {
+  void put(int row, int column, Float64List value) {
     _content.put(_rowStride * row, _columnStride * column, value);
   }
 

@@ -517,7 +517,7 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
    * @throws ArgumentError
    *             if <tt>values.length != rows()*columns()</tt>.
    */
-  void setAll(final List<int> values) {
+  void setAll(final Int32List values) {
     if (values.length != _rows * _columns) {
       throw new ArgumentError("Must have same length: length=${values.length} rows()*columns()=${rows * columns}");
     }
@@ -567,7 +567,7 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
    *             <tt>values.length != rows() || for any 0 &lt;= row &lt; rows(): values[row].length != columns()</tt>
    *             .
    */
-  void setAll2D(final List<List<int>> values) {
+  void setAll2D(final List<Int32List> values) {
     if (values.length != _rows) {
       throw new ArgumentError("Must have same number of rows: rows=${values.length} rows()=${rows}");
     }
@@ -784,7 +784,7 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
     if ((nthreads > 1) && (_rows * _columns >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
       List<Future> futures = new List<Future>(nthreads);
-      List<int> results = new List<int>(nthreads);
+      Int32List results = new Int32List(nthreads);
       int k = _rows / nthreads;
       for (int j = 0; j < nthreads; j++) {
         final int firstRow = j * k;
@@ -972,7 +972,7 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
    * @param valueList
    *            the list to be filled with values, can have any size.
    */
-  void negativeValues(final List<int> rowList, final List<int> columnList, final List<int> valueList) {
+  void negativeValues(final Int32List rowList, final Int32List columnList, final Int32List valueList) {
     rowList.clear();
     columnList.clear();
     valueList.clear();
@@ -1023,7 +1023,7 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
    * @param valueList
    *            the list to be filled with values, can have any size.
    */
-  void nonZeros(final List<int> rowList, final List<int> columnList, final List<int> valueList) {
+  void nonZeros(final Int32List rowList, final Int32List columnList, final Int32List valueList) {
     rowList.clear();
     columnList.clear();
     valueList.clear();
@@ -1052,7 +1052,7 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
    * @param valueList
    *            the list to be filled with values, can have any size.
    */
-  void positiveValues(final List<int> rowList, final List<int> columnList, final List<int> valueList) {
+  void positiveValues(final Int32List rowList, final Int32List columnList, final Int32List valueList) {
     rowList.clear();
     columnList.clear();
     valueList.clear();
@@ -1377,7 +1377,7 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
    *
    * @return an array filled with the values of the cells.
    */
-  List<List<int>> toList() {
+  List<Int32List> toList() {
     final List<Int32List> values = new List<Int32List>.generate(_rows,
         (_) => new Int32List(_columns));
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -1691,7 +1691,7 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
    * @return the new view.
    */
   AbstractIntMatrix where(IntVectorProcedure condition) {
-    List<int> matches = new List<int>();
+    var matches = <int>[];
     for (int i = 0; i < _rows; i++) {
       if (condition(row(i))) {
         matches.add(i);
@@ -1748,7 +1748,7 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
    *             if <tt>!(0 <= columnIndexes[i] < columns())</tt> for any
    *             <tt>i=0..columnIndexes.length()-1</tt>.
    */
-  AbstractIntMatrix select(List<int> rowIndexes, List<int> columnIndexes) {
+  AbstractIntMatrix select(Int32List rowIndexes, Int32List columnIndexes) {
     // check for "all"
     if (rowIndexes == null) {
       rowIndexes = new Int32List(_rows);
@@ -1776,7 +1776,7 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
     return _viewSelectionLike(rowOffsets, columnOffsets);
   }
 
-  AbstractIntMatrix selectIterable(Iterable<List<int>> indexes) {
+  AbstractIntMatrix selectIterable(Iterable<Int32List> indexes) {
     int n = indexes.length;
     Int32List rowIndexes = new Int32List(n);
     Int32List columnIndexes = new Int32List(n);
@@ -1810,7 +1810,7 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
    *            the offsets of the visible elements.
    * @return a new view.
    */
-  AbstractIntMatrix _viewSelectionLike(List<int> rowOffsets, List<int> columnOffsets);
+  AbstractIntMatrix _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets);
 
   /**
    * Sorts the matrix rows into ascending order, according to the <i>natural

@@ -53,7 +53,7 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
    *             <tt>for any 1 &lt;= row &lt; values.length: values[row].length != values[row-1].length || index < -rows+1 || index > columns - 1</tt>
    *             .
    */
-  factory DiagonalDoubleMatrix.fromList(List<List<double>> values, int dindex) {
+  factory DiagonalDoubleMatrix.fromList(List<Float64List> values, int dindex) {
     return new DiagonalDoubleMatrix(values.length, values.length == 0 ? 0 : values[0].length, dindex)
       ..setAll2D(values);
   }
@@ -149,7 +149,7 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
     for (int i = _dlength; --i >= 0; ) _elements[i] = value;
   }
 
-  void setAll(final List<double> values) {
+  void setAll(final Float64List values) {
     if (values.length != _dlength) {
       throw new ArgumentError("Must have same length: length=${values.length} dlength=$_dlength");
     }
@@ -175,7 +175,7 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
     //}
   }
 
-  void setAll2D(final List<List<double>> values) {
+  void setAll2D(final List<Float64List> values) {
     if (values.length != _rows) {
       throw new ArgumentError("Must have same number of rows: rows=${values.length} rows()=${rows}");
     }
@@ -304,7 +304,7 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
     if ((nthreads > 1) && (_dlength >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _dlength);
       List<Future> futures = new List<Future>(nthreads);
-      List<int> results = new List<int>(nthreads);
+      Int32List results = new Int32List(nthreads);
       int k = _dlength / nthreads;
       for (int j = 0; j < nthreads; j++) {
         final int firstRow = j * k;
@@ -436,7 +436,7 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
     if ((nthreads > 1) && (_dlength >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _dlength);
       List<Future> futures = new List<Future>(nthreads);
-      List<Float64List> results = new List<double>(nthreads);//[2];
+      List<Float64List> results = new Float64List(nthreads);//[2];
       int k = _dlength ~/ nthreads;
       for (int j = 0; j < nthreads; j++) {
         final int firstRow = j * k;
@@ -505,7 +505,7 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
     if ((nthreads > 1) && (_dlength >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _dlength);
       List<Future> futures = new List<Future>(nthreads);
-      List<Float64List> results = new List<double>(nthreads);//[2];
+      List<Float64List> results = new Float64List(nthreads);//[2];
       int k = _dlength ~/ nthreads;
       for (int j = 0; j < nthreads; j++) {
         final int firstRow = j * k;

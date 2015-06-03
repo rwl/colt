@@ -518,7 +518,7 @@ abstract class DoubleMatrixTest {
     }
     double alpha = 3.0;
     double beta = 5.0;
-    AbstractDoubleVector z = DoubleFactory1D.dense.random(A.rows);
+    AbstractDoubleVector z = new DoubleVector.random(A.rows);
     Float64List expected = z.toList();
     z = A.mult(y, z, alpha, beta, false);
     for (int r = 0; r < A.rows; r++) {
@@ -552,7 +552,7 @@ abstract class DoubleMatrixTest {
     for (int i = 0; i < y.length; i++) {
       y.set(i, random.nextDouble());
     }
-    z = DoubleFactory1D.dense.random(A.columns);
+    z = new DoubleVector.random(A.columns);
     expected = z.toList();
     z = A.mult(y, z, alpha, beta, true);
     for (int r = 0; r < A.columns; r++) {
@@ -584,7 +584,7 @@ abstract class DoubleMatrixTest {
   testZMult2D() {
     double alpha = 3.0;
     double beta = 5.0;
-    AbstractDoubleMatrix C = DoubleFactory2D.dense.random(A.rows, A.rows);
+    AbstractDoubleMatrix C = new DoubleMatrix.random(A.rows, A.rows);
     List<Float64List> expected = C.toList();
     C = A.multiply(Bt, C, alpha, beta, false, false);
     for (int j = 0; j < A.rows; j++) {
@@ -622,7 +622,7 @@ abstract class DoubleMatrixTest {
     }
 
     //transposeA
-    C = DoubleFactory2D.dense.random(A.columns, A.columns);
+    C = new DoubleMatrix.random(A.columns, A.columns);
     expected = C.toList();
     C = A.multiply(B, C, alpha, beta, true, false);
     for (int j = 0; j < A.columns; j++) {
@@ -660,7 +660,7 @@ abstract class DoubleMatrixTest {
     }
 
     //transposeB
-    C = DoubleFactory2D.dense.random(A.rows, A.rows);
+    C = new DoubleMatrix.random(A.rows, A.rows);
     expected = C.toList();
     C = A.multiply(B, C, alpha, beta, false, true);
     for (int j = 0; j < A.rows; j++) {
@@ -697,7 +697,7 @@ abstract class DoubleMatrixTest {
       }
     }
     //transposeA and transposeB
-    C = DoubleFactory2D.dense.random(A.columns, A.columns);
+    C = new DoubleMatrix.random(A.columns, A.columns);
     expected = C.toList();
     C = A.multiply(Bt, C, alpha, beta, true, true);
     for (int j = 0; j < A.columns; j++) {

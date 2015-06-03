@@ -33,7 +33,7 @@ part of cern.colt.matrix;
  */
 class SparseRCComplexMatrix extends WrapperComplexMatrix {
 
-  static int _searchFromTo(List<int> list, int key, int from, int to) {
+  static int _searchFromTo(Int32List list, int key, int from, int to) {
     while (from <= to) {
       if (list[from] == key) {
         return from;
@@ -69,7 +69,7 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
    *             <tt>for any 1 &lt;= row &lt; values.length: values[row].length != values[row-1].length</tt>
    *             .
    */
-  factory SparseRCComplexMatrix.fromList(List<List<double>> values) {
+  factory SparseRCComplexMatrix.fromList(List<Float64List> values) {
     return new SparseRCComplexMatrix(values.length, values.length == 0 ? 0 : values[0].length)
       ..setAll2D(values);
   }
@@ -143,7 +143,7 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
    * @param removeDuplicates
    *            if true, then duplicates (if any) are removed
    */
-  factory SparseRCComplexMatrix.withValue(int rows, int columns, List<int> rowIndexes, List<int> columnIndexes, double re, double im, bool removeDuplicates) {
+  factory SparseRCComplexMatrix.withValue(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, double re, double im, bool removeDuplicates) {
     /*try {
       _setUp(rows, columns);
     } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
@@ -199,7 +199,7 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
    * @param removeZeroes
    *            if true, then zeroes (if any) are removed
    */
-  factory SparseRCComplexMatrix.withValues(int rows, int columns, List<int> rowIndexes, List<int> columnIndexes, List<double> values, {bool removeDuplicates: false, bool removeZeroes: false}) {
+  factory SparseRCComplexMatrix.withValues(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, Float64List values, {bool removeDuplicates: false, bool removeZeroes: false}) {
     /*try {
       _setUp(rows, columns);
     } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
@@ -542,7 +542,7 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
     return dense;
   }
 
-  List<double> get(int row, int column) {
+  Float64List get(int row, int column) {
     //int k = cern.colt.Sorting.binarySearchFromTo(columnIndexes, column, rowPointers[row], rowPointers[row + 1] - 1);
     int k = _searchFromTo(_columnIndexes, column, _rowPointers[row], _rowPointers[row + 1] - 1);
 
@@ -712,7 +712,7 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
     /* finalize A */
   }
 
-  void set(int row, int column, List<double> value) {
+  void set(int row, int column, Float64List value) {
     //int k = cern.colt.Sorting.binarySearchFromTo(columnIndexes, column, rowPointers[row], rowPointers[row + 1] - 1);
     int k = _searchFromTo(_columnIndexes, column, _rowPointers[row], _rowPointers[row + 1] - 1);
 
@@ -770,7 +770,7 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
     _realloc(0);
   }
 
-  AbstractComplexVector mult(AbstractComplexVector y, [AbstractComplexVector z = null, List<double> alpha = null, List<double> beta = null, bool transposeA = false]) {
+  AbstractComplexVector mult(AbstractComplexVector y, [AbstractComplexVector z = null, Float64List alpha = null, Float64List beta = null, bool transposeA = false]) {
     if (alpha == null) {
       alpha = new Float64List.fromList([1.0, 0.0]);
     }
@@ -974,7 +974,7 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
     return z;
   }
 
-  AbstractComplexMatrix multiply(AbstractComplexMatrix B, [AbstractComplexMatrix C = null, List<double> alpha = null, List<double> beta = null, bool transposeA = false, bool transposeB = false]) {
+  AbstractComplexMatrix multiply(AbstractComplexMatrix B, [AbstractComplexMatrix C = null, Float64List alpha = null, Float64List beta = null, bool transposeA = false, bool transposeB = false]) {
     if (alpha == null) {
       alpha = new Float64List.fromList([1.0, 0.0]);
     }
@@ -1167,7 +1167,7 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
     return C;
   }
 
-  static double _cumsum(List<int> p, List<int> c, int n) {
+  static double _cumsum(Int32List p, Int32List c, int n) {
     int nz = 0;
     double nz2 = 0.0;
     for (int k = 0; k < n; k++) {
@@ -1198,10 +1198,10 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
     return this;
   }
 
-  void _insert(int row, int column, int index, List<double> value) {
-    List<int> columnIndexesList = new List<int>.from(_columnIndexes);
+  void _insert(int row, int column, int index, Float64List value) {
+    var columnIndexesList = new List.from(_columnIndexes);
     //columnIndexesList._setSizeRaw(_rowPointers[_rows]);
-    List<double> valuesList = new List<double>.from(_values);
+    var valuesList = new List.from(_values);
     //valuesList._setSizeRaw(2 * _rowPointers[_rows]);
     columnIndexesList.insert(index, column);
     valuesList.insert(2 * index, value[0]);
@@ -1214,9 +1214,9 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
   }
 
   void _insertParts(int row, int column, int index, double re, double im) {
-    List<int> columnIndexesList = new List<int>.from(_columnIndexes);
+    var columnIndexesList = new List.from(_columnIndexes);
     //columnIndexesList._setSizeRaw(_rowPointers[_rows]);
-    List<double> valuesList = new List<double>.from(_values);
+    var valuesList = new List.from(_values);
     //valuesList._setSizeRaw(2 * _rowPointers[_rows]);
     columnIndexesList.insert(index, column);
     valuesList.insert(2 * index, re);
@@ -1229,9 +1229,9 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
   }
 
   void _remove(int row, int index) {
-    List<int> columnIndexesList = new List<int>.from(_columnIndexes);
+    var columnIndexesList = new List.from(_columnIndexes);
     //columnIndexesList._setSizeRaw(_rowPointers[_rows]);
-    List<double> valuesList = new List<double>.from(_values);
+    var valuesList = new List.from(_values);
     //valuesList._setSizeRaw(_rowPointers[_rows]);
     columnIndexesList.remove(index);
     valuesList.remove(2 * index);

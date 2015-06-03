@@ -70,7 +70,7 @@ class DoubleMatrix extends AbstractDoubleMatrix {
    *             <tt>for any 1 &lt;= row &lt; values.length: values[row].length != values[row-1].length</tt>
    *             .
    */
-  factory DoubleMatrix.fromList(List<List<double>> values) {
+  factory DoubleMatrix.fromList(List<Float64List> values) {
     return new DoubleMatrix(values.length, values.length == 0 ? 0 : values[0].length)
       ..setAll2D(values);
   }
@@ -125,6 +125,10 @@ class DoubleMatrix extends AbstractDoubleMatrix {
     this._isNoView = !isView;
   }
 
+  factory DoubleMatrix.random(int rows, int columns) {
+    return dfactory.randomMatrix(rows, columns, (r, c) => new DoubleMatrix(r, c));
+  }
+
   /**
    * Constructs a matrix from MatrixVectorReader.
    *
@@ -148,8 +152,8 @@ class DoubleMatrix extends AbstractDoubleMatrix {
     final m = new DenseDoubleMatrix(size.numRows(), size.numColumns());
     m._elements = new Float64List(_rows * _columns);
     int numEntries = size.numEntries();
-    List<int> columnIndexes = new List<int>(numEntries);
-    List<int> rowIndexes = new List<int>(numEntries);
+    Int32List columnIndexes = new Int32List(numEntries);
+    Int32List rowIndexes = new Int32List(numEntries);
     Float64List values = new Float64List(numEntries);
     reader.readCoordinate(rowIndexes, columnIndexes, values);
     for (int i = 0; i < numEntries; i++) {
@@ -262,12 +266,12 @@ class DoubleMatrix extends AbstractDoubleMatrix {
     return a;
   }
 
-  double reduceRange(DoubleDoubleFunction aggr, DoubleFunction f, final /*IntArrayList*/List<int> rowList, final /*IntArrayList*/List<int> columnList) {
+  double reduceRange(DoubleDoubleFunction aggr, DoubleFunction f, final /*IntArrayList*/Int32List rowList, final /*IntArrayList*/Int32List columnList) {
     if (this.length == 0) return double.NAN;
     final int zero = index(0, 0);
     final int size = rowList.length;
-    final List<int> rowElements = rowList;//.elements;
-    final List<int> columnElements = columnList;//.elements;
+    final Int32List rowElements = rowList;//.elements;
+    final Int32List columnElements = columnList;//.elements;
     double a = 0.0;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -551,7 +555,7 @@ class DoubleMatrix extends AbstractDoubleMatrix {
     //}
   }
 
-  void setAll(final List<double> values) {
+  void setAll(final Float64List values) {
     if (values.length != length) {
       throw new ArgumentError("Must have same length: length=${values.length} rows()*columns()=${rows * columns}");
     }
@@ -597,7 +601,7 @@ class DoubleMatrix extends AbstractDoubleMatrix {
     }
   }
 
-  void setAll2D(final List<List<double>> values) {
+  void setAll2D(final List<Float64List> values) {
     if (values.length != _rows) {
       throw new ArgumentError("Must have same number of rows: rows=${values.length} rows()=${rows}");
     }
@@ -980,11 +984,11 @@ class DoubleMatrix extends AbstractDoubleMatrix {
     //}
   }
 
-  void forEachWithNonZero(final AbstractDoubleMatrix y, DoubleDoubleFunction function,  /*IntArrayList*/List<int> rowList,  /*IntArrayList*/List<int> columnList) {
+  void forEachWithNonZero(final AbstractDoubleMatrix y, DoubleDoubleFunction function,  /*IntArrayList*/Int32List rowList,  /*IntArrayList*/Int32List columnList) {
     checkShape(y);
     final int size = rowList.length;
-    final List<int> rowElements = rowList;//.elements;
-    final List<int> columnElements = columnList;//.elements;
+    final Int32List rowElements = rowList;//.elements;
+    final Int32List columnElements = columnList;//.elements;
     final Float64List elementsOther = y.elements as Float64List;
     final int zeroOther = y.index(0, 0);
     final int zero = this.index(0, 0);
@@ -1027,7 +1031,7 @@ class DoubleMatrix extends AbstractDoubleMatrix {
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
       List<Future> futures = new List<Future>(nthreads);
-      List<int> results = new List<int>(nthreads);
+      Int32List results = new Int32List(nthreads);
       int k = _rows ~/ nthreads;
       for (int j = 0; j < nthreads; j++) {
         final int firstRow = j * k;
@@ -1319,7 +1323,7 @@ class DoubleMatrix extends AbstractDoubleMatrix {
     return new DoubleMatrixLocation(minValue, rowLocation, columnLocation);
   }
 
-  void negativeValues(final /*IntArrayList*/List<int> rowList, final /*IntArrayList*/List<int> columnList, final /*DoubleArrayList*/List<double> valueList) {
+  void negativeValues(final List<int> rowList, final List<int> columnList, final List<double> valueList) {
     rowList.clear();
     columnList.clear();
     valueList.clear();
@@ -1339,7 +1343,7 @@ class DoubleMatrix extends AbstractDoubleMatrix {
     }
   }
 
-  void nonZeros(final /*IntArrayList*/List<int> rowList, final /*IntArrayList*/List<int> columnList, final /*DoubleArrayList*/List<double> valueList) {
+  void nonZeros(final List<int> rowList, final List<int> columnList, final List<double> valueList) {
     rowList.clear();
     columnList.clear();
     valueList.clear();
@@ -1359,7 +1363,7 @@ class DoubleMatrix extends AbstractDoubleMatrix {
     }
   }
 
-  void positiveValues(final /*IntArrayList*/List<int> rowList, final /*IntArrayList*/List<int> columnList, final /*DoubleArrayList*/List<double> valueList) {
+  void positiveValues(final List<int> rowList, final List<int> columnList, final List<double> valueList) {
     rowList.clear();
     columnList.clear();
     valueList.clear();
@@ -1399,7 +1403,7 @@ class DoubleMatrix extends AbstractDoubleMatrix {
     _elements[_rowZero + row * _rowStride + _columnZero + column * _columnStride] = value;
   }
 
-  List<List<double>> toList() {
+  List<Float64List> toList() {
     final List<Float64List> values = new List<Float64List>(_rows);//[_columns];
     final int zero = this.index(0, 0);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -1888,7 +1892,7 @@ class DoubleMatrix extends AbstractDoubleMatrix {
     return new DoubleVector._internal(size, this._elements, zero, stride, true);
   }
 
-  AbstractDoubleMatrix _viewSelectionLike(List<int> rowOffsets, List<int> columnOffsets) {
+  AbstractDoubleMatrix _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets) {
     return new SelectedDenseDoubleMatrix.offset(this._elements, rowOffsets, columnOffsets, 0);
   }
 
@@ -1948,7 +1952,7 @@ class SelectedDenseDoubleMatrix extends AbstractDoubleMatrix {
   /**
    * The offsets of the visible cells of this matrix.
    */
-  List<int> _rowOffsets, _columnOffsets;
+  Int32List _rowOffsets, _columnOffsets;
 
   /**
    * The offset.
@@ -1966,7 +1970,7 @@ class SelectedDenseDoubleMatrix extends AbstractDoubleMatrix {
    *            The column offsets of the cells that shall be visible.
    * @param offset
    */
-  factory SelectedDenseDoubleMatrix.offset(Float64List elements, List<int> rowOffsets, List<int> columnOffsets, int offset) {
+  factory SelectedDenseDoubleMatrix.offset(Float64List elements, Int32List rowOffsets, Int32List columnOffsets, int offset) {
     return new SelectedDenseDoubleMatrix(rowOffsets.length, columnOffsets.length, elements, 0, 0, 1, 1, rowOffsets, columnOffsets, offset, true);
   }
 
@@ -1995,7 +1999,7 @@ class SelectedDenseDoubleMatrix extends AbstractDoubleMatrix {
    *            The column offsets of the cells that shall be visible.
    * @param offset
    */
-  SelectedDenseDoubleMatrix(int rows, int columns, Float64List elements, int rowZero, int columnZero, int rowStride, int columnStride, List<int> rowOffsets, List<int> columnOffsets, int offset, bool isView) {
+  SelectedDenseDoubleMatrix(int rows, int columns, Float64List elements, int rowZero, int columnZero, int rowStride, int columnStride, Int32List rowOffsets, Int32List columnOffsets, int offset, bool isView) {
     // be sure parameters are valid, we do not check...
     _setUp(rows, columns, rowZero, columnZero, rowStride, columnStride);
 
@@ -2308,7 +2312,7 @@ class SelectedDenseDoubleMatrix extends AbstractDoubleMatrix {
    *            the offsets of the visible elements.
    * @return a new view.
    */
-  AbstractDoubleMatrix _viewSelectionLike(List<int> rowOffsets, List<int> columnOffsets) {
+  AbstractDoubleMatrix _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets) {
     return new SelectedDenseDoubleMatrix.offset(this._elements, rowOffsets, columnOffsets, this._offset);
   }
 

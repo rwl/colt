@@ -524,7 +524,7 @@ abstract class IntMatrixTest {
     }
     int alpha = 3;
     int beta = 5;
-    AbstractIntVector z = IntFactory1D.dense.random(A.rows);
+    AbstractIntVector z = new IntVector.random(A.rows);
     z.forEach(ifunc.modulus(A.rows));
     Int32List expected = z.toList();
     z = A.mult(y, z, alpha, beta, false);
@@ -559,7 +559,7 @@ abstract class IntMatrixTest {
     for (int i = 0; i < y.length; i++) {
       y.set(i, random.nextInt(MAX_INT) % A.rows);
     }
-    z = IntFactory1D.dense.random(A.columns);
+    z = new IntVector.random(A.columns);
     z.forEach(ifunc.modulus(A.rows));
     expected = z.toList();
     z = A.mult(y, z, alpha, beta, true);
@@ -592,7 +592,7 @@ abstract class IntMatrixTest {
   void testMultiply() {
     int alpha = 3;
     int beta = 5;
-    AbstractIntMatrix C = IntFactory2D.dense.random(A.rows, A.rows);
+    AbstractIntMatrix C = new IntMatrix.random(A.rows, A.rows);
     C.forEach(ifunc.modulus(A.rows));
     List<Int32List> expected = C.toList();
     C = A.multiply(Bt, C, alpha, beta, false, false);
@@ -631,7 +631,7 @@ abstract class IntMatrixTest {
     }
 
     //transposeA
-    C = IntFactory2D.dense.random(A.columns, A.columns);
+    C = new IntMatrix.random(A.columns, A.columns);
     C.forEach(ifunc.modulus(A.rows));
     expected = C.toList();
     C = A.multiply(B, C, alpha, beta, true, false);
@@ -669,7 +669,7 @@ abstract class IntMatrixTest {
     }
 
     //transposeB
-    C = IntFactory2D.dense.random(A.rows, A.rows);
+    C = new IntMatrix.random(A.rows, A.rows);
     C.forEach(ifunc.modulus(A.rows));
     expected = C.toList();
     C = A.multiply(B, C, alpha, beta, false, true);
@@ -706,7 +706,7 @@ abstract class IntMatrixTest {
       }
     }
     //transposeA and transposeB
-    C = IntFactory2D.dense.random(A.columns, A.columns);
+    C = new IntMatrix.random(A.columns, A.columns);
     C.forEach(ifunc.modulus(A.rows));
     expected = C.toList();
     C = A.multiply(Bt, C, alpha, beta, true, true);

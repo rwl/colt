@@ -39,9 +39,9 @@ class ComplexVector extends AbstractComplexVector {
    * @param values
    *            The values to be filled into the new matrix.
    */
-  factory ComplexVector.fromList(List<double> values) {
+  factory ComplexVector.fromList(Float64List values) {
     return new ComplexVector(values.length ~/ 2)
-      ..setAll(values);
+      ..setValues(values);
   }
 
   /**
@@ -54,11 +54,11 @@ class ComplexVector extends AbstractComplexVector {
    * @throws IllegalArgumentException
    *             if <tt>size<0</tt>.
    */
-  factory ComplexVector.fromReal(List<double> realPart) {
+  factory ComplexVector.fromReal(AbstractDoubleVector realPart) {
     return new ComplexVector(realPart.length)..setReal(realPart);
   }
 
-  factory ComplexVector.fromImaginary(List<double> imagPart) {
+  factory ComplexVector.fromImaginary(AbstractDoubleVector imagPart) {
     return new ComplexVector(imagPart.length)..setImaginary(imagPart);
   }
 
@@ -76,7 +76,7 @@ class ComplexVector extends AbstractComplexVector {
    * @throws IllegalArgumentException
    *             if <tt>size<0</tt>.
    */
-  factory ComplexVector.fromParts(List<double> realPart, List<double> imaginaryPart) {
+  factory ComplexVector.fromParts(AbstractDoubleVector realPart, AbstractDoubleVector imaginaryPart) {
     return new ComplexVector(realPart.length)
         ..setReal(realPart)
         ..setImaginary(imaginaryPart);
@@ -138,7 +138,7 @@ class ComplexVector extends AbstractComplexVector {
     return new ComplexVector.fromParts(real, imag);
   }
 
-  List<double> reduce(final cfunc.ComplexComplexComplexFunction aggr, final cfunc.ComplexComplexFunction f) {
+  Float64List aggregate(final cfunc.ComplexComplexComplexFunction aggr, final cfunc.ComplexComplexFunction f) {
     Float64List b = new Float64List(2);
     if (_size == 0) {
       b[0] = double.NAN;
@@ -177,7 +177,7 @@ class ComplexVector extends AbstractComplexVector {
     return a;
   }
 
-  List<double> reduceWith(final AbstractComplexVector other, final cfunc.ComplexComplexComplexFunction aggr, final cfunc.ComplexComplexComplexFunction f) {
+  Float64List reduceWith(final AbstractComplexVector other, final cfunc.ComplexComplexComplexFunction aggr, final cfunc.ComplexComplexComplexFunction f) {
     if (!(other is ComplexVector)) {
       return super.reduceWith(other, aggr, f);
     }
@@ -228,7 +228,7 @@ class ComplexVector extends AbstractComplexVector {
     return a;
   }
 
-  void forEach(final cfunc.ComplexComplexFunction function) {
+  void apply(final cfunc.ComplexComplexFunction function) {
     if (this._elements == null) {
       throw new Error();
     }
@@ -333,7 +333,7 @@ class ComplexVector extends AbstractComplexVector {
     //}
   }
 
-  void fillWhere(final cfunc.ComplexProcedure cond, final List<double> value) {
+  void fillWhere(final cfunc.ComplexProcedure cond, final Float64List value) {
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
@@ -731,7 +731,7 @@ class ComplexVector extends AbstractComplexVector {
     //}
   }
 
-  void setAll(List<double> values) {
+  void setValues(Float64List values) {
     if (_isNoView) {
       if (values.length != 2 * _size) {
         throw new ArgumentError("The length of values[] must be equal to 2*size()=${2 * length}");
@@ -739,7 +739,7 @@ class ComplexVector extends AbstractComplexVector {
       //System.arraycopy(values, 0, this._elements, 0, values.length);
       this._elements.setAll(0, values);
     } else {
-      super.setAll(values);
+      super.setValues(values);
     }
   }
 
@@ -887,7 +887,7 @@ class ComplexVector extends AbstractComplexVector {
     }
   }
 
-  List<double> get(int index) {
+  Float64List get(int index) {
     int idx = _zero + index * _stride;
     return new Float64List.fromList([_elements[idx], _elements[idx + 1]]);
   }
@@ -1045,7 +1045,7 @@ class ComplexVector extends AbstractComplexVector {
     this._elements[idx + 1] = im;
   }
 
-  void set(int index, List<double> value) {
+  void set(int index, Float64List value) {
     int idx = _zero + index * _stride;
     this._elements[idx] = value[0];
     this._elements[idx + 1] = value[1];
@@ -1110,7 +1110,7 @@ class ComplexVector extends AbstractComplexVector {
     //}
   }
 
-  void fillList(List<double> values) {
+  void fillList(Float64List values) {
     if (values.length < 2 * _size) {
       throw new ArgumentError("values too small");
     }
@@ -1122,7 +1122,7 @@ class ComplexVector extends AbstractComplexVector {
     }
   }
 
-  List<double> dot(final AbstractComplexVector y, [final int from = 0, int length = null]) {
+  Float64List dot(final AbstractComplexVector y, [final int from = 0, int length = null]) {
     if (length == null) {
       length = this.length;
     }
@@ -1196,7 +1196,7 @@ class ComplexVector extends AbstractComplexVector {
     return sum;
   }
 
-  List<double> sum() {
+  Float64List sum() {
     Float64List sum = new Float64List(2);
     if (this._elements == null) {
       throw new Error();
@@ -1273,7 +1273,7 @@ class ComplexVector extends AbstractComplexVector {
     return _zero + rank * _stride;
   }
 
-  AbstractComplexVector _viewSelectionLike(List<int> offsets) {
+  AbstractComplexVector _viewSelectionLike(Int32List offsets) {
     return new SelectedDenseComplexVector(this._elements, offsets);
   }
 
@@ -1311,7 +1311,7 @@ class SelectedDenseComplexVector extends AbstractComplexVector {
   /**
    * The offsets of visible indexes of this matrix.
    */
-  List<int> _offsets;
+  Int32List _offsets;
 
   /**
    * The offset.
@@ -1326,7 +1326,7 @@ class SelectedDenseComplexVector extends AbstractComplexVector {
    * @param indexes
    *            The indexes of the cells that shall be visible.
    */
-  factory SelectedDenseComplexVector(Float64List elements, List<int> offsets) {
+  factory SelectedDenseComplexVector(Float64List elements, Int32List offsets) {
     return new SelectedDenseComplexVector._internal(offsets.length, elements, 0, 1, offsets, 0);
   }
 
@@ -1346,7 +1346,7 @@ class SelectedDenseComplexVector extends AbstractComplexVector {
    *            the offsets of the cells that shall be visible.
    * @param offset
    */
-  SelectedDenseComplexVector._internal(int size, Float64List elements, int zero, int stride, List<int> offsets, int offset) {
+  SelectedDenseComplexVector._internal(int size, Float64List elements, int zero, int stride, Int32List offsets, int offset) {
     _setUp(size, zero, stride);
 
     this._elements = elements;
@@ -1359,7 +1359,7 @@ class SelectedDenseComplexVector extends AbstractComplexVector {
     return _offsets[absRank];
   }
 
-  List<double> get(int index) {
+  Float64List get(int index) {
     int idx = _zero + index * _stride;
     return new Float64List.fromList([_elements[__offset + _offsets[idx]], _elements[__offset + _offsets[idx] + 1]]);
   }
@@ -1460,7 +1460,7 @@ class SelectedDenseComplexVector extends AbstractComplexVector {
     throw new UnsupportedError("This method is not supported.");
   }*/
 
-  void set(int index, List<double> value) {
+  void set(int index, Float64List value) {
     int idx = _zero + index * _stride;
     _elements[__offset + _offsets[idx]] = value[0];
     _elements[__offset + _offsets[idx] + 1] = value[1];
@@ -1477,7 +1477,7 @@ class SelectedDenseComplexVector extends AbstractComplexVector {
     this.__offset = 0;
   }
 
-  AbstractComplexVector _viewSelectionLike(List<int> offsets) {
+  AbstractComplexVector _viewSelectionLike(Int32List offsets) {
     return new SelectedDenseComplexVector(this._elements, offsets);
   }
 

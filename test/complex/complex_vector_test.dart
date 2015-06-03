@@ -78,7 +78,7 @@ abstract class ComplexVectorTest {
     for (int i = 0; i < A.length; i++) {
       expected = Complex.plus(expected, Complex.square(A.get(i)));
     }
-    Float64List result = A.reduce(plus, square);
+    Float64List result = A.aggregate(plus, square);
     assertEquals(expected, result, TOL);
   }
 
@@ -93,7 +93,7 @@ abstract class ComplexVectorTest {
 
   void testAssign() {
     AbstractComplexVector Acopy = A.copy();
-    A.forEach(acos);
+    A.apply(acos);
     for (int i = 0; i < A.length; i++) {
       Float64List expected = Complex.acos(Acopy.get(i));
       assertEquals(expected, A.get(i), TOL);
@@ -170,7 +170,7 @@ abstract class ComplexVectorTest {
     for (int i = 0; i < 2 * A.length; i++) {
       expected[i] = random.nextDouble();
     }
-    A.setAll(expected);
+    A.setValues(expected);
     for (int i = 0; i < A.length; i++) {
       Float64List elem = A.get(i);
       expect(expected[2 * i], closeTo(elem[0], TOL));
@@ -192,7 +192,7 @@ abstract class ComplexVectorTest {
 
   void testAssignImaginary() {
     AbstractComplexVector Acopy = A.copy();
-    AbstractDoubleVector Im = DoubleFactory1D.dense.random(A.length);
+    AbstractDoubleVector Im = new DoubleVector.random(A.length);
     A.setImaginary(Im);
     for (int i = 0; i < A.length; i++) {
       Float64List elem = A.get(i);
@@ -203,7 +203,7 @@ abstract class ComplexVectorTest {
 
   void testAssignReal() {
     AbstractComplexVector Acopy = A.copy();
-    AbstractDoubleVector Re = DoubleFactory1D.dense.random(A.length);
+    AbstractDoubleVector Re = new DoubleVector.random(A.length);
     A.setReal(Re);
     for (int i = 0; i < A.length; i++) {
       Float64List elem = A.get(i);
@@ -327,7 +327,7 @@ abstract class ComplexVectorTest {
   }
 
   void testViewSelectionProc() {
-    AbstractComplexVector B = A.where((Float64List element) {
+    AbstractComplexVector B = A.upon((Float64List element) {
       if (element[0] < element[1]) {
         return true;
       } else {
@@ -377,8 +377,8 @@ abstract class ComplexVectorTest {
   }
 
   void testZDotProductIndex() {
-    List<int> indexList = new List<int>();
-    List<Float64List> valueList = new List<Float64List>();
+    var indexList = <int>[];
+    var valueList = <Float64List>[];
     B.nonZeros(indexList: indexList, valueList: valueList);
     Float64List actual = A.dotNonZero(B,
         new Int32List.fromList(indexList), 5, B.length - 10);

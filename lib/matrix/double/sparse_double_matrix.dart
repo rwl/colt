@@ -175,7 +175,7 @@ class SparseDoubleMatrix extends AbstractDoubleMatrix {
    * @param value
    *            numerical value
    */
-  factory SparseDoubleMatrix.withValue(int rows, int columns, List<int> rowIndexes, List<int> columnIndexes, double value) {
+  factory SparseDoubleMatrix.withValue(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, double value) {
     /*try {
         _setUp(rows, columns);
     } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
@@ -201,7 +201,7 @@ class SparseDoubleMatrix extends AbstractDoubleMatrix {
    * @param values
    *            numerical values
    */
-  factory SparseDoubleMatrix.withValues(int rows, int columns, List<int> rowIndexes, List<int> columnIndexes, List<double> values) {
+  factory SparseDoubleMatrix.withValues(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, Float64List values) {
     /*try {
         _setUp(rows, columns);
     } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
@@ -394,7 +394,7 @@ class SparseDoubleMatrix extends AbstractDoubleMatrix {
    *            cell's value of <tt>y</tt>,
    * @return <tt>this</tt> (for convenience only).
    */
-  void assignIndexValueFunc(final List<int> rowIndexes, final List<int> columnIndexes, final double value, final func.DoubleDoubleFunction function) {
+  void assignIndexValueFunc(final Int32List rowIndexes, final Int32List columnIndexes, final double value, final func.DoubleDoubleFunction function) {
     int size = rowIndexes.length;
     if (function == func.plus) { // x[i] = x[i] + y[i]
       for (int i = 0; i < size; i++) {
@@ -448,7 +448,7 @@ class SparseDoubleMatrix extends AbstractDoubleMatrix {
    *            cell's value of <tt>y</tt>,
    * @return <tt>this</tt> (for convenience only).
    */
-  void assignIndexValuesFunc(final List<int> rowIndexes, final List<int> columnIndexes, final List<double> values, final func.DoubleDoubleFunction function) {
+  void assignIndexValuesFunc(final Int32List rowIndexes, final Int32List columnIndexes, final Float64List values, final func.DoubleDoubleFunction function) {
     int size = rowIndexes.length;
     if (function == func.plus) { // x[i] = x[i] + y[i]
       for (int i = 0; i < size; i++) {
@@ -786,7 +786,7 @@ class SparseDoubleMatrix extends AbstractDoubleMatrix {
     return C;
   }
 
-  void _insert(List<int> rowIndexes, List<int> columnIndexes, double value) {
+  void _insert(Int32List rowIndexes, Int32List columnIndexes, double value) {
     int size = rowIndexes.length;
     for (int i = 0; i < size; i++) {
       int row = rowIndexes[i];
@@ -811,7 +811,7 @@ class SparseDoubleMatrix extends AbstractDoubleMatrix {
     }
   }
 
-  void _insertValues(List<int> rowIndexes, List<int> columnIndexes, List<double> values) {
+  void _insertValues(Int32List rowIndexes, Int32List columnIndexes, Float64List values) {
     int size = rowIndexes.length;
     for (int i = 0; i < size; i++) {
       double value = values[i];
@@ -850,7 +850,7 @@ class SparseDoubleMatrix extends AbstractDoubleMatrix {
     return new SparseDoubleVector._internal(size, this._elements, offset, stride, false);
   }
 
-  AbstractDoubleMatrix _viewSelectionLike(List<int> rowOffsets, List<int> columnOffsets) {
+  AbstractDoubleMatrix _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets) {
     return new SelectedSparseDoubleMatrix(this._elements, rowOffsets, columnOffsets, 0);
   }
 
@@ -930,7 +930,7 @@ class SelectedSparseDoubleMatrix extends AbstractDoubleMatrix {
    *            The column offsets of the cells that shall be visible.
    * @param offset
    */
-  factory SelectedSparseDoubleMatrix(Map<int, double> elements, List<int> rowOffsets, List<int> columnOffsets, int offset) {
+  factory SelectedSparseDoubleMatrix(Map<int, double> elements, Int32List rowOffsets, Int32List columnOffsets, int offset) {
     return new SelectedSparseDoubleMatrix._internal(rowOffsets.length, columnOffsets.length, elements, 0, 0, 1, 1, rowOffsets, columnOffsets, offset);
   }
 
@@ -959,7 +959,7 @@ class SelectedSparseDoubleMatrix extends AbstractDoubleMatrix {
    *            The column offsets of the cells that shall be visible.
    * @param offset
    */
-  SelectedSparseDoubleMatrix._internal(int rows, int columns, Map<int, double> elements, int rowZero, int columnZero, int rowStride, int columnStride, List<int> rowOffsets, List<int> columnOffsets, int offset) {
+  SelectedSparseDoubleMatrix._internal(int rows, int columns, Map<int, double> elements, int rowZero, int columnZero, int rowStride, int columnStride, Int32List rowOffsets, Int32List columnOffsets, int offset) {
     // be sure parameters are valid, we do not check...
     _setUp(rows, columns, rowZero, columnZero, rowStride, columnStride);
 
@@ -1286,7 +1286,7 @@ class SelectedSparseDoubleMatrix extends AbstractDoubleMatrix {
    *            the offsets of the visible elements.
    * @return a new view.
    */
-  AbstractDoubleMatrix _viewSelectionLike(List<int> rowOffsets, List<int> columnOffsets) {
+  AbstractDoubleMatrix _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets) {
     return new SelectedSparseDoubleMatrix(this._elements, rowOffsets, columnOffsets, this._offset);
   }
 

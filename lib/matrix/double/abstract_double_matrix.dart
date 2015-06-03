@@ -520,7 +520,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
    * @throws ArgumentError
    *             if <tt>values.length != rows()*columns()</tt>.
    */
-  void setAll(List<double> values) {
+  void setAll(Float64List values) {
     if (values.length != _rows * _columns) {
       throw new ArgumentError("Must have same length: length=${values.length}rows()*columns()=${rows * columns}");
     }
@@ -569,7 +569,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
    *             <tt>values.length != rows() || for any 0 &lt;= row &lt; rows(): values[row].length != columns()</tt>
    *             .
    */
-  void setAll2D(final List<List<double>> values) {
+  void setAll2D(final List<Float64List> values) {
     if (values.length != _rows) {
       throw new ArgumentError("Must have same number of rows: rows=${values.length}rows()=${rows}");
     }
@@ -583,7 +583,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
         final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
         futures[j] = ConcurrencyUtils.submit(() {
           for (int r = firstRow; r < lastRow; r++) {
-            List<double> currentRow = values[r];
+            Float64List currentRow = values[r];
             if (currentRow.length != _columns) throw new ArgumentError("Must have same number of columns in every row: columns=" + currentRow.length + "columns()=" + columns());
             for (int c = 0; c < _columns; c++) {
               setQuick(r, c, currentRow[c]);
@@ -594,7 +594,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
       for (int r = 0; r < _rows; r++) {
-        List<double> currentRow = values[r];
+        Float64List currentRow = values[r];
         if (currentRow.length != _columns) {
           throw new ArgumentError("Must have same number of columns in every row: columns=${currentRow.length}columns()=${columns}");
         }
@@ -786,7 +786,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
    * @throws ArgumentError
    *             if <tt>values.length != rows()*columns()</tt>.
    */
-//  DoubleMatrix assignList(List<double> values) {
+//  DoubleMatrix assignList(Float64List values) {
 //    if (values.length != _rows * _columns) {
 //      throw new ArgumentError("Must have same length: length=${values.length} rows()*columns()=${rows * columns}");
 //    }
@@ -1013,7 +1013,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
       List<Future> futures = new List<Future>(nthreads);
-      List<List<double>> results = new List<List<double>>(nthreads);//[2];
+      List<Float64List> results = new List<Float64List>(nthreads);//[2];
       int k = _rows ~/ nthreads;
       for (int j = 0; j < nthreads; j++) {
         final int firstRow = j * k;
@@ -1040,7 +1040,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
       }
       try {
         for (int j = 0; j < nthreads; j++) {
-          results[j] = futures[j].get() as List<double>;
+          results[j] = futures[j].get() as Float64List;
         }
         maxValue = results[0][0];
         rowLocation = results[0][1] as int;
@@ -1089,7 +1089,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
       List<Future> futures = new List<Future>(nthreads);
-      List<List<double>> results = new List<List<double>>(nthreads);//[2];
+      List<Float64List> results = new List<Float64List>(nthreads);//[2];
       int k = _rows ~/ nthreads;
       for (int j = 0; j < nthreads; j++) {
         final int firstRow = j * k;
@@ -1116,7 +1116,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
       }
       try {
         for (int j = 0; j < nthreads; j++) {
-          results[j] = futures[j].get() as List<double>;
+          results[j] = futures[j].get() as Float64List;
         }
         minValue = results[0][0];
         rowLocation = results[0][1] as int;
@@ -1165,7 +1165,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
    * @param valueList
    *            the list to be filled with values, can have any size.
    */
-  void negativeValues(final /*IntArrayList*/List<int> rowList, final /*IntArrayList*/List<int> columnList, final /*/*DoubleArrayList*/List<double>*/List<double> valueList) {
+  void negativeValues(final List<int> rowList, final List<int> columnList, final List<double> valueList) {
     rowList.clear();
     columnList.clear();
     valueList.clear();
@@ -1216,7 +1216,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
    * @param valueList
    *            the list to be filled with values, can have any size.
    */
-  void nonZeros(final /*IntArrayList*/List<int> rowList, final /*IntArrayList*/List<int> columnList, final /*/*DoubleArrayList*/List<double>*/List<double> valueList) {
+  void nonZeros(final List<int> rowList, final List<int> columnList, final List<double> valueList) {
     rowList.clear();
     columnList.clear();
     valueList.clear();
@@ -1245,7 +1245,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
    * @param valueList
    *            the list to be filled with values, can have any size.
    */
-  void positiveValues(final /*IntArrayList*/List<int> rowList, final /*IntArrayList*/List<int> columnList, final /*DoubleArrayList*/List<double> valueList) {
+  void positiveValues(final List<int> rowList, final List<int> columnList, final List<double> valueList) {
     rowList.clear();
     columnList.clear();
     valueList.clear();
@@ -1398,7 +1398,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
    *
    * @return an array filled with the values of the cells.
    */
-  List<List<double>> toList() {
+  List<Float64List> toList() {
     final List<Float64List> values = new List<Float64List>.generate(_rows,
         (_) => new Float64List(_columns));
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -1411,7 +1411,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
         final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
         futures[j] = ConcurrencyUtils.submit(() {
           for (int r = firstRow; r < lastRow; r++) {
-            List<double> currentRow = values[r];
+            Float64List currentRow = values[r];
             for (int c = 0; c < _columns; c++) {
               currentRow[c] = getQuick(r, c);
             }
@@ -1421,7 +1421,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
       ConcurrencyUtils.waitForCompletion(futures);
     } else {*/
       for (int r = 0; r < _rows; r++) {
-        List<double> currentRow = values[r];
+        Float64List currentRow = values[r];
         for (int c = 0; c < _columns; c++) {
           currentRow[c] = get(r, c);
         }
@@ -1695,7 +1695,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
    * @return the new view.
    */
   AbstractDoubleMatrix where(DoubleVectorProcedure condition) {
-    /*IntArrayList*/List<int> matches = new /*IntArrayList*/List<int>();
+    var matches = <int>[];
     for (int i = 0; i < _rows; i++) {
       if (condition(row(i))) {
         matches.add(i);
@@ -1752,7 +1752,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
    *             if <tt>!(0 <= columnIndexes[i] < columns())</tt> for any
    *             <tt>i=0..columnIndexes.length()-1</tt>.
    */
-  AbstractDoubleMatrix select(List<int> rowIndexes, List<int> columnIndexes) {
+  AbstractDoubleMatrix select(Int32List rowIndexes, Int32List columnIndexes) {
     // check for "all"
     if (rowIndexes == null) {
       rowIndexes = new Int32List(_rows);
@@ -1776,7 +1776,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
     return _viewSelectionLike(rowOffsets, columnOffsets);
   }
 
-  AbstractDoubleMatrix selectIterable(Iterable<List<int>> indexes) {
+  AbstractDoubleMatrix selectIterable(Iterable<Int32List> indexes) {
     int n = indexes.length;
     Int32List rowIndexes = new Int32List(n);
     Int32List columnIndexes = new Int32List(n);
@@ -2168,7 +2168,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
    *            the offsets of the visible elements.
    * @return a new view.
    */
-  AbstractDoubleMatrix _viewSelectionLike(List<int> rowOffsets, List<int> columnOffsets);
+  AbstractDoubleMatrix _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets);
 
   Object clone();
 

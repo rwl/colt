@@ -384,7 +384,7 @@ abstract class AbstractDoubleVector extends AbstractVector with ListMixin<double
    * @throws IllegalArgumentException
    *             if <tt>values.length != size()</tt>.
    */
-  void setValues(List<double> values) {
+  void setValues(Float64List values) {
     if (values.length != _size) {
       throw new ArgumentError("Must have same number of cells: length=${values.length} size()=${length}");
     }
@@ -730,7 +730,7 @@ abstract class AbstractDoubleVector extends AbstractVector with ListMixin<double
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
       List<Future> futures = new List<Future>(nthreads);
-      List<List<double>> results = new List<List<double>>(nthreads);//[2];
+      List<Float64List> results = new List<Float64List>(nthreads);//[2];
       int k = _size ~/ nthreads;
       for (int j = 0; j < nthreads; j++) {
         final int firstIdx = j * k;
@@ -751,7 +751,7 @@ abstract class AbstractDoubleVector extends AbstractVector with ListMixin<double
       }
       try {
         for (int j = 0; j < nthreads; j++) {
-          results[j] = futures[j].get() as List<double>;
+          results[j] = futures[j].get() as Float64List;
         }
         maxValue = results[0][0];
         location = results[0][1] as int;
@@ -792,7 +792,7 @@ abstract class AbstractDoubleVector extends AbstractVector with ListMixin<double
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
       List<Future> futures = new List<Future>(nthreads);
-      List<List<double>> results = new List<List<double>>(nthreads);//[2];
+      List<Float64List> results = new List<Float64List>(nthreads);//[2];
       int k = _size ~/ nthreads;
       for (int j = 0; j < nthreads; j++) {
         final int firstIdx = j * k;
@@ -813,7 +813,7 @@ abstract class AbstractDoubleVector extends AbstractVector with ListMixin<double
       }
       try {
         for (int j = 0; j < nthreads; j++) {
-          results[j] = futures[j].get() as List<double>;
+          results[j] = futures[j].get() as Float64List;
         }
         minValue = results[0][0];
         location = results[0][1] as int;
@@ -1263,8 +1263,8 @@ abstract class AbstractDoubleVector extends AbstractVector with ListMixin<double
    *
    * @return an array filled with the values of the cells.
    */
-  List<double> toList({bool growable: false}) {
-    List<double> result;
+  Float64List toList({bool growable: false}) {
+    Float64List result;
     if (growable) {
       result = new List<double>()..length = length;
     } else {
@@ -1284,7 +1284,7 @@ abstract class AbstractDoubleVector extends AbstractVector with ListMixin<double
    * @throws IllegalArgumentException
    *             if <tt>values.length < size()</tt>.
    */
-  void fillList(List<double> values) {
+  void fillList(Float64List values) {
     if (values.length < _size) {
       throw new ArgumentError("values too small");
     }
@@ -1396,7 +1396,7 @@ abstract class AbstractDoubleVector extends AbstractVector with ListMixin<double
    * @return the new view.
    */
   AbstractDoubleVector where(DoubleProcedure condition) {
-    /*IntArrayList*/List<int> matches = new /*IntArrayList*/List<int>();
+    var matches = <int>[];
     for (int i = 0; i < _size; i++) {
       if (condition(get(i))) matches.add(i);
     }
@@ -1435,7 +1435,7 @@ abstract class AbstractDoubleVector extends AbstractVector with ListMixin<double
    *             if <tt>!(0 <= indexes[i] < size())</tt> for any
    *             <tt>i=0..indexes.length()-1</tt>.
    */
-  AbstractDoubleVector select(List<int> indexes) {
+  AbstractDoubleVector select(Int32List indexes) {
     // check for "all"
     if (indexes == null) {
       indexes = new Int32List(_size);
@@ -1531,7 +1531,7 @@ abstract class AbstractDoubleVector extends AbstractVector with ListMixin<double
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, length);
       List<Future> futures = new List<Future>(nthreads);
-      List<double> results = new List<double>(nthreads);
+      Float64List results = new Float64List(nthreads);
       int k = length ~/ nthreads;
       for (int j = 0; j < nthreads; j++) {
         final int firstIdx = j * k;
@@ -1689,7 +1689,7 @@ abstract class AbstractDoubleVector extends AbstractVector with ListMixin<double
    *            the offsets of the visible elements.
    * @return a new view.
    */
-  AbstractDoubleVector _viewSelectionLike(List<int> offsets);
+  AbstractDoubleVector _viewSelectionLike(Int32List offsets);
 
   /**
    * Returns the dot product of two vectors x and y, which is

@@ -390,7 +390,7 @@ abstract class AbstractIntVector extends AbstractVector with ListMixin<int> {
    * @throws ArgumentError
    *             if <tt>values.length != size()</tt>.
    */
-//  void setAll(final List<int> values) {
+//  void setAll(final Int32List values) {
 //    if (values.length != _size) {
 //      throw new ArgumentError("Must have same number of cells: length=${values.length} size()=$length");
 //    }
@@ -564,7 +564,7 @@ abstract class AbstractIntVector extends AbstractVector with ListMixin<int> {
    *             if <tt>size() != y.size()</tt>.
    * @see IntFunctions
    */
-  void forEachWithNonZero(AbstractIntVector y, ifunc.IntIntFunction function, List<int> nonZeroIndexes) {
+  void forEachWithNonZero(AbstractIntVector y, ifunc.IntIntFunction function, Int32List nonZeroIndexes) {
     checkSize(y);
     Int32List nonZeroElements = nonZeroIndexes;//.elements;
 
@@ -756,7 +756,7 @@ abstract class AbstractIntVector extends AbstractVector with ListMixin<int> {
    * @param valueList
    *            the list to be filled with values, can have any size.
    */
-  void negativeValues({List<int> indexList: null, final List<int> valueList: null}) {
+  void negativeValues({Int32List indexList: null, final Int32List valueList: null}) {
     bool fillIndexList = indexList != null;
     bool fillValueList = valueList != null;
     if (fillIndexList) {
@@ -829,7 +829,7 @@ abstract class AbstractIntVector extends AbstractVector with ListMixin<int> {
    * @param valueList
    *            the list to be filled with values, can have any size.
    */
-  void _nonZeros(List<int> indexList, List<int> valueList) {
+  void _nonZeros(Int32List indexList, Int32List valueList) {
     bool fillIndexList = indexList != null;
     bool fillValueList = valueList != null;
     if (fillIndexList) {
@@ -904,7 +904,7 @@ abstract class AbstractIntVector extends AbstractVector with ListMixin<int> {
    * @param maxCardinality
    *            maximal cardinality
    */
-  void nonZeros({List<int> indexList: null, List<int> valueList: null, int maxCardinality: null}) {
+  void nonZeros({Int32List indexList: null, Int32List valueList: null, int maxCardinality: null}) {
     if (maxCardinality == null) {
       return _nonZeros(indexList, valueList);
     }
@@ -946,7 +946,7 @@ abstract class AbstractIntVector extends AbstractVector with ListMixin<int> {
    * @param valueList
    *            the list to be filled with values, can have any size.
    */
-  void positiveValues({List<int> indexList: null, List<int> valueList: null}) {
+  void positiveValues({Int32List indexList: null, Int32List valueList: null}) {
     bool fillIndexList = indexList != null;
     bool fillValueList = valueList != null;
     if (fillIndexList) {
@@ -1304,10 +1304,10 @@ abstract class AbstractIntVector extends AbstractVector with ListMixin<int> {
    *
    * @return an array filled with the values of the cells.
    */
-  List<int> toList({bool growable: false}) {
-    List<int> result;
+  Int32List toList({bool growable: false}) {
+    Int32List result;
     if (growable) {
-      result = new List<int>()..length = length;
+      result = new Int32List()..length = length;
     } else {
       result = new Int32List(length);
     }
@@ -1325,7 +1325,7 @@ abstract class AbstractIntVector extends AbstractVector with ListMixin<int> {
    * @throws ArgumentError
    *             if <tt>values.length < size()</tt>.
    */
-  void fillList(final List<int> values) {
+  void fillList(final Int32List values) {
     if (values.length < _size) {
       throw new ArgumentError("values too small");
     }
@@ -1455,7 +1455,7 @@ abstract class AbstractIntVector extends AbstractVector with ListMixin<int> {
    * @return the new view.
    */
   AbstractIntVector where(ifunc.IntProcedure condition) {
-    List<int> matches = new List<int>();
+    var matches = <int>[];
     for (int i = 0; i < _size; i++) {
       if (condition(get(i))) {
         matches.add(i);
@@ -1496,7 +1496,7 @@ abstract class AbstractIntVector extends AbstractVector with ListMixin<int> {
    *             if <tt>!(0 <= indexes[i] < size())</tt> for any
    *             <tt>i=0..indexes.length()-1</tt>.
    */
-  AbstractIntVector select(List<int> indexes) {
+  AbstractIntVector select(Int32List indexes) {
     // check for "all"
     if (indexes == null) {
       indexes = new Int32List(_size);
@@ -1520,7 +1520,7 @@ abstract class AbstractIntVector extends AbstractVector with ListMixin<int> {
    *            the offsets of the visible elements.
    * @return a new view.
    */
-  AbstractIntVector _viewSelectionLike(List<int> offsets);
+  AbstractIntVector _viewSelectionLike(Int32List offsets);
 
   /**
    * Sorts the vector into ascending order, according to the <i>natural

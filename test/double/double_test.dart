@@ -30,8 +30,8 @@ doubleMatrixTests() {
   testDoubleMatrix('DiagonalDoubleMatrix', new DiagonalDoubleMatrixTest());
   testDoubleMatrix('DiagonalDoubleMatrix viewDice', new DiagonalDoubleMatrixViewTest());
 
-  testDoubleMatrix('SparseCCDoubleMatrix', new SparseCCDoubleMatrixTest());
-  testDoubleMatrix('SparseCCDoubleMatrix viewDice', new SparseCCDoubleMatrixViewTest());
+//  testDoubleMatrix('SparseCCDoubleMatrix', new SparseCCDoubleMatrixTest());
+//  testDoubleMatrix('SparseCCDoubleMatrix viewDice', new SparseCCDoubleMatrixViewTest());
   testDoubleMatrix('SparseDoubleMatrix', new SparseDoubleMatrixTest());
   testDoubleMatrix('SparseDoubleMatrix viewDice', new SparseDoubleMatrixViewTest());
   testDoubleMatrix('SparseRCDoubleMatrix', new SparseRCDoubleMatrixTest());

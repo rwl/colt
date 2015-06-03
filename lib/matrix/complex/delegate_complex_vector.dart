@@ -43,7 +43,7 @@ class DelegateComplexVector extends AbstractComplexVector {
     this._content = newContent;
   }
 
-  List<double> get(int index) {
+  Float64List get(int index) {
     return _content.get(_row, index);
   }
 
@@ -55,7 +55,7 @@ class DelegateComplexVector extends AbstractComplexVector {
     return _content.like2D(rows, columns);
   }
 
-  void set(int index, List<double> value) {
+  void set(int index, Float64List value) {
     _content.set(_row, index, value);
   }
 
@@ -73,7 +73,7 @@ class DelegateComplexVector extends AbstractComplexVector {
     throw new ArgumentError("This method is not supported.");
   }*/
 
-  AbstractComplexVector _viewSelectionLike(List<int> offsets) {
+  AbstractComplexVector _viewSelectionLike(Int32List offsets) {
     throw new ArgumentError("This method is not supported.");
   }
 

@@ -136,7 +136,7 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
    *             <tt>for any 1 &lt;= row &lt; values.length: values[row].length != values[row-1].length</tt>
    *             .
    */
-  factory SparseCCDoubleMatrix.fromList(List<List<double>> values) {
+  factory SparseCCDoubleMatrix.fromList(List<Float64List> values) {
     return new SparseCCDoubleMatrix(values.length, values[0].length)
       ..setAll2D(values);
   }
@@ -253,7 +253,7 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
    * @param sortRowIndexes
    *            if true, then row indexes are sorted
    */
-  factory SparseCCDoubleMatrix.withValue(int rows, int columns, List<int> rowIndexes, List<int> columnIndexes, double value, bool removeDuplicates, bool sortRowIndexes) {
+  factory SparseCCDoubleMatrix.withValue(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, double value, bool removeDuplicates, bool sortRowIndexes) {
     /*try {
       _setUp(rows, columns);
     } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
@@ -323,7 +323,7 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
    * @param sortRowIndexes
    *            if true, then row indexes are sorted
    */
-  factory SparseCCDoubleMatrix.withValues(int rows, int columns, List<int> rowIndexes, List<int> columnIndexes, List<double> values, [bool removeDuplicates=false, bool removeZeroes=false, bool sortRowIndexes=false]) {
+  factory SparseCCDoubleMatrix.withValues(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, Float64List values, [bool removeDuplicates=false, bool removeZeroes=false, bool sortRowIndexes=false]) {
     /*try {
       _setUp(rows, columns);
     } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
@@ -964,9 +964,9 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
   }
 
   void _insert(int row, int column, int index, double value) {
-    List<int> rowIndexes = new List<int>.from(_dcs.i);
+    Int32List rowIndexes = new Int32List.from(_dcs.i);
     //rowIndexes._setSizeRaw(_dcs.p[_columns]);
-    List<double> values = new List<double>.from(_dcs.x);
+    Float64List values = new Float64List.from(_dcs.x);
     //values._setSizeRaw(_dcs.p[_columns]);
     rowIndexes.insert(index, row);
     values.insert(index, value);
@@ -979,8 +979,8 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
   }
 
   void _remove(int column, int index) {
-    List<int> rowIndexes = new List<int>.from(_dcs.i);
-    List<double> values = new List<double>.from(_dcs.x);
+    Int32List rowIndexes = new Int32List.from(_dcs.i);
+    Float64List values = new Float64List.from(_dcs.x);
     rowIndexes.removeAt(index);
     values.removeAt(index);
     for (int i = _dcs.p.length; --i > column; ) {
@@ -991,7 +991,7 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
     _dcs.nzmax = rowIndexes.length;
   }
 
-  static int _searchFromTo(List<int> list, int key, int from, int to) {
+  static int _searchFromTo(Int32List list, int key, int from, int to) {
     while (from <= to) {
       if (list[from] == key) {
         return from;

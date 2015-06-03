@@ -138,7 +138,7 @@ class SparseCCIntMatrix extends WrapperIntMatrix {
    *             <tt>for any 1 &lt;= row &lt; values.length: values[row].length != values[row-1].length</tt>
    *             .
    */
-  factory SparseCCIntMatrix.fromList(List<List<int>> values) {
+  factory SparseCCIntMatrix.fromList(List<Int32List> values) {
     return new SparseCCIntMatrix(values.length, values[0].length)
       ..setAll2D(values);
   }
@@ -213,7 +213,7 @@ class SparseCCIntMatrix extends WrapperIntMatrix {
    * @param sortRowIndexes
    *            if true, then row indexes are sorted
    */
-  factory SparseCCIntMatrix.withValue(int rows, int columns, List<int> rowIndexes, List<int> columnIndexes, int value, bool removeDuplicates, bool sortRowIndexes) : super(null) {
+  factory SparseCCIntMatrix.withValue(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, int value, bool removeDuplicates, bool sortRowIndexes) : super(null) {
     /*try {
       _setUp(rows, columns);
     } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
@@ -272,7 +272,7 @@ class SparseCCIntMatrix extends WrapperIntMatrix {
    * @param sortRowIndexes
    *            if true, then row indexes are sorted
    */
-  factory SparseCCIntMatrix.withValues(int rows, int columns, List<int> rowIndexes, List<int> columnIndexes, List<int> values, bool removeDuplicates, bool removeZeroes, bool sortRowIndexes) : super(null) {
+  factory SparseCCIntMatrix.withValues(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, Int32List values, bool removeDuplicates, bool removeZeroes, bool sortRowIndexes) : super(null) {
     /*try {
       _setUp(rows, columns);
     } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
@@ -1054,9 +1054,9 @@ class SparseCCIntMatrix extends WrapperIntMatrix {
   }
 
   void _insert(int row, int column, int index, int value) {
-    List<int> rowIndexesList = new List<int>.from(_rowIndexes);
+    Int32List rowIndexesList = new Int32List.from(_rowIndexes);
     //rowIndexesList._setSizeRaw(_columnPointers[_columns]);
-    List<int> valuesList = new List<int>.from(_values);
+    Int32List valuesList = new Int32List.from(_values);
     //valuesList._setSizeRaw(_columnPointers[_columns]);
     rowIndexesList.insert(index, row);
     valuesList.insert(index, value);
@@ -1068,8 +1068,8 @@ class SparseCCIntMatrix extends WrapperIntMatrix {
   }
 
   void _remove(int column, int index) {
-    List<int> rowIndexesList = new List<int>.from(_rowIndexes);
-    List<int> valuesList = new List<int>.from(_values);
+    Int32List rowIndexesList = new Int32List.from(_rowIndexes);
+    Int32List valuesList = new Int32List.from(_values);
     rowIndexesList.remove(index);
     valuesList.remove(index);
     for (int i = _columnPointers.length; --i > column; ) {
@@ -1079,7 +1079,7 @@ class SparseCCIntMatrix extends WrapperIntMatrix {
     _values = new Int32List.fromList(valuesList);
   }
 
-  static int _searchFromTo(List<int> list, int key, int from, int to) {
+  static int _searchFromTo(Int32List list, int key, int from, int to) {
     while (from <= to) {
       if (list[from] == key) {
         return from;
@@ -1091,7 +1091,7 @@ class SparseCCIntMatrix extends WrapperIntMatrix {
     return -(from + 1); // key not found.
   }
 
-  static int _cumsum(List<int> p, List<int> c, int n) {
+  static int _cumsum(Int32List p, Int32List c, int n) {
     int nz = 0;
     int nz2 = 0;
     for (int k = 0; k < n; k++) {
@@ -1118,7 +1118,7 @@ class SparseCCIntMatrix extends WrapperIntMatrix {
     _values = valuesNew;
   }
 
-  int _scatter(SparseCCIntMatrix A, int j, int beta, List<int> w, List<int> x, int mark, SparseCCIntMatrix C, int nz) {
+  int _scatter(SparseCCIntMatrix A, int j, int beta, Int32List w, Int32List x, int mark, SparseCCIntMatrix C, int nz) {
     int i, p;
     Int32List Ap, Ai, Ci;
     Int32List Ax;

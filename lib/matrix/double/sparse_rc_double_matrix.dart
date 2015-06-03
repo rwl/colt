@@ -159,7 +159,7 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
    *             <tt>for any 1 &lt;= row &lt; values.length: values[row].length != values[row-1].length</tt>
    *             .
    */
-  factory SparseRCDoubleMatrix.fromList(List<List<double>> values) {
+  factory SparseRCDoubleMatrix.fromList(List<Float64List> values) {
     return new SparseRCDoubleMatrix(values.length, values.length == 0 ? 0 : values[0].length)
       ..setAll2D(values);
   }
@@ -230,7 +230,7 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
    * @param sortColumnIndexes
    *            if true, then column indexes are sorted
    */
-  factory SparseRCDoubleMatrix.withValue(int rows, int columns, List<int> rowIndexes, List<int> columnIndexes, double value, bool removeDuplicates, bool sortColumnIndexes) {
+  factory SparseRCDoubleMatrix.withValue(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, double value, bool removeDuplicates, bool sortColumnIndexes) {
     /*try {
       _setUp(rows, columns);
     } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
@@ -288,7 +288,7 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
    * @param sortColumnIndexes
    *            if true, then column indexes are sorted
    */
-  factory SparseRCDoubleMatrix.withValues(int rows, int columns, List<int> rowIndexes, List<int> columnIndexes, List<double> values, {bool removeDuplicates: true, bool removeZeroes: false, bool sortColumnIndexes: false}) {
+  factory SparseRCDoubleMatrix.withValues(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, Float64List values, {bool removeDuplicates: true, bool removeZeroes: false, bool sortColumnIndexes: false}) {
     /*try {
       _setUp(rows, columns);
     } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
@@ -1133,7 +1133,7 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
     return C;
   }
 
-  static double _cumsum(List<int> p, Int32List c, int n) {
+  static double _cumsum(Int32List p, Int32List c, int n) {
     int nz = 0;
     double nz2 = 0.0;
     for (int k = 0; k < n; k++) {
@@ -1165,9 +1165,9 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
   }
 
   void _insert(int row, int column, int index, double value) {
-    List<int> columnIndexesList = new List<int>.from(_columnIndexes);
+    var columnIndexesList = new List.from(_columnIndexes);
     //columnIndexesList._setSizeRaw(_rowPointers[_rows]);
-    List<double> valuesList = new List<double>.from(_values);
+    var valuesList = new List.from(_values);
     //valuesList._setSizeRaw(_rowPointers[_rows]);
     columnIndexesList.insert(index, column);
     valuesList.insert(index, value);
@@ -1179,9 +1179,9 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
   }
 
   void _remove(int row, int index) {
-    List<int> columnIndexesList = new List<int>.from(_columnIndexes);
+    var columnIndexesList = new List.from(_columnIndexes);
     //columnIndexesList._setSizeRaw(_rowPointers[_rows]);
-    List<double> valuesList = new List<double>.from(_values);
+    var valuesList = new List.from(_values);
     //valuesList._setSizeRaw(_rowPointers[_rows]);
     columnIndexesList.removeAt(index);
     valuesList.removeAt(index);

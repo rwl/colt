@@ -72,7 +72,7 @@ class ComplexMatrix extends AbstractComplexMatrix {
    *             <tt>for any 1 &lt;= row &lt; values.length: values[row].length != values[row-1].length</tt>
    *             .
    */
-  factory ComplexMatrix.fromList(List<List<double>> values) {
+  factory ComplexMatrix.fromList(List<Float64List> values) {
     return new ComplexMatrix(values.length, values.length == 0 ? 0 : values[0].length / 2)
       ..setAll2D(values);
   }
@@ -145,7 +145,7 @@ class ComplexMatrix extends AbstractComplexMatrix {
     this._isNoView = isNoView;
   }
 
-  List<double> reduce(final cfunc.ComplexComplexComplexFunction aggr, final cfunc.ComplexComplexFunction f) {
+  Float64List reduce(final cfunc.ComplexComplexComplexFunction aggr, final cfunc.ComplexComplexFunction f) {
     Float64List b = new Float64List(2);
     if (length == 0) {
       b[0] = double.NAN;
@@ -192,7 +192,7 @@ class ComplexMatrix extends AbstractComplexMatrix {
     return a;
   }
 
-  List<double> reduceWith(final AbstractComplexMatrix other, final cfunc.ComplexComplexComplexFunction aggr, final cfunc.ComplexComplexComplexFunction f) {
+  Float64List reduceWith(final AbstractComplexMatrix other, final cfunc.ComplexComplexComplexFunction aggr, final cfunc.ComplexComplexComplexFunction f) {
     if (!(other is ComplexMatrix)) {
       return super.reduceWith(other, aggr, f);
     }
@@ -380,7 +380,7 @@ class ComplexMatrix extends AbstractComplexMatrix {
     //}
   }
 
-  void fillWhere(final cfunc.ComplexProcedure cond, final List<double> value) {
+  void fillWhere(final cfunc.ComplexProcedure cond, final Float64List value) {
     final int zero = index(0, 0);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
@@ -816,7 +816,7 @@ class ComplexMatrix extends AbstractComplexMatrix {
     //}
   }
 
-  void setAll(final List<double> values) {
+  void setAll(final Float64List values) {
     if (values.length != _rows * 2 * _columns) {
       throw new ArgumentError("Must have same length: length=${values.length} rows()*2*columns()=${rows * 2 * columns}");
     }
@@ -864,7 +864,7 @@ class ComplexMatrix extends AbstractComplexMatrix {
     }
   }
 
-  void setAll2D(final List<List<double>> values) {
+  void setAll2D(final List<Float64List> values) {
     if (values.length != _rows) {
       throw new ArgumentError("Must have same number of rows: rows=${values.length} rows()=${rows}");
     }
@@ -1051,7 +1051,7 @@ class ComplexMatrix extends AbstractComplexMatrix {
     if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
       nthreads = Math.min(nthreads, _rows);
       List<Future> futures = new List<Future>(nthreads);
-      List<int> results = new List<int>(nthreads);
+      Int32List results = new Int32List(nthreads);
       int k = _rows ~/ nthreads;
       for (int j = 0; j < nthreads; j++) {
         final int firstRow = j * k;
@@ -1240,7 +1240,7 @@ class ComplexMatrix extends AbstractComplexMatrix {
     return Im;
   }
 
-  void nonZeros(final List<int> rowList, final List<int> columnList, final List<Float64List> valueList) {
+  void nonZeros(final List<int> rowList, final List<int> columnList, final List<List<double>> valueList) {
     rowList.clear();
     columnList.clear();
     valueList.clear();
@@ -1263,7 +1263,7 @@ class ComplexMatrix extends AbstractComplexMatrix {
 
   }
 
-  List<double> get(int row, int column) {
+  Float64List get(int row, int column) {
     int idx = _rowZero + row * _rowStride + _columnZero + column * _columnStride;
     return new Float64List.fromList([_elements[idx], _elements[idx + 1]]);
   }
@@ -1332,13 +1332,13 @@ class ComplexMatrix extends AbstractComplexMatrix {
     _elements[idx + 1] = im;
   }
 
-  void set(int row, int column, List<double> value) {
+  void set(int row, int column, Float64List value) {
     int idx = _rowZero + row * _rowStride + _columnZero + column * _columnStride;
     _elements[idx] = value[0];
     _elements[idx + 1] = value[1];
   }
 
-  List<List<double>> toList() {
+  List<Float64List> toList() {
     final List<Float64List> values = new List<Float64List>.generate(_rows,
         (_) => new Float64List(2 * _columns));
     final int zero = index(0, 0);
@@ -1425,7 +1425,7 @@ class ComplexMatrix extends AbstractComplexMatrix {
     return v;
   }
 
-  AbstractComplexVector mult(final AbstractComplexVector y, [AbstractComplexVector z = null, List<double> alpha = null, List<double> beta = null, bool transposeA = false]) {
+  AbstractComplexVector mult(final AbstractComplexVector y, [AbstractComplexVector z = null, Float64List alpha = null, Float64List beta = null, bool transposeA = false]) {
     if (alpha == null) {
       alpha = new Float64List.fromList([1.0, 0.0]);
     }
@@ -1536,7 +1536,7 @@ class ComplexMatrix extends AbstractComplexMatrix {
     return zz;
   }
 
-  AbstractComplexMatrix multiply(final AbstractComplexMatrix B, [AbstractComplexMatrix C = null, List<double> alpha = null, List<double> beta = null, final bool transposeA = false, final bool transposeB = false]) {
+  AbstractComplexMatrix multiply(final AbstractComplexMatrix B, [AbstractComplexMatrix C = null, Float64List alpha = null, Float64List beta = null, final bool transposeA = false, final bool transposeB = false]) {
     if (alpha == null) {
       alpha = new Float64List.fromList([1.0, 0.0]);
     }
@@ -1608,7 +1608,7 @@ class ComplexMatrix extends AbstractComplexMatrix {
     return C;
   }
 
-  AbstractComplexMatrix _multiplySeq(AbstractComplexMatrix B, AbstractComplexMatrix C, List<double> alpha, List<double> beta, bool transposeA, bool transposeB) {
+  AbstractComplexMatrix _multiplySeq(AbstractComplexMatrix B, AbstractComplexMatrix C, Float64List alpha, Float64List beta, bool transposeA, bool transposeB) {
     if (transposeA) {
       return conjugateTranspose().multiply(B, C, alpha, beta, false, transposeB);
     }
@@ -1746,7 +1746,7 @@ class ComplexMatrix extends AbstractComplexMatrix {
     return C;
   }
 
-  List<double> sum() {
+  Float64List sum() {
     Float64List sum = new Float64List(2);
     final int zero = this.index(0, 0);
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -1816,7 +1816,7 @@ class ComplexMatrix extends AbstractComplexMatrix {
     return new ComplexVector._internal(size, this._elements, zero, stride, false);
   }
 
-  AbstractComplexMatrix _viewSelectionLike(List<int> rowOffsets, List<int> columnOffsets) {
+  AbstractComplexMatrix _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets) {
     return new SelectedDenseComplexMatrix(this._elements, rowOffsets, columnOffsets, 0);
   }
 
@@ -1855,7 +1855,7 @@ class SelectedDenseComplexMatrix extends AbstractComplexMatrix {
   /**
    * The offsets of the visible cells of this matrix.
    */
-  List<int> _rowOffsets, _columnOffsets;
+  Int32List _rowOffsets, _columnOffsets;
 
   /**
    * The offset.
@@ -1873,7 +1873,7 @@ class SelectedDenseComplexMatrix extends AbstractComplexMatrix {
    *            The column offsets of the cells that shall be visible.
    * @param offset
    */
-  factory SelectedDenseComplexMatrix(Float64List elements, List<int> rowOffsets, List<int> columnOffsets, int offset) {
+  factory SelectedDenseComplexMatrix(Float64List elements, Int32List rowOffsets, Int32List columnOffsets, int offset) {
     return new SelectedDenseComplexMatrix._internal(rowOffsets.length, columnOffsets.length, elements, 0, 0, 1, 1, rowOffsets, columnOffsets, offset);
   }
 
@@ -1902,7 +1902,7 @@ class SelectedDenseComplexMatrix extends AbstractComplexMatrix {
    *            The column offsets of the cells that shall be visible.
    * @param offset
    */
-  SelectedDenseComplexMatrix._internal(int rows, int columns, Float64List elements, int rowZero, int columnZero, int rowStride, int columnStride, List<int> rowOffsets, List<int> columnOffsets, int offset) {
+  SelectedDenseComplexMatrix._internal(int rows, int columns, Float64List elements, int rowZero, int columnZero, int rowStride, int columnStride, Int32List rowOffsets, Int32List columnOffsets, int offset) {
     // be sure parameters are valid, we do not check...
     _setUp(rows, columns, rowZero, columnZero, rowStride, columnStride);
 
@@ -1922,7 +1922,7 @@ class SelectedDenseComplexMatrix extends AbstractComplexMatrix {
     return _rowOffsets[absRank];
   }
 
-  List<double> get(int row, int column) {
+  Float64List get(int row, int column) {
     int idxr = _rowZero + row * _rowStride;
     int idxc = _columnZero + column * _columnStride;
     return new Float64List.fromList([_elements[_offset + _rowOffsets[idxr] + _columnOffsets[idxc]], _elements[_offset + _rowOffsets[idxr] + _columnOffsets[idxc] + 1]]);
@@ -1969,7 +1969,7 @@ class SelectedDenseComplexMatrix extends AbstractComplexMatrix {
     // properly.
   }
 
-  void set(int row, int column, List<double> value) {
+  void set(int row, int column, Float64List value) {
     int idxr = _rowZero + row * _rowStride;
     int idxc = _columnZero + column * _columnStride;
     _elements[_offset + _rowOffsets[idxr] + _columnOffsets[idxc]] = value[0];
@@ -2024,7 +2024,7 @@ class SelectedDenseComplexMatrix extends AbstractComplexMatrix {
     return new SelectedDenseComplexVector._internal(viewSize, this._elements, viewZero, viewStride, viewOffsets, viewOffset);
   }
 
-  AbstractComplexMatrix _viewSelectionLike(List<int> rowOffsets, List<int> columnOffsets) {
+  AbstractComplexMatrix _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets) {
     return new SelectedDenseComplexMatrix(this._elements, rowOffsets, columnOffsets, this._offset);
   }
 

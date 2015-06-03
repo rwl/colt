@@ -106,6 +106,10 @@ class IntVector extends AbstractIntVector {
     return new IntVector.fromList(idx);
   }
 
+  factory IntVector.random(int size) {
+    return ifactory.random(size, (sz) => new IntVector(sz));
+  }
+
   int aggregate(final ifunc.IntIntFunction aggr, final ifunc.IntFunction f) {
     if (_size == 0) {
       throw new ArgumentError("size == 0");
@@ -647,7 +651,7 @@ class IntVector extends AbstractIntVector {
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
       List<Future> futures = new List<Future>(nthreads);
-      List<int> results = new List<int>(nthreads);
+      Int32List results = new Int32List(nthreads);
       int k = _size / nthreads;
       for (int j = 0; j < nthreads; j++) {
         final int firstIdx = j * k;
@@ -1119,7 +1123,7 @@ class IntVector extends AbstractIntVector {
     //}
   }
 
-  void fillList(List<int> values) {
+  void fillList(Int32List values) {
     if (values.length < _size) {
       throw new ArgumentError("values too small");
     }
@@ -1151,7 +1155,7 @@ class IntVector extends AbstractIntVector {
       final int strideOtherF = strideOther;
       nthreads = Math.min(nthreads, _size);
       List<Future> futures = new List<Future>(nthreads);
-      List<int> results = new List<int>(nthreads);
+      Int32List results = new Int32List(nthreads);
       int k = _size / nthreads;
       for (int j = 0; j < nthreads; j++) {
         final int firstIdx = j * k;
@@ -1233,7 +1237,7 @@ class IntVector extends AbstractIntVector {
       final int strideOtherF = strideOther;
       nthreads = Math.min(nthreads, length);
       List<Future> futures = new List<Future>(nthreads);
-      List<int> results = new List<int>(nthreads);
+      Int32List results = new Int32List(nthreads);
       int k = length / nthreads;
       for (int j = 0; j < nthreads; j++) {
         final int firstIdx = j * k;
@@ -1291,7 +1295,7 @@ class IntVector extends AbstractIntVector {
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
       List<Future> futures = new List<Future>(nthreads);
-      List<int> results = new List<int>(nthreads);
+      Int32List results = new Int32List(nthreads);
       int k = _size / nthreads;
       for (int j = 0; j < nthreads; j++) {
         final int firstIdx = j * k;
@@ -1355,7 +1359,7 @@ class IntVector extends AbstractIntVector {
     return _zero + rank * _stride;
   }
 
-  AbstractIntVector _viewSelectionLike(List<int> offsets) {
+  AbstractIntVector _viewSelectionLike(Int32List offsets) {
     return new SelectedDenseIntVector(this._elements, offsets);
   }
 
@@ -1415,7 +1419,7 @@ class SelectedDenseIntVector extends AbstractIntVector {
   Int32List _elements;
 
   /** The offsets of visible indexes of this matrix. */
-  List<int> _offsets;
+  Int32List _offsets;
 
   /** The offset. */
   int __offset;
@@ -1428,7 +1432,7 @@ class SelectedDenseIntVector extends AbstractIntVector {
    * @param indexes
    *            The indexes of the cells that shall be visible.
    */
-  factory SelectedDenseIntVector(Int32List elements, List<int> offsets) {
+  factory SelectedDenseIntVector(Int32List elements, Int32List offsets) {
     return new SelectedDenseIntVector._internal(offsets.length, elements, 0, 1, offsets, 0);
   }
 
@@ -1448,7 +1452,7 @@ class SelectedDenseIntVector extends AbstractIntVector {
    *            the offsets of the cells that shall be visible.
    * @param offset
    */
-  SelectedDenseIntVector._internal(int size, Int32List elements, int zero, int stride, List<int> offsets, int offset) {
+  SelectedDenseIntVector._internal(int size, Int32List elements, int zero, int stride, Int32List offsets, int offset) {
     _setUp(size, zero, stride);
 
     this._elements = elements;
@@ -1603,7 +1607,7 @@ class SelectedDenseIntVector extends AbstractIntVector {
    *            the offsets of the visible elements.
    * @return a new view.
    */
-  AbstractIntVector _viewSelectionLike(List<int> offsets) {
+  AbstractIntVector _viewSelectionLike(Int32List offsets) {
     return new SelectedDenseIntVector(this._elements, offsets);
   }
 

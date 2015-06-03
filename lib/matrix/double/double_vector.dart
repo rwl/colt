@@ -53,7 +53,7 @@ class DoubleVector extends AbstractDoubleVector {
    * @param values
    *            The values to be filled into the new matrix.
    */
-  factory DoubleVector.fromList(List<double> values) {
+  factory DoubleVector.fromList(Float64List values) {
     final m = new DoubleVector(values.length);
     m.setValues(values);
     return m;
@@ -99,6 +99,10 @@ class DoubleVector extends AbstractDoubleVector {
     this._isNoView = !isView;
   }
 
+  factory DoubleVector.random(int size) {
+    return dfactory.random(size, (sz) => new DoubleVector(sz));
+  }
+
   double aggregate(final DoubleDoubleFunction aggr, final DoubleFunction f) {
     if (_size == 0) return double.NAN;
     double a = 0.0;
@@ -130,10 +134,10 @@ class DoubleVector extends AbstractDoubleVector {
     return a;
   }
 
-  double reduceRange(final DoubleDoubleFunction aggr, final DoubleFunction f, final /*IntArrayList*/List<int> indexList) {
+  double reduceRange(final DoubleDoubleFunction aggr, final DoubleFunction f, final /*IntArrayList*/Int32List indexList) {
     if (this.length == 0) return double.NAN;
     final int size = indexList.length;
-    final List<int> indexElements = indexList;//.elements;
+    final Int32List indexElements = indexList;//.elements;
     double a = 0.0;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
@@ -358,7 +362,7 @@ class DoubleVector extends AbstractDoubleVector {
     //}
   }
 
-  void setValues(final List<double> values) {
+  void setValues(final Float64List values) {
     if (values.length != _size) {
       throw new ArgumentError("Must have same number of cells: length=${values.length} size()=${length}");
     }
@@ -625,7 +629,7 @@ class DoubleVector extends AbstractDoubleVector {
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
       List<Future> futures = new List<Future>(nthreads);
-      List<int> results = new List<int>(nthreads);
+      Int32List results = new Int32List(nthreads);
       int k = _size ~/ nthreads;
       for (int j = 0; j < nthreads; j++) {
         final int firstIdx = j * k;
@@ -877,7 +881,7 @@ class DoubleVector extends AbstractDoubleVector {
     if ((nthreads > 1) && (_size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
       nthreads = Math.min(nthreads, _size);
       List<Future> futures = new List<Future>(nthreads);
-      List<List<double>> results = new List<Float64List>(nthreads);//[2];
+      List<Float64List> results = new List<Float64List>(nthreads);//[2];
       int k = _size ~/ nthreads;
       for (int j = 0; j < nthreads; j++) {
         final int firstIdx = j * k;
@@ -1244,7 +1248,7 @@ class DoubleVector extends AbstractDoubleVector {
     return _zero + rank * _stride;
   }
 
-  AbstractDoubleVector _viewSelectionLike(List<int> offsets) {
+  AbstractDoubleVector _viewSelectionLike(Int32List offsets) {
     return new SelectedDenseDoubleVector.offset(this._elements, offsets);
   }
 
@@ -1303,7 +1307,7 @@ class SelectedDenseDoubleVector extends AbstractDoubleVector {
   /**
    * The offsets of visible indexes of this matrix.
    */
-  List<int> _offsets;
+  Int32List _offsets;
 
   /**
    * The offset.
@@ -1318,7 +1322,7 @@ class SelectedDenseDoubleVector extends AbstractDoubleVector {
    * @param indexes
    *            The indexes of the cells that shall be visible.
    */
-  factory SelectedDenseDoubleVector.offset(Float64List elements, List<int> offsets) {
+  factory SelectedDenseDoubleVector.offset(Float64List elements, Int32List offsets) {
     return new SelectedDenseDoubleVector(offsets.length, elements, 0, 1, offsets, 0);
   }
 
@@ -1338,7 +1342,7 @@ class SelectedDenseDoubleVector extends AbstractDoubleVector {
    *            the offsets of the cells that shall be visible.
    * @param offset
    */
-  SelectedDenseDoubleVector(int size, Float64List elements, int zero, int stride, List<int> offsets, int offset) {
+  SelectedDenseDoubleVector(int size, Float64List elements, int zero, int stride, Int32List offsets, int offset) {
     _setUp(size, zero, stride);
 
     this._elements = elements;
@@ -1528,7 +1532,7 @@ class SelectedDenseDoubleVector extends AbstractDoubleVector {
    *            the offsets of the visible elements.
    * @return a new view.
    */
-  AbstractDoubleVector _viewSelectionLike(List<int> offsets) {
+  AbstractDoubleVector _viewSelectionLike(Int32List offsets) {
     return new SelectedDenseDoubleVector.offset(this._elements, offsets);
   }
 

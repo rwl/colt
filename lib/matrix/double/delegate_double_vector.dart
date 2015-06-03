@@ -73,7 +73,7 @@ class DelegateDoubleVector extends AbstractDoubleVector {
     throw new IllegalArgumentException("This method is not supported.");
   }*/
 
-  AbstractDoubleVector _viewSelectionLike(List<int> offsets) {
+  AbstractDoubleVector _viewSelectionLike(Int32List offsets) {
     throw new Error(); // should never get called
   }
 

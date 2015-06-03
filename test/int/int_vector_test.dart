@@ -353,7 +353,7 @@ abstract class IntVectorTest {
   }
 
   void testSelect() {
-    final indexes = [5, 11, 22, 37, 101];
+    final indexes = new Int32List.fromList([5, 11, 22, 37, 101]);
     AbstractIntVector b = A.select(indexes);
     for (int i = 0; i < indexes.length; i++) {
       expect(A.get(indexes[i]), equals(b.get(i)));

@@ -38,9 +38,9 @@ class WrapperIntMatrix extends AbstractIntMatrix {
   void forEachWith(final AbstractIntMatrix y, final ifunc.IntIntFunction function) {
     checkShape(y);
     if (y is WrapperIntMatrix) {
-      List<int> rowList = new List<int>();
-      List<int> columnList = new List<int>();
-      List<int> valueList = new List<int>();
+      Int32List rowList = new Int32List();
+      Int32List columnList = new Int32List();
+      Int32List valueList = new Int32List();
       y.nonZeros(rowList, columnList, valueList);
       forEachWithRange(y, function, rowList, columnList);
     } else {
@@ -49,7 +49,7 @@ class WrapperIntMatrix extends AbstractIntMatrix {
     return;
   }
 
-  void setAll(final List<int> values) {
+  void setAll(final Int32List values) {
     if (_content is DiagonalIntMatrix) {
       int dlength = (_content as DiagonalIntMatrix)._dlength;
       final Int32List elems = (_content as DiagonalIntMatrix)._elements;
@@ -221,7 +221,7 @@ class WrapperIntMatrix extends AbstractIntMatrix {
     return view;
   }
 
-  AbstractIntMatrix select(List<int> rowIndexes, List<int> columnIndexes) {
+  AbstractIntMatrix select(Int32List rowIndexes, Int32List columnIndexes) {
     // check for "all"
     if (rowIndexes == null) {
       rowIndexes = new Int32List(_rows);
@@ -273,7 +273,7 @@ class WrapperIntMatrix extends AbstractIntMatrix {
     throw new Error(); // should never get called
   }
 
-  AbstractIntMatrix _viewSelectionLike(List<int> rowOffsets, List<int> columnOffsets) {
+  AbstractIntMatrix _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets) {
     throw new Error(); // should never be called
   }
 

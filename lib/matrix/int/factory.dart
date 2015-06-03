@@ -157,7 +157,7 @@ AbstractIntVector fill(int size, int initialValue, AbstractIntVector make(int)) 
  *            The values to be filled into the new matrix.
  * @return a new matrix.
  */
-AbstractIntVector fromList(List<int> values, AbstractIntVector make(int)) {
+AbstractIntVector fromList(Int32List values, AbstractIntVector make(int)) {
   int size = values.length;
   AbstractIntVector vector = make(size);
   for (int i = size; --i >= 0; ) {

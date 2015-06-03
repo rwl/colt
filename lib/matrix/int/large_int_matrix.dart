@@ -29,7 +29,7 @@ part of cern.colt.matrix;
  */
 class LargeIntMatrix extends WrapperIntMatrix {
 
-  List<List<int>> _elements;
+  List<Int32List> _elements;
 
   LargeIntMatrix(int rows, int columns) : super(null) {
     try {
@@ -39,7 +39,7 @@ class LargeIntMatrix extends WrapperIntMatrix {
         throw exc;
       }
     }
-    _elements = new List<List<int>>.generate(rows,
+    _elements = new List<Int32List>.generate(rows,
         (_) => new Int32List(columns));
     _content = this;
   }

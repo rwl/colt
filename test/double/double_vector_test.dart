@@ -353,7 +353,7 @@ abstract class DoubleVectorTest {
   }
 
   testViewSelectionIndex() {
-    final indexes = [5, 11, 22, 37, 101];
+    final indexes = new Int32List.fromList([5, 11, 22, 37, 101]);
     AbstractDoubleVector b = A.select(indexes);
     for (int i = 0; i < indexes.length; i++) {
       expect(A.get(indexes[i]), closeTo(b.get(i), TOL));

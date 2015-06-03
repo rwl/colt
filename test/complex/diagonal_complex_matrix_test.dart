@@ -78,7 +78,7 @@ class DiagonalComplexMatrixTest extends ComplexMatrixTest {
   }
 
   void testAssignImaginary() {
-    AbstractDoubleMatrix Im = DoubleFactory2D.dense.random(A.rows, A.columns);
+    AbstractDoubleMatrix Im = new DoubleMatrix.random(A.rows, A.columns);
     AbstractComplexMatrix Acopy = A.copy();
     A.setImaginary(Im);
     if (DINDEX >= 0) {
@@ -95,7 +95,7 @@ class DiagonalComplexMatrixTest extends ComplexMatrixTest {
   }
 
   void testAssignReal() {
-    AbstractDoubleMatrix Re = DoubleFactory2D.dense.random(A.rows, A.columns);
+    AbstractDoubleMatrix Re = new DoubleMatrix.random(A.rows, A.columns);
     AbstractComplexMatrix Acopy = A.copy();
     A.setReal(Re);
     if (DINDEX >= 0) {

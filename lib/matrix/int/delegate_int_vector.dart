@@ -165,7 +165,7 @@ class DelegateIntVector extends AbstractIntVector {
     throw new IllegalArgumentException("This method is not supported.");
   }*/
 
-  AbstractIntVector _viewSelectionLike(List<int> offsets) {
+  AbstractIntVector _viewSelectionLike(Int32List offsets) {
     throw new Error(); // should never get called
   }
 

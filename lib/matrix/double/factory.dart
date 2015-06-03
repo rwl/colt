@@ -87,7 +87,7 @@ AbstractDoubleVector descending(int size, AbstractDoubleVector make(int)) {
    *            The values to be filled into the new matrix.
    * @return a new matrix.
    */
-  /*AbstractDoubleVector makeList(List<double> values) {
+  /*AbstractDoubleVector makeList(Float64List values) {
     int size = values.length;
     AbstractDoubleVector vector = make(size);
     for (int i = size; --i >= 0; ) {
@@ -104,7 +104,7 @@ AbstractDoubleVector descending(int size, AbstractDoubleVector make(int)) {
    * @param values
    *            The values to be filled into the new matrix.
    */
-//  AbstractDoubleVector fromList(List<double> values) {
+//  AbstractDoubleVector fromList(Float64List values) {
 //    if (this == sparse) {
 //      return new SparseDoubleVector.fromList(values);
 //    } else {
@@ -327,7 +327,7 @@ AbstractDoubleVector repeat(AbstractDoubleVector A, int repeat, AbstractDoubleVe
  * @throws IllegalArgumentException
  *             if the array is not rectangular.
  */
-void _checkRectangularShape(List<List<double>> array) {
+void _checkRectangularShape(List<Float64List> array) {
   int columns = -1;
   for (int row = array.length; --row >= 0; ) {
     if (array[row] != null) {
@@ -945,7 +945,7 @@ AbstractDoubleMatrix descendingMatrix(int rows, int columns, AbstractDoubleMatri
  *
  * @return a new matrix.
  */
-AbstractDoubleMatrix diagonal(List<double> vector, AbstractDoubleMatrix make(int r, int c)) {
+AbstractDoubleMatrix diagonal(Float64List vector, AbstractDoubleMatrix make(int r, int c)) {
   int size = vector.length;
   AbstractDoubleMatrix diag = make(size, size);
   for (int i = 0; i < size; i++) {
@@ -1030,7 +1030,7 @@ AbstractDoubleMatrix identity(int rowsAndColumns, AbstractDoubleMatrix make(int 
  *                <tt>values.length</tt> must be a multiple of <tt>rows</tt>
  *                .
  */
-AbstractDoubleMatrix makeColumn(List<double> values, int rows, AbstractDoubleMatrix make(int r, int c)) {
+AbstractDoubleMatrix makeColumn(Float64List values, int rows, AbstractDoubleMatrix make(int r, int c)) {
   int columns = (rows != 0 ? values.length / rows : 0);
   if (rows * columns != values.length) {
     throw new ArgumentError("Array length must be a multiple of m.");
@@ -1060,7 +1060,7 @@ AbstractDoubleMatrix makeColumn(List<double> values, int rows, AbstractDoubleMat
    *             <tt>for any 1 &lt;= row &lt; values.length: values[row].length != values[row-1].length</tt>
    *             .
    */
-//  AbstractDoubleMatrix fromList(List<List<double>> values) {
+//  AbstractDoubleMatrix fromList(List<Float64List> values) {
 //    if (this == sparse) {
 //      return new SparseDoubleMatrix.fromList(values);
 //    } else {

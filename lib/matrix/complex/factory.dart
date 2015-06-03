@@ -74,7 +74,7 @@ AbstractComplexVector append(AbstractComplexVector A, AbstractComplexVector B, A
  * @param values
  *            The values to be filled into the new matrix.
  */
-//  AbstractComplexVector withValues(List<double> values) {
+//  AbstractComplexVector withValues(Float64List values) {
 //    if (this == sparse) {
 //      return new SparseComplexVector.fromList(values);
 //    } else {
@@ -122,7 +122,7 @@ AbstractComplexVector concat(List<AbstractComplexVector> parts, AbstractComplexV
  * Constructs a matrix with the given shape, each cell initialized with the
  * given value.
  */
-AbstractComplexVector fill(int size, List<double> initialValue, AbstractComplexVector make(int)) {
+AbstractComplexVector fill(int size, Float64List initialValue, AbstractComplexVector make(int)) {
   return make(size)..fill(initialValue[0], initialValue[1]);
 }
 
@@ -135,7 +135,7 @@ AbstractComplexVector fill(int size, List<double> initialValue, AbstractComplexV
  *            The values to be filled into the new matrix.
  * @return a new matrix.
  */
-AbstractComplexVector fromList(List<List<double>> values, AbstractComplexVector make(int)) {
+AbstractComplexVector fromList(List<Float64List> values, AbstractComplexVector make(int)) {
   int size = values.length;
   AbstractComplexVector vector = make(size);
   for (int i = 0; i < size; i++) {
@@ -214,7 +214,7 @@ AbstractComplexVector repeat(AbstractComplexVector A, int repeat, AbstractComple
  *            The values to be filled into the new list.
  * @return a new list.
  */
-List<List<double>> toList(AbstractComplexVector values) {
+List<Float64List> toList(AbstractComplexVector values) {
   int size = values.length;
   List<Float64List> list = new List<Float64List>(size);
   for (int i = 0; i < size; i++) {
@@ -432,7 +432,7 @@ AbstractComplexMatrix appendRow(AbstractComplexMatrix A, AbstractComplexVector b
  * @throws ArgumentError
  *             if the array is not rectangular.
  */
-void _checkRectangularShape(List<List<double>> array) {
+void _checkRectangularShape(List<Float64List> array) {
   int columns = -1;
   for (int r = 0; r < array.length; r++) {
     if (array[r] != null) {
@@ -778,7 +778,7 @@ AbstractComplexMatrix identity(int rowsAndColumns, AbstractComplexMatrix make(in
  *             <tt>for any 1 &lt;= row &lt; values.length: values[row].length != values[row-1].length</tt>
  *             .
  */
-//  AbstractComplexMatrix fromList(List<List<double>> values) {
+//  AbstractComplexMatrix fromList(List<Float64List> values) {
 //    if (this == sparse) {
 //      return new SparseComplexMatrix.fromList(values);
 //    } else {
@@ -802,7 +802,7 @@ AbstractComplexMatrix identity(int rowsAndColumns, AbstractComplexMatrix make(in
  * Constructs a matrix with the given shape, each cell initialized with the
  * given value.
  */
-AbstractComplexMatrix fillMatrix(int rows, int columns, List<double> initialValue, AbstractComplexMatrix make(int r, int c)) {
+AbstractComplexMatrix fillMatrix(int rows, int columns, Float64List initialValue, AbstractComplexMatrix make(int r, int c)) {
   if (initialValue[0] == 0 && initialValue[1] == 0) {
     return make(rows, columns);
   }
