@@ -20,7 +20,7 @@ part of cern.colt.matrix;
  * @author Piotr Wendykier (piotr.wendykier@gmail.com)
  *
  */
-abstract class AbstractComplexVector extends AbstractVector {
+abstract class AbstractComplexVector extends AbstractVector with ListMixin<double> {
 
   /**
    * Makes this class non instantiable, but still let's others inherit from
@@ -41,7 +41,7 @@ abstract class AbstractComplexVector extends AbstractVector {
    * @return the aggregated measure.
    * @see cern.jet.math.tdcomplex.ComplexFunctions
    */
-  List<double> reduce(final cfunc.ComplexComplexComplexFunction aggr, final cfunc.ComplexComplexFunction f) {
+  List<double> aggregate(final cfunc.ComplexComplexComplexFunction aggr, final cfunc.ComplexComplexFunction f) {
     Float64List b = new Float64List(2);
     int size = this.length;
     if (size == 0) {
@@ -136,7 +136,7 @@ abstract class AbstractComplexVector extends AbstractVector {
    * @return <tt>this</tt> (for convenience only).
    * @see cern.jet.math.tdcomplex.ComplexFunctions
    */
-  void forEach(final cfunc.ComplexComplexFunction f) {
+  void apply(final cfunc.ComplexComplexFunction f) {
     int size = this.length;
     /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
@@ -410,7 +410,7 @@ abstract class AbstractComplexVector extends AbstractVector {
    * @throws ArgumentError
    *             if <tt>values.length != 2*size()</tt>.
    */
-  void setAll(final List<double> values) {
+  void setValues(final List<double> values) {
     int size = this.length;
     if (values.length != 2 * size) {
       throw new ArgumentError("The length of values[] must be equal to 2*size()=$size");
@@ -635,12 +635,13 @@ abstract class AbstractComplexVector extends AbstractVector {
    * @throws IndexOutOfBoundsException
    *             if <tt>index&lt;0 || index&gt;=size()</tt>.
    */
-  List<double> operator [](int index) {
+  double operator [](int index) {
     int size = this.length;
-    if (index < 0 || index >= size) {
-      _checkIndex(index);
+    if (index < 0 || index >= 2*size) {
+      throw new RangeError("Attempted to access " + toStringShort() + " at index=$index");
     }
-    return get(index);
+    var tmp = get(index~/2);
+    return index % 2 == 0 ? tmp[0] : tmp[1];
   }
 
   /**
@@ -820,10 +821,18 @@ abstract class AbstractComplexVector extends AbstractVector {
    * @throws IndexOutOfBoundsException
    *             if <tt>index&lt;0 || index&gt;=size()</tt>.
    */
-  void operator []=(int index, List<double> value) {
+  void operator []=(int index, double value) {
     int size = this.length;
-    if (index < 0 || index >= size) _checkIndex(index);
-    set(index, value);
+    if (index < 0 || index >= 2*size) {
+      throw new RangeError("Attempted to access " + toStringShort() + " at index=$index");
+    }
+    var index2 = index ~/ 2;
+    var curr = get(index2);
+    if (index % 2 == 0) {
+      set(index2, [value, curr[1]]);
+    } else {
+      set(index~/2, [curr[0], value]);
+    }
   }
 
   /**
@@ -913,7 +922,7 @@ abstract class AbstractComplexVector extends AbstractVector {
    *
    * @return an array filled with the values of the cells.
    */
-  List<double> toList() {
+  List<double> toList({growable: false}) {
     Float64List values = new Float64List(2 * length);
     fillList(values);
     return values;
@@ -1061,7 +1070,7 @@ abstract class AbstractComplexVector extends AbstractVector {
    *            The condition to be matched.
    * @return the new view.
    */
-  AbstractComplexVector where(cfunc.ComplexProcedure condition) {
+  AbstractComplexVector upon(cfunc.ComplexProcedure condition) {
     int size = this.length;
     List<int> matches = new List<int>();
     for (int i = 0; i < size; i++) {
@@ -1436,11 +1445,11 @@ abstract class AbstractComplexVector extends AbstractVector {
   }
 
   AbstractComplexVector operator -() {
-    return this.copy()..forEach(cfunc.neg);
+    return this.copy()..apply(cfunc.neg);
   }
 
   AbstractComplexVector conj() {
-    return this.copy()..forEach(cfunc.conj);
+    return this.copy()..apply(cfunc.conj);
   }
 
   AbstractComplexVector abs() {
