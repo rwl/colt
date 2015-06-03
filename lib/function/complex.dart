@@ -708,7 +708,7 @@ ComplexComplexFunction divide(final List<double> b) {
 }
 
 ComplexComplexFunction divideBy(final double b) {
-  Float64List tmp = new Float64List.fromList([b, 0]);
+  Float64List tmp = new Float64List.fromList([b, 0.0]);
   return multiply(Complex.inv(tmp));
 }
 
