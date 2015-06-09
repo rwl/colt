@@ -1247,4 +1247,18 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
     return new SparseRCComplexMatrix._internal(_rows, _columns, _rowPointers, _columnIndexes, _values);
   }
 
+  double normInf() {
+    Float64List elem = new Float64List(2);
+    double norm = 0.0;
+    for (int j = 0; j < _rows; j++) {
+      var s = 0.0;
+      for (var p = _rowPointers[j]; p < _rowPointers[j + 1]; p++) {
+        elem[0] = _values[2 * p];
+        elem[1] = _values[2 * p + 1];
+        s += cfunc.abs(elem);
+      }
+      norm = Math.max(norm, s);
+    }
+    return norm;
+  }
 }
