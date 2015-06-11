@@ -350,7 +350,7 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
     }
   }
 
-  void forEachMatrix(final AbstractComplexMatrix y, cfunc.ComplexComplexComplexFunction function) {
+  void forEachWith(final AbstractComplexMatrix y, cfunc.ComplexComplexComplexFunction function) {
     checkShape(y);
     if ((y is SparseRCComplexMatrix) && (function == cfunc.plus)) { // x[i] = x[i] + y[i]
       SparseRCComplexMatrix yy = y;
