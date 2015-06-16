@@ -299,7 +299,7 @@ class SparseDoubleMatrix extends AbstractDoubleMatrix {
   }
 
   factory SparseDoubleMatrix.compose(List<List<AbstractDoubleMatrix>> parts) {
-    return compose(parts, (rows, columns) => new SparseRCDoubleMatrix(rows, columns));
+    return dfactory.compose(parts, (rows, columns) => new SparseDoubleMatrix(rows, columns));
   }
 
   /*DoubleMatrix assign(func.DoubleFunction function) {

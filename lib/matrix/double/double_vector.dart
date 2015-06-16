@@ -103,6 +103,10 @@ class DoubleVector extends AbstractDoubleVector {
     return dfactory.random(size, (sz) => new DoubleVector(sz));
   }
 
+  factory DoubleVector.append(AbstractDoubleVector A, AbstractDoubleVector B) {
+    return dfactory.append(A, B, (sz) => new DoubleVector(sz));
+  }
+
   double aggregate(final DoubleDoubleFunction aggr, final DoubleFunction f) {
     if (_size == 0) return double.NAN;
     double a = 0.0;

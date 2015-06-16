@@ -455,7 +455,7 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
           elem = Complex.multiply(elem, y.get(i, j));
           _values[2 * k] = elem[0];
           _values[2 * k + 1] = elem[1];
-          if (_values[2 * k] == 0 && _values[2 * k + 1] == 0) _remove(i, j);
+//          if (_values[2 * k] == 0 && _values[2 * k + 1] == 0) _remove(i, j);
         }
       }
       return;
@@ -472,7 +472,7 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
           elem = Complex.div_(elem, y.get(i, j));
           _values[2 * k] = elem[0];
           _values[2 * k + 1] = elem[1];
-          if (_values[2 * k] == 0 && _values[2 * k + 1] == 0) _remove(i, j);
+//          if (_values[2 * k] == 0 && _values[2 * k + 1] == 0) _remove(i, j);
         }
       }
       return;
@@ -641,7 +641,7 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
   }
 
   AbstractComplexMatrix like2D(int rows, int columns) {
-    return new SparseRCComplexMatrix(rows, columns);
+    return new SparseRCComplexMatrix(rows, columns);//, _columnIndexes.length);
   }
 
   AbstractComplexVector like1D(int size) {
@@ -717,10 +717,10 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
     int k = _searchFromTo(_columnIndexes, column, _rowPointers[row], _rowPointers[row + 1] - 1);
 
     if (k >= 0) { // found
-      if (value[0] == 0 && value[1] == 0) _remove(row, k); else {
+//      if (value[0] == 0 && value[1] == 0) _remove(row, k); else {
         _values[2 * k] = value[0];
         _values[2 * k + 1] = value[1];
-      }
+//      }
       return;
     }
 
@@ -735,10 +735,10 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
     int k = _searchFromTo(_columnIndexes, column, _rowPointers[row], _rowPointers[row + 1] - 1);
 
     if (k >= 0) { // found
-      if (re == 0 && im == 0) _remove(row, k); else {
+//      if (re == 0 && im == 0) _remove(row, k); else {
         _values[2 * k] = re;
         _values[2 * k + 1] = im;
-      }
+//      }
       return;
     }
 
@@ -1228,7 +1228,7 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
     _values = new Float64List.fromList(valuesList);
   }
 
-  void _remove(int row, int index) {
+  /*void _remove(int row, int index) {
     var columnIndexesList = new List.from(_columnIndexes);
     //columnIndexesList._setSizeRaw(_rowPointers[_rows]);
     var valuesList = new List.from(_values);
@@ -1241,7 +1241,7 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
     }
     _columnIndexes = new Int32List.fromList(columnIndexesList);
     _values = new Float64List.fromList(valuesList);
-  }
+  }*/
 
   Object clone() {
     return new SparseRCComplexMatrix._internal(_rows, _columns, _rowPointers, _columnIndexes, _values);

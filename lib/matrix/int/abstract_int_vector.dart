@@ -1306,11 +1306,11 @@ abstract class AbstractIntVector extends AbstractVector with ListMixin<int> {
    */
   Int32List toList({bool growable: false}) {
     Int32List result;
-    if (growable) {
-      result = new Int32List()..length = length;
-    } else {
+//    if (growable) {
+//      result = new Int32List()..length = length;
+//    } else {
       result = new Int32List(length);
-    }
+//    }
     fillList(result);
     return result;
   }
@@ -1712,4 +1712,16 @@ abstract class AbstractIntVector extends AbstractVector with ListMixin<int> {
   }
 
   Object clone();
+
+  AbstractIntVector operator &(AbstractIntVector a) {
+    return this.copy()..forEachWith(a, ifunc.and);
+  }
+
+  AbstractIntVector operator |(AbstractIntVector a) {
+    return this.copy()..forEachWith(a, ifunc.or);
+  }
+
+  AbstractIntVector operator ~() {
+    return this.copy()..forEach(ifunc.not);
+  }
 }

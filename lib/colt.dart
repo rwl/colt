@@ -1,3 +1,5 @@
+library colt;
+
 import 'dart:typed_data';
 
 export 'matrix/matrix.dart';

@@ -68,12 +68,13 @@ class SparseComplexVector extends AbstractComplexVector {
     this._isNoView = isNoView;
   }
 
-  void setAll(Float64List value) {
+//  void setAll(Float64List value) {
+  void fill(double re, double im) {
     // overriden for performance only
-    if (this._isNoView && value[0] == 0 && value[1] == 0) {
+    if (this._isNoView && re == 0 && im == 0) {
       this._elements.clear();
     } else {
-      super.setAll(value);
+      super.fill(re, im);
     }
   }
 

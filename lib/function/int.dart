@@ -47,7 +47,7 @@ int neg(int a) => -a;
 /**
  * Function that returns <tt>~a</tt>.
  */
-int not(int a) => ~a;
+int not(int a) => a == 0 ? 1 : 0;
 
 /**
  * Function that returns <tt>a < 0 ? -1 : a > 0 ? 1 : 0</tt>.
