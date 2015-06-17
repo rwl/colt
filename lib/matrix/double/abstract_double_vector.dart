@@ -1265,11 +1265,11 @@ abstract class AbstractDoubleVector extends AbstractVector with ListMixin<double
    */
   Float64List toList({bool growable: false}) {
     Float64List result;
-    if (growable) {
-      result = new List<double>()..length = length;
-    } else {
+//    if (growable) {
+//      result = new List<double>()..length = length;
+//    } else {
       result = new Float64List(length);
-    }
+//    }
     fillList(result);
     return result;
   }
