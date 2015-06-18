@@ -143,7 +143,7 @@ class SparseDoubleVector extends AbstractDoubleVector {
   }
 
   factory SparseDoubleVector.append(AbstractDoubleVector A, AbstractDoubleVector B) {
-    return append(A, B, (n) => new SparseDoubleVector(n));
+    return dfactory.append(A, B, (n) => new SparseDoubleVector(n));
   }
 
   /**
@@ -499,7 +499,11 @@ class SelectedSparseDoubleVector extends AbstractDoubleVector {
     // if (debug) if (index<0 || index>=size) checkIndex(index);
     // return elements.get(index(index));
     // manually inlined:
-    return _elements[__offset + _offsets[_zero + index * _stride]];
+    final i = __offset + _offsets[_zero + index * _stride];
+    if (_elements.containsKey(i)) {
+      return _elements[i];
+    }
+    return 0.0;
   }
 
   /**
