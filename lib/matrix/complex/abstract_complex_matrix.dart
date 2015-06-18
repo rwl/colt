@@ -1753,5 +1753,9 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
 
   AbstractComplexMatrix conj() {
     return this.copy()..forEach(cfunc.conj);
+    /*return this.copy()..forEachNonZero((i, j, a) {
+      a[1] = -a[1];
+      return a;
+    });*/
   }
 }
