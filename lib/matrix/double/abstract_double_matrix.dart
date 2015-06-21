@@ -1548,6 +1548,9 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
     return _view().._vDice();
   }
 
+  /// Synonym for [dice].
+  AbstractDoubleMatrix get T => dice();
+
   /**
    * Constructs and returns a new <i>sub-range view</i> that is a
    * <tt>height x width</tt> sub matrix starting at <tt>[row,column]</tt>.
