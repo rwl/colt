@@ -110,6 +110,10 @@ class IntVector extends AbstractIntVector {
     return ifactory.random(size, (sz) => new IntVector(sz));
   }
 
+  factory IntVector.append(AbstractIntVector a, AbstractIntVector b) {
+    return ifactory.append(a, b, (size) => new IntVector(size));
+  }
+
   int aggregate(final ifunc.IntIntFunction aggr, final ifunc.IntFunction f) {
     if (_size == 0) {
       throw new ArgumentError("size == 0");

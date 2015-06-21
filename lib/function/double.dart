@@ -20,6 +20,10 @@ double radians(double a) => a * (Math.PI/180.0);
 
 double degrees(double a) => a * (180.0/Math.PI);
 
+double or(double a, double b) => (a != 0.0 || b != 0.0) ? 1.0 : 0.0;
+
+double and(double a, double b) => (a != 0.0 && b != 0.0) ? 1.0 : 0.0;
+
 /***************************************************************************
  * <H3>Unary functions</H3>
  **************************************************************************/
@@ -332,7 +336,7 @@ double pow(double a, double b) => Math.pow(a, b);
  */
 DoubleFunction between(double from, double to) {
     return (double a) {
-            return (from <= a && a <= to) ? 1 : 0;
+            return (from <= a && a <= to) ? 1.0 : 0.0;
     };
 }
 
@@ -422,7 +426,7 @@ DoubleFunction chainGH(DoubleFunction g, DoubleFunction h) {
  */
 DoubleFunction compareTo(double b) {
     return (double a) {
-            return a < b ? -1 : a > b ? 1 : 0;
+            return a < b ? -1 : a > b ? 1.0 : 0.0;
     };
 }
 
@@ -551,7 +555,7 @@ DoubleFunction divide(double b) {
  */
 DoubleFunction equalTo(double b) {
     return (double a) {
-            return a == b ? 1 : 0;
+            return a == b ? 1.0 : 0.0;
     };
 }
 
@@ -561,7 +565,7 @@ DoubleFunction equalTo(double b) {
  */
 DoubleFunction greaterThan(double b) {
     return (double a) {
-            return a > b ? 1 : 0;
+            return a > b ? 1.0 : 0.0;
     };
 }
 
@@ -621,7 +625,7 @@ DoubleProcedure isLessThan(double b) {
  */
 DoubleFunction lessThan(double b) {
     return (double a) {
-            return a < b ? 1 : 0;
+            return a < b ? 1.0 : 0.0;
     };
 }
 
