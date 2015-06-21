@@ -19,6 +19,6 @@ double normInfinity(AbstractDoubleVector x) {
   return x.aggregate(max, abs);
 }
 
-typedef AbstractDoubleVector Solve(AbstractDoubleMatrix, AbstractDoubleVector);
-typedef dynamic Factor(AbstractDoubleMatrix);
-typedef AbstractDoubleVector SolveFactors(dynamic, AbstractDoubleVector);
+typedef AbstractDoubleVector Solve(SparseRCDoubleMatrix A, AbstractDoubleVector b);
+typedef dynamic Factor(SparseRCDoubleMatrix A);
+typedef AbstractDoubleVector SolveFactors(dynamic handle, AbstractDoubleVector b);
