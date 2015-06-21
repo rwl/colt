@@ -352,7 +352,7 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
 
   void forEachWith(final AbstractComplexMatrix y, cfunc.ComplexComplexComplexFunction function) {
     checkShape(y);
-    if ((y is SparseRCComplexMatrix) && (function == cfunc.plus)) { // x[i] = x[i] + y[i]
+    /*if ((y is SparseRCComplexMatrix) && (function == cfunc.plus)) { // x[i] = x[i] + y[i]
       SparseRCComplexMatrix yy = y;
 
       final Int32List rowPointersY = yy._rowPointers;
@@ -403,6 +403,122 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
               columnIndexesC[kc] = j2;
               valuesC[2 * kc] = valuesY[2 * kb];
               valuesC[2 * kc + 1] = valuesY[2 * kb + 1];
+              kb++;
+              kc++;
+            }
+            if (kc >= nzmax) {
+              throw new ArgumentError("The number of elements in C exceeds nzmax");
+            }
+          }
+          rowPointersC[i + 1] = kc;
+        }
+        this._rowPointers = rowPointersC;
+        this._columnIndexes = columnIndexesC;
+        this._values = valuesC;
+        return;
+      }
+    }*/
+    if ((y is SparseRCComplexMatrix) && (function == cfunc.plus || function == cfunc.minus)) { // x[i] = x[i] + y[i]
+      SparseRCComplexMatrix yy = y;
+
+      final Int32List rowPointersY = yy._rowPointers;
+      final Int32List columnIndexesY = yy._columnIndexes;
+      final Float64List valuesY = yy._values;
+
+      final Int32List rowPointersC = new Int32List(_rows + 1);
+      int cnz = Math.max(_columnIndexes.length, Math.min(MAX_INT, _rowPointers[_rows] + rowPointersY[_rows]));
+      final Int32List columnIndexesC = new Int32List(cnz);
+      final Float64List valuesC = new Float64List(2 * cnz);
+      int nrow = _rows;
+      int ncol = _columns;
+      int nzmax = cnz;
+      if (function == cfunc.plus) { // x[i] = x[i] + y[i]
+        int kc = 0;
+        rowPointersC[0] = kc;
+        int j1, j2;
+        for (int i = 0; i < nrow; i++) {
+          int ka = _rowPointers[i];
+          int kb = rowPointersY[i];
+          int kamax = _rowPointers[i + 1] - 1;
+          int kbmax = rowPointersY[i + 1] - 1;
+          while (ka <= kamax || kb <= kbmax) {
+            if (ka <= kamax) {
+              j1 = _columnIndexes[ka];
+            } else {
+              j1 = ncol + 1;
+            }
+            if (kb <= kbmax) {
+              j2 = columnIndexesY[kb];
+            } else {
+              j2 = ncol + 1;
+            }
+            if (j1 == j2) {
+              valuesC[2 * kc] = _values[2 * ka] + valuesY[2 * kb];
+              valuesC[2 * kc + 1] = _values[2 * ka + 1] + valuesY[2 * kb + 1];
+              columnIndexesC[kc] = j1;
+              ka++;
+              kb++;
+              kc++;
+            } else if (j1 < j2) {
+              columnIndexesC[kc] = j1;
+              valuesC[2 * kc] = _values[2 * ka];
+              valuesC[2 * kc + 1] = _values[2 * ka + 1];
+              ka++;
+              kc++;
+            } else if (j1 > j2) {
+              columnIndexesC[kc] = j2;
+              valuesC[2 * kc] = valuesY[2 * kb];
+              valuesC[2 * kc + 1] = valuesY[2 * kb + 1];
+              kb++;
+              kc++;
+            }
+            if (kc >= nzmax) {
+              throw new ArgumentError("The number of elements in C exceeds nzmax");
+            }
+          }
+          rowPointersC[i + 1] = kc;
+        }
+        this._rowPointers = rowPointersC;
+        this._columnIndexes = columnIndexesC;
+        this._values = valuesC;
+        return;
+      } else if (function == cfunc.minus) { // x[i] = x[i] - y[i]
+        int kc = 0;
+        rowPointersC[0] = kc;
+        int j1, j2;
+        for (int i = 0; i < nrow; i++) {
+          int ka = _rowPointers[i];
+          int kb = rowPointersY[i];
+          int kamax = _rowPointers[i + 1] - 1;
+          int kbmax = rowPointersY[i + 1] - 1;
+          while (ka <= kamax || kb <= kbmax) {
+            if (ka <= kamax) {
+              j1 = _columnIndexes[ka];
+            } else {
+              j1 = ncol + 1;
+            }
+            if (kb <= kbmax) {
+              j2 = columnIndexesY[kb];
+            } else {
+              j2 = ncol + 1;
+            }
+            if (j1 == j2) {
+              valuesC[2 * kc] = _values[2 * ka] - valuesY[2 * kb];
+              valuesC[2 * kc + 1] = _values[2 * ka + 1] - valuesY[2 * kb + 1];
+              columnIndexesC[kc] = j1;
+              ka++;
+              kb++;
+              kc++;
+            } else if (j1 < j2) {
+              columnIndexesC[kc] = j1;
+              valuesC[2 * kc] = -_values[2 * ka];
+              valuesC[2 * kc + 1] = -_values[2 * ka + 1];
+              ka++;
+              kc++;
+            } else if (j1 > j2) {
+              columnIndexesC[kc] = j2;
+              valuesC[2 * kc] = -valuesY[2 * kb];
+              valuesC[2 * kc + 1] = -valuesY[2 * kb + 1];
               kb++;
               kc++;
             }
@@ -1260,5 +1376,25 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
       norm = Math.max(norm, s);
     }
     return norm;
+  }
+
+  AbstractDoubleMatrix real() {
+    var vals = new Float64List(length);
+    for (var i = 0; i < length; i++) {
+      vals[i] = _values[2 * i];
+    }
+    var rowptr = new Int32List.fromList(_rowPointers);
+    var colidx = new Int32List.fromList(_columnIndexes);
+    return new SparseRCDoubleMatrix._internal(_rows, _columns, rowptr, colidx, vals);
+  }
+
+  AbstractDoubleMatrix imaginary() {
+    var vals = new Float64List(length);
+    for (var i = 0; i < length; i++) {
+      vals[i] = _values[2 * i + 1];
+    }
+    var rowptr = new Int32List.fromList(_rowPointers);
+    var colidx = new Int32List.fromList(_columnIndexes);
+    return new SparseRCDoubleMatrix._internal(_rows, _columns, rowptr, colidx, vals);
   }
 }
