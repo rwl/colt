@@ -213,7 +213,7 @@ class SparseCCIntMatrix extends WrapperIntMatrix {
    * @param sortRowIndexes
    *            if true, then row indexes are sorted
    */
-  factory SparseCCIntMatrix.withValue(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, int value, bool removeDuplicates, bool sortRowIndexes) : super(null) {
+  factory SparseCCIntMatrix.withValue(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, int value, bool removeDuplicates, bool sortRowIndexes) {//: super(null) {
     /*try {
       _setUp(rows, columns);
     } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
@@ -272,7 +272,7 @@ class SparseCCIntMatrix extends WrapperIntMatrix {
    * @param sortRowIndexes
    *            if true, then row indexes are sorted
    */
-  factory SparseCCIntMatrix.withValues(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, Int32List values, bool removeDuplicates, bool removeZeroes, bool sortRowIndexes) : super(null) {
+  factory SparseCCIntMatrix.withValues(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, Int32List values, bool removeDuplicates, bool removeZeroes, bool sortRowIndexes) {//: super(null) {
     /*try {
       _setUp(rows, columns);
     } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
