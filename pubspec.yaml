@@ -1,11 +1,7 @@
 name: colt
+version: 0.0.1
 description: A pub package
 dependencies:
-  btf: any
-#  csparse:
-#    path: ../csparse
   intl: any
-#  klu:
-#    path: ../klu
 dev_dependencies:
   unittest: any
