@@ -1,12 +1,14 @@
-/*
-Copyright (C) 1999 CERN - European Organization for Nuclear Research.
-Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose
-is hereby granted without fee, provided that the above copyright notice appear in all copies and
-that both that copyright notice and this permission notice appear in supporting documentation.
-CERN makes no representations about the suitability of this software for any purpose.
-It is provided "as is" without expressed or implied warranty.
- */
-part of cern.colt.matrix;
+// Copyright (C) 1999 CERN - European Organization for Nuclear Research.
+//
+// Permission to use, copy, modify, distribute and sell this software and
+// its documentation for any purpose is hereby granted without fee, provided
+// that the above copyright notice appear in all copies and that both that
+// copyright notice and this permission notice appear in supporting
+// documentation.
+//
+// CERN makes no representations about the suitability of this software for
+// any purpose. It is provided "as is" without expressed or implied warranty.
+part of cern.colt.matrix.int;
 
 /**
  * Dense 1-d matrix (aka <i>vector</i>) holding <tt>int</tt> elements. First see
@@ -85,7 +87,8 @@ class IntVector extends AbstractIntVector {
    * @throws ArgumentError
    *             if <tt>size<0</tt>.
    */
-  IntVector._internal(int size, Int32List elements, int zero, int stride, bool isView) {
+  IntVector._internal(int size, Int32List elements, int zero, int stride, bool isView)
+      : super(size, zero, stride) {
     if (elements == null) {
       elements = new Int32List(size);
     }
@@ -1456,7 +1459,8 @@ class SelectedDenseIntVector extends AbstractIntVector {
    *            the offsets of the cells that shall be visible.
    * @param offset
    */
-  SelectedDenseIntVector._internal(int size, Int32List elements, int zero, int stride, Int32List offsets, int offset) {
+  SelectedDenseIntVector._internal(int size, Int32List elements, int zero, int stride, Int32List offsets, int offset)
+      : super(size, zero, stride) {
     _setUp(size, zero, stride);
 
     this._elements = elements;

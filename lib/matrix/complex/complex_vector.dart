@@ -1,12 +1,14 @@
-/*
-Copyright (C) 1999 CERN - European Organization for Nuclear Research.
-Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose
-is hereby granted without fee, provided that the above copyright notice appear in all copies and
-that both that copyright notice and this permission notice appear in supporting documentation.
-CERN makes no representations about the suitability of this software for any purpose.
-It is provided "as is" without expressed or implied warranty.
- */
-part of cern.colt.matrix;
+// Copyright (C) 1999 CERN - European Organization for Nuclear Research.
+//
+// Permission to use, copy, modify, distribute and sell this software and
+// its documentation for any purpose is hereby granted without fee, provided
+// that the above copyright notice appear in all copies and that both that
+// copyright notice and this permission notice appear in supporting
+// documentation.
+//
+// CERN makes no representations about the suitability of this software for
+// any purpose. It is provided "as is" without expressed or implied warranty.
+part of cern.colt.matrix.complex;
 
 /**
  * Dense 1-d matrix (aka <i>vector</i>) holding <tt>complex</tt> elements.
@@ -107,7 +109,8 @@ class ComplexVector extends AbstractComplexVector {
    * @throws IllegalArgumentException
    *             if <tt>size<0</tt>.
    */
-  ComplexVector._internal(int size, Float64List elements, int zero, int stride, bool isNoView) {
+  ComplexVector._internal(int size, Float64List elements, int zero, int stride, bool isNoView)
+      : super(size, zero, stride) {
     _setUp(size, zero, stride);
     this._elements = elements;
     this._isNoView = isNoView;
@@ -1346,7 +1349,8 @@ class SelectedDenseComplexVector extends AbstractComplexVector {
    *            the offsets of the cells that shall be visible.
    * @param offset
    */
-  SelectedDenseComplexVector._internal(int size, Float64List elements, int zero, int stride, Int32List offsets, int offset) {
+  SelectedDenseComplexVector._internal(int size, Float64List elements, int zero, int stride, Int32List offsets, int offset)
+      : super(size, zero, stride) {
     _setUp(size, zero, stride);
 
     this._elements = elements;

@@ -1,12 +1,14 @@
-/*
-Copyright (C) 1999 CERN - European Organization for Nuclear Research.
-Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose
-is hereby granted without fee, provided that the above copyright notice appear in all copies and
-that both that copyright notice and this permission notice appear in supporting documentation.
-CERN makes no representations about the suitability of this software for any purpose.
-It is provided "as is" without expressed or implied warranty.
- */
-part of cern.colt.matrix;
+// Copyright (C) 1999 CERN - European Organization for Nuclear Research.
+//
+// Permission to use, copy, modify, distribute and sell this software and
+// its documentation for any purpose is hereby granted without fee, provided
+// that the above copyright notice appear in all copies and that both that
+// copyright notice and this permission notice appear in supporting
+// documentation.
+//
+// CERN makes no representations about the suitability of this software for
+// any purpose. It is provided "as is" without expressed or implied warranty.
+part of cern.colt.matrix.complex;
 
 /**
  * Abstract base class for 1-d matrices (aka <i>vectors</i>) holding
@@ -21,6 +23,8 @@ part of cern.colt.matrix;
  *
  */
 abstract class AbstractComplexVector extends AbstractVector {//with ListMixin<double> {
+  AbstractComplexVector(int size, [int zero = 0, int stride = 1, bool isNoView = true])
+      : super(size, zero, stride, isNoView);
 
   /**
    * Makes this class non instantiable, but still let's others inherit from

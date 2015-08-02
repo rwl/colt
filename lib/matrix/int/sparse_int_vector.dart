@@ -1,12 +1,14 @@
-/*
-Copyright (C) 1999 CERN - European Organization for Nuclear Research.
-Permission to use, copy, modify, distribute and sell this software and its documentation for any purpose
-is hereby granted without fee, provided that the above copyright notice appear in all copies and
-that both that copyright notice and this permission notice appear in supporting documentation.
-CERN makes no representations about the suitability of this software for any purpose.
-It is provided "as is" without expressed or implied warranty.
- */
-part of cern.colt.matrix;
+// Copyright (C) 1999 CERN - European Organization for Nuclear Research.
+//
+// Permission to use, copy, modify, distribute and sell this software and
+// its documentation for any purpose is hereby granted without fee, provided
+// that the above copyright notice appear in all copies and that both that
+// copyright notice and this permission notice appear in supporting
+// documentation.
+//
+// CERN makes no representations about the suitability of this software for
+// any purpose. It is provided "as is" without expressed or implied warranty.
+part of cern.colt.matrix.int;
 
 /**
  * Sparse hashed 1-d matrix (aka <i>vector</i>) holding <tt>int</tt> elements.
@@ -128,7 +130,8 @@ class SparseIntVector extends AbstractIntVector {
    * @throws IllegalArgumentException
    *             if <tt>size<0</tt>.
    */
-  SparseIntVector._internal(int size, Map<int, int> elements, int offset, int stride) {
+  SparseIntVector._internal(int size, Map<int, int> elements, int offset, int stride)
+      : super(size, offset, stride) {
     _setUp(size, offset, stride);
     this._elements = elements;
     this._isNoView = false;
@@ -458,7 +461,8 @@ class SelectedSparseIntVector extends AbstractIntVector {
    *            the offsets of the cells that shall be visible.
    * @param offset
    */
-  SelectedSparseIntVector._internal(int size, Map<int, int> elements, int zero, int stride, Int32List offsets, int offset) {
+  SelectedSparseIntVector._internal(int size, Map<int, int> elements, int zero, int stride, Int32List offsets, int offset)
+      : super(size, zero, stride) {
     _setUp(size, zero, stride);
 
     this._elements = elements;
