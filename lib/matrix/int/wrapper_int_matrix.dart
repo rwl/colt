@@ -26,7 +26,8 @@ class WrapperIntMatrix extends AbstractIntMatrix {
    */
   AbstractIntMatrix _content;
 
-  WrapperIntMatrix(AbstractIntMatrix newContent) {
+  WrapperIntMatrix(AbstractIntMatrix newContent)
+      : super(newContent.rows, newContent.columns) {
     if (newContent != null) try {
       _setUp(newContent.rows, newContent.columns);
     } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !

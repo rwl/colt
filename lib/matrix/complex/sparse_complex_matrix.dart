@@ -74,7 +74,8 @@ class SparseComplexMatrix extends AbstractComplexMatrix {
    *             <tt>rows<0 || columns<0 || (double)columns*rows > Integer.MAX_VALUE</tt>
    *             or flip's are illegal.
    */
-  SparseComplexMatrix._internal(int rows, int columns, Map<int, Float64List> elements, int rowZero, int columnZero, int rowStride, int columnStride, bool isNoView) {
+  SparseComplexMatrix._internal(int rows, int columns, Map<int, Float64List> elements, int rowZero, int columnZero, int rowStride, int columnStride, bool isNoView)
+      : super(rows, columns, rowZero, columnZero, rowStride, columnStride) {
     _setUp(rows, columns, rowZero, columnZero, rowStride, columnStride);
     this._elements = elements;
     this._isNoView = isNoView;
@@ -354,7 +355,8 @@ class SelectedSparseComplexMatrix extends AbstractComplexMatrix {
    *            The column offsets of the cells that shall be visible.
    * @param offset
    */
-  SelectedSparseComplexMatrix._internal(int rows, int columns, Map<int, Float64List> elements, int rowZero, int columnZero, int rowStride, int columnStride, Int32List rowOffsets, Int32List columnOffsets, int offset) {
+  SelectedSparseComplexMatrix._internal(int rows, int columns, Map<int, Float64List> elements, int rowZero, int columnZero, int rowStride, int columnStride, Int32List rowOffsets, Int32List columnOffsets, int offset)
+      : super(rows, columns, rowZero, columnZero, rowStride, columnStride) {
     // be sure parameters are valid, we do not check...
     _setUp(rows, columns, rowZero, columnZero, rowStride, columnStride);
 

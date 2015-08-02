@@ -26,7 +26,8 @@ class WrapperDoubleMatrix extends AbstractDoubleMatrix {
      */
   AbstractDoubleMatrix _content;
 
-  WrapperDoubleMatrix(AbstractDoubleMatrix newContent) {
+  WrapperDoubleMatrix(AbstractDoubleMatrix newContent)
+      : super(newContent.rows, newContent.columns) {
     if (newContent != null) {
       try {
         _setUp(newContent.rows, newContent.columns);

@@ -130,7 +130,7 @@ void vPart(AbstractVector vector, int index, int width) {
 }
 
 /// Self modifying version of [viewStrides].
-void vStrides(AbstractVector vector, int stride) {
+void vStride(AbstractVector vector, int stride) {
   if (stride <= 0) {
     throw new RangeError("illegal stride: $stride");
   }

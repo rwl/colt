@@ -288,7 +288,8 @@ class SparseIntMatrix extends AbstractIntMatrix {
    *             <tt>rows<0 || columns<0 || (double)columns*rows > Integer.MAX_VALUE</tt>
    *             or flip's are illegal.
    */
-  SparseIntMatrix._internal(int rows, int columns, Map<int, int> elements, int rowZero, int columnZero, int rowStride, int columnStride) {
+  SparseIntMatrix._internal(int rows, int columns, Map<int, int> elements, int rowZero, int columnZero, int rowStride, int columnStride)
+      : super(rows, columns, rowZero, columnZero, rowStride, columnStride) {
     try {
       _setUp(rows, columns, rowZero, columnZero, rowStride, columnStride);
     } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
@@ -972,7 +973,8 @@ class SelectedSparseIntMatrix extends AbstractIntMatrix {
    *            The column offsets of the cells that shall be visible.
    * @param offset
    */
-  SelectedSparseIntMatrix._internal(int rows, int columns, Map<int, int> elements, int rowZero, int columnZero, int rowStride, int columnStride, Int32List rowOffsets, Int32List columnOffsets, int offset) {
+  SelectedSparseIntMatrix._internal(int rows, int columns, Map<int, int> elements, int rowZero, int columnZero, int rowStride, int columnStride, Int32List rowOffsets, Int32List columnOffsets, int offset)
+      : super(rows, columns, rowZero, columnZero, rowStride, columnStride) {
     // be sure parameters are valid, we do not check...
     _setUp(rows, columns, rowZero, columnZero, rowStride, columnStride);
 

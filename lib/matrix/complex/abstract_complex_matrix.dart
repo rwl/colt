@@ -29,13 +29,11 @@ typedef bool ComplexVectorProcedure(AbstractComplexVector element);
  *
  */
 abstract class AbstractComplexMatrix extends AbstractMatrix {
-
-  /**
-   * Makes this class non instantiable, but still let's others inherit from
-   * it.
-   */
-  AbstractComplexMatrix() {
-  }
+  AbstractComplexMatrix(int rows, int columns, [int rowZero = 0,
+      int columnZero = 0, int rowStride = null, int columnStride = 1,
+      bool isNoView = true])
+      : super(rows, columns, rowZero, columnZero, rowStride, columnStride,
+          isNoView);
 
   /**
    * Applies a function to each cell and aggregates the results.

@@ -444,7 +444,7 @@ abstract class AbstractDoubleVector extends AbstractVector {
   /// every i-th cell.
   AbstractDoubleVector strides(int stride) {
     var v = _view();
-    vStrides(this, stride);
+    vStride(this, stride);
     return v;
   }
 

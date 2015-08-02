@@ -39,6 +39,11 @@ class IntMatrixLocation {
  *
  */
 abstract class AbstractIntMatrix extends AbstractMatrix {
+  AbstractIntMatrix(int rows, int columns, [int rowZero = 0,
+      int columnZero = 0, int rowStride = null, int columnStride = 1,
+      bool isNoView = true])
+      : super(rows, columns, rowZero, columnZero, rowStride, columnStride,
+          isNoView);
 
   /**
    * Applies a function to each cell and aggregates the results. Returns a

@@ -23,7 +23,8 @@ class WrapperComplexMatrix extends AbstractComplexMatrix {
    */
   AbstractComplexMatrix _content;
 
-  WrapperComplexMatrix(AbstractComplexMatrix newContent) {
+  WrapperComplexMatrix(AbstractComplexMatrix newContent)
+      : super(newContent.rows, newContent.columns) {
     if (newContent != null) {
       _setUp(newContent.rows, newContent.columns);
     }

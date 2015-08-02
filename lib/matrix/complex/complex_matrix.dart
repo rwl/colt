@@ -141,7 +141,8 @@ class ComplexMatrix extends AbstractComplexMatrix {
    *             or flip's are illegal.
    */
   //ComplexMatrix._internal(int rows, int columns, [Float64List elements = null, int rowZero = 0, int columnZero = 0, int rowStride = null, int columnStride = 2, bool isNoView = true]) {
-  ComplexMatrix._internal(int rows, int columns, Float64List elements, int rowZero, int columnZero, int rowStride, int columnStride, bool isNoView) {
+  ComplexMatrix._internal(int rows, int columns, Float64List elements, int rowZero, int columnZero, int rowStride, int columnStride, bool isNoView)
+      : super(rows, columns, rowZero, columnZero, rowStride, columnStride) {
     _setUp(rows, columns, rowZero, columnZero, rowStride, columnStride);
     this._elements = elements;
     this._isNoView = isNoView;
@@ -1904,7 +1905,8 @@ class SelectedDenseComplexMatrix extends AbstractComplexMatrix {
    *            The column offsets of the cells that shall be visible.
    * @param offset
    */
-  SelectedDenseComplexMatrix._internal(int rows, int columns, Float64List elements, int rowZero, int columnZero, int rowStride, int columnStride, Int32List rowOffsets, Int32List columnOffsets, int offset) {
+  SelectedDenseComplexMatrix._internal(int rows, int columns, Float64List elements, int rowZero, int columnZero, int rowStride, int columnStride, Int32List rowOffsets, Int32List columnOffsets, int offset)
+      : super(rows, columns, rowZero, columnZero, rowStride, columnStride) {
     // be sure parameters are valid, we do not check...
     _setUp(rows, columns, rowZero, columnZero, rowStride, columnStride);
 

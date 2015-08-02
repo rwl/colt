@@ -290,7 +290,8 @@ class SparseDoubleMatrix extends AbstractDoubleMatrix {
    *             or flip's are illegal.
    */
 //  SparseDoubleMatrix._internal(int rows, int columns, [Map<int, double> elements = null, int rowZero = 0, int columnZero = 0, int rowStride = null, int columnStride = 1, bool isView = false]) {
-  SparseDoubleMatrix._internal(int rows, int columns, Map<int, double> elements, int rowZero, int columnZero, int rowStride, int columnStride, bool isView) {
+  SparseDoubleMatrix._internal(int rows, int columns, Map<int, double> elements, int rowZero, int columnZero, int rowStride, int columnStride, bool isView)
+      : super(rows, columns, rowZero, columnZero, rowStride, columnStride) {
     try {
       _setUp(rows, columns, rowZero, columnZero, rowStride, columnStride);
     } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
@@ -961,7 +962,8 @@ class SelectedSparseDoubleMatrix extends AbstractDoubleMatrix {
    *            The column offsets of the cells that shall be visible.
    * @param offset
    */
-  SelectedSparseDoubleMatrix._internal(int rows, int columns, Map<int, double> elements, int rowZero, int columnZero, int rowStride, int columnStride, Int32List rowOffsets, Int32List columnOffsets, int offset) {
+  SelectedSparseDoubleMatrix._internal(int rows, int columns, Map<int, double> elements, int rowZero, int columnZero, int rowStride, int columnStride, Int32List rowOffsets, Int32List columnOffsets, int offset)
+      : super(rows, columns, rowZero, columnZero, rowStride, columnStride) {
     // be sure parameters are valid, we do not check...
     _setUp(rows, columns, rowZero, columnZero, rowStride, columnStride);
 

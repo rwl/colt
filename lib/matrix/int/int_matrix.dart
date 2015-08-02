@@ -131,7 +131,8 @@ class IntMatrix extends AbstractIntMatrix {
    *             <tt>rows<0 || columns<0 || (int)columns*rows > Int.MAX_VALUE</tt>
    *             or flip's are illegal.
    */
-  IntMatrix._internal(int rows, int columns, Int32List elements, int rowZero, int columnZero, int rowStride, int columnStride, bool isView) {
+  IntMatrix._internal(int rows, int columns, Int32List elements, int rowZero, int columnZero, int rowStride, int columnStride, bool isView)
+      : super(rows, columns, rowZero, columnZero, rowStride, columnStride) {
     _setUp(rows, columns, rowZero, columnZero, rowStride, columnStride);
     this._elements = elements;
     this._isNoView = !isView;
@@ -1871,7 +1872,8 @@ class SelectedDenseIntMatrix extends AbstractIntMatrix {
    *            The column offsets of the cells that shall be visible.
    * @param offset
    */
-  SelectedDenseIntMatrix(int rows, int columns, Int32List elements, int rowZero, int columnZero, int rowStride, int columnStride, Int32List rowOffsets, Int32List columnOffsets, int offset) {
+  SelectedDenseIntMatrix(int rows, int columns, Int32List elements, int rowZero, int columnZero, int rowStride, int columnStride, Int32List rowOffsets, Int32List columnOffsets, int offset)
+      : super(rows, columns, rowZero, columnZero, rowStride, columnStride) {
     // be sure parameters are valid, we do not check...
     _setUp(rows, columns, rowZero, columnZero, rowStride, columnStride);
 
