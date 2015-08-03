@@ -6,9 +6,9 @@ import '../math.dart' show MAX_INT;
 typedef int IntFunction(int argument);
 typedef int IntIntFunction(int x, int y);
 typedef int IntIntIntFunction(int first, int second, int third);
-typedef bool IntIntIntProcedure(int first, int second, int third);
-typedef bool IntIntProcedure(int first, int second);
-typedef bool IntProcedure(int element);
+//typedef bool IntIntIntProcedure(int first, int second, int third);
+//typedef bool IntIntProcedure(int first, int second);
+//typedef bool IntProcedure(int element);
 
 
 /***************************************************************************

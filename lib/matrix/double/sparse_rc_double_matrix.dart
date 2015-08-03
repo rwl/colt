@@ -345,7 +345,7 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
       }
       return;
     }
-    super.forEachWith(y, fn);
+    super.assign(y, fn);
   }
 
   int get cardinality => _rowPointers[rows];
