@@ -21,21 +21,23 @@ part of cern.colt.matrix.double;
  */
 class WrapperDoubleMatrix extends AbstractDoubleMatrix {
 
-  /*
-     * The elements of the matrix.
-     */
   AbstractDoubleMatrix _content;
 
-  WrapperDoubleMatrix(AbstractDoubleMatrix newContent)
+  WrapperDoubleMatrix._(int rows, int columns)
+  : super(rows, columns);
+
+  WrapperDoubleMatrix._wrap(AbstractDoubleMatrix newContent)
       : super(newContent.rows, newContent.columns) {
-    if (newContent != null) {
-      try {
-        _setUp(newContent.rows, newContent.columns);
-      } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
-        if ("matrix too large" != exc.message) throw exc;
-      }
-    }
-    this._content = newContent;
+//    if (newContent != null) {
+//      try {
+//        _setUp(newContent.rows, newContent.columns);
+//      } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
+//        if ("matrix too large" != exc.message) throw exc;
+//      }
+//    }
+    //var m = new WrapperDoubleMatrix._(newContent.rows, newContent.columns);
+    _content = newContent;
+//    return m;
   }
 
   void setAll(final Float64List values) {
@@ -311,7 +313,8 @@ class WrapperDoubleMatrix extends AbstractDoubleMatrix {
 
 class ColumnFlipWrapperDoubleMatrix extends WrapperDoubleMatrix {
 
-  ColumnFlipWrapperDoubleMatrix(AbstractDoubleMatrix newContent) : super(newContent);
+  ColumnFlipWrapperDoubleMatrix(AbstractDoubleMatrix newContent)
+      : super._wrap(newContent);
 
   double get(int row, int column) {
       return _content.get(row, _columns - 1 - column);
@@ -336,7 +339,7 @@ class ColumnFlipWrapperDoubleMatrix extends WrapperDoubleMatrix {
 
 class DiceWrapperDoubleMatrix extends WrapperDoubleMatrix {
 
-  DiceWrapperDoubleMatrix(AbstractDoubleMatrix newContent) : super(newContent);
+  DiceWrapperDoubleMatrix(AbstractDoubleMatrix newContent) : super._wrap(newContent);
 
   double get(int row, int column) {
       return _content.get(column, row);
@@ -364,7 +367,7 @@ class PartWrapperDoubleMatrix extends WrapperDoubleMatrix {
   final int _row;
   final int _column;
 
-  PartWrapperDoubleMatrix(AbstractDoubleMatrix newContent, this._row, this._column) : super(newContent);
+  PartWrapperDoubleMatrix(AbstractDoubleMatrix newContent, this._row, this._column) : super._wrap(newContent);
 
   double get(int i, int j) {
       return _content.get(_row + i, _column + j);
@@ -389,7 +392,7 @@ class PartWrapperDoubleMatrix extends WrapperDoubleMatrix {
 
 class RowFlipWrapperDoubleMatrix extends WrapperDoubleMatrix {
 
-  RowFlipWrapperDoubleMatrix(AbstractDoubleMatrix newContent) : super(newContent);
+  RowFlipWrapperDoubleMatrix(AbstractDoubleMatrix newContent) : super._wrap(newContent);
 
   double get(int row, int column) {
       return _content.get(_rows - 1 - row, column);
@@ -417,7 +420,7 @@ class SelectionWrapperDoubleMatrix extends WrapperDoubleMatrix {
   final Int32List _cix;
   final Int32List _rix;
 
-  SelectionWrapperDoubleMatrix(AbstractDoubleMatrix newContent, this._cix, this._rix) : super(newContent);
+  SelectionWrapperDoubleMatrix(AbstractDoubleMatrix newContent, this._cix, this._rix) : super._wrap(newContent);
 
   double get(int i, int j) {
       return _content.get(_rix[i], _cix[j]);
@@ -445,7 +448,7 @@ class StridesWrapperDoubleMatrix extends WrapperDoubleMatrix {
   final int _rowStride;
   final int _columnStride;
 
-  StridesWrapperDoubleMatrix(AbstractDoubleMatrix newContent, this._rowStride, this._columnStride) : super(newContent);
+  StridesWrapperDoubleMatrix(AbstractDoubleMatrix newContent, this._rowStride, this._columnStride) : super._wrap(newContent);
 
   double get(int row, int column) {
       return _content.get(_rowStride * row, _columnStride * column);

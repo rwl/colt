@@ -35,7 +35,7 @@ import '../../function/double.dart' as func;
 
 import 'factory.dart' as dfactory;
 
-import '../../math.dart' show DoubleMult, DoublePlusMultSecond;
+import '../../math.dart' show DoubleMult, DoublePlusMultSecond, DoublePlusMultFirst;
 
 import 'algo/algo.dart' as dprop;
 
