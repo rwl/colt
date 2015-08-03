@@ -15,6 +15,7 @@ import '../matrix.dart'
         vPart,
         vStride,
         checkShape,
+        checkBox,
         checkColumn,
         checkRow,
         checkColumnIndexes,
@@ -23,7 +24,10 @@ import '../matrix.dart'
         vColumnFlip,
         vRowFlip,
         vDice,
-        vBox;
+        vBox,
+        setIsNoView,
+        setRows,
+        setColumns;
 
 import '../../function/double.dart'
     show DoubleFunction, DoubleDoubleFunction; //,
@@ -35,7 +39,7 @@ import '../../function/double.dart' as func;
 
 import 'factory.dart' as dfactory;
 
-import '../../math.dart' show DoubleMult, DoublePlusMultSecond, DoublePlusMultFirst;
+import '../../math.dart' show DoubleMult, DoublePlusMultSecond, DoublePlusMultFirst, EPSILON;
 
 import 'algo/algo.dart' as dprop;
 

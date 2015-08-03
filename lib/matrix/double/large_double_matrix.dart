@@ -10,50 +10,24 @@
 // any purpose. It is provided "as is" without expressed or implied warranty.
 part of cern.colt.matrix.double;
 
-/**
- * Dense 2-d matrix holding <tt>double</tt> elements. First see the <a
- * href="package-summary.html">package summary</a> and javadoc <a
- * href="package-tree.html">tree view</a> to get the broad picture.
- * <p>
- * <b>Implementation:</b>
- * <p>
- * This data structure allows to store more than 2^31 elements. Internally holds
- * one two-dimensional array, elements[rows][columns]. Note that this
- * implementation is not synchronized.
- * <p>
- * <b>Time complexity:</b>
- * <p>
- * <tt>O(1)</tt> (i.e. constant time) for the basic operations <tt>get</tt>,
- * <tt>getQuick</tt>, <tt>set</tt>, <tt>setQuick</tt> and <tt>size</tt>.
- *
- * @author Piotr Wendykier (piotr.wendykier@gmail.com)
- *
- */
+/// Dense 2-d matrix holding [double] elements.
+///
+/// Internally holds one two-dimensional array, `elements[rows][columns]`.
 class LargeDoubleMatrix extends WrapperDoubleMatrix {
 
   List<Float64List> _elements;
 
   factory LargeDoubleMatrix(int rows, int columns) {
-    final elements = new List<Float64List>.generate(rows, (_) => new Float64List(columns));
+    var elements = new List.generate(rows, (_) => new Float64List(columns));
     return new LargeDoubleMatrix._internal(rows, columns, elements);
   }
 
-  LargeDoubleMatrix._internal(int rows, int columns, List<Float64List> elements) : super(null) {
-    try {
-      _setUp(rows, columns);
-    } on ArgumentError catch (exc) { // we can hold rows*columns>MAX_INT cells !
-      if ("matrix too large" != exc.message) {
-        throw exc;
-      }
-    }
+  LargeDoubleMatrix._internal(int rows, int columns, List<Float64List> elements) : super._(rows, columns) {
     _elements = elements;
     _content = this;
   }
 
-  double get(int row, int column) {
-    return _elements[row][column];
-  }
-
+  double get(int row, int column) => _elements[row][column];
 
   void set(int row, int column, double value) {
     _elements[row][column] = value;
@@ -61,19 +35,15 @@ class LargeDoubleMatrix extends WrapperDoubleMatrix {
 
   List<Float64List> get elements => _elements;
 
-  AbstractDoubleMatrix _getContent() {
-    return this;
-  }
+  AbstractDoubleMatrix _getContent() => this;
 
   AbstractDoubleMatrix like2D(int rows, int columns) {
     return new LargeDoubleMatrix(rows, columns);
   }
 
-  AbstractDoubleVector like1D(int size) {
-    return new DoubleVector(size);
-  }
+  AbstractDoubleVector like1D(int size) => new DoubleVector(size);
 
   Object clone() {
-    return new LargeDoubleMatrix._internal(_rows, _columns, _elements);
+    return new LargeDoubleMatrix._internal(rows, columns, _elements);
   }
 }
