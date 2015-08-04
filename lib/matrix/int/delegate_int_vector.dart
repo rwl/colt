@@ -111,68 +111,40 @@ part of cern.colt.matrix.int;
 
 
 class DelegateIntVector extends AbstractIntVector {
-
-  /*
-   * The elements of the matrix.
-   */
   AbstractIntMatrix _content;
 
-  /*
-   * The row this view is bound to.
-   */
+  /// The row this view is bound to.
   int _row;
 
-  /**
-   * Constructs a matrix view with a given content and row
-   *
-   * @param newContent
-   *            the content of this view
-   * @param row
-   *            the row this view is bound to
-   */
+  /// Constructs a matrix view with a given content and row.
   DelegateIntVector(AbstractIntMatrix newContent, int row)
       : super(newContent.columns) {
     if (row < 0 || row >= newContent.rows) {
       throw new ArgumentError();
     }
-    _setUp(newContent.columns);
-    this._row = row;
-    this._content = newContent;
+    _row = row;
+    _content = newContent;
   }
 
-  int get(int index) {
-    return _content.get(_row, index);
-  }
+  int get(int index) => _content.get(_row, index);
 
-  AbstractIntVector like1D(int size) {
-    return _content.like1D(size);
-  }
+  AbstractIntVector like1D(int size) => _content.like1D(size);
 
   AbstractIntMatrix like2D(int rows, int columns) {
     return _content.like2D(rows, columns);
   }
 
-  void set(int index, int value) {
-    _content.set(_row, index, value);
-  }
+  void set(int index, int value) => _content.set(_row, index, value);
 
-  Object get elements {
-    return _content.elements;
-  }
+  Object get elements => _content.elements;
 
   AbstractIntMatrix reshape(int rows, int columns) {
     throw new ArgumentError("This method is not supported.");
   }
 
-  /*IntMatrix3D reshape(int slices, int rows, int columns) {
-    throw new IllegalArgumentException("This method is not supported.");
-  }*/
-
   AbstractIntVector _viewSelectionLike(Int32List offsets) {
     throw new Error(); // should never get called
   }
 
-  Object clone() {
-    return new DelegateIntVector(_content, _row);
-  }
+  Object clone() => new DelegateIntVector(_content, _row);
 }

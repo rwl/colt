@@ -517,6 +517,7 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
   }
 
   void sortColumnIndexes() {
+    // TODO: check translation
     SparseRCDoubleMatrix T = transpose();
     SparseRCDoubleMatrix TT = T.transpose();
     _columnIndexes = TT._columnIndexes;

@@ -36,7 +36,7 @@ import '../../function/int.dart' as ifunc;
 
 import 'factory.dart' as ifactory;
 
-//import '../../math.dart' show DoubleMult, DoublePlusMultSecond, DoublePlusMultFirst, EPSILON;
+import '../../math.dart' show MAX_INT;
 
 import 'algo/algo.dart' as iprop;
 
@@ -55,6 +55,7 @@ part 'diagonal_int_matrix.dart';
 part 'sparse_cc_int_matrix.dart';
 part 'sparse_rc_int_matrix.dart';
 part 'delegate_int_vector.dart';
+part 'large_int_matrix.dart';
 
 class IntVectorLocation {
   final int value, location;
