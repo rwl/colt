@@ -10,44 +10,28 @@
 // any purpose. It is provided "as is" without expressed or implied warranty.
 part of cern.colt.matrix.int;
 
-/**
- * 2-d matrix holding <tt>int</tt> elements; either a view wrapping another
- * matrix or a matrix whose views are wrappers.
- *
- * @author wolfgang.hoschek@cern.ch
- * @version 1.0, 04/14/2000
- *
- * @author Piotr Wendykier (piotr.wendykier@gmail.com)
- */
+/// 2-d matrix holding [int] elements; either a view wrapping another
+/// matrix or a matrix whose views are wrappers.
 class WrapperIntMatrix extends AbstractIntMatrix {
+  WrapperIntMatrix._(int rows, int columns) : super(rows, columns);
 
-  /*
-   * The elements of the matrix.
-   */
   AbstractIntMatrix _content;
 
-  WrapperIntMatrix(AbstractIntMatrix newContent)
+  WrapperIntMatrix._wrap(AbstractIntMatrix newContent)
       : super(newContent.rows, newContent.columns) {
-    if (newContent != null) try {
-      _setUp(newContent.rows, newContent.columns);
-    } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
-      if ("matrix too large" != exc.message) {
-        throw exc;
-      }
-    }
-    this._content = newContent;
+    _content = newContent;
   }
 
-  void forEachWith(final AbstractIntMatrix y, final ifunc.IntIntFunction function) {
-    checkShape(y);
+  void assign(final AbstractIntMatrix y, final ifunc.IntIntFunction function) {
+    checkShape(this, y);
     if (y is WrapperIntMatrix) {
-      Int32List rowList = new Int32List();
-      Int32List columnList = new Int32List();
-      Int32List valueList = new Int32List();
-      y.nonZeros(rowList, columnList, valueList);
+      var rowList = new List();
+      var columnList = new List();
+      var valueList = new List();
+      y.nonzero(rowList, columnList, valueList);
       forEachWithRange(y, function, rowList, columnList);
     } else {
-      super.forEachWith(y, function);
+      super.assign(y, function);
     }
     return;
   }
@@ -55,30 +39,13 @@ class WrapperIntMatrix extends AbstractIntMatrix {
   void setAll(final Int32List values) {
     if (_content is DiagonalIntMatrix) {
       int dlength = (_content as DiagonalIntMatrix)._dlength;
-      final Int32List elems = (_content as DiagonalIntMatrix)._elements;
+      Int32List elems = (_content as DiagonalIntMatrix)._elements;
       if (values.length != dlength) {
         throw new ArgumentError("Must have same length: length=${values.length} dlength=$dlength");
       }
-      /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
-      if ((nthreads > 1) && (dlength >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-        nthreads = Math.min(nthreads, dlength);
-        List<Future> futures = new List<Future>(nthreads);
-        int k = dlength ~/ nthreads;
-        for (int j = 0; j < nthreads; j++) {
-          final int firstIdx = j * k;
-          final int lastIdx = (j == nthreads - 1) ? dlength : firstIdx + k;
-          futures[j] = ConcurrencyUtils.submit(() {
-            for (int i = firstIdx; i < lastIdx; i++) {
-              elems[i] = values[i];
-            }
-          });
-        }
-        ConcurrencyUtils.waitForCompletion(futures);
-      } else {*/
-        for (int i = 0; i < dlength; i++) {
-          elems[i] = values[i];
-        }
-      //}
+      for (int i = 0; i < dlength; i++) {
+        elems[i] = values[i];
+      }
       return;
     } else {
       super.setAll(values);
@@ -88,25 +55,7 @@ class WrapperIntMatrix extends AbstractIntMatrix {
 
   Object get elements => _content.elements;
 
-  int get(int row, int column) {
-    return _content.get(row, column);
-  }
-
-  bool all(int value) {
-    if (_content is DiagonalIntMatrix) {
-      Int32List elements = _content.elements as Int32List;
-      for (int r = 0; r < elements.length; r++) {
-        int x = elements[r];
-        int diff = value - x;
-        if (diff != 0) {
-          return false;
-        }
-      }
-      return true;
-    } else {
-      return super.all(value);
-    }
-  }
+  int get(int row, int column) => _content.get(row, column);
 
   bool equals(AbstractIntMatrix obj) {
     if (_content is DiagonalIntMatrix && obj is DiagonalIntMatrix) {
@@ -141,113 +90,81 @@ class WrapperIntMatrix extends AbstractIntMatrix {
     return _content.like2D(rows, columns);
   }
 
-  AbstractIntVector like1D(int size) {
-    return _content.like1D(size);
-  }
+  AbstractIntVector like1D(int size) => _content.like1D(size);
 
   void set(int row, int column, int value) {
     _content.set(row, column, value);
   }
 
-  AbstractIntVector vectorize() {
-    final IntVector v = new IntVector(length);
-    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    if ((nthreads > 1) && (length >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-      nthreads = Math.min(nthreads, _columns);
-      List<Future> futures = new List<Future>(nthreads);
-      int k = _columns ~/ nthreads;
-      for (int j = 0; j < nthreads; j++) {
-        final int firstCol = j * k;
-        final int lastCol = (j == nthreads - 1) ? _columns : firstCol + k;
-        final int firstidx = j * k * _rows;
-        futures[j] = ConcurrencyUtils.submit(() {
-          int idx = firstidx;
-          for (int c = firstCol; c < lastCol; c++) {
-            for (int r = 0; r < _rows; r++) {
-              v.set(idx++, get(r, c));
-            }
-          }
-        });
-      }
-      ConcurrencyUtils.waitForCompletion(futures);
-    } else {*/
-      int idx = 0;
-      for (int c = 0; c < _columns; c++) {
-        for (int r = 0; r < _rows; r++) {
-          v.set(idx++, get(r, c));
-        }
-      }
-    //}
-    return v;
-  }
-
-  AbstractIntVector column(int column) {
-    return dice().row(column);
-  }
+  AbstractIntVector column(int column) => dice().row(column);
 
   AbstractIntMatrix columnFlip() {
-    if (_columns == 0) return this;
-    WrapperIntMatrix view = new FlipWrapperIntMatrix2D(this);
-    view._isNoView = false;
+    if (columns == 0) {
+      return this;
+    }
+    var view = new FlipWrapperIntMatrix2D(this);
+    setIsNoView(view, false);
 
     return view;
   }
 
   AbstractIntMatrix dice() {
-    WrapperIntMatrix view = new DiceWrapperIntMatrix2D(this);
-    view._rows = _columns;
-    view._columns = _rows;
-    view._isNoView = false;
+    var view = new DiceWrapperIntMatrix2D(this);
+    setRows(view, columns);
+    setColumns(view, rows);
+    setIsNoView(view, false);
 
     return view;
   }
 
   AbstractIntMatrix part(final int row, final int column, int height, int width) {
-    _checkBox(row, column, height, width);
-    WrapperIntMatrix view = new PartWrapperIntMatrix2D(this, column, row);
-    view._rows = height;
-    view._columns = width;
-    view._isNoView = false;
+    checkBox(this, row, column, height, width);
+    var view = new PartWrapperIntMatrix2D(this, column, row);
+    setRows(view, height);
+    setColumns(view, width);
+    setIsNoView(view, false);
 
     return view;
   }
 
   AbstractIntVector row(int row) {
-    _checkRow(row);
+    checkRow(this, row);
     return new DelegateIntVector(this, row);
   }
 
   AbstractIntMatrix rowFlip() {
-    if (_rows == 0) return this;
-    WrapperIntMatrix view = new RowFlipWrapperIntMatrix2D(this);
-    view._isNoView = false;
+    if (rows == 0) {
+      return this;
+    }
+    var view = new RowFlipWrapperIntMatrix2D(this);
+    setIsNoView(view, false);
     return view;
   }
 
   AbstractIntMatrix select(Int32List rowIndexes, Int32List columnIndexes) {
     // check for "all"
     if (rowIndexes == null) {
-      rowIndexes = new Int32List(_rows);
-      for (int i = _rows; --i >= 0; ) {
+      rowIndexes = new Int32List(rows);
+      for (int i = rows; --i >= 0; ) {
         rowIndexes[i] = i;
       }
     }
     if (columnIndexes == null) {
-      columnIndexes = new Int32List(_columns);
-      for (int i = _columns; --i >= 0; ) {
+      columnIndexes = new Int32List(columns);
+      for (int i = columns; --i >= 0; ) {
         columnIndexes[i] = i;
       }
     }
 
-    _checkRowIndexes(rowIndexes);
-    _checkColumnIndexes(columnIndexes);
-    final Int32List rix = new Int32List.fromList(rowIndexes);
-    final Int32List cix = new Int32List.fromList(columnIndexes);
+    checkRowIndexes(this, rowIndexes);
+    checkColumnIndexes(this, columnIndexes);
+    var rix = new Int32List.fromList(rowIndexes);
+    var cix = new Int32List.fromList(columnIndexes);
 
-    WrapperIntMatrix view = new SelectWrapperIntMatrix2D(this, cix, rix);
-    view._rows = rowIndexes.length;
-    view._columns = columnIndexes.length;
-    view._isNoView = false;
+    var view = new SelectWrapperIntMatrix2D(this, cix, rix);
+    setRows(view, rowIndexes.length);
+    setColumns(view, columnIndexes.length);
+    setIsNoView(view, false);
 
     return view;
   }
@@ -256,21 +173,19 @@ class WrapperIntMatrix extends AbstractIntMatrix {
     if (_rowStride <= 0 || _columnStride <= 0) {
       throw new RangeError("illegal stride");
     }
-    WrapperIntMatrix view = new StridesWrapperIntMatrix2D(this);
-    if (_rows != 0) {
-      view._rows = (_rows - 1) ~/ _rowStride + 1;
+    var view = new StridesWrapperIntMatrix2D(this);
+    if (rows != 0) {
+      setRows(view, (rows - 1) ~/ _rowStride + 1);
     }
-    if (_columns != 0) {
-      view._columns = (_columns - 1) ~/ _columnStride + 1;
+    if (columns != 0) {
+      setColumns(view, (columns - 1) ~/ _columnStride + 1);
     }
-    view._isNoView = false;
+    setIsNoView(view, false);
 
     return view;
   }
 
-  AbstractIntMatrix _getContent() {
-    return _content;
-  }
+  AbstractIntMatrix _getContent() => _content;
 
   AbstractIntVector _like1D(int size, int offset, int stride) {
     throw new Error(); // should never get called
@@ -280,166 +195,127 @@ class WrapperIntMatrix extends AbstractIntMatrix {
     throw new Error(); // should never be called
   }
 
-  Object clone() {
-    return new WrapperIntMatrix(_content);
-  }
+  Object clone() => new WrapperIntMatrix._wrap(_content);
 }
 
 class StridesWrapperIntMatrix2D extends WrapperIntMatrix {
 
-  StridesWrapperIntMatrix2D(AbstractIntMatrix newContent) : super(newContent);
+  StridesWrapperIntMatrix2D(AbstractIntMatrix newContent) : super._wrap(newContent);
 
   int get(int row, int column) {
-    return _content.get(_rowStride * row, _columnStride * column);
+    return _content.get(rowStride * row, columnStride * column);
   }
 
   void set(int row, int column, int value) {
-    _content.set(_rowStride * row, _columnStride * column, value);
+    _content.set(rowStride * row, columnStride * column, value);
   }
 
   int at(int row, int column) {
-    return _content.at(_rowStride * row, _columnStride * column);
+    return _content.at(rowStride * row, columnStride * column);
   }
 
   void put(int row, int column, int value) {
-    _content.put(_rowStride * row, _columnStride * column, value);
+    _content.put(rowStride * row, columnStride * column, value);
   }
 
-  Object clone() {
-    return new StridesWrapperIntMatrix2D(_content);
-  }
+  Object clone() => new StridesWrapperIntMatrix2D(_content);
 }
 
 class SelectWrapperIntMatrix2D extends WrapperIntMatrix {
   final Int32List cix;
   final Int32List rix;
 
-  SelectWrapperIntMatrix2D(AbstractIntMatrix newContent, Int32List cix, Int32List rix) : super(newContent),
+  SelectWrapperIntMatrix2D(AbstractIntMatrix newContent, Int32List cix, Int32List rix) : super._wrap(newContent),
     cix = cix,
     rix = rix;
 
-  int get(int i, int j) {
-    return _content.get(rix[i], cix[j]);
-  }
+  int get(int i, int j) => _content.get(rix[i], cix[j]);
 
-  void set(int i, int j, int value) {
-    _content.set(rix[i], cix[j], value);
-  }
+  void set(int i, int j, int value) => _content.set(rix[i], cix[j], value);
 
-  int at(int i, int j) {
-    return _content.at(rix[i], cix[j]);
-  }
+  int at(int i, int j) => _content.at(rix[i], cix[j]);
 
-  void put(int i, int j, int value) {
-    _content.put(rix[i], cix[j], value);
-  }
+  void put(int i, int j, int value) => _content.put(rix[i], cix[j], value);
 
-  Object clone() {
-    return new SelectWrapperIntMatrix2D(_content, cix, rix);
-  }
+  Object clone() => new SelectWrapperIntMatrix2D(_content, cix, rix);
 }
 
 class RowFlipWrapperIntMatrix2D extends WrapperIntMatrix {
 
-  RowFlipWrapperIntMatrix2D(AbstractIntMatrix newContent) : super(newContent);
+  RowFlipWrapperIntMatrix2D(AbstractIntMatrix newContent) : super._wrap(newContent);
 
-  int get(int row, int column) {
-    return _content.get(_rows - 1 - row, column);
-  }
+  int get(int row, int column) => _content.get(rows - 1 - row, column);
 
   void set(int row, int column, int value) {
-    _content.set(_rows - 1 - row, column, value);
+    _content.set(rows - 1 - row, column, value);
   }
 
-  int at(int row, int column) {
-    return _content.at(_rows - 1 - row, column);
-  }
+  int at(int row, int column) => _content.at(rows - 1 - row, column);
 
   void put(int row, int column, int value) {
-    _content.put(_rows - 1 - row, column, value);
+    _content.put(rows - 1 - row, column, value);
   }
 
-  Object clone() {
-    return new RowFlipWrapperIntMatrix2D(_content);
-  }
+  Object clone() => new RowFlipWrapperIntMatrix2D(_content);
 }
 
 class PartWrapperIntMatrix2D extends WrapperIntMatrix {
   final int __column;
   final int __row;
 
-  PartWrapperIntMatrix2D(AbstractIntMatrix newContent, int column, int row) : super(newContent),
+  PartWrapperIntMatrix2D(AbstractIntMatrix newContent, int column, int row) : super._wrap(newContent),
     __column = column,
     __row = row;
 
-
-  int get(int i, int j) {
-    return _content.get(__row + i, __column + j);
-  }
+  int get(int i, int j) => _content.get(__row + i, __column + j);
 
   void set(int i, int j, int value) {
     _content.set(__row + i, __column + j, value);
   }
 
-  int at(int i, int j) {
-    return _content.at(__row + i, __column + j);
-  }
+  int at(int i, int j) => _content.at(__row + i, __column + j);
 
   void put(int i, int j, int value) {
     _content.put(__row + i, __column + j, value);
   }
 
-  Object clone() {
-    return new PartWrapperIntMatrix2D(_content, __column, __row);
-  }
+  Object clone() => new PartWrapperIntMatrix2D(_content, __column, __row);
 }
 
 class DiceWrapperIntMatrix2D extends WrapperIntMatrix {
 
-  DiceWrapperIntMatrix2D(AbstractIntMatrix newContent) : super(newContent);
+  DiceWrapperIntMatrix2D(AbstractIntMatrix newContent) : super._wrap(newContent);
 
-  int get(int row, int column) {
-    return _content.get(column, row);
-  }
+  int get(int row, int column) => _content.get(column, row);
 
   void set(int row, int column, int value) {
     _content.set(column, row, value);
   }
 
-  int at(int row, int column) {
-    return _content.at(column, row);
-  }
+  int at(int row, int column) => _content.at(column, row);
 
   void put(int row, int column, int value) {
     _content.put(column, row, value);
   }
 
-  Object clone() {
-    return new DiceWrapperIntMatrix2D(_content);
-  }
+  Object clone() => new DiceWrapperIntMatrix2D(_content);
 }
 
 class FlipWrapperIntMatrix2D extends WrapperIntMatrix {
 
-  FlipWrapperIntMatrix2D(AbstractIntMatrix newContent) : super(newContent);
+  FlipWrapperIntMatrix2D(AbstractIntMatrix newContent) : super._wrap(newContent);
 
-  int get(int row, int column) {
-    return _content.get(row, _columns - 1 - column);
-  }
+  int get(int row, int column) => _content.get(row, columns - 1 - column);
 
   void set(int row, int column, int value) {
-    _content.set(row, _columns - 1 - column, value);
+    _content.set(row, columns - 1 - column, value);
   }
 
-  int at(int row, int column) {
-    return _content.at(row, _columns - 1 - column);
-  }
+  int at(int row, int column) => _content.at(row, columns - 1 - column);
 
   void put(int row, int column, int value) {
-    _content.put(row, _columns - 1 - column, value);
+    _content.put(row, columns - 1 - column, value);
   }
 
-  Object clone() {
-    return new FlipWrapperIntMatrix2D(_content);
-  }
+  Object clone() => new FlipWrapperIntMatrix2D(_content);
 }

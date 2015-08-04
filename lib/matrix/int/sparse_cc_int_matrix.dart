@@ -183,7 +183,7 @@ class SparseCCIntMatrix extends WrapperIntMatrix {
     return new SparseCCIntMatrix._internal(rows, columns, rowIndexes, columnPointers, values);
   }
 
-  SparseCCIntMatrix._internal(int rows, int columns, Int32List rowIndexes, Int32List columnPointers, Int32List values) : super(null) {
+  SparseCCIntMatrix._internal(int rows, int columns, Int32List rowIndexes, Int32List columnPointers, Int32List values) : super._(rows, columns) {
     try {
       _setUp(rows, columns);
     } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !

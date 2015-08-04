@@ -345,7 +345,7 @@ class SparseRCIntMatrix extends WrapperIntMatrix {
    * @param values
    *            numerical values
    */
-  SparseRCIntMatrix._internal(int rows, int columns, Int32List rowPointers, Int32List columnIndexes, Int32List values) : super(null) {
+  SparseRCIntMatrix._internal(int rows, int columns, Int32List rowPointers, Int32List columnIndexes, Int32List values) : super._(rows, columns) {
     try {
       _setUp(rows, columns);
     } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !

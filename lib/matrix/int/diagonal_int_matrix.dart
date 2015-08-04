@@ -73,7 +73,7 @@ class DiagonalIntMatrix extends WrapperIntMatrix {
    * @throws ArgumentError
    *             if <tt>size<0 (int)size > Integer.MAX_VALUE</tt>.
    */
-  DiagonalIntMatrix(int rows, int columns, int dindex) : super(null) {
+  DiagonalIntMatrix(int rows, int columns, int dindex) : super._(rows, columns) {
     try {
       _setUp(rows, columns);
     } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !

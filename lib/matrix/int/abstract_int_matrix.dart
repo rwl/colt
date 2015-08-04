@@ -12,9 +12,8 @@ part of cern.colt.matrix.int;
 
 /// Abstract base class for 2-d matrices holding [int] elements.
 abstract class AbstractIntMatrix extends AbstractMatrix {
-  AbstractIntMatrix(int rows, int columns, [int rowZero = 0,
-      int columnZero = 0, int rowStride = null, int columnStride = 1,
-      bool isNoView = true])
+  AbstractIntMatrix(int rows, int columns, [int rowZero = 0, int columnZero = 0,
+      int rowStride = null, int columnStride = 1, bool isNoView = true])
       : super(rows, columns, rowZero, columnZero, rowStride, columnStride,
           isNoView);
 
@@ -84,7 +83,8 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
   /// have to be stored in a row-wise order.
   void setAll(final Int32List values) {
     if (values.length != rows * columns) {
-      throw new ArgumentError("Must have same length: length=${values.length} rows()*columns()=${rows * columns}");
+      throw new ArgumentError("Must have same length: length=${values.length} "
+          "rows()*columns()=${rows * columns}");
     }
     int idx = 0;
     for (int r = 0; r < rows; r++) {
@@ -208,7 +208,8 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
   /// the specified lists. Fills into the lists, starting at index 0. After
   /// this call returns the specified lists all have a new size, the number
   /// of negative values.
-  void negative(final Int32List rowList, final Int32List columnList, final Int32List valueList) {
+  void negative(final Int32List rowList, final Int32List columnList,
+      final Int32List valueList) {
     rowList.clear();
     columnList.clear();
     valueList.clear();
@@ -241,7 +242,8 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
   ///     valueList  = (8,7)
   ///
   /// In other words, `get(0,2) == 8, get(1,1) == 7`.
-  void nonzero(final Int32List rowList, final Int32List columnList, final Int32List valueList) {
+  void nonzero(final Int32List rowList, final Int32List columnList,
+      final Int32List valueList) {
     rowList.clear();
     columnList.clear();
     valueList.clear();
@@ -261,7 +263,8 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
   /// the specified lists. Fills into the lists, starting at index 0. After
   /// this call returns the specified lists all have a new size, the number
   /// of positive values.
-  void positive(final Int32List rowList, final Int32List columnList, final Int32List valueList) {
+  void positive(final Int32List rowList, final Int32List columnList,
+      final Int32List valueList) {
     rowList.clear();
     columnList.clear();
     valueList.clear();
@@ -418,374 +421,138 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
     return v;
   }
 
-  /**
-   * Constructs and returns a new <i>dice (transposition) view</i>; Swaps
-   * axes; example: 3 x 4 matrix --> 4 x 3 matrix. The view has both
-   * dimensions exchanged; what used to be columns become rows, what used to
-   * be rows become columns. In other words:
-   * `view.get(row,column)==this.get(column,row)`. This is a zero-copy
-   * transposition, taking O(1), i.e. constant time. The returned view is
-   * backed by this matrix, so changes in the returned view are reflected in
-   * this matrix, and vice-versa. Use idioms like
-   * `result = viewDice(A).copy()` to generate an independent
-   * transposed matrix.
-   * <p>
-   * <b>Example:</b>
-   * <table border="0">
-   * <tr nowrap>
-   * <td valign="top">2 x 3 matrix: <br>
-   * 1, 2, 3<br>
-   * 4, 5, 6</td>
-   * <td>transpose ==></td>
-   * <td valign="top">3 x 2 matrix:<br>
-   * 1, 4 <br>
-   * 2, 5 <br>
-   * 3, 6</td>
-   * <td>transpose ==></td>
-   * <td valign="top">2 x 3 matrix: <br>
-   * 1, 2, 3<br>
-   * 4, 5, 6</td>
-   * </tr>
-   * </table>
-   *
-   * @return a new dice view.
-   */
+  /// Constructs and returns a new *dice (transposition) view*; Swaps
+  /// axes; example: 3 x 4 matrix --> 4 x 3 matrix.
+  ///
+  /// Example:
+  ///     2 x 3 matrix:
+  ///     1, 2, 3
+  ///     4, 5, 6
+  ///     transpose ==>
+  ///     3 x 2 matrix:
+  ///     1, 4
+  ///     2, 5
+  ///     3, 6
+  ///     transpose ==>
+  ///     2 x 3 matrix:
+  ///     1, 2, 3
+  ///     4, 5, 6
   AbstractIntMatrix dice() {
-    return _view().._vDice();
+    var v = _view();
+    vDice(v);
+    return v;
   }
 
-  /**
-   * Constructs and returns a new <i>sub-range view</i> that is a
-   * `height x width` sub matrix starting at `[row,column]`.
-   *
-   * Operations on the returned view can only be applied to the restricted
-   * range. Any attempt to access coordinates not contained in the view will
-   * throw an `IndexOutOfBoundsException`.
-   * <p>
-   * <b>Note that the view is really just a range restriction:</b> The
-   * returned matrix is backed by this matrix, so changes in the returned
-   * matrix are reflected in this matrix, and vice-versa.
-   * <p>
-   * The view contains the cells from `[row,column]` to
-   * `[row+height-1,column+width-1]`, all inclusive. and has
-   * `view.rows() == height; view.columns() == width;`. A view's legal
-   * coordinates are again zero based, as usual. In other words, legal
-   * coordinates of the view range from `[0,0]` to
-   * `[view.rows()-1==height-1,view.columns()-1==width-1]`. As usual,
-   * any attempt to access a cell at a coordinate
-   * `column&lt;0 || column&gt;=view.columns() || row&lt;0 || row&gt;=view.rows()`
-   * will throw an `IndexOutOfBoundsException`.
-   *
-   * @param row
-   *            The index of the row-coordinate.
-   * @param column
-   *            The index of the column-coordinate.
-   * @param height
-   *            The height of the box.
-   * @param width
-   *            The width of the box.
-   * @throws IndexOutOfBoundsException
-   *             if
-   *             `column<0 || width<0 || column+width>columns() || row<0 || height<0 || row+height>rows()`
-   * @return the new view.
-   *
-   */
+  /// Constructs and returns a new *sub-range view* that is a
+  /// `height x width` sub matrix starting at `[row,column]`.
   AbstractIntMatrix part(int row, int column, int height, int width) {
-    return _view().._vPart(row, column, height, width);
+    var v = _view();
+    vBox(v, row, column, height, width);
+    return v;
   }
 
-  /**
-   * Constructs and returns a new <i>slice view</i> representing the columns
-   * of the given row. The returned view is backed by this matrix, so changes
-   * in the returned view are reflected in this matrix, and vice-versa. To
-   * obtain a slice view on subranges, construct a sub-ranging view (
-   * `viewPart(...)`), then apply this method to the sub-range view.
-   * <p>
-   * <b>Example:</b>
-   * <table border="0">
-   * <tr nowrap>
-   * <td valign="top">2 x 3 matrix: <br>
-   * 1, 2, 3<br>
-   * 4, 5, 6</td>
-   * <td>viewRow(0) ==></td>
-   * <td valign="top">Vector of size 3:<br>
-   * 1, 2, 3</td>
-   * </tr>
-   * </table>
-   *
-   * @param row
-   *            the row to fix.
-   * @return a new slice view.
-   * @throws IndexOutOfBoundsException
-   *             if `row < 0 || row >= rows()`.
-   * @see #column(int)
-   */
+  /// Constructs and returns a new *slice view* representing the columns
+  /// of the given row.
+  ///
+  /// Example:
+  ///     2 x 3 matrix:
+  ///     1, 2, 3
+  ///     4, 5, 6
+  ///     row(0) ==>
+  ///     Vector of size 3:
+  ///     1, 2, 3
   AbstractIntVector row(int row) {
-    _checkRow(row);
-    int viewSize = this._columns;
+    checkRow(this, row);
+    int viewSize = columns;
     int viewZero = index(row, 0);
-    int viewStride = this._columnStride;
+    int viewStride = columnStride;
     return _like1D(viewSize, viewZero, viewStride);
   }
 
-  /**
-   * Constructs and returns a new <i>flip view</i> aint the row axis. What
-   * used to be row `0` is now row `rows()-1`, ..., what used to
-   * be row `rows()-1` is now row `0`. The returned view is
-   * backed by this matrix, so changes in the returned view are reflected in
-   * this matrix, and vice-versa.
-   * <p>
-   * <b>Example:</b>
-   * <table border="0">
-   * <tr nowrap>
-   * <td valign="top">2 x 3 matrix: <br>
-   * 1, 2, 3<br>
-   * 4, 5, 6</td>
-   * <td>rowFlip ==></td>
-   * <td valign="top">2 x 3 matrix:<br>
-   * 4, 5, 6 <br>
-   * 1, 2, 3</td>
-   * <td>rowFlip ==></td>
-   * <td valign="top">2 x 3 matrix: <br>
-   * 1, 2, 3<br>
-   * 4, 5, 6</td>
-   * </tr>
-   * </table>
-   *
-   * @return a new flip view.
-   * @see #columnFlip()
-   */
+  /// Constructs and returns a new *flip view* aint the row axis. What
+  /// used to be row `0` is now row `rows()-1`.
+  ///
+  /// Example:
+  ///     2 x 3 matrix:
+  ///     1, 2, 3
+  ///     4, 5, 6
+  ///     rowFlip ==>
+  ///     2 x 3 matrix:
+  ///     4, 5, 6
+  ///     1, 2, 3
+  ///     rowFlip ==>
+  ///     2 x 3 matrix:
+  ///     1, 2, 3
+  ///     4, 5, 6
   AbstractIntMatrix rowFlip() {
-    return _view().._vRowFlip();
+    var v = _view();
+    vRowFlip(v);
+    return v;
   }
 
-  /**
-   * Constructs and returns a new <i>selection view</i> that is a matrix
-   * holding all <b>rows</b> matching the given condition. Applies the
-   * condition to each row and takes only those row where
-   * `condition(viewRow(i))` yields `true`. To match
-   * columns, use a dice view.
-   * <p>
-   * <b>Example:</b> <br>
-   *
-   * <pre>
-   *   // extract and view all rows which have a value &lt; threshold in the first column (representing &quot;age&quot;)
-   *   final int threshold = 16;
-   *   matrix.viewSelection(
-   *      new IntVectorProcedure() {
-   *         final bool apply(IntVector m) { return m.get(0) &lt; threshold; }
-   *      }
-   *   );
-   *
-   *   // extract and view all rows with RMS &lt; threshold
-   *   // The RMS (Root-Mean-Square) is a measure of the average &quot;size&quot; of the elements of a data sequence.
-   *   matrix = 0 1 2 3
-   *   final int threshold = 0.5;
-   *   matrix.viewSelection(
-   *      new IntVectorProcedure() {
-   *         final bool apply(IntVector m) { return Math.sqrt(m.aggregate(F.plus,F.square) / m.length) &lt; threshold; }
-   *      }
-   *   );
-   *
-   * </pre>
-   *
-   * For further examples, see the <a
-   * href="package-summary.html#FunctionObjects">package doc</a>. The returned
-   * view is backed by this matrix, so changes in the returned view are
-   * reflected in this matrix, and vice-versa.
-   *
-   * @param condition
-   *            The condition to be matched.
-   * @return the new view.
-   */
-  AbstractIntMatrix where(IntVectorProcedure condition) {
-    var matches = <int>[];
-    for (int i = 0; i < _rows; i++) {
-      if (condition(row(i))) {
-        matches.add(i);
-      }
-    }
-
-    //matches.trimToSize();
-    return select(new Int32List.fromList(matches), null); // take all columns
-  }
-
-  /**
-   * Constructs and returns a new <i>selection view</i> that is a matrix
-   * holding the indicated cells. There holds
-   * `view.rows() == rowIndexes.length, view.columns() == columnIndexes.length`
-   * and `view.get(i,j) == this.get(rowIndexes[i],columnIndexes[j])`.
-   * Indexes can occur multiple times and can be in arbitrary order.
-   * <p>
-   * <b>Example:</b>
-   *
-   * <pre>
-   *   this = 2 x 3 matrix:
-   *   1, 2, 3
-   *   4, 5, 6
-   *   rowIndexes     = (0,1)
-   *   columnIndexes  = (1,0,1,0)
-   *   --&gt;
-   *   view = 2 x 4 matrix:
-   *   2, 1, 2, 1
-   *   5, 4, 5, 4
-   *
-   * </pre>
-   *
-   * Note that modifying the index arguments after this call has returned has
-   * no effect on the view. The returned view is backed by this matrix, so
-   * changes in the returned view are reflected in this matrix, and
-   * vice-versa.
-   * <p>
-   * To indicate "all" rows or "all columns", simply set the respective
-   * parameter
-   *
-   * @param rowIndexes
-   *            The rows of the cells that shall be visible in the new view.
-   *            To indicate that <i>all</i> rows shall be visible, simply set
-   *            this parameter to `null`.
-   * @param columnIndexes
-   *            The columns of the cells that shall be visible in the new
-   *            view. To indicate that <i>all</i> columns shall be visible,
-   *            simply set this parameter to `null`.
-   * @return the new view.
-   * @throws IndexOutOfBoundsException
-   *             if `!(0 <= rowIndexes[i] < rows())` for any
-   *             `i=0..rowIndexes.length()-1`.
-   * @throws IndexOutOfBoundsException
-   *             if `!(0 <= columnIndexes[i] < columns())` for any
-   *             `i=0..columnIndexes.length()-1`.
-   */
+  /// Constructs and returns a new *selection view* that is a matrix
+  /// holding the indicated cells. Indexes can occur multiple times and
+  /// can be in arbitrary order.
+  ///
+  /// Example:
+  ///     2 x 3 matrix:
+  ///     1, 2, 3
+  ///     4, 5, 6
+  ///     rowIndexes     = (0,1)
+  ///     columnIndexes  = (1,0,1,0)
+  ///     -->
+  ///     view = 2 x 4 matrix:
+  ///     2, 1, 2, 1
+  ///     5, 4, 5, 4
+  ///
+  /// To indicate "all" rows or "all columns", simply set the respective
+  /// parameter
   AbstractIntMatrix select(Int32List rowIndexes, Int32List columnIndexes) {
     // check for "all"
     if (rowIndexes == null) {
-      rowIndexes = new Int32List(_rows);
-      for (int i = 0; i < _rows; i++) {
+      rowIndexes = new Int32List(rows);
+      for (int i = 0; i < rows; i++) {
         rowIndexes[i] = i;
       }
     }
     if (columnIndexes == null) {
-      columnIndexes = new Int32List(_columns);
-      for (int i = 0; i < _columns; i++) {
+      columnIndexes = new Int32List(columns);
+      for (int i = 0; i < columns; i++) {
         columnIndexes[i] = i;
       }
     }
 
-    _checkRowIndexes(rowIndexes);
-    _checkColumnIndexes(columnIndexes);
-    Int32List rowOffsets = new Int32List(rowIndexes.length);
-    Int32List columnOffsets = new Int32List(columnIndexes.length);
+    checkRowIndexes(this, rowIndexes);
+    checkColumnIndexes(this, columnIndexes);
+    var rowOffsets = new Int32List(rowIndexes.length);
+    var columnOffsets = new Int32List(columnIndexes.length);
     for (int i = 0; i < rowIndexes.length; i++) {
-      rowOffsets[i] = _rowOffset(_rowRank(rowIndexes[i]));
+      rowOffsets[i] = rowOffset(rowRank(rowIndexes[i]));
     }
     for (int i = 0; i < columnIndexes.length; i++) {
-      columnOffsets[i] = _columnOffset(_columnRank(columnIndexes[i]));
+      columnOffsets[i] = columnOffset(columnRank(columnIndexes[i]));
     }
     return _viewSelectionLike(rowOffsets, columnOffsets);
   }
 
-  AbstractIntMatrix selectIterable(Iterable<Int32List> indexes) {
-    int n = indexes.length;
-    Int32List rowIndexes = new Int32List(n);
-    Int32List columnIndexes = new Int32List(n);
-    int idx = 0;
-    for (Iterator<Int32List> iterator = indexes.iterator; iterator.current != null; ) {
-      iterator.moveNext();
-      Int32List is_ = iterator.current;
-      rowIndexes[idx] = is_[0];
-      columnIndexes[idx] = is_[1];
-      idx++;
-    }
-    _checkRowIndexes(rowIndexes);
-    _checkColumnIndexes(columnIndexes);
-    Int32List rowOffsets = new Int32List(rowIndexes.length);
-    Int32List columnOffsets = new Int32List(columnIndexes.length);
-    for (int i = 0; i < rowIndexes.length; i++) {
-      rowOffsets[i] = _rowOffset(_rowRank(rowIndexes[i]));
-    }
-    for (int i = 0; i < columnIndexes.length; i++) {
-      columnOffsets[i] = _columnOffset(_columnRank(columnIndexes[i]));
-    }
-    return _viewSelectionLike(rowOffsets, columnOffsets);
-  }
+  /// Construct and returns a new selection view.
+  AbstractIntMatrix _viewSelectionLike(
+      Int32List rowOffsets, Int32List columnOffsets);
 
-  /**
-   * Construct and returns a new selection view.
-   *
-   * @param rowOffsets
-   *            the offsets of the visible elements.
-   * @param columnOffsets
-   *            the offsets of the visible elements.
-   * @return a new view.
-   */
-  AbstractIntMatrix _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets);
-
-  /**
-   * Sorts the matrix rows into ascending order, according to the <i>natural
-   * ordering</i> of the matrix values in the given column. This sort is
-   * guaranteed to be <i>stable</i>. For further information, see
-   * {@link IntSorting#sort(IntMatrix,int)}. For
-   * more advanced sorting functionality, see
-   * {@link IntSorting}.
-   *
-   * @return a new sorted vector (matrix) view.
-   * @throws IndexOutOfBoundsException
-   *             if `column < 0 || column >= columns()`.
-   */
-  /*IntMatrix sorted(int column) {
-    return IntSorting.mergeSort.sort(this, column);
-  }*/
-
-  /**
-   * Constructs and returns a new <i>stride view</i> which is a sub matrix
-   * consisting of every i-th cell. More specifically, the view has
-   * `this.rows()/rowStride` rows and
-   * `this.columns()/columnStride` columns holding cells
-   * `this.get(i*rowStride,j*columnStride)` for all
-   * `i = 0..rows()/rowStride - 1, j = 0..columns()/columnStride - 1`.
-   * The returned view is backed by this matrix, so changes in the returned
-   * view are reflected in this matrix, and vice-versa.
-   *
-   * @param rowStride
-   *            the row step factor.
-   * @param columnStride
-   *            the column step factor.
-   * @return a new view.
-   * @throws IndexOutOfBoundsException
-   *             if `rowStride<=0 || columnStride<=0`.
-   */
+  /// Constructs and returns a new *stride view* which is a sub matrix
+  /// consisting of every i-th cell.
   AbstractIntMatrix strides(int rowStride, int columnStride) {
-    return _view().._vStrides(rowStride, columnStride);
+    var v = _view();
+    vStrides(v, rowStride, columnStride);
+    return v;
   }
 
-  /**
-   * Linear algebraic matrix-vector multiplication; `z = A * y`;
-   * Equivalent to `return A.zMult(y,z,1,0);`
-   */
-  /*IntVector mult(IntVector y, IntVector z) {
-      return mult(y, z, 1, (z == null ? 1 : 0), false);
-  }*/
-
-  /**
-   * Linear algebraic matrix-vector multiplication;
-   * `z = alpha * A * y + beta*z`.
-   * `z[i] = alpha*Sum(A[i,j] * y[j]) + beta*z[i], i=0..A.rows()-1, j=0..y.length-1`
-   * . Where `A == this`. <br>
-   * Note: Matrix shape conformance is checked <i>after</i> potential
-   * transpositions.
-   *
-   * @param y
-   *            the source vector.
-   * @param z
-   *            the vector where results are to be stored. Set this parameter
-   *            to `null` to indicate that a new result vector shall be
-   *            constructed.
-   * @return z (for convenience only).
-   *
-   * @throws ArgumentError
-   *             if `A.columns() != y.length || A.rows() > z.length)`.
-   */
-  AbstractIntVector mult(final AbstractIntVector y, [AbstractIntVector z = null, final int alpha = 1, int beta = null, final bool transposeA = false]) {
+  /// Linear algebraic matrix-vector multiplication;
+  /// `z = alpha * A * y + beta*z`.
+  /// `z[i] = alpha*Sum(A[i,j] * y[j]) + beta*z[i], i=0..A.rows()-1, j=0..y.length-1`.
+  /// Where `A == this`.
+  AbstractIntVector mult(final AbstractIntVector y, [AbstractIntVector z = null,
+      final int alpha = 1, int beta = null, final bool transposeA = false]) {
     if (beta == null) {
       beta = z == null ? 1 : 0;
     }
@@ -794,79 +561,36 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
     }
     AbstractIntVector z_loc;
     if (z == null) {
-      z_loc = new IntVector(this._rows);
+      z_loc = new IntVector(rows);
     } else {
       z_loc = z;
     }
-    if (_columns != y.length || _rows > z_loc.length) {
-      throw new ArgumentError("Incompatible args: " + toStringShort() + ", " + y.toStringShort() + ", " + z_loc.toStringShort());
+    if (columns != y.size || rows > z_loc.size) {
+      throw new ArgumentError("Incompatible args: " +
+          toStringShort() +
+          ", " +
+          y.toStringShort() +
+          ", " +
+          z_loc.toStringShort());
     }
 
-    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-      nthreads = Math.min(nthreads, _rows);
-      List<Future> futures = new List<Future>(nthreads);
-      int k = _rows / nthreads;
-      for (int j = 0; j < nthreads; j++) {
-        final int firstRow = j * k;
-        final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
-
-        futures[j] = ConcurrencyUtils.submit(() {
-          for (int r = firstRow; r < lastRow; r++) {
-            int s = 0;
-            for (int c = 0; c < _columns; c++) {
-              s += get(r, c) * y.get(c);
-            }
-            z_loc.set(r, alpha * s + beta * z_loc.get(r));
-          }
-        });
+    for (int r = 0; r < rows; r++) {
+      int s = 0;
+      for (int c = 0; c < columns; c++) {
+        s += get(r, c) * y.get(c);
       }
-      ConcurrencyUtils.waitForCompletion(futures);
-    } else {*/
-      for (int r = 0; r < _rows; r++) {
-        int s = 0;
-        for (int c = 0; c < _columns; c++) {
-          s += get(r, c) * y.get(c);
-        }
-        z_loc.set(r, alpha * s + beta * z_loc.get(r));
-      }
-    //}
+      z_loc.set(r, alpha * s + beta * z_loc.get(r));
+    }
     return z_loc;
   }
 
-  /**
-   * Linear algebraic matrix-matrix multiplication; `C = A x B`;
-   * Equivalent to `A.zMult(B,C,1,0,false,false)`.
-   */
-  /*IntMatrix multiply(IntMatrix B, IntMatrix C) {
-        return multiply(B, C, 1, (C == null ? 1 : 0), false, false);
-    }*/
-
-  /**
-   * Linear algebraic matrix-matrix multiplication;
-   * `C = alpha * A x B + beta*C`.
-   * `C[i,j] = alpha*Sum(A[i,k] * B[k,j]) + beta*C[i,j], k=0..n-1`. <br>
-   * Matrix shapes: `A(m x n), B(n x p), C(m x p)`. <br>
-   * Note: Matrix shape conformance is checked <i>after</i> potential
-   * transpositions.
-   *
-   * @param B
-   *            the second source matrix.
-   * @param C
-   *            the matrix where results are to be stored. Set this parameter
-   *            to `null` to indicate that a new result matrix shall be
-   *            constructed.
-   * @return C (for convenience only).
-   *
-   * @throws ArgumentError
-   *             if `B.rows() != A.columns()`.
-   * @throws ArgumentError
-   *             if
-   *             `C.rows() != A.rows() || C.columns() != B.columns()`.
-   * @throws ArgumentError
-   *             if `A == C || B == C`.
-   */
-  AbstractIntMatrix multiply(final AbstractIntMatrix B, [AbstractIntMatrix C = null, final int alpha = 1, int beta = null, final bool transposeA = false, final bool transposeB = false]) {
+  /// Linear algebraic matrix-matrix multiplication;
+  /// `C = alpha * A x B + beta*C`.
+  /// `C[i,j] = alpha*Sum(A[i,k] * B[k,j]) + beta*C[i,j], k=0..n-1`.
+  /// Matrix shapes: `A(m x n), B(n x p), C(m x p)`.
+  AbstractIntMatrix multiply(final AbstractIntMatrix B,
+      [AbstractIntMatrix C = null, final int alpha = 1, int beta = null,
+      final bool transposeA = false, final bool transposeB = false]) {
     if (beta == null) {
       beta = C == null ? 1 : 0;
     }
@@ -874,72 +598,55 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
       return dice().multiply(B, C, alpha, beta, false, transposeB);
     }
     if (transposeB) {
-      return this.multiply(B.dice(), C, alpha, beta, transposeA, false);
+      return multiply(B.dice(), C, alpha, beta, transposeA, false);
     }
 
-    final int m = _rows;
-    final int n = _columns;
-    final int p = B._columns;
+    int m = rows;
+    int n = columns;
+    int p = B.columns;
     AbstractIntMatrix C_loc;
     if (C == null) {
       C_loc = new IntMatrix(m, p);
     } else {
       C_loc = C;
     }
-    if (B._rows != n) {
-      throw new ArgumentError("Matrix inner dimensions must agree:" + toStringShort() + ", " + B.toStringShort());
+    if (B.rows != n) {
+      throw new ArgumentError("Matrix inner dimensions must agree:" +
+          toStringShort() +
+          ", " +
+          B.toStringShort());
     }
-    if (C_loc._rows != m || C_loc._columns != p) {
-      throw new ArgumentError("Incompatibe result matrix: " + toStringShort() + ", " + B.toStringShort() + ", " + C_loc.toStringShort());
+    if (C_loc.rows != m || C_loc.columns != p) {
+      throw new ArgumentError("Incompatibe result matrix: " +
+          toStringShort() +
+          ", " +
+          B.toStringShort() +
+          ", " +
+          C_loc.toStringShort());
     }
     if (this == C_loc || B == C_loc) {
       throw new ArgumentError("Matrices must not be identical");
     }
-    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-      nthreads = Math.min(nthreads, p);
-      List<Future> futures = new List<Future>(nthreads);
-      int k = p / nthreads;
-      for (int j = 0; j < nthreads; j++) {
-        final int firstIdx = j * k;
-        final int lastIdx = (j == nthreads - 1) ? p : firstIdx + k;
-        futures[j] = ConcurrencyUtils.submit(() {
-          for (int a = firstIdx; a < lastIdx; a++) {
-            for (int b = 0; b < m; b++) {
-              int s = 0;
-              for (int c = 0; c < n; c++) {
-                s += get(b, c) * B.get(c, a);
-              }
-              C_loc.set(b, a, alpha * s + beta * C_loc.get(b, a));
-            }
-          }
-        });
-      }
-      ConcurrencyUtils.waitForCompletion(futures);
-    } else {*/
-      for (int a = 0; a < p; a++) {
-        for (int b = 0; b < m; b++) {
-          int s = 0;
-          for (int c = 0; c < n; c++) {
-            s += get(b, c) * B.get(c, a);
-          }
-          C_loc.set(b, a, alpha * s + beta * C_loc.get(b, a));
+
+    for (int a = 0; a < p; a++) {
+      for (int b = 0; b < m; b++) {
+        int s = 0;
+        for (int c = 0; c < n; c++) {
+          s += get(b, c) * B.get(c, a);
         }
+        C_loc.set(b, a, alpha * s + beta * C_loc.get(b, a));
       }
-    //}
+    }
+
     return C_loc;
   }
 
-  /**
-   * Returns the sum of all cells; `Sum( x[i,j] )`.
-   *
-   * @return the sum.
-   */
+  /// Returns the sum of all cells; `Sum( x[i,j] )`.
   int sum() {
-    if (length == 0) {
+    if (size == 0) {
       return 0;
     }
-    return reduce(ifunc.plus, ifunc.identity);
+    return aggregate(ifunc.plus, ifunc.identity);
   }
 
   Object clone();
