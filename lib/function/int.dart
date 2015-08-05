@@ -298,33 +298,33 @@ IntFunction equalTo(final int b) {
  * Constructs a function that returns <tt>from<=a && a<=to</tt>. <tt>a</tt>
  * is a variable, <tt>from</tt> and <tt>to</tt> are fixed.
  */
-IntProcedure isBetween(final int from, final int to) {
-  return (int a) => from <= a && a <= to;
-}
+//IntProcedure isBetween(final int from, final int to) {
+//  return (int a) => from <= a && a <= to;
+//}
 
 /**
  * Constructs a function that returns <tt>a == b</tt>. <tt>a</tt> is a
  * variable, <tt>b</tt> is fixed.
  */
-IntProcedure isEqualTo(final int b) {
-  return (int a) => a == b;
-}
+//IntProcedure isEqualTo(final int b) {
+//  return (int a) => a == b;
+//}
 
 /**
  * Constructs a function that returns <tt>a > b</tt>. <tt>a</tt> is a
  * variable, <tt>b</tt> is fixed.
  */
-IntProcedure isGreaterThan(final int b) {
-  return (int a) => a > b;
-}
+//IntProcedure isGreaterThan(final int b) {
+//  return (int a) => a > b;
+//}
 
 /**
  * Constructs a function that returns <tt>a < b</tt>. <tt>a</tt> is a
  * variable, <tt>b</tt> is fixed.
  */
-IntProcedure isLessThan(final int b) {
-  return (int a) => a < b;
-}
+//IntProcedure isLessThan(final int b) {
+//  return (int a) => a < b;
+//}
 
 /**
  * Constructs a function that returns <tt>Math.max(a,b)</tt>. <tt>a</tt> is

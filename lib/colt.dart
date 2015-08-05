@@ -3,6 +3,9 @@ library colt;
 import 'dart:typed_data';
 
 export 'matrix/matrix.dart';
+export 'matrix/double/matrix.dart';
+export 'matrix/int/matrix.dart';
+export 'matrix/complex/matrix.dart';
 
 //export 'matrix/double/algo/algo.dart';
 //export 'matrix/complex/algo/algo.dart';

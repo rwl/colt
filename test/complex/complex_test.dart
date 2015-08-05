@@ -3,7 +3,7 @@ library cern.colt.matrix.complex.test;
 import 'dart:math' as math;
 import 'dart:typed_data';
 
-import 'package:unittest/unittest.dart';
+import 'package:test/test.dart';
 import 'package:colt/colt.dart';
 import 'package:colt/math.dart';
 import 'package:colt/function/complex.dart' hide equals;

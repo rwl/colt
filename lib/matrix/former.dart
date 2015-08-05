@@ -11,6 +11,9 @@ library cern.colt.matrix.format;
 import 'dart:math' as Math;
 import 'package:intl/intl.dart';
 import 'matrix.dart';
+import 'double/matrix.dart';
+import 'int/matrix.dart';
+import 'complex/matrix.dart';
 
 part 'former_factory.dart';
 part 'abstract_formatter.dart';
