@@ -3,6 +3,7 @@ library cern.colt.matrix.complex;
 import 'dart:math' as Math;
 import 'dart:typed_data';
 //import 'dart:collection' show ListMixin;
+import 'package:intl/intl_browser.dart' show NumberFormat;
 
 import '../matrix.dart'
     show
@@ -33,12 +34,22 @@ import '../../function/complex.dart'
     show ComplexFunction, ComplexComplexFunction;
 
 import '../../function/complex.dart' as cfunc;
+import '../../function/double.dart' as func;
 
-import '../double/matrix.dart' show AbstractDoubleVector, AbstractDoubleMatrix;
+import '../double/matrix.dart'
+    show
+        AbstractDoubleVector,
+        AbstractDoubleMatrix,
+        DoubleVector,
+        DoubleMatrix,
+        LargeDoubleMatrix,
+        SparseDoubleVector,
+        SparseDoubleMatrix,
+        SparseRCDoubleMatrix;
 
 import 'factory.dart' as cfactory;
 
-import '../../math.dart' show EPSILON;
+import '../../math.dart' show EPSILON, DEG_RAD, MAX_INT, Complex;
 
 import 'algo/algo.dart' as cprop;
 

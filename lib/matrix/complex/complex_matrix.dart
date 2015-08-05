@@ -60,7 +60,7 @@ class ComplexMatrix extends AbstractComplexMatrix {
       for (int c = d; c < columns; c++) {
         idx = zero + r * rowStride + c * columnStride;
         a = aggr(a,
-            f(new Float64List.fromList([_elements[idx], _elements[idx + 1]])));
+            fn(new Float64List.fromList([_elements[idx], _elements[idx + 1]])));
       }
       d = 0;
     }
@@ -128,7 +128,7 @@ class ComplexMatrix extends AbstractComplexMatrix {
         for (int i = idx, c = 0; c < columns; c++) {
           tmp[0] = _elements[i];
           tmp[1] = _elements[i + 1];
-          tmp[0] = function(tmp);
+          tmp[0] = fn(tmp);
           _elements[i] = tmp[0];
           _elements[i + 1] = 0.0;
           i += columnStride;
@@ -194,7 +194,7 @@ class ComplexMatrix extends AbstractComplexMatrix {
       return;
     }
     checkShape(this, y);
-    Float64List elemsOther = y._elements;
+    Float64List elemsOther = y.elements;
     if (_elements == null || elemsOther == null) {
       throw new Error();
     }
@@ -258,7 +258,7 @@ class ComplexMatrix extends AbstractComplexMatrix {
           tmp1[1] = _elements[i + 1];
           tmp2[0] = elemsOther[j];
           tmp2[1] = elemsOther[j + 1];
-          tmp1 = function(tmp1, tmp2);
+          tmp1 = fn(tmp1, tmp2);
           _elements[i] = tmp1[0];
           _elements[i + 1] = tmp1[1];
           i += columnStride;
@@ -543,8 +543,8 @@ class ComplexMatrix extends AbstractComplexMatrix {
         idx += columnStride;
         idxY += strideY;
       }
-      reZ = elemsZ[idxZeroZ];
-      imZ = elemsZ[idxZeroZ + 1];
+      var reZ = elemsZ[idxZeroZ];
+      var imZ = elemsZ[idxZeroZ + 1];
       elemsZ[idxZeroZ] =
           reS * alpha[0] - imS * alpha[1] + reZ * beta[0] - imZ * beta[1];
       elemsZ[idxZeroZ + 1] =
@@ -793,9 +793,9 @@ class SelectedDenseComplexMatrix extends AbstractComplexMatrix {
     _offset = offset;
   }
 
-  int _columnOffset(int absRank) => _columnOffsets[absRank];
+  int columnOffset(int absRank) => _columnOffsets[absRank];
 
-  int _rowOffset(int absRank) => _rowOffsets[absRank];
+  int rowOffset(int absRank) => _rowOffsets[absRank];
 
   Float64List get(int row, int column) {
     int idxr = rowZero + row * rowStride;
@@ -857,14 +857,14 @@ class SelectedDenseComplexMatrix extends AbstractComplexMatrix {
     _elements[_offset + _rowOffsets[idxr] + _columnOffsets[idxc] + 1] = im;
   }
 
-  void _vDice() {
-    super._vDice();
-    // swap
+  AbstractComplexMatrix dice() {
+    var v = _view();
+    vDice(v);
     Int32List tmp = _rowOffsets;
     _rowOffsets = _columnOffsets;
     _columnOffsets = tmp;
-
-    this._isNoView = false;
+    setIsNoView(v, false);
+    return v;
   }
 
   AbstractComplexVector column(int column) {
@@ -879,11 +879,11 @@ class SelectedDenseComplexMatrix extends AbstractComplexMatrix {
   }
 
   AbstractComplexVector row(int row) {
-    checkRow(row);
+    checkRow(this, row);
     int viewSize = columns;
     int viewZero = columnZero;
     int viewStride = columnStride;
-    Int32List viewOffsets = columnOffsets;
+    Int32List viewOffsets = _columnOffsets;
     int viewOffset = _offset + rowOffset(rowRank(row));
     return new SelectedDenseComplexVector._internal(
         viewSize, _elements, viewZero, viewStride, viewOffsets, viewOffset);

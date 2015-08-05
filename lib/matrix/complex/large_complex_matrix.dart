@@ -10,37 +10,21 @@
 // any purpose. It is provided "as is" without expressed or implied warranty.
 part of cern.colt.matrix.complex;
 
-/**
- * Dense 2-d matrix holding <tt>complex</tt> elements.<br>
- * <b>Implementation:</b>
- * <p>
- * This data structure allows to store more than 2^31 elements. Internally holds
- * one two-dimensional array, elements[rows][2*columns]. Complex data is
- * represented by 2 double values in sequence, i.e. elements[row][2*column]
- * constitute the real part and elements[row][2*column+1] constitute the
- * imaginary part. Note that this implementation is not synchronized.
- *
- * @author Piotr Wendykier (piotr.wendykier@gmail.com)
- *
- */
+/// Dense 2-d matrix holding `complex` elements.
+///
+/// Internally holds one two-dimensional array, `elements[rows][2*columns]`.
+/// Complex data is represented by 2 double values in sequence.
 class LargeComplexMatrix extends WrapperComplexMatrix {
-
   List<Float64List> _elements;
 
-  LargeComplexMatrix(int rows, int columns) : super(null) {
-    try {
-      _setUp(rows, columns);
-    } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
-      if ("matrix too large" != exc.message) {
-        throw exc;
-      }
-    }
-    _elements = new List<Float64List>.generate(rows, (_) => new Float64List(2 * columns));
+  LargeComplexMatrix(int rows, int columns) : super._(rows, columns) {
+    _elements = new List.generate(rows, (_) => new Float64List(2 * columns));
     _content = this;
   }
 
   Float64List get(int row, int column) {
-    return new Float64List.fromList([_elements[row][2 * column], _elements[row][2 * column + 1]]);
+    return new Float64List.fromList(
+        [_elements[row][2 * column], _elements[row][2 * column + 1]]);
   }
 
   void set(int row, int column, Float64List value) {
@@ -55,15 +39,11 @@ class LargeComplexMatrix extends WrapperComplexMatrix {
 
   Object get elements => _elements;
 
-  AbstractComplexMatrix _getContent() {
-    return this;
-  }
+  AbstractComplexMatrix _getContent() => this;
 
   AbstractComplexMatrix like2D(int rows, int columns) {
     return new LargeComplexMatrix(rows, columns);
   }
 
-  AbstractComplexVector like1D(int size) {
-    return new ComplexVector(size);
-  }
+  AbstractComplexVector like1D(int size) => new ComplexVector(size);
 }

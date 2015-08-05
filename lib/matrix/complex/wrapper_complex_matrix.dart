@@ -10,56 +10,30 @@
 // any purpose. It is provided "as is" without expressed or implied warranty.
 part of cern.colt.matrix.complex;
 
-/**
- * 2-d matrix holding <tt>complex</tt> elements; either a view wrapping another
- * matrix or a matrix whose views are wrappers.
- *
- * @author Piotr Wendykier (piotr.wendykier@gmail.com)
- */
+/// 2-d matrix holding `complex` elements; either a view wrapping another
+/// matrix or a matrix whose views are wrappers.
 class WrapperComplexMatrix extends AbstractComplexMatrix {
-
-  /*
-   * The elements of the matrix.
-   */
   AbstractComplexMatrix _content;
 
-  WrapperComplexMatrix(AbstractComplexMatrix newContent)
+  WrapperComplexMatrix._(int rows, int columns) : super(rows, columns);
+
+  WrapperComplexMatrix._wrap(AbstractComplexMatrix newContent)
       : super(newContent.rows, newContent.columns) {
-    if (newContent != null) {
-      _setUp(newContent.rows, newContent.columns);
-    }
-    this._content = newContent;
+    _content = newContent;
   }
 
   void setAll(final Float64List values) {
     if (_content is DiagonalComplexMatrix) {
       int dlength = (_content as DiagonalComplexMatrix)._dlength;
-      final Float64List elems = (_content as DiagonalComplexMatrix)._elements;
+      Float64List elems = (_content as DiagonalComplexMatrix)._elements;
       if (values.length != 2 * dlength) {
-        throw new ArgumentError("Must have same length: length=${values.length} 2 * dlength=${2 * dlength}");
+        throw new ArgumentError(
+            "Must have same length: length=${values.length} 2 * dlength=${2 * dlength}");
       }
-      /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
-      if ((nthreads > 1) && (dlength >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-        nthreads = Math.min(nthreads, dlength);
-        List<Future> futures = new List<Future>(nthreads);
-        int k = dlength ~/ nthreads;
-        for (int j = 0; j < nthreads; j++) {
-          final int firstIdx = j * k;
-          final int lastIdx = (j == nthreads - 1) ? dlength : firstIdx + k;
-          futures[j] = ConcurrencyUtils.submit(() {
-            for (int i = firstIdx; i < lastIdx; i++) {
-              elems[2 * i] = values[2 * i];
-              elems[2 * i + 1] = values[2 * i + 1];
-            }
-          });
-        }
-        ConcurrencyUtils.waitForCompletion(futures);
-      } else {*/
       for (int i = 0; i < dlength; i++) {
         elems[2 * i] = values[2 * i];
         elems[2 * i + 1] = values[2 * i + 1];
       }
-      //}
       return;
     } else {
       super.setAll(values);
@@ -69,59 +43,7 @@ class WrapperComplexMatrix extends AbstractComplexMatrix {
 
   Object get elements => _content.elements;
 
-  bool all(Float64List value) {
-    if (_content is DiagonalComplexMatrix) {
-      double epsilon = EPSILON;
-      Float64List elements = _content.elements as Float64List;
-      int dlength = (_content as DiagonalComplexMatrix)._dlength;
-      Float64List x = new Float64List(2);
-      Float64List diff = new Float64List(2);
-      for (int i = 0; i < dlength; i++) {
-        x[0] = elements[2 * i];
-        x[1] = elements[2 * i + 1];
-        diff[0] = (value[0] - x[0]).abs();
-        diff[1] = (value[1] - x[1]).abs();
-        if (((diff[0] != diff[0]) || (diff[1] != diff[1])) && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1])))) || (Complex.isEqual(value, x, epsilon))) {
-          diff[0] = 0.0;
-          diff[1] = 0.0;
-        }
-        if ((diff[0] > epsilon) || (diff[1] > epsilon)) {
-          return false;
-        }
-      }
-      return true;
-    } else {
-      return super.all(value);
-    }
-  }
-
   bool equals(AbstractComplexMatrix obj) {
-    /*if (obj is Float64List) {
-      final value = obj;
-      if (_content is DiagonalComplexMatrix) {
-        double epsilon = EPSILON;
-        Float64List elements = _content.elements as Float64List;
-        int dlength = (_content as DiagonalComplexMatrix)._dlength;
-        Float64List x = new Float64List(2);
-        Float64List diff = new Float64List(2);
-        for (int i = 0; i < dlength; i++) {
-          x[0] = elements[2 * i];
-          x[1] = elements[2 * i + 1];
-          diff[0] = (value[0] - x[0]).abs();
-          diff[1] = (value[1] - x[1]).abs();
-          if (((diff[0] != diff[0]) || (diff[1] != diff[1])) && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1])))) || (Complex.isEqual(value, x, epsilon))) {
-            diff[0] = 0.0;
-            diff[1] = 0.0;
-          }
-          if ((diff[0] > epsilon) || (diff[1] > epsilon)) {
-            return false;
-          }
-        }
-        return true;
-      } else {
-        return super == (value);
-      }
-    }*/
     if (_content is DiagonalComplexMatrix && obj is DiagonalComplexMatrix) {
       DiagonalComplexMatrix other = obj;
       int dlength = (_content as DiagonalComplexMatrix)._dlength;
@@ -134,14 +56,17 @@ class WrapperComplexMatrix extends AbstractComplexMatrix {
       }
       DiagonalComplexMatrix A = _content as DiagonalComplexMatrix;
       DiagonalComplexMatrix B = obj;
-      if (A.columns != B.columns || A.rows != B.rows || A.diagonalIndex != B.diagonalIndex || A.diagonalLength != B.diagonalLength) {
+      if (A.columns != B.columns ||
+          A.rows != B.rows ||
+          A.diagonalIndex != B.diagonalIndex ||
+          A.diagonalLength != B.diagonalLength) {
         return false;
       }
       Float64List otherElements = other._elements;
       Float64List elements = (_content as DiagonalComplexMatrix)._elements;
-      Float64List x = new Float64List(2);
-      Float64List value = new Float64List(2);
-      Float64List diff = new Float64List(2);
+      var x = new Float64List(2);
+      var value = new Float64List(2);
+      var diff = new Float64List(2);
       for (int i = 0; i < dlength; i++) {
         x[0] = elements[2 * i];
         x[1] = elements[2 * i + 1];
@@ -149,7 +74,10 @@ class WrapperComplexMatrix extends AbstractComplexMatrix {
         value[1] = otherElements[2 * i + 1];
         diff[0] = (value[0] - x[0]).abs();
         diff[1] = (value[1] - x[1]).abs();
-        if (((diff[0] != diff[0]) || (diff[1] != diff[1])) && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1])))) || (Complex.isEqual(value, x, epsilon))) {
+        if (((diff[0] != diff[0]) || (diff[1] != diff[1])) &&
+                ((((value[0] != value[0]) || (value[1] != value[1])) &&
+                    ((x[0] != x[0]) || (x[1] != x[1])))) ||
+            (Complex.isEqual(value, x, epsilon))) {
           diff[0] = 0.0;
           diff[1] = 0.0;
         }
@@ -163,17 +91,13 @@ class WrapperComplexMatrix extends AbstractComplexMatrix {
     }
   }
 
-  Float64List get(int row, int column) {
-    return _content.get(row, column);
-  }
+  Float64List get(int row, int column) => _content.get(row, column);
 
   AbstractComplexMatrix like2D(int rows, int columns) {
     return _content.like2D(rows, columns);
   }
 
-  AbstractComplexVector like1D(int size) {
-    return _content.like1D(size);
-  }
+  AbstractComplexVector like1D(int size) => _content.like1D(size);
 
   void set(int row, int column, Float64List value) {
     _content.set(row, column, value);
@@ -183,101 +107,73 @@ class WrapperComplexMatrix extends AbstractComplexMatrix {
     _content.setParts(row, column, re, im);
   }
 
-  AbstractComplexVector vectorize() {
-    final ComplexVector v = new ComplexVector(this.length);
-    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-      nthreads = Math.min(nthreads, _columns);
-      List<Future> futures = new List<Future>(nthreads);
-      int k = _columns ~/ nthreads;
-      for (int j = 0; j < nthreads; j++) {
-        final int firstColumn = j * k;
-        final int lastColumn = (j == nthreads - 1) ? _columns : firstColumn + k;
-        futures[j] = ConcurrencyUtils.submit(() {
-          int idx = firstColumn * _rows;
-          for (int c = firstColumn; c < lastColumn; c++) {
-            for (int r = 0; r < _rows; r++) {
-              v.setQuick(idx++, getQuick(r, c));
-            }
-          }
-        });
-      }
-      ConcurrencyUtils.waitForCompletion(futures);
-    } else {*/
-    int idx = 0;
-    for (int c = 0; c < _columns; c++) {
-      for (int r = 0; r < _rows; r++) {
-        v.set(idx++, get(r, c));
-      }
-    }
-    //}
-    return v;
-  }
-
-  AbstractComplexVector column(int column) {
-    return dice().row(column);
-  }
+  AbstractComplexVector column(int column) => dice().row(column);
 
   AbstractComplexMatrix columnFlip() {
-    if (_columns == 0) return this;
-    WrapperComplexMatrix view = new ColumnFlipWrapperComplexMatrix(this);
-    view._isNoView = false;
+    if (columns == 0) {
+      return this;
+    }
+    var view = new ColumnFlipWrapperComplexMatrix(this);
+    setIsNoView(view, false);
     return view;
   }
 
   AbstractComplexMatrix dice() {
-    WrapperComplexMatrix view = new DiceWrapperComplexMatrix(this);
-    view._rows = _columns;
-    view._columns = _rows;
-    view._isNoView = false;
-
+    var view = new DiceWrapperComplexMatrix(this);
+    setRows(view, columns);
+    setColumns(view, rows);
+    setIsNoView(view, false);
     return view;
   }
 
-  AbstractComplexMatrix part(final int row, final int column, int height, int width) {
-    _checkBox(row, column, height, width);
-    WrapperComplexMatrix view = new PartWrapperComplexMatrix(this, row, column);
-    view._rows = height;
-    view._columns = width;
-    view._isNoView = false;
-
+  AbstractComplexMatrix part(
+      final int row, final int column, int height, int width) {
+    checkBox(this, row, column, height, width);
+    var view = new PartWrapperComplexMatrix(this, row, column);
+    setRows(view, height);
+    setColumns(view, width);
+    setIsNoView(view, false);
     return view;
   }
 
   AbstractComplexVector row(int row) {
-    _checkRow(row);
+    checkRow(this, row);
     return new DelegateComplexVector(this, row);
   }
 
   AbstractComplexMatrix rowFlip() {
-    if (_rows == 0) return this;
+    if (rows == 0) {
+      return this;
+    }
     WrapperComplexMatrix view = new RowWrapperComplexMatrix(this);
-    view._isNoView = false;
-
+    setIsNoView(view, false);
     return view;
   }
 
   AbstractComplexMatrix select(Int32List rowIndexes, Int32List columnIndexes) {
     // check for "all"
     if (rowIndexes == null) {
-      rowIndexes = new Int32List(_rows);
-      for (int i = _rows; --i >= 0; ) rowIndexes[i] = i;
+      rowIndexes = new Int32List(rows);
+      for (int i = rows; --i >= 0;) {
+        rowIndexes[i] = i;
+      }
     }
     if (columnIndexes == null) {
-      columnIndexes = new Int32List(_columns);
-      for (int i = _columns; --i >= 0; ) columnIndexes[i] = i;
+      columnIndexes = new Int32List(columns);
+      for (int i = columns; --i >= 0;) {
+        columnIndexes[i] = i;
+      }
     }
 
-    _checkRowIndexes(rowIndexes);
-    _checkColumnIndexes(columnIndexes);
+    checkRowIndexes(this, rowIndexes);
+    checkColumnIndexes(this, columnIndexes);
     final rix = new Int32List.fromList(rowIndexes);
     final cix = new Int32List.fromList(columnIndexes);
 
-    WrapperComplexMatrix view = new SelectionWrapperComplexMatrix(this, cix, rix);
-    view._rows = rowIndexes.length;
-    view._columns = columnIndexes.length;
-    view._isNoView = false;
-
+    var view = new SelectionWrapperComplexMatrix(this, cix, rix);
+    setRows(view, rowIndexes.length);
+    setColumns(view, columnIndexes.length);
+    setIsNoView(view, false);
     return view;
   }
 
@@ -285,119 +181,77 @@ class WrapperComplexMatrix extends AbstractComplexMatrix {
     if (rowStride <= 0 || columnStride <= 0) {
       throw new RangeError("illegal stride");
     }
-    WrapperComplexMatrix view = new StridesWrapperComplexMatrix(this, rowStride, columnStride);
-    if (_rows != 0) {
-      view._rows = (_rows - 1) ~/ rowStride + 1;
+    var view = new StridesWrapperComplexMatrix(this, rowStride, columnStride);
+    if (rows != 0) {
+      setRows(view, (rows - 1) ~/ rowStride + 1);
     }
-    if (_columns != 0) {
-      view._columns = (_columns - 1) ~/ columnStride + 1;
+    if (columns != 0) {
+      setColumns(view, (columns - 1) ~/ columnStride + 1);
     }
-    view._isNoView = false;
-
+    setIsNoView(view, false);
     return view;
   }
 
-  AbstractComplexMatrix _getContent() {
-    return _content;
-  }
+  AbstractComplexMatrix _getContent() => _content;
 
   AbstractComplexVector _like1D(int size, int offset, int stride) {
     throw new Error(); // should never get called
   }
 
-  AbstractComplexMatrix _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets) {
+  AbstractComplexMatrix _viewSelectionLike(
+      Int32List rowOffsets, Int32List columnOffsets) {
     throw new Error(); // should never be called
   }
 
   AbstractDoubleMatrix imaginary() {
-    final LargeDoubleMatrix Im = new LargeDoubleMatrix(_rows, _columns);
-    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-      nthreads = Math.min(nthreads, _rows);
-      List<Future> futures = new List<Future>(nthreads);
-      int k = _rows ~/ nthreads;
-      for (int j = 0; j < nthreads; j++) {
-        final int firstRow = j * k;
-        final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
-        futures[j] = ConcurrencyUtils.submit(() {
-          for (int r = firstRow; r < lastRow; r++) {
-            for (int c = 0; c < _columns; c++) {
-              Im.setQuick(r, c, getQuick(r, c)[1]);
-            }
-          }
-        });
-      }
-      ConcurrencyUtils.waitForCompletion(futures);
-    } else {*/
-    for (int r = 0; r < _rows; r++) {
-      for (int c = 0; c < _columns; c++) {
+    var Im = new LargeDoubleMatrix(rows, columns);
+    for (int r = 0; r < rows; r++) {
+      for (int c = 0; c < columns; c++) {
         Im.set(r, c, get(r, c)[1]);
       }
     }
-    //}
     return Im;
   }
 
   AbstractDoubleMatrix real() {
-    final LargeDoubleMatrix Re = new LargeDoubleMatrix(_rows, _columns);
-    /*int nthreads = ConcurrencyUtils.getNumberOfThreads();
-    if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
-      nthreads = Math.min(nthreads, _rows);
-      List<Future> futures = new List<Future>(nthreads);
-      int k = _rows / nthreads;
-      for (int j = 0; j < nthreads; j++) {
-        final int firstRow = j * k;
-        final int lastRow = (j == nthreads - 1) ? _rows : firstRow + k;
-        futures[j] = ConcurrencyUtils.submit(() {
-          for (int r = firstRow; r < lastRow; r++) {
-            for (int c = 0; c < _columns; c++) {
-              Re.setQuick(r, c, getQuick(r, c)[0]);
-            }
-          }
-        });
-      }
-      ConcurrencyUtils.waitForCompletion(futures);
-    } else {*/
-    for (int r = 0; r < _rows; r++) {
-      for (int c = 0; c < _columns; c++) {
+    var Re = new LargeDoubleMatrix(rows, columns);
+    for (int r = 0; r < rows; r++) {
+      for (int c = 0; c < columns; c++) {
         Re.set(r, c, get(r, c)[0]);
       }
     }
-    //}
     return Re;
   }
 
-  Object clone() {
-    return new WrapperComplexMatrix(_content);
-  }
+  Object clone() => new WrapperComplexMatrix._wrap(_content);
 }
 
 class ColumnFlipWrapperComplexMatrix extends WrapperComplexMatrix {
-
-  ColumnFlipWrapperComplexMatrix(AbstractComplexMatrix newContent) : super(newContent);
+  ColumnFlipWrapperComplexMatrix(AbstractComplexMatrix newContent)
+      : super._wrap(newContent);
 
   Float64List get(int row, int column) {
-    return _content.get(row, _columns - 1 - column);
+    return _content.get(row, columns - 1 - column);
   }
 
   void set(int row, int column, Float64List value) {
-    _content.set(row, _columns - 1 - column, value);
+    _content.set(row, columns - 1 - column, value);
   }
 
   void setParts(int row, int column, double re, double im) {
-    _content.setParts(row, _columns - 1 - column, re, im);
+    _content.setParts(row, columns - 1 - column, re, im);
   }
 
   Float64List at(int row, int column) {
-    return _content.at(row, _columns - 1 - column);
+    return _content.at(row, columns - 1 - column);
   }
 
   void put(int row, int column, Float64List value) {
-    _content.put(row, _columns - 1 - column, value);
+    _content.put(row, columns - 1 - column, value);
   }
 
   void putParts(int row, int column, double re, double im) {
-    _content.putParts(row, _columns - 1 - column, re, im);
+    _content.putParts(row, columns - 1 - column, re, im);
   }
 
   Object clone() {
@@ -406,8 +260,8 @@ class ColumnFlipWrapperComplexMatrix extends WrapperComplexMatrix {
 }
 
 class DiceWrapperComplexMatrix extends WrapperComplexMatrix {
-
-  DiceWrapperComplexMatrix(AbstractComplexMatrix newContent) : super(newContent);
+  DiceWrapperComplexMatrix(AbstractComplexMatrix newContent)
+      : super._wrap(newContent);
 
   Float64List get(int row, int column) {
     return _content.get(column, row);
@@ -442,8 +296,9 @@ class PartWrapperComplexMatrix extends WrapperComplexMatrix {
   final int _row;
   final int _column;
 
-  PartWrapperComplexMatrix(AbstractComplexMatrix newContent, int row, int column)
-      : super(newContent),
+  PartWrapperComplexMatrix(
+      AbstractComplexMatrix newContent, int row, int column)
+      : super._wrap(newContent),
         _row = row,
         _column = column;
 
@@ -477,31 +332,31 @@ class PartWrapperComplexMatrix extends WrapperComplexMatrix {
 }
 
 class RowWrapperComplexMatrix extends WrapperComplexMatrix {
-
-  RowWrapperComplexMatrix(AbstractComplexMatrix newContent) : super(newContent);
+  RowWrapperComplexMatrix(AbstractComplexMatrix newContent)
+      : super._wrap(newContent);
 
   Float64List get(int row, int column) {
-    return _content.get(_rows - 1 - row, column);
+    return _content.get(rows - 1 - row, column);
   }
 
   void set(int row, int column, Float64List value) {
-    _content.set(_rows - 1 - row, column, value);
+    _content.set(rows - 1 - row, column, value);
   }
 
   void setParts(int row, int column, double re, double im) {
-    _content.setParts(_rows - 1 - row, column, re, im);
+    _content.setParts(rows - 1 - row, column, re, im);
   }
 
   Float64List at(int row, int column) {
-    return _content.at(_rows - 1 - row, column);
+    return _content.at(rows - 1 - row, column);
   }
 
   void put(int row, int column, Float64List value) {
-    _content.put(_rows - 1 - row, column, value);
+    _content.put(rows - 1 - row, column, value);
   }
 
   void putParts(int row, int column, double re, double im) {
-    _content.putParts(_rows - 1 - row, column, re, im);
+    _content.putParts(rows - 1 - row, column, re, im);
   }
 
   Object clone() {
@@ -513,8 +368,9 @@ class SelectionWrapperComplexMatrix extends WrapperComplexMatrix {
   final Int32List cix;
   final Int32List rix;
 
-  SelectionWrapperComplexMatrix(AbstractComplexMatrix newContent, Int32List cix, Int32List rix)
-      : super(newContent),
+  SelectionWrapperComplexMatrix(
+      AbstractComplexMatrix newContent, Int32List cix, Int32List rix)
+      : super._wrap(newContent),
         cix = cix,
         rix = rix;
 
@@ -548,11 +404,14 @@ class SelectionWrapperComplexMatrix extends WrapperComplexMatrix {
 }
 
 class StridesWrapperComplexMatrix extends WrapperComplexMatrix {
+  final int _rowStride;
+  final int _columnStride;
 
-  StridesWrapperComplexMatrix(AbstractComplexMatrix newContent, int rowStride, int columnStride) : super(newContent) {
-    _rowStride = rowStride;
-    _columnStride = columnStride;
-  }
+  StridesWrapperComplexMatrix(
+      AbstractComplexMatrix newContent, int rowStride, int columnStride)
+      : super._wrap(newContent),
+        _rowStride = rowStride,
+        _columnStride = columnStride;
 
   Float64List get(int row, int column) {
     return _content.get(_rowStride * row, _columnStride * column);

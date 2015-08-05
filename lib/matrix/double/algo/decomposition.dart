@@ -5,7 +5,7 @@ import 'dart:typed_data';
 //import 'package:klu/double.dart' as klu;
 //import 'package:btf/btf.dart' as btf;
 
-import '../../matrix.dart';
+import '../matrix.dart';
 import 'algo.dart';
 
 typedef void solve(AbstractDoubleMatrix A, AbstractDoubleVector b);
