@@ -4,4 +4,4 @@ description: A pub package
 dependencies:
   intl: any
 dev_dependencies:
-  unittest: any
+  test: any
