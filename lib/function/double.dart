@@ -4,805 +4,500 @@ import 'dart:math' as Math;
 import '../math.dart';
 
 typedef double DoubleFunction(double x);
-typedef double Double5Function(double a, double b, double c, double d, double e);
-typedef double Double9Function(double a00, double a01, double a02, double a10, double a11, double a12, double a20,
-    double a21, double a22);
+typedef double Double5Function(
+    double a, double b, double c, double d, double e);
+typedef double Double9Function(double a00, double a01, double a02, double a10,
+    double a11, double a12, double a20, double a21, double a22);
 typedef double DoubleDoubleFunction(double x, double y);
-typedef bool DoubleDoubleProcedure(double first, double second);
-typedef bool DoubleIntProcedure(double first, int second);
-typedef bool DoubleProcedure(double element);
 typedef double IntDoubleFunction(int first, double second);
-typedef bool IntDoubleProcedure(int first, double second);
 typedef double IntIntDoubleFunction(int first, int second, double third);
-typedef bool IntIntDoubleProcedure(int first, int second, double third);
 
-double radians(double a) => a * (Math.PI/180.0);
+double toRadians(double a) => a * (Math.PI / 180.0);
 
-double degrees(double a) => a * (180.0/Math.PI);
+double toDegrees(double a) => a * (180.0 / Math.PI);
 
 double or(double a, double b) => (a != 0.0 || b != 0.0) ? 1.0 : 0.0;
 
 double and(double a, double b) => (a != 0.0 && b != 0.0) ? 1.0 : 0.0;
 
-/***************************************************************************
- * <H3>Unary functions</H3>
- **************************************************************************/
-/**
- * Function that returns <tt>Math.abs(a)</tt>.
- */
+/// Unary functions
+
+/// Function that returns `Math.abs(a)`.
 double abs(double a) => a.abs();
 
-/**
- * Function that returns <tt>Math.acos(a)</tt>.
- */
-double acos (double a) => Math.acos(a);
+/// Function that returns `Math.acos(a)`.
+double acos(double a) => Math.acos(a);
 
-/**
- * Function that returns <tt>com.imsl.math.Sfun.acosh(a)</tt>.
- */
+/// Function that returns `acosh(a)`.
 //double acosh(double a) => Math.acosh(a);
 
-/**
- * Function that returns <tt>Math.asin(a)</tt>.
- */
+/// Function that returns `Math.asin(a)`.
 double asin(double a) => Math.asin(a);
 
-/**
- * Function that returns <tt>com.imsl.math.Sfun.asinh(a)</tt>.
- */
+/// Function that returns `asinh(a)`.
 //double asinh (double a) => Math.asinh(a);
 
-/**
- * Function that returns <tt>Math.atan(a)</tt>.
- */
+/// Function that returns `Math.atan(a)`.
 double atan(double a) => Math.atan(a);
 
-/**
- * Function that returns <tt>com.imsl.math.Sfun.atanh(a)</tt>.
- */
+/// Function that returns `atanh(a)`.
 //double atanh(double a) => Math.atanh(a);
 
-/**
- * Function that returns <tt>Math.ceil(a)</tt>.
- */
+/// Function that returns `Math.ceil(a)`.
 double ceil(double a) => a.ceilToDouble();
 
-/**
- * Function that returns <tt>Math.cos(a)</tt>.
- */
+/// Function that returns `Math.cos(a)`.
 double cos(double a) => Math.cos(a);
 
-/**
- * Function that returns <tt>com.imsl.math.Sfun.cosh(a)</tt>.
- */
+/// Function that returns `cosh(a)`.
 //double cosh(double a) => Math.cosh(a);
 
-/**
- * Function that returns <tt>com.imsl.math.Sfun.cot(a)</tt>.
- */
+/// Function that returns `cot(a)`.
 //double cot(double a) => Math.cot(a);
 
-/**
- * Function that returns <tt>com.imsl.math.Sfun.erf(a)</tt>.
- */
+/// Function that returns `erf(a)`.
 //double erf(double a) => Math.erf(a);
 
-/**
- * Function that returns <tt>com.imsl.math.Sfun.erfc(a)</tt>.
- */
+/// Function that returns `erfc(a)`.
 //double erfc(double a) => Math.erfc(a);
 
-/**
- * Function that returns <tt>Math.exp(a)</tt>.
- */
+/// Function that returns `Math.exp(a)`.
 double exp(double a) => Math.exp(a);
 
-/**
- * Function that returns <tt>Math.floor(a)</tt>.
- */
+/// Function that returns `Math.floor(a)`.
 double floor(double a) => a.floorToDouble();
 
-/**
- * Function that returns <tt>com.imsl.math.Sfun.gamma(a)</tt>.
- */
+/// Function that returns `gamma(a)`.
 //double gamma(double a) => Math.gamma(a);
 
-/**
- * Function that returns its argument.
- */
+/// Function that returns its argument.
 double identity(double a) => a;
 
-/**
- * Function that returns <tt>1.0 / a</tt>.
- */
+/// Function that returns `1.0 / a`.
 double inv(double a) => 1.0 / a;
 
-/**
- * Function that returns <tt>Math.log(a)</tt>.
- */
+/// Function that returns `Math.log(a)`.
 double log(double a) => Math.log(a);
 
-/**
- * Function that returns <tt>com.imsl.math.Sfun.log10(a)</tt>.
- */
+/// Function that returns `log10(a)`.
 //double log10(double a) => Math.log10(a);
 
-/**
- * Function that returns <tt>Math.log(a) / Math.log(2)</tt>.
- */
+/// Function that returns `Math.log(a) / Math.log(2)`.
 // 1.0 / Math.log(2) == 1.4426950408889634
 double log2(double a) => Math.log(a) * 1.4426950408889634;
 
-/**
- * Function that returns <tt>com.imsl.math.Sfun.logGamma(a)</tt>.
- */
+/// Function that returns `logGamma(a)`.
 //double logGamma(double a) => Math.logGamma(a);
 
-/**
- * Function that returns <tt>-a</tt>.
- */
+/// Function that returns `-a`.
 double neg(double a) => -a;
 
-/**
- * Function that returns <tt>Math.rint(a)</tt>.
- */
+/// Function that returns `Math.rint(a)`.
 //double rint(double a) => Math.rint(a);
 
-/**
- * Function that returns <tt>a < 0 ? -1 : a > 0 ? 1 : 0</tt>.
- */
+/// Function that returns `a < 0 ? -1 : a > 0 ? 1 : 0`.
 double sign(double a) => a < 0 ? -1.0 : a > 0 ? 1.0 : 0.0;
 
-/**
- * Function that returns <tt>Math.sin(a)</tt>.
- */
+/// Function that returns `Math.sin(a)`.
 double sin(double a) => Math.sin(a);
 
-/**
- * Function that returns <tt>com.imsl.math.Sfun.sinh(a)</tt>.
- */
-/*
- * DoubleFunction sinh = new DoubleFunction() { public
- * final double apply(double a) { return Sfun.sinh(a); } };
- */
+/// Function that returns `sinh(a)`.
+//double sinh(double a) => Math.sinh(a);
 
-/**
- * Function that returns <tt>Math.sqrt(a)</tt>.
- */
+/// Function that returns `Math.sqrt(a)`.
 double sqrt(double a) => Math.sqrt(a);
 
-/**
- * Function that returns <tt>a * a</tt>.
- */
+/// Function that returns `a * a`.
 double square(double a) => a * a;
 
-/**
- * Function that returns <tt>Math.tan(a)</tt>.
- */
+/// Function that returns `Math.tan(a)`.
 double tan(double a) => Math.tan(a);
 
-/**
- * Function that returns <tt>com.imsl.math.Sfun.tanh(a)</tt>.
- */
+/// Function that returns `tanh(a)`.
 //double tanh(double a) => Math.tanh(a);
 
-/**
- * Function that returns <tt>Math.toDegrees(a)</tt>.
- */
-//double toDegrees(double a) => Math.toDegrees(a);
+/// Binary functions
 
-/**
- * Function that returns <tt>Math.toRadians(a)</tt>.
- */
-//double toRadians(double a) => Math.toRadians(a);
-
-/***************************************************************************
- * <H3>Binary functions</H3>
- **************************************************************************/
-
-/**
- * Function that returns <tt>Math.atan2(a,b)</tt>.
- */
+/// Function that returns `Math.atan2(a,b)`.
 double atan2(double a, double b) => Math.atan2(a, b);
 
-/**
- * Function that returns <tt>com.imsl.math.Sfun.logBeta(a,b)</tt>.
- */
+/// Function that returns `logBeta(a,b)`.
 //double logBeta(double a, double b) => Math.logBeta(a,b);
 
-/**
- * Function that returns <tt>a < b ? -1 : a > b ? 1 : 0</tt>.
- */
+/// Function that returns `a < b ? -1 : a > b ? 1 : 0`.
 double compare(double a, double b) => a < b ? -1.0 : a > b ? 1.0 : 0.0;
 
-/**
- * Function that returns <tt>a / b</tt>.
- */
+/// Function that returns `a / b`.
 double div(double a, double b) => a / b;
 
-/**
- * Function that returns <tt>-(a / b)</tt>.
- */
+/// Function that returns `-(a / b)`.
 double divNeg(double a, double b) => -(a / b);
 
-/**
- * Function that returns <tt>a == b ? 1 : 0</tt>.
- */
+/// Function that returns `a == b ? 1 : 0`.
 double equals(double a, double b) => a == b ? 1.0 : 0.0;
 
-/**
- * Function that returns <tt>a > b ? 1 : 0</tt>.
- */
+/// Function that returns `a > b ? 1 : 0`.
 double greater(double a, double b) => a > b ? 1.0 : 0.0;
 
-/**
- * Function that returns <tt>Math.IEEEremainder(a,b)</tt>.
- */
+/// Function that returns `Math.IEEEremainder(a,b)`.
 //double IEEEremainder(double a, double b) => Math.IEEEremainder(a, b);
 
-/**
- * Function that returns <tt>a == b</tt>.
- */
+/// Function that returns `a == b`.
 bool isEqual(double a, double b) => a == b;
 
-/**
- * Function that returns <tt>a < b</tt>.
- */
+/// Function that returns `a < b`.
 bool isLess(double a, double b) => a < b;
 
-/**
- * Function that returns <tt>a > b</tt>.
- */
+/// Function that returns `a > b`.
 bool isGreater(double a, double b) => a > b;
 
-/**
- * Function that returns <tt>a < b ? 1 : 0</tt>.
- */
+/// Function that returns `a < b ? 1 : 0`.
 double less(double a, double b) => a < b ? 1.0 : 0.0;
 
-/**
- * Function that returns <tt>Math.log(a) / Math.log(b)</tt>.
- */
+/// Function that returns `Math.log(a) / Math.log(b)`.
 double lg(double a, double b) => Math.log(a) / Math.log(b);
 
-/**
- * Function that returns <tt>Math.max(a,b)</tt>.
- */
+/// Function that returns `Math.max(a,b)`.
 double max(double a, double b) => Math.max(a, b);
 
-/**
- * Function that returns <tt>Math.min(a,b)</tt>.
- */
+/// Function that returns `Math.min(a,b)`.
 double min(double a, double b) => Math.min(a, b);
 
-/**
- * Function that returns <tt>a - b</tt>.
- */
+/// Function that returns `a - b`.
 final DoubleDoubleFunction minus = plusMultSecond(-1.0);
 
-/*
- * new DoubleDoubleFunction() { public final double apply(double a, double
- * b) { return a - b; } };
- */
-
-/**
- * Function that returns <tt>a % b</tt>.
- */
+/// Function that returns `a % b`.
 double mod(double a, double b) => a % b;
 
-/**
- * Function that returns <tt>a * b</tt>.
- */
+/// Function that returns `a * b`.
 double mult(double a, double b) => a * b;
 
-/**
- * Function that returns <tt>-(a * b)</tt>.
- */
+/// Function that returns `-(a * b)`.
 double multNeg(double a, double b) => -(a * b);
 
-/**
- * Function that returns <tt>a * b^2</tt>.
- */
+/// Function that returns `a * b^2`.
 double multSquare(double a, double b) => a * b * b;
 
-/**
- * Function that returns <tt>a + b</tt>.
- */
+/// Function that returns `a + b`.
 final DoubleDoubleFunction plus = plusMultSecond(1.0);
-//        new DoubleDoubleFunction() {
-//            public final double apply(double a, double b) {
-//                return a + b;
-//            }
-//        };
 
-/**
- * Function that returns <tt>Math.abs(a) + Math.abs(b)</tt>.
- */
+/// Function that returns `Math.abs(a) + Math.abs(b)`.
 double plusAbs(double a, double b) => a.abs() + b.abs();
 
-/**
- * Function that returns <tt>Math.pow(a,b)</tt>.
- */
+/// Function that returns `Math.pow(a,b)`.
 double pow(double a, double b) => Math.pow(a, b);
 
-/**
- * Makes this class non instantiable, but still let's others inherit from
- * it.
- */
-
-/**
- * Constructs a function that returns <tt>(from<=a && a<=to) ? 1 : 0</tt>.
- * <tt>a</tt> is a variable, <tt>from</tt> and <tt>to</tt> are fixed.
- */
+/// Constructs a function that returns `(from<=a && a<=to) ? 1 : 0`.
+/// `a` is a variable, `from` and `to` are fixed.
 DoubleFunction between(double from, double to) {
-    return (double a) {
-            return (from <= a && a <= to) ? 1.0 : 0.0;
-    };
+  return (double a) => (from <= a && a <= to) ? 1.0 : 0.0;
 }
 
-/**
- * Constructs a unary function from a binary function with the first operand
- * (argument) fixed to the given constant <tt>c</tt>. The second operand is
- * variable (free).
- *
- * @param function
- *            a binary function taking operands in the form
- *            <tt>function.apply(c,var)</tt>.
- * @return the unary function <tt>function(c,var)</tt>.
- */
-DoubleFunction bindArg1(DoubleDoubleFunction function, double c) {
-    return (double v) {
-            return function(c, v);
-    };
+/// Constructs a unary function from a binary function with the first operand
+/// (argument) fixed to the given constant `c`. The second operand is
+/// variable (free).
+DoubleFunction bindArg1(DoubleDoubleFunction fn, double c) {
+  return (double v) => fn(c, v);
 }
 
-/**
- * Constructs a unary function from a binary function with the second
- * operand (argument) fixed to the given constant <tt>c</tt>. The first
- * operand is variable (free).
- *
- * @param function
- *            a binary function taking operands in the form
- *            <tt>function.apply(var,c)</tt>.
- * @return the unary function <tt>function(var,c)</tt>.
- */
-DoubleFunction bindArg2(DoubleDoubleFunction function, double c) {
-    return (double v) {
-            return function(v, c);
-    };
+/// Constructs a unary function from a binary function with the second
+/// operand (argument) fixed to the given constant `c`. The first
+/// operand is variable (free).
+DoubleFunction bindArg2(DoubleDoubleFunction fn, double c) {
+  return (double v) => fn(v, c);
 }
 
-/**
- * Constructs the function <tt>f( g(a), h(b) )</tt>.
- *
- * @param f
- *            a binary function.
- * @param g
- *            a unary function.
- * @param h
- *            a unary function.
- * @return the binary function <tt>f( g(a), h(b) )</tt>.
- */
-DoubleDoubleFunction chainFGH(DoubleDoubleFunction f, DoubleFunction g,
-        DoubleFunction h) {
-    return (double a, double b) {
-            return f(g(a), h(b));
-    };
+/// Constructs the function `f( g(a), h(b) )`.
+DoubleDoubleFunction chainFGH(
+    DoubleDoubleFunction f, DoubleFunction g, DoubleFunction h) {
+  return (double a, double b) => f(g(a), h(b));
 }
 
-/**
- * Constructs the function <tt>g( h(a,b) )</tt>.
- *
- * @param g
- *            a unary function.
- * @param h
- *            a binary function.
- * @return the unary function <tt>g( h(a,b) )</tt>.
- */
+/// Constructs the function `g( h(a,b) )`.
 DoubleDoubleFunction chain(DoubleFunction g, DoubleDoubleFunction h) {
-    return (double a, double b) {
-            return g(h(a, b));
-    };
+  return (double a, double b) => g(h(a, b));
 }
 
-/**
- * Constructs the function <tt>g( h(a) )</tt>.
- *
- * @param g
- *            a unary function.
- * @param h
- *            a unary function.
- * @return the unary function <tt>g( h(a) )</tt>.
- */
+/// Constructs the function `g( h(a) )`.
 DoubleFunction chainGH(DoubleFunction g, DoubleFunction h) {
-    return (double a) {
-            return g(h(a));
-    };
+  return (double a) => g(h(a));
 }
 
-/**
- * Constructs a function that returns <tt>a < b ? -1 : a > b ? 1 : 0</tt>.
- * <tt>a</tt> is a variable, <tt>b</tt> is fixed.
- */
+/// Constructs a function that returns `a < b ? -1 : a > b ? 1 : 0`.
+/// `a` is a variable, `b` is fixed.
 DoubleFunction compareTo(double b) {
-    return (double a) {
-            return a < b ? -1 : a > b ? 1.0 : 0.0;
-    };
+  return (double a) => a < b ? -1 : a > b ? 1.0 : 0.0;
 }
 
-/**
- * Constructs a function that returns the constant <tt>c</tt>.
- */
+/// Constructs a function that returns the constant `c`.
 DoubleFunction constant(double c) {
-    return (double a) {
-            return c;
-    };
+  return (double a) => c;
 }
 
-/**
- * Demonstrates usage of this class.
- */
-void demo1() {
-    //DoubleFunctions F = cern.jet.math.tdouble.DoubleFunctions.functions;
-    double a = 0.5;
-    double b = 0.2;
-    double v = Math.sin(a) + Math.pow(Math.cos(b), 2);
-    print(v);
-    DoubleDoubleFunction f = chainFGH(plus, sin, chainGH(square, cos));
-    // DoubleDoubleFunction f = F.chain(plus,sin,F.chain(square,cos));
-    print(f(a, b));
-    double g(double x, double y) {
-            return Math.sin(x) + Math.pow(Math.cos(y), 2);
-    };
-    print(g(a, b));
-    DoubleFunction m = add(3.0);
-    DoubleFunction n = add(4.0);
-    print(m(0.0));
-    print(n(0.0));
-}
-
-/**
- * Benchmarks and demonstrates usage of trivial and complex functions.
- */
-void demo2(int size) {
-    //cern.jet.math.tdouble.DoubleFunctions F = cern.jet.math.tdouble.DoubleFunctions.functions;
-    print("\n\n");
-    double a = 0.0;
-    double b = 0.0;
-    double v = (Math.sin(a) + Math.pow(Math.cos(b), 2)).abs();
-    // double v = Math.sin(a) + Math.pow(Math.cos(b),2);
-    // double v = a + b;
-    print(v);
-
-    // DoubleDoubleFunction f = F.chain(F.plus,F.identity,F.identity);
-    DoubleDoubleFunction f = chain(abs, chainFGH(plus, sin, chainGH(square, cos)));
-    // DoubleDoubleFunction f =
-    // F.chain(F.plus,F.sin,F.chain(F.square,F.cos));
-    // DoubleDoubleFunction f = F.plus;
-
-    print(f(a, b));
-    double g(double x, double y) {
-            return (Math.sin(x) + Math.pow(Math.cos(y), 2)).abs();
-    };
-    print(g(a, b));
-
-    // emptyLoop
-    //colt.Timer emptyLoop = new colt.Timer().start();
-    a = 0.0;
-    b = 0.0;
-    double sum = 0.0;
-    for (int i = size; --i >= 0;) {
-        sum += a;
-        a++;
-        b++;
-    }
-    //emptyLoop.stop().display();
-    print("empty sum=$sum");
-
-    //colt.Timer timer = new colt.Timer().start();
-    a = 0.0;
-    b = 0.0;
-    sum = 0.0;
-    for (int i = size; --i >= 0;) {
-        sum += (Math.sin(a) + Math.pow(Math.cos(b), 2)).abs();
-        // sum += a + b;
-        a++;
-        b++;
-    }
-    //timer.stop().display();
-    //print("evals / sec = ${size / timer.minus(emptyLoop).seconds()}");
-    print("sum=$sum");
-
-    //timer.reset().start();
-    a = 0.0;
-    b = 0.0;
-    sum = 0.0;
-    for (int i = size; --i >= 0;) {
-        sum += f(a, b);
-        a++;
-        b++;
-    }
-    //timer.stop().display();
-    //print("evals / sec = ${size / timer.minus(emptyLoop).seconds()}");
-    print("sum=${sum}");
-
-    //timer.reset().start();
-    a = 0.0;
-    b = 0.0;
-    sum = 0.0;
-    for (int i = size; --i >= 0;) {
-        sum += g(a, b);
-        a++;
-        b++;
-    }
-    //timer.stop().display();
-    //print("evals / sec = ${size / timer.minus(emptyLoop).seconds()}");
-    print("sum=$sum");
-
-}
-
-/**
- * Constructs a function that returns <tt>a / b</tt>. <tt>a</tt> is a
- * variable, <tt>b</tt> is fixed.
- */
+/// Constructs a function that returns `a / b`. `a` is a
+/// variable, `b` is fixed.
 DoubleFunction divide(double b) {
-    return multiply(1.0 / b);
+  return multiply(1.0 / b);
 }
 
-/**
- * Constructs a function that returns <tt>a == b ? 1 : 0</tt>. <tt>a</tt> is
- * a variable, <tt>b</tt> is fixed.
- */
+/// Constructs a function that returns `a == b ? 1 : 0`. `a` is
+/// a variable, `b` is fixed.
 DoubleFunction equalTo(double b) {
-    return (double a) {
-            return a == b ? 1.0 : 0.0;
-    };
+  return (double a) {
+    return a == b ? 1.0 : 0.0;
+  };
 }
 
-/**
- * Constructs a function that returns <tt>a > b ? 1 : 0</tt>. <tt>a</tt> is
- * a variable, <tt>b</tt> is fixed.
- */
+/// Constructs a function that returns `a > b ? 1 : 0`. `a` is
+/// a variable, `b` is fixed.
 DoubleFunction greaterThan(double b) {
-    return (double a) {
-            return a > b ? 1.0 : 0.0;
-    };
+  return (double a) {
+    return a > b ? 1.0 : 0.0;
+  };
 }
 
-/**
- * Constructs a function that returns <tt>Math.IEEEremainder(a,b)</tt>.
- * <tt>a</tt> is a variable, <tt>b</tt> is fixed.
- */
+/// Constructs a function that returns `Math.IEEEremainder(a,b)`.
+/// `a` is a variable, `b` is fixed.
 /*DoubleFunction IEEEremainderOf(double b) {
     return (double a) {
             return Math.IEEEremainder(a, b);
     };
 }*/
 
-/**
- * Constructs a function that returns <tt>from<=a && a<=to</tt>. <tt>a</tt>
- * is a variable, <tt>from</tt> and <tt>to</tt> are fixed.
- */
-DoubleProcedure isBetween(double from, double to) {
-    return (double a) {
-            return from <= a && a <= to;
-    };
-}
+/// Constructs a function that returns `from<=a && a<=to`. `a`
+/// is a variable, `from` and `to` are fixed.
+//DoubleProcedure isBetween(double from, double to) {
+//    return (double a) => from <= a && a <= to;
+//}
+
+/// Constructs a function that returns `a == b`. `a` is a
+/// variable, `b` is fixed.
+//DoubleProcedure isEqualTo(double b) {
+//    return (double a) => a == b;
+//}
+
+/// Constructs a function that returns `a > b`. `a` is a
+/// variable, `b` is fixed.
+//DoubleProcedure isGreaterThan(double b) {
+//    return (double a) => a > b;
+//}
 
 /**
- * Constructs a function that returns <tt>a == b</tt>. <tt>a</tt> is a
- * variable, <tt>b</tt> is fixed.
+ * Constructs a function that returns `a < b`. `a` is a
+ * variable, `b` is fixed.
  */
-DoubleProcedure isEqualTo(double b) {
-    return (double a) {
-            return a == b;
-    };
-}
+//DoubleProcedure isLessThan(double b) {
+//    return (double a) => a < b;
+//}
 
-/**
- * Constructs a function that returns <tt>a > b</tt>. <tt>a</tt> is a
- * variable, <tt>b</tt> is fixed.
- */
-DoubleProcedure isGreaterThan(double b) {
-    return (double a) {
-            return a > b;
-    };
-}
-
-/**
- * Constructs a function that returns <tt>a < b</tt>. <tt>a</tt> is a
- * variable, <tt>b</tt> is fixed.
- */
-DoubleProcedure isLessThan(double b) {
-    return (double a) {
-            return a < b;
-    };
-}
-
-/**
- * Constructs a function that returns <tt>a < b ? 1 : 0</tt>. <tt>a</tt> is
- * a variable, <tt>b</tt> is fixed.
- */
+/// Constructs a function that returns `a < b ? 1 : 0`. `a` is
+/// a variable, `b` is fixed.
 DoubleFunction lessThan(double b) {
-    return (double a) {
-            return a < b ? 1.0 : 0.0;
-    };
+  return (double a) => a < b ? 1.0 : 0.0;
 }
 
-/**
- * Constructs a function that returns <tt><tt>Math.log(a) / Math.log(b)</tt>
- * </tt>. <tt>a</tt> is a variable, <tt>b</tt> is fixed.
- */
+/// Constructs a function that returns ``Math.log(a) / Math.log(b)`
+/// `. `a` is a variable, `b` is fixed.
 DoubleFunction lgFn(double b) {
-    double logInv = 1 / Math.log(b); // cached for speed
-    return (double a) {
-            return Math.log(a) * logInv;
-    };
+  double logInv = 1 / Math.log(b); // cached for speed
+  return (double a) => Math.log(a) * logInv;
 }
 
-/**
- * Tests various methods of this class.
- */
-void main() {
-    int size = 6;//Integer.parseInt(args[0]);
-    demo2(size);
-    // demo1();
-}
-
-/**
- * Constructs a function that returns <tt>Math.max(a,b)</tt>. <tt>a</tt> is
- * a variable, <tt>b</tt> is fixed.
- */
+/// Constructs a function that returns `Math.max(a,b)`. `a` is
+/// a variable, `b` is fixed.
 DoubleFunction maximum(double b) {
-    return (double a) {
-            return Math.max(a, b);
-    };
+  return (double a) => Math.max(a, b);
 }
 
-/**
- * Constructs a function that returns <tt>Math.min(a,b)</tt>. <tt>a</tt> is
- * a variable, <tt>b</tt> is fixed.
- */
+/// Constructs a function that returns `Math.min(a,b)`. `a` is
+/// a variable, `b` is fixed.
 DoubleFunction minimum(double b) {
-    return (double a) {
-            return Math.min(a, b);
-    };
+  return (double a) => Math.min(a, b);
 }
 
-/**
- * Constructs a function that returns <tt>a - b</tt>. <tt>a</tt> is a
- * variable, <tt>b</tt> is fixed.
- */
+/// Constructs a function that returns `a - b`. `a` is a
+/// variable, `b` is fixed.
 DoubleFunction subtract(num b) {
-    return add(-b.toDouble());
+  return add(-b.toDouble());
 }
 
-/**
- * Constructs a function that returns <tt>a - b*constant</tt>. <tt>a</tt>
- * and <tt>b</tt> are variables, <tt>constant</tt> is fixed.
- */
+/// Constructs a function that returns `a - b*constant`. `a`
+/// and `b` are variables, `constant` is fixed.
 DoubleDoubleFunction minusMult(double constant) {
-    return plusMultSecond(-constant);
+  return plusMultSecond(-constant);
 }
 
-/**
- * Constructs a function that returns <tt>a % b</tt>. <tt>a</tt> is a
- * variable, <tt>b</tt> is fixed.
- */
+/// Constructs a function that returns `a % b`. `a` is a
+/// variable, `b` is fixed.
 DoubleFunction modulus(double b) {
-    return (double a) {
-            return a % b;
-    };
+  return (double a) {
+    return a % b;
+  };
 }
 
-/**
- * Constructs a function that returns <tt>a * b</tt>. <tt>a</tt> is a
- * variable, <tt>b</tt> is fixed.
- */
+/// Constructs a function that returns `a * b`. `a` is a
+/// variable, `b` is fixed.
 DoubleFunction multiply(double b) {
-    return new DoubleMult(b);
-    /*
-     * return new DoubleFunction() { public final double apply(double a) {
-     * return a * b; } };
-     */
+  return new DoubleMult(b);
 }
 
-/**
- * Constructs a function that returns <tt>a + b</tt>. <tt>a</tt> is a
- * variable, <tt>b</tt> is fixed.
- */
+/// Constructs a function that returns `a + b`. `a` is a
+/// variable, `b` is fixed.
 DoubleFunction add(double b) {
-    return (double a) {
-            return a + b;
-    };
+  return (double a) => a + b;
 }
 
-/**
- * Constructs a function that returns <tt>b*constant</tt>.
- */
+/// Constructs a function that returns `b*constant`.
 DoubleDoubleFunction multSecond(double constant) {
-    return (double a, double b) {
-            return b * constant;
-    };
+  return (double a, double b) => b * constant;
 }
 
-/**
- * Constructs a function that returns <tt>a + b*constant</tt>. <tt>a</tt>
- * and <tt>b</tt> are variables, <tt>constant</tt> is fixed.
- */
+/// Constructs a function that returns `a + b*constant`. `a`
+/// and `b` are variables, `constant` is fixed.
 DoubleDoubleFunction plusMultSecond(double constant) {
-    return new DoublePlusMultSecond(constant);
+  return new DoublePlusMultSecond(constant);
 }
 
-/**
- * Constructs a function that returns <tt>a * constant + b</tt>. <tt>a</tt>
- * and <tt>b</tt> are variables, <tt>constant</tt> is fixed.
- */
+/// Constructs a function that returns `a * constant + b`. `a`
+/// and `b` are variables, `constant` is fixed.
 DoubleDoubleFunction plusMultFirst(double constant) {
-    return new DoublePlusMultFirst(constant);
+  return new DoublePlusMultFirst(constant);
 }
 
-/**
- * Constructs a function that returns <tt>Math.pow(a,b)</tt>. <tt>a</tt> is
- * a variable, <tt>b</tt> is fixed.
- */
+/// Constructs a function that returns `Math.pow(a,b)`. `a` is
+/// a variable, `b` is fixed.
 DoubleFunction power(double b) {
-    return (double a) {
-            return Math.pow(a, b);
-    };
+  return (double a) => Math.pow(a, b);
 }
 
-/**
- * Constructs a function that returns a new uniform random number in the
- * open unit interval <code>(0.0,1.0)</code> (excluding 0.0 and 1.0).
- * Currently the engine is
- * {@link cern.jet.random.tdouble.engine.DoubleMersenneTwister} and is
- * seeded with the current time.
- * <p>
- * Note that any random engine derived from
- * {@link cern.jet.random.tdouble.engine.DoubleRandomEngine} and any random
- * distribution derived from
- * {@link cern.jet.random.tdouble.AbstractDoubleDistribution} are function
- * objects, because they implement the proper interfaces. Thus, if you are
- * not happy with the default, just pass your favourite random generator to
- * function evaluating methods.
- */
+/// Constructs a function that returns a new uniform random number in the
+/// open unit interval <code>(0.0,1.0)</code> (excluding 0.0 and 1.0).
 DoubleFunction random() {
-    return RandomDoubleFunction;
+  return RandomDoubleFunction;
 }
 
-// TODO
+final _r = new Math.Random();
+
 double RandomDoubleFunction(double argument) {
-        return new Math.Random().nextDouble();
+  return _r.nextDouble();
 }
 
-/**
- * Constructs a function that returns the number rounded to the given
- * precision; <tt>Math.rint(a/precision)*precision</tt>. Examples:
- *
- * <pre>
- * precision = 0.01 rounds 0.012 --&gt; 0.01, 0.018 --&gt; 0.02
- * precision = 10   rounds 123   --&gt; 120 , 127   --&gt; 130
- * </pre>
- */
+/// Constructs a function that returns the number rounded to the given
+/// precision; `Math.rint(a/precision)*precision`. Examples:
+///     precision = 0.01 rounds 0.012 --> 0.01, 0.018 --> 0.02
+///     precision = 10   rounds 123   --> 120 , 127   --> 130
 DoubleFunction round(double precision) {
-    return (double a) {
-            return (a / precision).round() * precision;
-    };
+  return (double a) => (a / precision).round() * precision;
 }
 
-/**
- * Constructs a function that returns <tt>function.apply(b,a)</tt>, i.e.
- * applies the function with the first operand as second operand and the
- * second operand as first operand.
- *
- * @param function
- *            a function taking operands in the form
- *            <tt>function.apply(a,b)</tt>.
- * @return the binary function <tt>function(b,a)</tt>.
- */
-DoubleDoubleFunction swapArgs(final DoubleDoubleFunction function) {
-    return (double a, double b) {
-            return function(b, a);
-    };
+/// Constructs a function that returns `fn(b,a)`, i.e.
+/// applies the function with the first operand as second operand and the
+/// second operand as first operand.
+DoubleDoubleFunction swapArgs(final DoubleDoubleFunction fn) {
+  return (double a, double b) => fn(b, a);
+}
+
+/// Only for performance tuning of compute intensive linear algebraic
+/// computations. Constructs functions that return one of:
+/// - `a * constant`
+/// - `a / constant`
+/// `a` is variable, `constant` is fixed, but for performance
+/// reasons publicly accessible. Intended to be passed to
+/// `matrix.apply(function)` methods.
+class DoubleMult {
+    /// Public read/write access to avoid frequent object construction.
+    double multiplicator;
+
+    DoubleMult(this.multiplicator);
+
+    /// Returns the result of the function evaluation.
+    double call(double a) => a * multiplicator;
+
+    /// `a / constant`.
+    factory DoubleMult.div(final double constant) {
+        return new DoubleMult.mult(1 / constant);
+    }
+
+    /// `a * constant`.
+    factory DoubleMult.mult(final double constant) {
+        return new DoubleMult(constant);
+    }
+}
+
+/// Only for performance tuning of compute intensive linear algebraic
+/// computations. Constructs functions that return one of:
+/// - `a*constant + b`
+/// - `a*constant - b`
+/// - `a/constant + b`
+/// - `a/constant - b`
+/// `a` and `b` are variables, `constant` is fixed, but for
+/// performance reasons publicly accessible. Intended to be passed to
+/// `matrix.assign(otherMatrix,function)` methods.
+class DoublePlusMultFirst {
+    /// Public read/write access to avoid frequent object construction.
+    double multiplicator;
+
+    DoublePlusMultFirst(this.multiplicator);
+
+    /// Returns the result of the function evaluation.
+    double call(double a, double b) => a * multiplicator + b;
+
+    /// `a - b/constant`.
+    factory DoublePlusMultFirst.minusDiv(final double constant) {
+        return new DoublePlusMultFirst(-1 / constant);
+    }
+
+    /// `a - b*constant`.
+    factory DoublePlusMultFirst.minusMult(final double constant) {
+        return new DoublePlusMultFirst(-constant);
+    }
+
+    /// `a + b/constant`.
+    factory DoublePlusMultFirst.plusDiv(final double constant) {
+        return new DoublePlusMultFirst(1 / constant);
+    }
+
+    /// `a + b*constant`.
+    factory DoublePlusMultFirst.plusMult(final double constant) {
+        return new DoublePlusMultFirst(constant);
+    }
+}
+
+/// Only for performance tuning of compute intensive linear algebraic
+/// computations. Constructs functions that return one of:
+/// - `a + b*constant`
+/// - `a - b*constant`
+/// - `a + b/constant`
+/// - `a - b/constant`
+/// `a` and `b` are variables, `constant` is fixed, but for
+/// performance reasons publicly accessible. Intended to be passed to
+/// `matrix.assign(otherMatrix,function)` methods.
+class DoublePlusMultSecond {
+    /// Public read/write access to avoid frequent object construction.
+    double multiplicator;
+
+    DoublePlusMultSecond(this.multiplicator);
+
+    /// Returns the result of the function evaluation.
+    double call(double a, double b) => a + b * multiplicator;
+
+    /// `a - b/constant`.
+    factory DoublePlusMultSecond.minusDiv(final double constant) {
+        return new DoublePlusMultSecond(-1 / constant);
+    }
+
+    /// `a - b*constant`.
+    factory DoublePlusMultSecond.minusMult(final double constant) {
+        return new DoublePlusMultSecond(-constant);
+    }
+
+    /// `a + b/constant`.
+    factory DoublePlusMultSecond.plusDiv(final double constant) {
+        return new DoublePlusMultSecond(1 / constant);
+    }
+
+    /// `a + b*constant`.
+    factory DoublePlusMultSecond.plusMult(final double constant) {
+        return new DoublePlusMultSecond(constant);
+    }
 }
