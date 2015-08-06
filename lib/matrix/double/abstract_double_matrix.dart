@@ -252,7 +252,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
   /// specified lists. Fills into the lists, starting at index 0. After this
   /// call returns the specified lists all have a new size, the number of
   /// negative values.
-  void negativeValues(final List<int> rowList, final List<int> columnList,
+  void negative(final List<int> rowList, final List<int> columnList,
       final List<double> valueList) {
     rowList.clear();
     columnList.clear();

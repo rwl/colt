@@ -5,52 +5,42 @@ void testDoubleMatrix(String name, DoubleMatrixTest t) {
     setUp(t.setUp);
     tearDown(t.tearDown);
     test('aggregate', t.testAggregate);
-    test('aggregateProc', t.testAggregateProc);
-    test('aggregateIndex', t.testAggregateIndex);
-    test('aggregateFunc', t.testAggregateFunc);
-    test('assignValue', t.testAssignValue);
-    test('assignValues2D', t.testAssignValues2D);
+    test('fill', t.testFill);
+    test('apply', t.testApply);
+    test('copyFrom', t.testCopyFrom);
     test('assign', t.testAssign);
-    test('assignMatrix', t.testAssignMatrix);
-    test('assignFunc', t.testAssignFunc);
-    test('assignFuncIndex', t.testAssignFuncIndex);
-    test('assignProc', t.testAssignProc);
-    test('assignProcFunc', t.testAssignProcFunc);
     test('cardinality', t.testCardinality);
-    test('all', t.testAll);
     test('equals', t.testEquals);
     test('forEachNonZero', t.testForEachNonZero);
-    test('maxLocation', t.testMaxLocation);
-    test('minLocation', t.testMinLocation);
-    test('getNegativeValues', t.testGetNegativeValues);
-    test('getNonZeros', t.testGetNonZeros);
-    test('getPositiveValues', t.testGetPositiveValues);
-    test('toArray', t.testToArray);
-    test('vectorize', t.testVectorize);
-    test('viewColumn', t.testViewColumn);
-    test('viewColumnFlip', t.testViewColumnFlip);
-    test('viewDice', t.testViewDice);
-    test('viewPart', t.testViewPart);
-    test('viewRow', t.testViewRow);
-    test('viewRowFlip', t.testViewRowFlip);
-    test('viewSelectionProc', t.testViewSelectionProc);
-    test('viewSelection', t.testViewSelection);
-    test('viewStrides', t.testViewStrides);
-    test('zMult', t.testZMult);
-    test('zMult2D', t.testZMult2D);
-    test('testZSum', t.testZSum);
+    test('max', t.testMax);
+    test('min', t.testMin);
+    test('negative', t.testNegative);
+    test('nonzero', t.testNonzero);
+    test('positive', t.testPositive);
+    test('toList', t.testToList);
+    test('column', t.testColumn);
+    test('columnFlip', t.testColumnFlip);
+    test('dice', t.testDice);
+    test('part', t.testPart);
+    test('row', t.testRow);
+    test('rowFlip', t.testRowFlip);
+    test('select', t.testSelect);
+    test('strides', t.testStrides);
+    test('mult', t.testMult);
+    test('multiply', t.testMultiply);
+    test('sum', t.testSum);
   });
 }
 
 abstract class DoubleMatrixTest {
 
-  /** Matrix to test. */
+  /// Matrix to test.
   AbstractDoubleMatrix A;
 
-  /** Matrix of the same size as [A]. */
+  /// Matrix of the same size as [A].
   AbstractDoubleMatrix B;
 
-  /** Matrix of the size A.columns() x A.rows(). */
+  /// Matrix of the size `A.columns x A.rows`.
   AbstractDoubleMatrix Bt;
 
   final int NROWS = 13;
@@ -59,7 +49,6 @@ abstract class DoubleMatrixTest {
   final double TOL = 1e-10;
 
   void populateMatrices() {
-    //ConcurrencyUtils.setThreadsBeginN_2D(1);
     for (int r = 0; r < A.rows; r++) {
       for (int c = 0; c < A.columns; c++) {
         A.set(r, c, random.nextDouble());
@@ -98,68 +87,11 @@ abstract class DoubleMatrixTest {
         expected += elem * elem;
       }
     }
-    double result = A.reduce(plus, square);
+    double result = A.aggregate(plus, square);
     expect(expected, closeTo(result, TOL));
   }
 
-  testAggregateProc() {
-    bool procedure(double element) {
-      if (element.abs() > 0.2) {
-        return true;
-      } else {
-        return false;
-      }
-    }
-    double expected = 0.0;
-    for (int r = 0; r < A.rows; r++) {
-      for (int c = 0; c < A.columns; c++) {
-        double elem = A.get(r, c);
-        if (elem.abs() > 0.2) {
-          expected += elem * elem;
-        }
-      }
-    }
-
-    double result = A.reduceWhere(plus, square, procedure);
-    expect(expected, closeTo(result, TOL));
-  }
-
-  testAggregateIndex() {
-    List<int> rowList = new List<int>();
-    List<int> columnList = new List<int>();
-    for (int r = 0; r < A.rows; r++) {
-      for (int c = 0; c < A.columns; c++) {
-        rowList.add(r);
-        columnList.add(c);
-      }
-    }
-    double expected = 0.0;
-    for (int r = 0; r < A.rows; r++) {
-      for (int c = 0; c < A.columns; c++) {
-        double elem = A.get(r, c);
-        expected += elem * elem;
-      }
-    }
-    double result = A.reduceRange(plus, square,
-        new Int32List.fromList(rowList),
-        new Int32List.fromList(columnList));
-    expect(expected, closeTo(result, TOL));
-  }
-
-  testAggregateFunc() {
-    double expected = 0.0;
-    for (int r = 0; r < A.rows; r++) {
-      for (int c = 0; c < A.columns; c++) {
-        double elemA = A.get(r, c);
-        double elemB = B.get(r, c);
-        expected += elemA * elemB;
-      }
-    }
-    double result = A.reduceMatrix(B, plus, mult);
-    expect(expected, closeTo(result, TOL));
-  }
-
-  testAssignValue() {
+  testFill() {
     double value = random.nextDouble();
     A.fill(value);
     for (int r = 0; r < A.rows; r++) {
@@ -169,26 +101,9 @@ abstract class DoubleMatrixTest {
     }
   }
 
-  testAssignValues2D() {
-    List<Float64List> expected = new List<Float64List>(A.rows);//[A.columns()];
-    for (int r = 0; r < A.rows; r++) {
-      expected[r] = new Float64List(A.columns);
-      for (int c = 0; c < A.columns; c++) {
-        expected[r][c] = random.nextDouble();
-      }
-    }
-    A.setAll2D(expected);
-    for (int r = 0; r < A.rows; r++) {
-      expect(A.columns == expected[r].length, isTrue);
-      for (int c = 0; c < A.columns; c++) {
-        expect(expected[r][c], closeTo(A.get(r, c), TOL));
-      }
-    }
-  }
-
-  testAssign() {
+  testApply() {
     AbstractDoubleMatrix Acopy = A.copy();
-    A.forEach(acos);
+    A.apply(acos);
     for (int r = 0; r < A.rows; r++) {
       for (int c = 0; c < A.columns; c++) {
         double expected = math.acos(Acopy.get(r, c));
@@ -197,7 +112,7 @@ abstract class DoubleMatrixTest {
     }
   }
 
-  testAssignMatrix() {
+  testCopyFrom() {
     A.copyFrom(B);
     for (int r = 0; r < A.rows; r++) {
       for (int c = 0; c < A.columns; c++) {
@@ -206,72 +121,12 @@ abstract class DoubleMatrixTest {
     }
   }
 
-  testAssignFunc() {
+  testAssign() {
     AbstractDoubleMatrix Acopy = A.copy();
-    A.forEachWith(B, plus);
+    A.assign(B, plus);
     for (int r = 0; r < A.rows; r++) {
       for (int c = 0; c < A.columns; c++) {
         expect(Acopy.get(r, c) + B.get(r, c), closeTo(A.get(r, c), TOL));
-      }
-    }
-  }
-
-  testAssignFuncIndex() {
-    List<int> rowList = new List<int>();
-    List<int> columnList = new List<int>();
-    for (int r = 0; r < A.rows; r++) {
-      for (int c = 0; c < A.columns; c++) {
-        rowList.add(r);
-        columnList.add(c);
-      }
-    }
-    AbstractDoubleMatrix Acopy = A.copy();
-    A.forEachWithNonZero(B, div, new Int32List.fromList(rowList), new Int32List.fromList(columnList));
-    for (int r = 0; r < A.rows; r++) {
-      for (int c = 0; c < A.columns; c++) {
-        expect(Acopy.get(r, c) / B.get(r, c), closeTo(A.get(r, c), TOL));
-      }
-    }
-  }
-
-  testAssignProc() {
-    bool procedure(double element) {
-      if (element.abs() > 0.1) {
-        return true;
-      } else {
-        return false;
-      }
-    }
-    AbstractDoubleMatrix Acopy = A.copy();
-    A.fillWhere(procedure, -1.0);
-    for (int r = 0; r < A.rows; r++) {
-      for (int c = 0; c < A.columns; c++) {
-        if (Acopy.get(r, c).abs() > 0.1) {
-          expect(-1.0, closeTo(A.get(r, c), TOL));
-        } else {
-          expect(Acopy.get(r, c), closeTo(A.get(r, c), TOL));
-        }
-      }
-    }
-  }
-
-  testAssignProcFunc() {
-    bool procedure(double element) {
-      if (element.abs() > 0.1) {
-        return true;
-      } else {
-        return false;
-      }
-    }
-    AbstractDoubleMatrix Acopy = A.copy();
-    A.forEachWhere(procedure, tan);
-    for (int r = 0; r < A.rows; r++) {
-      for (int c = 0; c < A.columns; c++) {
-        if (Acopy.get(r, c).abs() > 0.1) {
-          expect(math.tan(Acopy.get(r, c)), closeTo(A.get(r, c), TOL));
-        } else {
-          expect(Acopy.get(r, c), closeTo(A.get(r, c), TOL));
-        }
       }
     }
   }
@@ -281,13 +136,6 @@ abstract class DoubleMatrixTest {
     expect(A.rows * A.columns, equals(card));
   }
 
-  testAll() {
-    double value = 1.0;
-    A.fill(value);
-    expect(A.all(value), isTrue);
-    expect(A.all(2.0), isFalse);
-  }
-
   testEquals() {
     expect(A.equals(A), isTrue);
     expect(A.equals(B), isFalse);
@@ -295,10 +143,10 @@ abstract class DoubleMatrixTest {
 
   testForEachNonZero() {
     AbstractDoubleMatrix Acopy = A.copy();
-    double function(int first, int second, double third) {
+    double fn(int first, int second, double third) {
       return math.sqrt(third);
     }
-    A.forEachNonZero(function);
+    A.forEachNonZero(fn);
     for (int r = 0; r < A.rows; r++) {
       for (int c = 0; c < A.columns; c++) {
         expect(math.sqrt(Acopy.get(r, c)), closeTo(A.get(r, c), TOL));
@@ -306,7 +154,7 @@ abstract class DoubleMatrixTest {
     }
   }
 
-  testMaxLocation() {
+  testMax() {
     A.fill(0.0);
     A.set(A.rows ~/ 3, A.columns ~/ 3, 0.7);
     A.set(A.rows ~/ 2, A.columns ~/ 2, 0.1);
@@ -316,7 +164,7 @@ abstract class DoubleMatrixTest {
     expect(A.columns ~/ 3, equals(maxAndLoc.column));
   }
 
-  testMinLocation() {
+  testMin() {
     A.fill(0.0);
     A.set(A.rows ~/ 3, A.columns ~/ 3, -0.7);
     A.set(A.rows ~/ 2, A.columns ~/ 2, -0.1);
@@ -326,14 +174,14 @@ abstract class DoubleMatrixTest {
     expect(A.columns ~/ 3, equals(minAndLoc.column));
   }
 
-  testGetNegativeValues() {
+  testNegative() {
     A.fill(0.0);
     A.set(A.rows ~/ 3, A.columns ~/ 3, -0.7);
     A.set(A.rows ~/ 2, A.columns ~/ 2, -0.1);
-    List<int> rowList = new List<int>();
-    List<int> columnList = new List<int>();
-    List<double> valueList = new List<double>();
-    A.negativeValues(rowList, columnList, valueList);
+    var rowList = new List<int>();
+    var columnList = new List<int>();
+    var valueList = new List<double>();
+    A.negative(rowList, columnList, valueList);
     expect(2, equals(rowList.length));
     expect(2, equals(columnList.length));
     expect(2, equals(valueList.length));
@@ -345,14 +193,14 @@ abstract class DoubleMatrixTest {
     expect(valueList.contains(-0.1), isTrue);
   }
 
-  testGetNonZeros() {
+  testNonzero() {
     A.fill(0.0);
     A.set(A.rows ~/ 3, A.columns ~/ 3, 0.7);
     A.set(A.rows ~/ 2, A.columns ~/ 2, 0.1);
-    List<int> rowList = new List<int>();
-    List<int> columnList = new List<int>();
-    List<double> valueList = new List<double>();
-    A.nonZeros(rowList, columnList, valueList);
+    var rowList = new List<int>();
+    var columnList = new List<int>();
+    var valueList = new List<double>();
+    A.nonzero(rowList, columnList, valueList);
     expect(2, equals(rowList.length));
     expect(2, equals(columnList.length));
     expect(2, equals(valueList.length));
@@ -364,14 +212,14 @@ abstract class DoubleMatrixTest {
     expect(valueList.contains(0.1), isTrue);
   }
 
-  testGetPositiveValues() {
+  testPositive() {
     A.fill(0.0);
     A.set(A.rows ~/ 3, A.columns ~/ 3, 0.7);
     A.set(A.rows ~/ 2, A.columns ~/ 2, 0.1);
-    List<int> rowList = new List<int>();
-    List<int> columnList = new List<int>();
-    List<double> valueList = new List<double>();
-    A.positiveValues(rowList, columnList, valueList);
+    var rowList = new List<int>();
+    var columnList = new List<int>();
+    var valueList = new List<double>();
+    A.positive(rowList, columnList, valueList);
     expect(2, equals(rowList.length));
     expect(2, equals(columnList.length));
     expect(2, equals(valueList.length));
@@ -383,38 +231,17 @@ abstract class DoubleMatrixTest {
     expect(valueList.contains(0.1), isTrue);
   }
 
-  testToArray() {
-    List<Float64List> array = A.toList();
-    expect(A.rows == array.length, isTrue);
-    for (int r = 0; r < A.rows; r++) {
-      expect(A.columns == array[r].length, isTrue);
-      for (int c = 0; c < A.columns; c++) {
-        expect(0, closeTo((array[r][c] - A.get(r, c)).abs(), TOL));
-      }
-    }
-  }
-
-  testVectorize() {
-    AbstractDoubleVector Avec = A.vectorize();
-    int idx = 0;
-    for (int c = 0; c < A.columns; c++) {
-      for (int r = 0; r < A.rows; r++) {
-        expect(A.get(r, c), closeTo(Avec.get(idx++), TOL));
-      }
-    }
-  }
-
-  testViewColumn() {
+  testColumn() {
     AbstractDoubleVector col = A.column(A.columns ~/ 2);
-    expect(A.rows, equals(col.length));
+    expect(A.rows, equals(col.size));
     for (int r = 0; r < A.rows; r++) {
       expect(A.get(r, A.columns ~/ 2), closeTo(col.get(r), TOL));
     }
   }
 
-  testViewColumnFlip() {
+  testColumnFlip() {
     AbstractDoubleMatrix B = A.columnFlip();
-    expect(A.length, equals(B.length));
+    expect(A.size, equals(B.size));
     for (int r = 0; r < A.rows; r++) {
       for (int c = 0; c < A.columns; c++) {
         expect(A.get(r, A.columns - 1 - c), closeTo(B.get(r, c), TOL));
@@ -422,7 +249,7 @@ abstract class DoubleMatrixTest {
     }
   }
 
-  testViewDice() {
+  testDice() {
     AbstractDoubleMatrix B = A.dice();
     expect(A.rows, equals(B.columns));
     expect(A.columns, equals(B.rows));
@@ -433,28 +260,30 @@ abstract class DoubleMatrixTest {
     }
   }
 
-  testViewPart() {
-    AbstractDoubleMatrix B = A.part(A.rows ~/ 2, A.columns ~/ 2, A.rows ~/ 3, A.columns ~/ 3);
+  testPart() {
+    AbstractDoubleMatrix B =
+        A.part(A.rows ~/ 2, A.columns ~/ 2, A.rows ~/ 3, A.columns ~/ 3);
     expect(A.rows ~/ 3, equals(B.rows));
     expect(A.columns ~/ 3, equals(B.columns));
     for (int r = 0; r < A.rows / 3; r++) {
       for (int c = 0; c < A.columns / 3; c++) {
-        expect(A.get(A.rows ~/ 2 + r, A.columns ~/ 2 + c), closeTo(B.get(r, c), TOL));
+        expect(A.get(A.rows ~/ 2 + r, A.columns ~/ 2 + c),
+            closeTo(B.get(r, c), TOL));
       }
     }
   }
 
-  testViewRow() {
+  testRow() {
     AbstractDoubleVector B = A.row(A.rows ~/ 2);
-    expect(A.columns, equals(B.length));
+    expect(A.columns, equals(B.size));
     for (int r = 0; r < A.columns; r++) {
       expect(A.get(A.rows ~/ 2, r), closeTo(B.get(r), TOL));
     }
   }
 
-  testViewRowFlip() {
+  testRowFlip() {
     AbstractDoubleMatrix B = A.rowFlip();
-    expect(A.length, equals(B.length));
+    expect(A.size, equals(B.size));
     for (int r = 0; r < A.rows; r++) {
       for (int c = 0; c < A.columns; c++) {
         expect(A.get(A.rows - 1 - r, c), closeTo(B.get(r, c), TOL));
@@ -462,27 +291,17 @@ abstract class DoubleMatrixTest {
     }
   }
 
-  testViewSelectionProc() {
-    final double value = 2.0;
-    A.fill(0.0);
-    A.set(A.rows ~/ 4, 0, value);
-    A.set(A.rows ~/ 2, 0, value);
-    AbstractDoubleMatrix B = A.where((AbstractDoubleVector element) {
-      if ((element.get(0) - value).abs() < TOL) {
-        return true;
-      } else {
-        return false;
-      }
-    });
-    expect(2, equals(B.rows));
-    expect(A.columns, B.columns);
-    expect(A.get(A.rows ~/ 4, 0), closeTo(B.get(0, 0), TOL));
-    expect(A.get(A.rows ~/ 2, 0), closeTo(B.get(1, 0), TOL));
-  }
-
-  testViewSelection() {
-    Int32List rowIndexes = new Int32List.fromList([A.rows ~/ 6, A.rows ~/ 5, A.rows ~/ 4, A.rows ~/ 3, A.rows ~/ 2]);
-    Int32List colIndexes = new Int32List.fromList([A.columns ~/ 6, A.columns ~/ 5, A.columns ~/ 4, A.columns ~/ 3, A.columns ~/ 2, A.columns - 1]);
+  testSelect() {
+    var rowIndexes = new Int32List.fromList(
+        [A.rows ~/ 6, A.rows ~/ 5, A.rows ~/ 4, A.rows ~/ 3, A.rows ~/ 2]);
+    var colIndexes = new Int32List.fromList([
+      A.columns ~/ 6,
+      A.columns ~/ 5,
+      A.columns ~/ 4,
+      A.columns ~/ 3,
+      A.columns ~/ 2,
+      A.columns - 1
+    ]);
     AbstractDoubleMatrix B = A.select(rowIndexes, colIndexes);
     expect(rowIndexes.length, equals(B.rows));
     expect(colIndexes.length, equals(B.columns));
@@ -493,14 +312,7 @@ abstract class DoubleMatrixTest {
     }
   }
 
-  /*test('viewSorted', () {
-    DoubleMatrix B = A.viewSorted(1);
-    for (int r = 0; r < A.rows() - 1; r++) {
-      expect(B.getQuick(r + 1, 1) >= B.getQuick(r, 1), isTrue);
-    }
-  }*/
-
-  testViewStrides() {
+  testStrides() {
     int rowStride = 3;
     int colStride = 5;
     AbstractDoubleMatrix B = A.strides(rowStride, colStride);
@@ -511,9 +323,9 @@ abstract class DoubleMatrixTest {
     }
   }
 
-  testZMult() {
+  testMult() {
     AbstractDoubleVector y = new DoubleVector(A.columns);
-    for (int i = 0; i < y.length; i++) {
+    for (int i = 0; i < y.size; i++) {
       y.set(i, random.nextDouble());
     }
     double alpha = 3.0;
@@ -549,7 +361,7 @@ abstract class DoubleMatrixTest {
 
     //transpose
     y = new DoubleVector(A.rows);
-    for (int i = 0; i < y.length; i++) {
+    for (int i = 0; i < y.size; i++) {
       y.set(i, random.nextDouble());
     }
     z = new DoubleVector.random(A.columns);
@@ -581,7 +393,7 @@ abstract class DoubleMatrixTest {
     }
   }
 
-  testZMult2D() {
+  testMultiply() {
     double alpha = 3.0;
     double beta = 5.0;
     AbstractDoubleMatrix C = new DoubleMatrix.random(A.rows, A.rows);
@@ -605,7 +417,8 @@ abstract class DoubleMatrixTest {
     //---
     C = null;
     C = A.multiply(Bt, C, alpha, beta, false, false);
-    expected = new List<Float64List>.generate(A.rows, (_) => new Float64List(A.rows));
+    expected =
+        new List<Float64List>.generate(A.rows, (_) => new Float64List(A.rows));
     for (int j = 0; j < A.rows; j++) {
       for (int i = 0; i < A.rows; i++) {
         double s = 0.0;
@@ -642,8 +455,8 @@ abstract class DoubleMatrixTest {
     //---
     C = null;
     C = A.multiply(B, C, alpha, beta, true, false);
-    expected = new List<Float64List>.generate(A.columns,
-        (_) => new Float64List(A.columns));
+    expected = new List<Float64List>.generate(
+        A.columns, (_) => new Float64List(A.columns));
     for (int j = 0; j < A.columns; j++) {
       for (int i = 0; i < A.columns; i++) {
         double s = 0.0;
@@ -680,8 +493,8 @@ abstract class DoubleMatrixTest {
     //---
     C = null;
     C = A.multiply(B, C, alpha, beta, false, true);
-    expected = new List<Float64List>.generate(A.rows,
-        (_) => new Float64List(A.rows));
+    expected =
+        new List<Float64List>.generate(A.rows, (_) => new Float64List(A.rows));
     for (int j = 0; j < A.rows; j++) {
       for (int i = 0; i < A.rows; i++) {
         double s = 0.0;
@@ -717,8 +530,8 @@ abstract class DoubleMatrixTest {
     //---
     C = null;
     C = A.multiply(Bt, C, alpha, beta, true, true);
-    expected = new List<Float64List>.generate(A.columns,
-        (_) => new Float64List(A.columns));
+    expected = new List<Float64List>.generate(
+        A.columns, (_) => new Float64List(A.columns));
     for (int j = 0; j < A.columns; j++) {
       for (int i = 0; i < A.columns; i++) {
         double s = 0.0;
@@ -733,10 +546,9 @@ abstract class DoubleMatrixTest {
         expect(expected[r][c], closeTo(C.get(r, c), TOL));
       }
     }
-
   }
 
-  testZSum() {
+  testSum() {
     double sum = A.sum();
     double expected = 0.0;
     for (int r = 0; r < A.rows; r++) {

@@ -3,7 +3,7 @@ library cern.colt.matrix.double.test;
 import 'dart:math' as math;
 import 'dart:typed_data';
 
-import 'package:unittest/unittest.dart';
+import 'package:test/test.dart';
 import 'package:colt/colt.dart';
 import 'package:colt/function/double.dart' hide equals;
 
@@ -18,22 +18,28 @@ final math.Random random = new math.Random(0);
 
 doubleVectorTests() {
   testDoubleVector('DenseDoubleVector', new DenseDoubleVectorTest());
-  testDoubleVector('DenseDoubleVector viewFlip', new DenseDoubleVectorViewTest());
+  testDoubleVector(
+      'DenseDoubleVector viewFlip', new DenseDoubleVectorViewTest());
 
   testDoubleVector('SparseDoubleVector', new SparseDoubleVectorTest());
-  testDoubleVector('SparseDoubleVector viewFlip', new SparseDoubleVectorViewTest());
+  testDoubleVector(
+      'SparseDoubleVector viewFlip', new SparseDoubleVectorViewTest());
 }
 
 doubleMatrixTests() {
   testDenseDoubleMatrix('DenseDoubleMatrix', new DenseDoubleMatrixTest());
-  testDenseDoubleMatrix('DenseDoubleMatrix viewDice', new DenseDoubleMatrixViewTest());
+  testDenseDoubleMatrix(
+      'DenseDoubleMatrix viewDice', new DenseDoubleMatrixViewTest());
   testDoubleMatrix('DiagonalDoubleMatrix', new DiagonalDoubleMatrixTest());
-  testDoubleMatrix('DiagonalDoubleMatrix viewDice', new DiagonalDoubleMatrixViewTest());
+  testDoubleMatrix(
+      'DiagonalDoubleMatrix viewDice', new DiagonalDoubleMatrixViewTest());
 
-//  testDoubleMatrix('SparseCCDoubleMatrix', new SparseCCDoubleMatrixTest());
-//  testDoubleMatrix('SparseCCDoubleMatrix viewDice', new SparseCCDoubleMatrixViewTest());
-  testDoubleMatrix('SparseDoubleMatrix', new SparseDoubleMatrixTest());
-  testDoubleMatrix('SparseDoubleMatrix viewDice', new SparseDoubleMatrixViewTest());
-  testDoubleMatrix('SparseRCDoubleMatrix', new SparseRCDoubleMatrixTest());
-  testDoubleMatrix('SparseRCDoubleMatrix viewDice', new SparseRCDoubleMatrixViewTest());
+//  testSparseDoubleMatrix('SparseCCDoubleMatrix', new SparseCCDoubleMatrixTest());
+//  testSparseDoubleMatrix('SparseCCDoubleMatrix viewDice', new SparseCCDoubleMatrixViewTest());
+  testSparseDoubleMatrix('SparseDoubleMatrix', new SparseDoubleMatrixTest());
+  testSparseDoubleMatrix(
+      'SparseDoubleMatrix viewDice', new SparseDoubleMatrixViewTest());
+  testSparseDoubleMatrix('SparseRCDoubleMatrix', new SparseRCDoubleMatrixTest());
+  testSparseDoubleMatrix(
+      'SparseRCDoubleMatrix viewDice', new SparseRCDoubleMatrixViewTest());
 }
