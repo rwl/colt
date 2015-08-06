@@ -212,3 +212,9 @@ void vStrides(AbstractMatrix m, int rowStride, int columnStride) {
   }
   m._isNoView = false;
 }
+
+setIsNoView(AbstractMatrix m, bool isNoView) => m._isNoView = isNoView;
+
+setRows(AbstractMatrix m, int rows) => m._rows = rows;
+
+setColumns(AbstractMatrix m, int columns) => m._columns = columns;
