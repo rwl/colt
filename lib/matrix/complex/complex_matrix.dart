@@ -43,6 +43,10 @@ class ComplexMatrix extends AbstractComplexMatrix {
     _elements = elements;
   }
 
+  static ComplexMatrix create(int rows, int columns) {
+    return new ComplexMatrix(rows, columns);
+  }
+
   Float64List aggregate(final cfunc.ComplexComplexComplexFunction aggr,
       final cfunc.ComplexComplexFunction fn) {
     if (size == 0) {
@@ -385,7 +389,7 @@ class ComplexMatrix extends AbstractComplexMatrix {
     Float64List elemsOther = (transpose as ComplexMatrix)._elements;
     int zeroOther = transpose.index(0, 0);
     int columnStrideOther = transpose.columnStride;
-    int rowStrideOther = transpose.rowStride;
+    //int rowStrideOther = transpose.rowStride;
     int columnsOther = transpose.columns;
     int rowsOther = transpose.rows;
     int idxOther = zeroOther;

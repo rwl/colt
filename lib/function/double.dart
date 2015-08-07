@@ -1,7 +1,6 @@
 library cern.colt.function.double;
 
 import 'dart:math' as Math;
-import '../math.dart';
 
 typedef double DoubleFunction(double x);
 typedef double Double5Function(

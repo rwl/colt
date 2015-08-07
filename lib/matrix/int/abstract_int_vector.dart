@@ -105,7 +105,7 @@ abstract class AbstractIntVector
   ///     m1.assign(m2, F.pow);
   ///     -->
   ///     m1 == 1 1 16 729
-  void forEachWith(final AbstractIntVector y, final ifunc.IntIntFunction fn) {
+  void assign(final AbstractIntVector y, final ifunc.IntIntFunction fn) {
     checkSize(this, y);
     for (int i = 0; i < size; i++) {
       set(i, fn(get(i), y.get(i)));
@@ -162,7 +162,7 @@ abstract class AbstractIntVector
   /// the specified lists. Fills into the lists, starting at index 0. After
   /// this call returns the specified lists all have a new size, the number
   /// of negative values.
-  void negative({Int32List indexList, final Int32List valueList}) {
+  void negative({List<int> indexList, List<int> valueList}) {
     bool fillIndexList = indexList != null;
     bool fillValueList = valueList != null;
     if (fillIndexList) {
@@ -221,7 +221,7 @@ abstract class AbstractIntVector
   ///     valueList  = (8, 7)
   ///
   /// In other words, `get(2) == 8, get(4) == 7`.
-  void nonzero({Int32List indexList, Int32List valueList}) {
+  void nonzero({List<int> indexList, List<int> valueList}) {
     bool fillIndexList = indexList != null;
     bool fillValueList = valueList != null;
     if (fillIndexList) {
@@ -269,7 +269,7 @@ abstract class AbstractIntVector
   /// the specified lists. Fills into the lists, starting at index 0. After
   /// this call returns the specified lists all have a new size, the number
   /// of positive values.
-  void positive({Int32List indexList, Int32List valueList}) {
+  void positive({List<int> indexList, List<int> valueList}) {
     bool fillIndexList = indexList != null;
     bool fillValueList = valueList != null;
     if (fillIndexList) {
@@ -514,11 +514,11 @@ abstract class AbstractIntVector
   Object clone();
 
   AbstractIntVector operator &(AbstractIntVector a) {
-    return copy()..forEachWith(a, ifunc.and);
+    return copy()..assign(a, ifunc.and);
   }
 
   AbstractIntVector operator |(AbstractIntVector a) {
-    return copy()..forEachWith(a, ifunc.or);
+    return copy()..assign(a, ifunc.or);
   }
 
   AbstractIntVector operator ~() {

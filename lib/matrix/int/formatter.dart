@@ -29,8 +29,8 @@ class IntFormatter extends AbstractFormatter {
     if (format == null) {
       format = "%d";
     }
-    setFormat(format);
-    setAlignment(AbstractFormatter.DECIMAL);
+    _format = format;
+    _alignment = AbstractFormatter.DECIMAL;
   }
 
   /// Converts a given cell to a String; no alignment considered.
@@ -39,12 +39,12 @@ class IntFormatter extends AbstractFormatter {
   }
 
   /// Converts a given cell to a String; no alignment considered.
-  String _formVector(AbstractVector matrix, int index, Former formatter) {
+  /*String _formVector(AbstractVector matrix, int index, Former formatter) {
     return this._form(matrix as AbstractIntVector, index, formatter);
-  }
+  }*/
 
   /// Returns a string representations of all cells; no alignment considered.
-  List<List<String>> format(AbstractIntMatrix matrix) {
+  List<List<String>> formatMatrix(AbstractIntMatrix matrix) {
     final strings = new List<List<String>>.generate(
         matrix.rows, (_) => new List<String>(matrix.columns));
     for (int row = matrix.rows; --row >= 0;) {
@@ -55,7 +55,7 @@ class IntFormatter extends AbstractFormatter {
 
   /// Returns a string representations of all cells; no alignment considered.
   List<List<String>> _formatMatrix(AbstractMatrix matrix) {
-    return format(matrix as AbstractIntMatrix);
+    return formatMatrix(matrix as AbstractIntMatrix);
   }
 
   /// Returns the index of the decimal point.
@@ -77,9 +77,9 @@ class IntFormatter extends AbstractFormatter {
 
   /// Returns a string representation of the given matrix.
   String toStringVector(AbstractIntVector matrix) {
-    AbstractIntMatrix easy = matrix.like2D(1, matrix.length);
+    AbstractIntMatrix easy = matrix.like2D(1, matrix.size);
     easy.row(0).copyFrom(matrix);
-    return toString2D(easy);
+    return toStringMatrix(easy);
   }
 
   /// Returns a string representation of the given matrix.
@@ -88,9 +88,9 @@ class IntFormatter extends AbstractFormatter {
   }
 
   /// Returns a string representation of the given matrix.
-  String _toStringMatrix(AbstractMatrix matrix) {
+  /*String _toStringMatrix(AbstractMatrix matrix) {
     return toStringMatrix(matrix as AbstractIntMatrix);
-  }
+  }*/
 
   Object clone() {
     return new IntFormatter()

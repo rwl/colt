@@ -43,6 +43,10 @@ class SparseIntVector extends AbstractIntVector {
     _elements = elements;
   }
 
+  static SparseIntVector create(int size) {
+    return new SparseIntVector(size);
+  }
+
   void fill(int value) {
     if (!isView && value == 0) {
       _elements.clear();

@@ -13,7 +13,7 @@ import 'package:intl/intl.dart';
 import 'matrix.dart';
 import 'double/matrix.dart';
 import 'int/matrix.dart';
-import 'complex/matrix.dart';
+import '../math.dart' show MIN_INT;
 
 part 'double/formatter.dart';
 part 'int/formatter.dart';
@@ -106,7 +106,7 @@ abstract class AbstractFormatter {
 
   static List<String> _blanksCache = []; // for efficient String manipulations
 
-  static final FormerFactory _factory = new FormerFactory();
+  Function _factory = (String fmt) => new DefaultFormer(fmt);
 
   /*static {
     _setupBlanksCache();
@@ -154,7 +154,7 @@ abstract class AbstractFormatter {
   }
 
   /// Converts a row into a string.
-  int _alignmentCode(String alignment) {
+  /*int _alignmentCode(String alignment) {
     // {-1,0,1,2} = {left,centered,right,decimal point}
     if (alignment == LEFT) {
       return -1; }
@@ -167,7 +167,7 @@ abstract class AbstractFormatter {
     } else {
       throw new ArgumentError("unknown alignment: " + alignment);
     }
-  }
+  }*/
 
   /// Modifies the strings the string matrix to be aligned
   /// (left,centered,right,decimal).
@@ -219,13 +219,13 @@ abstract class AbstractFormatter {
   String _form(AbstractVector matrix, int index, Former formatter);
 
   /// Returns a string representations of all cells; no alignment considered.
-  List<List<String>> _format2D(AbstractMatrix matrix);
+  List<List<String>> _formatMatrix(AbstractMatrix matrix);
 
   /// Returns a string representations of all cells; no alignment considered.
   List<String> _formatRow(AbstractVector vector) {
     Former formatter = null;
-    formatter = _factory.create(_format);
-    int s = vector.length;
+    formatter = _factory(_format);
+    int s = vector.size;
     var strings = new List<String>(s);
     for (int i = 0; i < s; i++) {
       strings[i] = _form(vector, i, formatter);
@@ -240,7 +240,7 @@ abstract class AbstractFormatter {
   }
 
   /// Returns a String with the given character repeated `length` times.
-  String _repeat(String character, int length) {
+  /*String _repeat(String character, int length) {
     if (character == ' ') return _blanks(length);
     if (length < 0) length = 0;
     StringBuffer buf = new StringBuffer(length);
@@ -248,7 +248,7 @@ abstract class AbstractFormatter {
       buf.write(character);
     }
     return buf.toString();
-  }
+  }*/
 
   /// Sets the column alignment (left,center,right,decimal).
   void set alignment(String alignment) {
@@ -290,7 +290,7 @@ abstract class AbstractFormatter {
   }
 
   /// Cache for faster string processing.
-  static void _setupBlanksCache() {
+  /*static void _setupBlanksCache() {
     // Pre-fabricate 40 static strings with 0,1,2,..,39 blanks, for usage
     // within method blanks(length).
     // Now, we don't need to construct and fill them on demand, and garbage
@@ -308,14 +308,14 @@ abstract class AbstractFormatter {
       _blanksCache[i] = str.substring(0, i);
       // System.out.println(i+"-"+blanksCache[i]+"-");
     }
-  }
+  }*/
 
   /// Returns a short string representation describing the shape of the matrix.
   static String shapeVector(AbstractVector matrix) {
     // return "Vector of size="+matrix.size();
     // return matrix.size()+" element matrix";
     // return "matrix("+matrix.size()+")";
-    return "${matrix.length} vector";
+    return "${matrix.size} vector";
   }
 
   /// Returns a short string representation describing the shape of the matrix.
@@ -353,7 +353,7 @@ abstract class AbstractFormatter {
     _align(strings);
     String total = _toString(strings);
     if (_printShape) {
-      "${shape2D(matrix)}\n$total";
+      "${shapeMatrix(matrix)}\n$total";
     }
     return total.toString();
   }

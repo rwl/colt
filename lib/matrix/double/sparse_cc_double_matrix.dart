@@ -178,6 +178,10 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
       .._rowIndexesSorted = rowIndexesSorted;
   }
 
+  static SparseCCDoubleMatrix create(int rows, int columns) {
+    return new SparseCCDoubleMatrix(rows, columns);
+  }
+
   void apply(final func.DoubleFunction fn) {
     if (fn is DoubleMult) {
       // x[i] = mult*x[i]
@@ -195,7 +199,7 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
         return;
       }
 
-      final Float64List valuesE = _dcs.x;
+      final Float64List valuesE = _values;
       int nz = cardinality;
       for (int j = 0; j < nz; j++) {
         valuesE[j] *= alpha;
@@ -209,13 +213,13 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
 
   void fill(double value) {
     if (value == 0) {
-      _dcs.i.fillRange(0, _dcs.i.length, 0);
-      _dcs.p.fillRange(0, _dcs.p.length, 0);
-      _dcs.x.fillRange(0, _dcs.x.length, 0.0);
+      _rowIndexes.fillRange(0, _rowIndexes.length, 0);
+      _columnPointers.fillRange(0, _columnPointers.length, 0);
+      _values.fillRange(0, _values.length, 0.0);
     } else {
       int nnz = cardinality;
       for (int i = 0; i < nnz; i++) {
-        _dcs.x[i] = value;
+        _values[i] = value;
       }
     }
   }
@@ -228,24 +232,24 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
 
     if (source is SparseCCDoubleMatrix) {
       SparseCCDoubleMatrix other = source;
-      this._dcs.p.setAll(0, other.columnPointers);
-      //System.arraycopy(other.getColumnPointers(), 0, this._dcs.p, 0, _columns + 1);
+      this._columnPointers.setAll(0, other.columnPointers);
+      //System.arraycopy(other.getColumnPointers(), 0, this._columnPointers, 0, _columns + 1);
       int nzmax = other.rowIndexes.length;
       if (_dcs.nzmax < nzmax) {
-        _dcs.i = new Int32List(nzmax);
-        _dcs.x = new Float64List(nzmax);
+        _rowIndexes = new Int32List(nzmax);
+        _values = new Float64List(nzmax);
       }
-      this._dcs.i.setAll(0, other.rowIndexes);
-      //System.arraycopy(other.getRowIndexes(), 0, this._dcs.i, 0, nzmax);
-      this._dcs.x.setAll(0, other.values);
-      //System.arraycopy(other.getValues(), 0, this._dcs.x, 0, nzmax);
+      this._rowIndexes.setAll(0, other.rowIndexes);
+      //System.arraycopy(other.getRowIndexes(), 0, this._rowIndexes, 0, nzmax);
+      this._values.setAll(0, other.values);
+      //System.arraycopy(other.getValues(), 0, this._values, 0, nzmax);
       _rowIndexesSorted = other._rowIndexesSorted;
     } else if (source is SparseRCDoubleMatrix) {
       SparseRCDoubleMatrix other = source.transpose();
-      this._dcs.p = other.rowPointers;
-      this._dcs.i = other.columnIndexes;
-      this._dcs.x = other.values;
-      this._dcs.nzmax = this._dcs.x.length;
+      this._columnPointers = other.rowPointers;
+      this._rowIndexes = other.columnIndexes;
+      this._values = other.values;
+      this._dcs.nzmax = this._values.length;
       _rowIndexesSorted = true;
     } else {
       fill(0.0);
@@ -268,7 +272,7 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
 
     if (fn is DoublePlusMultSecond) {
       // x[i] = x[i] + alpha*y[i]
-      final double alpha = (fn as DoublePlusMultSecond).multiplicator;
+      final double alpha = fn.multiplicator;
       if (alpha == 0) {
         return; // nothing to do
       }
@@ -295,10 +299,10 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
 
     if (fn == func.mult) {
       // x[i] = x[i] * y[i]
-      final Int32List rowIndexesA = _dcs.i;
-      final Int32List columnPointersA = _dcs.p;
-      final Float64List valuesA = _dcs.x;
-      for (int j = _columns; --j >= 0;) {
+      final Int32List rowIndexesA = _rowIndexes;
+      final Int32List columnPointersA = _columnPointers;
+      final Float64List valuesA = _values;
+      for (int j = columns; --j >= 0;) {
         int low = columnPointersA[j];
         for (int k = columnPointersA[j + 1]; --k >= low;) {
           int i = rowIndexesA[k];
@@ -311,11 +315,11 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
 
     if (fn == func.div) {
       // x[i] = x[i] / y[i]
-      final Int32List rowIndexesA = _dcs.i;
-      final Int32List columnPointersA = _dcs.p;
-      final Float64List valuesA = _dcs.x;
+      final Int32List rowIndexesA = _rowIndexes;
+      final Int32List columnPointersA = _columnPointers;
+      final Float64List valuesA = _values;
 
-      for (int j = _columns; --j >= 0;) {
+      for (int j = columns; --j >= 0;) {
         int low = columnPointersA[j];
         for (int k = columnPointersA[j + 1]; --k >= low;) {
           int i = rowIndexesA[k];
@@ -325,17 +329,17 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
       }
       return;
     }
-    super.forEachWith(y, fn);
+    super.assign(y, fn);
   }
 
-  int get cardinality => _dcs.p[_columns];
+  int get cardinality => _columnPointers[columns];
 
-  Object get elements => _dcs;
+  Object get elements => _values;
 
   void forEachNonZero(final func.IntIntDoubleFunction function) {
-    final Int32List rowIndexesA = _dcs.i;
-    final Int32List columnPointersA = _dcs.p;
-    final Float64List valuesA = _dcs.x;
+    final Int32List rowIndexesA = _rowIndexes;
+    final Int32List columnPointersA = _columnPointers;
+    final Float64List valuesA = _values;
 
     for (int j = columns; --j >= 0;) {
       int low = columnPointersA[j];
@@ -363,10 +367,10 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
 
   double get(int row, int column) {
     //int k = Sorting.binarySearchFromTo(dcs.i, row, dcs.p[column], dcs.p[column + 1] - 1);
-    int k = _searchFromTo(_dcs.i, row, _dcs.p[column], _dcs.p[column + 1] - 1);
+    int k = _searchFromTo(_rowIndexes, row, _columnPointers[column], _columnPointers[column + 1] - 1);
     double v = 0.0;
     if (k >= 0) {
-      v = _dcs.x[k];
+      v = _values[k];
     }
     return v;
   }
@@ -375,7 +379,7 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
   /// in a row-compressed form.
   SparseRCDoubleMatrix rowCompressed() {
     cs.Matrix dcst = cs.transpose(_dcs, true);
-    SparseRCDoubleMatrix rc = new SparseRCDoubleMatrix(_rows, _columns);
+    SparseRCDoubleMatrix rc = new SparseRCDoubleMatrix(rows, columns);
     rc._columnIndexes = dcst.i;
     rc._rowPointers = dcst.p;
     rc._values = dcst.x;
@@ -388,7 +392,7 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
   /// Returns a new matrix that is the transpose of this matrix.
   SparseCCDoubleMatrix transpose() {
     cs.Matrix dcst = cs.transpose(_dcs, true);
-    SparseCCDoubleMatrix tr = new SparseCCDoubleMatrix(_columns, _rows);
+    SparseCCDoubleMatrix tr = new SparseCCDoubleMatrix(columns, rows);
     tr._dcs = dcst;
     return tr;
   }
@@ -405,14 +409,14 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
 
   void set(int row, int column, double value) {
     //int k = Sorting.binarySearchFromTo(dcs.i, row, dcs.p[column], dcs.p[column + 1] - 1);
-    int k = _searchFromTo(_dcs.i, row, _dcs.p[column], _dcs.p[column + 1] - 1);
+    int k = _searchFromTo(_rowIndexes, row, _columnPointers[column], _columnPointers[column + 1] - 1);
 
     if (k >= 0) {
       // found
       if (value == 0) {
         _remove(column, k);
       } else {
-        _dcs.x[k] = value;
+        _values[k] = value;
       }
       return;
     }
@@ -453,16 +457,16 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
     var buf = new StringBuffer();
     buf..write("$rows x $columns sparse matrix, nnz = $cardinality\n");
     for (int i = 0; i < columns; i++) {
-      int high = _dcs.p[i + 1];
-      for (int j = _dcs.p[i]; j < high; j++) {
+      int high = _columnPointers[i + 1];
+      for (int j = _columnPointers[i]; j < high; j++) {
         buf
           ..write('(')
-          ..write(_dcs.i[j])
+          ..write(_rowIndexes[j])
           ..write(',')
           ..write(i)
           ..write(')')
           ..write('\t')
-          ..write(_dcs.x[j])
+          ..write(_values[j])
           ..write('\n');
       }
     }
@@ -503,9 +507,9 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
     int strideY = yy.stride;
     int zeroY = yy.index(0);
 
-    Int32List rowIndexesA = _dcs.i;
-    Int32List columnPointersA = _dcs.p;
-    Float64List valuesA = _dcs.x;
+    Int32List rowIndexesA = _rowIndexes;
+    Int32List columnPointersA = _columnPointers;
+    Float64List valuesA = _values;
 
     int zidx = zeroZ;
     //int nthreads = ConcurrencyUtils.getNumberOfThreads();
@@ -527,25 +531,25 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
         z.apply(func.multiply(alpha));
       }
     } else {
-      int k = _dcs.p[0];
+      int k = _columnPointers[0];
       for (int i = 0; i < columns; i++) {
         double sum = 0.0;
-        int high = _dcs.p[i + 1];
+        int high = _columnPointers[i + 1];
         for (; k + 10 < high; k += 10) {
           int ind = k + 9;
-          sum += valuesA[ind] * elementsY[zeroY + strideY * _dcs.i[ind--]] +
-              valuesA[ind] * elementsY[zeroY + strideY * _dcs.i[ind--]] +
-              valuesA[ind] * elementsY[zeroY + strideY * _dcs.i[ind--]] +
-              valuesA[ind] * elementsY[zeroY + strideY * _dcs.i[ind--]] +
-              valuesA[ind] * elementsY[zeroY + strideY * _dcs.i[ind--]] +
-              valuesA[ind] * elementsY[zeroY + strideY * _dcs.i[ind--]] +
-              valuesA[ind] * elementsY[zeroY + strideY * _dcs.i[ind--]] +
-              valuesA[ind] * elementsY[zeroY + strideY * _dcs.i[ind--]] +
-              valuesA[ind] * elementsY[zeroY + strideY * _dcs.i[ind--]] +
-              valuesA[ind] * elementsY[zeroY + strideY * _dcs.i[ind--]];
+          sum += valuesA[ind] * elementsY[zeroY + strideY * _rowIndexes[ind--]] +
+              valuesA[ind] * elementsY[zeroY + strideY * _rowIndexes[ind--]] +
+              valuesA[ind] * elementsY[zeroY + strideY * _rowIndexes[ind--]] +
+              valuesA[ind] * elementsY[zeroY + strideY * _rowIndexes[ind--]] +
+              valuesA[ind] * elementsY[zeroY + strideY * _rowIndexes[ind--]] +
+              valuesA[ind] * elementsY[zeroY + strideY * _rowIndexes[ind--]] +
+              valuesA[ind] * elementsY[zeroY + strideY * _rowIndexes[ind--]] +
+              valuesA[ind] * elementsY[zeroY + strideY * _rowIndexes[ind--]] +
+              valuesA[ind] * elementsY[zeroY + strideY * _rowIndexes[ind--]] +
+              valuesA[ind] * elementsY[zeroY + strideY * _rowIndexes[ind--]];
         }
         for (; k < high; k++) {
-          sum += valuesA[k] * elementsY[_dcs.i[k]];
+          sum += valuesA[k] * elementsY[_rowIndexes[k]];
         }
         elementsZ[zidx] = alpha * sum + beta * elementsZ[zidx];
         zidx += strideZ;
@@ -616,9 +620,9 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
         BB = B;
       }
       DoubleMatrix CC = C;
-      Int32List columnPointersA = AA._dcs.p;
-      Int32List rowIndexesA = AA._dcs.i;
-      Float64List valuesA = AA._dcs.x;
+      Int32List columnPointersA = AA._columnPointers;
+      Int32List rowIndexesA = AA._rowIndexes;
+      Float64List valuesA = AA._values;
 
       int zeroB = BB.index(0, 0);
       int rowStrideB = BB.rowStride;
@@ -678,9 +682,9 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
 
       var fn = new DoublePlusMultSecond.plusMult(0.0);
 
-      final Int32List rowIndexesA = _dcs.i;
-      final Int32List columnPointersA = _dcs.p;
-      final Float64List valuesA = _dcs.x;
+      final Int32List rowIndexesA = _rowIndexes;
+      final Int32List columnPointersA = _columnPointers;
+      final Float64List valuesA = _values;
       for (int i = columns; --i >= 0;) {
         int low = columnPointersA[i];
         for (int k = columnPointersA[i + 1]; --k >= low;) {
@@ -700,30 +704,30 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
   AbstractDoubleMatrix _getContent() => this;
 
   void _insert(int row, int column, int index, double value) {
-    List rowIndexes = new List<int>.from(_dcs.i);
-    rowIndexes.lenght = _dcs.p[_columns];
-    List values = new List.from(_dcs.x);
-    values.length = _dcs.p[_columns];
+    List rowIndexes = new List<int>.from(_rowIndexes);
+    rowIndexes.length = _columnPointers[columns];
+    List values = new List.from(_values);
+    values.length = _columnPointers[columns];
     rowIndexes.insert(index, row);
     values.insert(index, value);
-    for (int i = _dcs.p.length; --i > column;) {
-      _dcs.p[i]++;
+    for (int i = _columnPointers.length; --i > column;) {
+      _columnPointers[i]++;
     }
-    _dcs.i = new Int32List.fromList(rowIndexes);
-    _dcs.x = new Float64List.fromList(values);
+    _rowIndexes = new Int32List.fromList(rowIndexes);
+    _values = new Float64List.fromList(values);
     _dcs.nzmax = rowIndexes.length;
   }
 
   void _remove(int column, int index) {
-    List rowIndexes = new List.from(_dcs.i);
-    List values = new List.from(_dcs.x);
+    List rowIndexes = new List.from(_rowIndexes);
+    List values = new List.from(_values);
     rowIndexes.removeAt(index);
     values.removeAt(index);
-    for (int i = _dcs.p.length; --i > column;) {
-      _dcs.p[i]--;
+    for (int i = _columnPointers.length; --i > column;) {
+      _columnPointers[i]--;
     }
-    _dcs.i = new Int32List.fromList(rowIndexes);
-    _dcs.x = new Float64List.fromList(values);
+    _rowIndexes = new Int32List.fromList(rowIndexes);
+    _values = new Float64List.fromList(values);
     _dcs.nzmax = rowIndexes.length;
   }
 

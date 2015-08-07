@@ -76,7 +76,7 @@ abstract class AbstractVector {
 
   /// Returns a string representation of the receiver's shape.
   String toStringShort() {
-    return AbstractFormatter.shape(this);
+    return AbstractFormatter.shapeVector(this);
   }
 }
 

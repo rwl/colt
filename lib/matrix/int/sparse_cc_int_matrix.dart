@@ -130,6 +130,10 @@ class SparseCCIntMatrix extends WrapperIntMatrix {
     }
   }
 
+  static SparseCCIntMatrix create(int rows, int columns) {
+    return new SparseCCIntMatrix(rows, columns);
+  }
+
   void apply(final ifunc.IntFunction fn) {
     if (fn is ifunc.IntMult) {
       // x[i] = mult*x[i]
@@ -742,9 +746,9 @@ class SparseCCIntMatrix extends WrapperIntMatrix {
           int j = rowIndexesA[k];
           fn.multiplicator = valuesA[k] * alpha;
           if (!transposeA) {
-            Crows[j].forEachWith(Brows[i], fn);
+            Crows[j].assign(Brows[i], fn);
           } else {
-            Crows[i].forEachWith(Brows[j], fn);
+            Crows[i].assign(Brows[j], fn);
           }
         }
       }

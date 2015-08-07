@@ -22,7 +22,7 @@ class WrapperIntMatrix extends AbstractIntMatrix {
     _content = newContent;
   }
 
-  void assign(final AbstractIntMatrix y, final ifunc.IntIntFunction function) {
+  /*void assign(final AbstractIntMatrix y, final ifunc.IntIntFunction function) {
     checkShape(this, y);
     if (y is WrapperIntMatrix) {
       var rowList = new List();
@@ -34,7 +34,7 @@ class WrapperIntMatrix extends AbstractIntMatrix {
       super.assign(y, function);
     }
     return;
-  }
+  }*/
 
   void setAll(final Int32List values) {
     if (_content is DiagonalIntMatrix) {

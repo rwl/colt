@@ -97,7 +97,7 @@ abstract class AbstractMatrix {
 
   /// A string representation of the receiver's shape.
   String toStringShort() {
-    return AbstractFormatter.shape2D(this);
+    return AbstractFormatter.shapeMatrix(this);
   }
 }
 

@@ -5,21 +5,21 @@ import 'dart:typed_data';
 
 import '../math.dart' as cmath;
 
-typedef List<double> ComplexComplexComplexFunction(List<double> x, List<double> y);
+typedef List<double> ComplexComplexComplexFunction(
+    List<double> x, List<double> y);
 typedef List<double> ComplexComplexFunc(double re, double im);
 typedef List<double> ComplexComplexFunction(List<double> x);
 //typedef bool ComplexComplexProcedure(List<double> x, List<double> y);
 typedef double ComplexComplexRealFunction(List<double> x, List<double> y);
 //typedef bool ComplexComplexRealProcedure(List<double> x, List<double> y, double tol);
-typedef double ComplexComplexRealRealFunction(List<double> x, List<double> y, double tol);
+typedef double ComplexComplexRealRealFunction(
+    List<double> x, List<double> y, double tol);
 //typedef bool ComplexProcedure(List<double> x);
 typedef List<double> ComplexRealComplexFunction(List<double> x, double y);
 typedef double ComplexRealFunction(List<double> x);
 typedef List<double> IntIntComplexFunction(int x, int y, List<double> z);
 typedef List<double> RealComplexComplexFunction(double x, List<double> y);
 typedef List<double> RealComplexFunction(double x);
-
-
 
 /// Unary functions
 
@@ -534,7 +534,6 @@ List<double> div(List<double> x, List<double> y) {
 
     z[0] = scalar * (x[0] + x[1] * (im / re));
     z[1] = scalar * (x[1] - x[0] * (im / re));
-
   } else {
     scalar = (1.0 / (re * (re / im) + im));
 
@@ -636,52 +635,60 @@ List<double> pow3(List<double> x, List<double> y) {
   return z;
 }
 
-ComplexComplexFunction bindArg1(final ComplexComplexComplexFunction function, final List<double> c) {
+ComplexComplexFunction bindArg1(
+    final ComplexComplexComplexFunction function, final List<double> c) {
   return (List<double> v) {
     return function(c, v);
   };
 }
 
-ComplexComplexFunction bindArg1_(final ComplexComplexComplexFunction function, final List<double> c) {
-        return (double re, double im) {
-            return function(c, new Float64List.fromList([re, im]));
-        };
+ComplexComplexFunc bindArg1_(
+    final ComplexComplexComplexFunction function, final List<double> c) {
+  return (double re, double im) {
+    return function(c, new Float64List.fromList([re, im]));
+  };
 }
 
-ComplexComplexFunction bindArg2(final ComplexComplexComplexFunction function, final List<double> c) {
+ComplexComplexFunction bindArg2(
+    final ComplexComplexComplexFunction function, final List<double> c) {
   return (List<double> v) {
     return function(v, c);
   };
 }
 
-ComplexComplexFunction bindArg2_(final ComplexComplexComplexFunction function, final List<double> c) {
-        return (double re, double im) {
-            return function(new Float64List.fromList([re, im]), c);
-    };
+ComplexComplexFunc bindArg2_(
+    final ComplexComplexComplexFunction function, final List<double> c) {
+  return (double re, double im) {
+    return function(new Float64List.fromList([re, im]), c);
+  };
 }
 
-ComplexComplexComplexFunction chain(final ComplexComplexComplexFunction f, final ComplexComplexFunction g, final ComplexComplexFunction h) {
+ComplexComplexComplexFunction chain(final ComplexComplexComplexFunction f,
+    final ComplexComplexFunction g, final ComplexComplexFunction h) {
   return (List<double> x, List<double> y) {
     return f(g(x), h(y));
   };
 }
 
-ComplexComplexComplexFunction chain2(final ComplexComplexFunction g, final ComplexComplexComplexFunction h) {
+ComplexComplexComplexFunction chain2(
+    final ComplexComplexFunction g, final ComplexComplexComplexFunction h) {
   return (List<double> x, List<double> y) {
     return g(h(x, y));
   };
 }
 
-ComplexComplexFunction chain3(final ComplexComplexFunction g, final ComplexComplexFunction h) {
+ComplexComplexFunction chain3(
+    final ComplexComplexFunction g, final ComplexComplexFunction h) {
   return (List<double> x) {
     return g(h(x));
   };
 }
 
-ComplexComplexFunction chain3_(final ComplexComplexFunction g, final ComplexComplexFunction h) {
-          return (double re, double im) {
-              return g(h(new Float64List.fromList([re, im])));
-      };
+ComplexComplexFunc chain3_(
+    final ComplexComplexFunction g, final ComplexComplexFunction h) {
+  return (double re, double im) {
+    return g(h(new Float64List.fromList([re, im])));
+  };
 }
 
 ComplexComplexFunction constant(final List<double> c) {
@@ -690,10 +697,10 @@ ComplexComplexFunction constant(final List<double> c) {
   };
 }
 
-ComplexComplexFunction constant_(final List<double> c) {
-          return (double re, double im) {
-              return new Float64List.fromList([re, im]);
-      };
+ComplexComplexFunc constant_(final List<double> c) {
+  return (double re, double im) {
+    return new Float64List.fromList([re, im]);
+  };
 }
 
 ComplexComplexFunction divide(final List<double> b) {
@@ -715,7 +722,7 @@ ComplexRealFunction equalTo(final List<double> y) {
   };
 }
 
-ComplexProcedure isEqualTo(final List<double> y) {
+/*ComplexProcedure isEqualTo(final List<double> y) {
   return (List<double> x) {
     if (x[0] == y[0] && x[1] == y[1]) {
       return true;
@@ -723,7 +730,7 @@ ComplexProcedure isEqualTo(final List<double> y) {
       return false;
     }
   };
-}
+}*/
 
 ComplexComplexFunction subtract(final List<double> x) {
   Float64List negb = new Float64List(2);
@@ -756,14 +763,13 @@ ComplexComplexFunction add(final List<double> y) {
   };
 }
 
-ComplexComplexFunction add_(final List<double> y) {
-
-          return (double re, double im) {
-              Float64List z = new Float64List(2);
-              z[0] = re + y[0];
-              z[1] = im + y[1];
-              return z;
-      };
+ComplexComplexFunc add_(final List<double> y) {
+  return (double re, double im) {
+    Float64List z = new Float64List(2);
+    z[0] = re + y[0];
+    z[1] = im + y[1];
+    return z;
+  };
 }
 
 ComplexComplexComplexFunction plusMultSecond(List<double> constant) {
@@ -786,16 +792,16 @@ ComplexComplexFunction power1(final double y) {
   };
 }
 
-ComplexComplexFunction power1_(final double y) {
-          return (double re, double im) {
-              Float64List z = new Float64List(2);
-              double re2 = (y * Math.log(cmath.abs(re, im)));
-              double im2 = y * cmath.arg(re, im);
-              double scalar = Math.exp(re2);
-              z[0] = (scalar * Math.cos(im2));
-              z[1] = (scalar * Math.sin(im2));
-              return z;
-      };
+ComplexComplexFunc power1_(final double y) {
+  return (double re, double im) {
+    Float64List z = new Float64List(2);
+    double re2 = (y * Math.log(cmath.abs_(re, im)));
+    double im2 = y * cmath.arg_(re, im);
+    double scalar = Math.exp(re2);
+    z[0] = (scalar * Math.cos(im2));
+    z[1] = (scalar * Math.sin(im2));
+    return z;
+  };
 }
 
 RealComplexFunction power2(final List<double> y) {
@@ -832,22 +838,21 @@ ComplexComplexFunction power3(final List<double> y) {
   };
 }
 
-ComplexComplexFunction power3_(final List<double> y) {
+ComplexComplexFunc power3_(final List<double> y) {
+  return (double re, double im) {
+    Float64List z = new Float64List(2);
+    double re1 = Math.log(cmath.abs_(re, im));
+    double im1 = cmath.arg_(re, im);
 
-          return (double re, double im) {
-              Float64List z = new Float64List(2);
-              double re1 = Math.log(cmath.abs(re, im));
-              double im1 = cmath.arg(re, im);
+    double re2 = (re1 * y[0]) - (im1 * y[1]);
+    double im2 = (re1 * y[1]) + (im1 * y[0]);
 
-              double re2 = (re1 * y[0]) - (im1 * y[1]);
-              double im2 = (re1 * y[1]) + (im1 * y[0]);
+    double scalar = Math.exp(re2);
 
-              double scalar = Math.exp(re2);
-
-              z[0] = scalar * Math.cos(im2);
-              z[1] = scalar * Math.sin(im2);
-              return z;
-      };
+    z[0] = scalar * Math.cos(im2);
+    z[1] = scalar * Math.sin(im2);
+    return z;
+  };
 }
 
 final _r = new Math.Random();
@@ -860,12 +865,12 @@ List<double> random_(double re, double im) {
   return new Float64List.fromList([_r.nextDouble(), _r.nextDouble()]);
 }
 
-ComplexComplexComplexFunction swapArgs(final ComplexComplexComplexFunction function) {
+ComplexComplexComplexFunction swapArgs(
+    final ComplexComplexComplexFunction function) {
   return (List<double> x, List<double> y) {
     return function(y, x);
   };
 }
-
 
 /// Only for performance tuning of compute intensive linear algebraic
 /// computations. Constructs functions that return one of:

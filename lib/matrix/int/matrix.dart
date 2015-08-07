@@ -29,18 +29,15 @@ import '../matrix.dart'
         setRows,
         setColumns;
 
-import '../../function/int.dart'
-    show IntFunction, IntIntFunction;
-
 import '../../function/int.dart' as ifunc;
 
 import 'factory.dart' as ifactory;
 
 import '../../math.dart' show MAX_INT;
 
-import 'algo/algo.dart' as iprop;
+import 'property.dart' as iprop;
 
-import '../former.dart';
+import '../formatter.dart';
 
 import '../double/matrix.dart' show DoubleVector;
 

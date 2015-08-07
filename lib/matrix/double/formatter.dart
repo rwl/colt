@@ -33,8 +33,8 @@ part of cern.colt.matrix.format;
 /// point aligned, left justified formatting.
 class DoubleFormatter extends AbstractFormatter {
   DoubleFormatter([String format = null /*"%G"*/]) {
-    setFormat(format);
-    setAlignment(AbstractFormatter.DECIMAL);
+    _format = format;
+    _alignment = AbstractFormatter.DECIMAL;
   }
 
   /// Converts a given cell to a String; no alignment considered.
@@ -81,14 +81,14 @@ class DoubleFormatter extends AbstractFormatter {
 
   /// Returns a string representation of the given matrix.
   String toStringDoubleVector(AbstractDoubleVector matrix) {
-    AbstractDoubleMatrix easy = matrix.like2D(1, matrix.length);
+    AbstractDoubleMatrix easy = matrix.like2D(1, matrix.size);
     easy.row(0).copyFrom(matrix);
     return toString2D(easy);
   }
 
   /// Returns a string representation of the given matrix.
   String toStringDoubleMatrix(AbstractDoubleMatrix matrix) {
-    return super.toString2D(matrix);
+    return super.toStringMatrix(matrix);
   }
 
   /// Returns a string representation of the given matrix.
@@ -96,14 +96,14 @@ class DoubleFormatter extends AbstractFormatter {
     return toStringDoubleMatrix(matrix as AbstractDoubleMatrix);
   }
 
-  Object clone() {
+  /*Object clone() {
     return new DoubleFormatter()
-      ..setAlignment(_alignment)
-      ..setFormat(_format)
-      ..setMinColumnWidth(_minColumnWidth)
-      ..setColumnSeparator(_columnSeparator)
-      ..setRowSeparator(_rowSeparator)
-      ..setSliceSeparator(_sliceSeparator)
-      ..setPrintShape(_printShape);
-  }
+      ..alignment = _alignment
+      ..format = _format
+      ..minColumnWidth = _minColumnWidth
+      ..columnSeparator = _columnSeparator
+      ..rowSeparator = _rowSeparator
+      ..sliceSeparator = _sliceSeparator
+      ..printShape = _printShape;
+  }*/
 }

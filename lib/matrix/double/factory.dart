@@ -85,7 +85,7 @@ AbstractDoubleVector repeat(AbstractDoubleVector A, int repeat, VectorFn make) {
 
 /// Checks whether the given array is rectangular, that is, whether all rows
 /// have the same number of columns.
-void _checkRectangularShape(List<Float64List> array) {
+/*void _checkRectangularShape(List<Float64List> array) {
   int columns = -1;
   for (int row = array.length; --row >= 0; ) {
     if (array[row] != null) {
@@ -97,7 +97,7 @@ void _checkRectangularShape(List<Float64List> array) {
       }
     }
   }
-}
+}*/
 
 /// Checks whether the given array is rectangular, that is, whether all rows
 /// have the same number of columns.

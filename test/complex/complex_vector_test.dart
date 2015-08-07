@@ -1,407 +1,241 @@
 part of cern.colt.matrix.complex.test;
 
-testComplexVector(String name, ComplexVectorTest t) {
-  group(name, () {
-    setUp(t.setUp);
-    tearDown(t.tearDown);
-    test('aggregate', t.testAggregate);
-    test('aggregateMatrix', t.testAggregateMatrix);
-    test('assign', t.testAssign);
-    test('assignMatrix', t.testAssignMatrix);
-    test('assignMatrixFunc', t.testAssignMatrixFunc);
-    test('assignProc', t.testAssignProc);
-    test('assignProcValue', t.testAssignProcValue);
-    test('assignRealFunc', t.testAssignRealFunc);
-    test('assignValues', t.testAssignValues);
-    test('assignValue', t.testAssignValue);
-    test('assignImaginary', t.testAssignImaginary);
-    test('assignReal', t.testAssignReal);
-    test('cardinality', t.testCardinality);
-    test('all', t.testAll);
-    test('equals', t.testEquals);
-    test('getImaginaryPart', t.testGetImaginaryPart);
-    test('getRealPart', t.testGetRealPart);
-    test('getNonZeros', t.testGetNonZeros);
-    test('reshape', t.testReshape);
-    test('swap', t.testSwap);
-    test('toArray', t.testToArray);
-    test('toArrayFill', t.testToArrayFill);
-    test('viewFlip', t.testViewFlip);
-    test('viewPart', t.testViewPart);
-    test('viewSelectionProc', t.testViewSelectionProc);
-    test('viewSelection', t.testViewSelection);
-    test('viewStrides', t.testViewStrides);
-    test('zDotProduct', t.testZDotProduct);
-    test('zDotProductRange', t.testZDotProductRange);
-    test('zDotProductIndex', t.testZDotProductIndex);
-    test('zSum', t.testZSum);
+const SIZE = 2 * 17 * 5;
+
+const TOL = 1e-10;
+
+testAbstractComplexVector(String kind, AbstractComplexVector make(int size)) {
+  group("AbstractComplexVector ($kind)", () {
+    AbstractComplexVector A, B;
+    setUp(() {
+      A = make(SIZE);
+      B = make(SIZE);
+      for (int i = 0; i < A.size; i++) {
+        A.setParts(i, random.nextDouble(), random.nextDouble());
+        B.setParts(i, random.nextDouble(), random.nextDouble());
+      }
+    });
+    test('aggregate', () {
+      Float64List expected = new Float64List(2);
+      for (int i = 0; i < A.size; i++) {
+        expected = cmath.plus(expected, cmath.square(A.get(i)));
+      }
+      Float64List result = A.aggregate(plus, square);
+      assertEquals(expected, result, TOL);
+    });
+
+    test('apply', () {
+      AbstractComplexVector Acopy = A.copy();
+      A.apply(acos);
+      for (int i = 0; i < A.size; i++) {
+        Float64List expected = cmath.acos(Acopy.get(i));
+        assertEquals(expected, A.get(i), TOL);
+      }
+    });
+
+    test('copyFrom', () {
+      A.copyFrom(B);
+      expect(A.size == B.size, isTrue);
+      for (int i = 0; i < A.size; i++) {
+        assertEquals(B.get(i), A.get(i), TOL);
+      }
+    });
+
+    test('assign', () {
+      AbstractComplexVector Acopy = A.copy();
+      A.assign(B, div);
+      for (int i = 0; i < A.size; i++) {
+        assertEquals(cmath.div_(Acopy.get(i), B.get(i)), A.get(i), TOL);
+      }
+    });
+
+    test('applyReal', () {
+      AbstractComplexVector Acopy = A.copy();
+      A.applyReal(abs);
+      for (int i = 0; i < A.size; i++) {
+        Float64List elem = A.get(i);
+        expect(cmath.abs(Acopy.get(i)), closeTo(elem[0], TOL));
+        expect(0, closeTo(elem[1], TOL));
+      }
+    });
+
+    test('setAll', () {
+      Float64List expected = new Float64List(2 * A.size);
+      for (int i = 0; i < 2 * A.size; i++) {
+        expected[i] = random.nextDouble();
+      }
+      A.setAll(expected);
+      for (int i = 0; i < A.size; i++) {
+        Float64List elem = A.get(i);
+        expect(expected[2 * i], closeTo(elem[0], TOL));
+        expect(expected[2 * i + 1], closeTo(elem[1], TOL));
+      }
+    });
+
+    test('fill', () {
+      double re = random.nextDouble();
+      double im = random.nextDouble();
+      A.fill(re, im);
+      for (int i = 0; i < A.size; i++) {
+        Float64List elem = A.get(i);
+        expect(re, closeTo(elem[0], TOL));
+        expect(im, closeTo(elem[1], TOL));
+      }
+    });
+
+    test('setImaginary', () {
+      AbstractComplexVector Acopy = A.copy();
+      AbstractDoubleVector Im = new DoubleVector.random(A.size);
+      A.setImaginary(Im);
+      for (int i = 0; i < A.size; i++) {
+        Float64List elem = A.get(i);
+        expect(Acopy.get(i)[0], closeTo(elem[0], TOL));
+        expect(Im.get(i), closeTo(elem[1], TOL));
+      }
+    });
+
+    test('setReal', () {
+      AbstractComplexVector Acopy = A.copy();
+      AbstractDoubleVector Re = new DoubleVector.random(A.size);
+      A.setReal(Re);
+      for (int i = 0; i < A.size; i++) {
+        Float64List elem = A.get(i);
+        expect(Acopy.get(i)[1], closeTo(elem[1], TOL));
+        expect(Re.get(i), closeTo(elem[0], TOL));
+      }
+    });
+
+    test('cardinality', () {
+      int card = A.cardinality;
+      expect(A.size, equals(card));
+    });
+
+    test('equals', () {
+      expect(A.equals(A), isTrue);
+      expect(A.equals(B), isFalse);
+    });
+
+    test('imaginary', () {
+      AbstractDoubleVector Im = A.imaginary();
+      for (int i = 0; i < A.size; i++) {
+        expect(A.get(i)[1], closeTo(Im.get(i), TOL));
+      }
+    });
+
+    test('real', () {
+      AbstractDoubleVector Re = A.real();
+      for (int i = 0; i < A.size; i++) {
+        expect(A.get(i)[0], closeTo(Re.get(i), TOL));
+      }
+    });
+
+    test('nonzero', () {
+      List<int> indexList = new List<int>();
+      List<Float64List> valueList = new List<Float64List>();
+      A.nonzero(indexList: indexList, valueList: valueList);
+      expect(A.size, equals(indexList.length));
+      expect(A.size, equals(valueList.length));
+      for (int i = 0; i < A.size; i++) {
+        assertEquals(A.get(indexList[i]), valueList[i], TOL);
+        expect(valueList[i][0] != 0 || valueList[i][1] != 0, isTrue);
+      }
+    });
+
+    test('reshape', () {
+      int rows = 10;
+      int columns = 17;
+      AbstractComplexMatrix B = A.reshape(rows, columns);
+      int idx = 0;
+      for (int c = 0; c < columns; c++) {
+        for (int r = 0; r < rows; r++) {
+          assertEquals(A.get(idx++), B.get(r, c), TOL);
+        }
+      }
+    });
+
+    test('toList', () {
+      Float64List array = A.toList();
+      for (int i = 0; i < A.size; i++) {
+        Float64List elem = A.get(i);
+        expect(elem[0], closeTo(array[2 * i], TOL));
+        expect(elem[1], closeTo(array[2 * i + 1], TOL));
+      }
+    });
+
+    test('fillList', () {
+      Float64List array = new Float64List(2 * A.size);
+      A.fillList(array);
+      for (int i = 0; i < A.size; i++) {
+        Float64List elem = A.get(i);
+        expect(elem[0], closeTo(array[2 * i], TOL));
+        expect(elem[1], closeTo(array[2 * i + 1], TOL));
+      }
+    });
+
+    test('flip', () {
+      AbstractComplexVector B = A.flip();
+      for (int i = 0; i < A.size; i++) {
+        assertEquals(A.get(A.size - 1 - i), B.get(i), TOL);
+      }
+    });
+
+    test('part', () {
+      AbstractComplexVector B = A.part(A.size ~/ 2, A.size ~/ 3);
+      for (int i = 0; i < A.size / 3; i++) {
+        assertEquals(A.get(A.size ~/ 2 + i), B.get(i), TOL);
+      }
+    });
+
+    test('select', () {
+      Int32List indexes = new Int32List.fromList(
+          [A.size ~/ 6, A.size ~/ 5, A.size ~/ 4, A.size ~/ 3, A.size ~/ 2]);
+      AbstractComplexVector B = A.select(indexes);
+      for (int i = 0; i < indexes.length; i++) {
+        assertEquals(A.get(indexes[i]), B.get(i), TOL);
+      }
+    });
+
+    test('strides', () {
+      int stride = 3;
+      AbstractComplexVector B = A.strides(stride);
+      for (int i = 0; i < B.size; i++) {
+        assertEquals(A.get(i * stride), B.get(i), TOL);
+      }
+    });
+
+    test('dot', () {
+      Float64List actual = A.dot(B);
+      Float64List expected = new Float64List(2);
+      for (int i = 0; i < A.size; i++) {
+        expected = cmath.plus(
+            expected, cmath.multiply(cmath.conj(B.get(i)), A.get(i)));
+      }
+      assertEquals(expected, actual, TOL);
+    });
+
+    test('dot range', () {
+      Float64List actual = A.dot(B, 5, B.size - 10);
+      Float64List expected = new Float64List(2);
+      for (int i = 5; i < A.size - 5; i++) {
+        expected = cmath.plus(
+            expected, cmath.multiply(cmath.conj(B.get(i)), A.get(i)));
+      }
+      assertEquals(expected, actual, TOL);
+    });
+
+    test('sum', () {
+      Float64List actual = A.sum();
+      Float64List expected = new Float64List(2);
+      for (int i = 0; i < A.size; i++) {
+        expected = cmath.plus(expected, A.get(i));
+      }
+      assertEquals(expected, actual, TOL);
+    });
   });
 }
 
-abstract class ComplexVectorTest {
-
-  /** Matrix to test. */
-  AbstractComplexVector A;
-
-  /** Matrix of the same size as [A]. */
-  AbstractComplexVector B;
-
-  int SIZE = 2 * 17 * 5;
-
-  double TOL = 1e-10;
-
-  void setUp() {
-    createMatrices();
-    populateMatrices();
+void assertEquals(List<double> expected, List<double> actual, double tol) {
+  for (int i = 0; i < actual.length; i++) {
+    expect(expected[i], closeTo(actual[i], tol));
   }
-
-  void createMatrices();
-
-  void populateMatrices() {
-    //ConcurrencyUtils.setThreadsBeginN_1D(1);
-
-    for (int i = 0; i < A.length; i++) {
-      A.set(i, new Float64List.fromList([random.nextDouble(), random.nextDouble()]));
-    }
-
-    for (int i = 0; i < A.length; i++) {
-      B.set(i, new Float64List.fromList([random.nextDouble(), random.nextDouble()]));
-    }
-  }
-
-  void tearDown() {
-    A = B = null;
-  }
-
-  void testAggregate() {
-    Float64List expected = new Float64List(2);
-    for (int i = 0; i < A.length; i++) {
-      expected = Complex.plus(expected, Complex.square(A.get(i)));
-    }
-    Float64List result = A.aggregate(plus, square);
-    assertEquals(expected, result, TOL);
-  }
-
-  void testAggregateMatrix() {
-    Float64List actual = A.reduceWith(B, plus, mult);
-    Float64List expected = new Float64List(2);
-    for (int i = 0; i < A.length; i++) {
-      expected = Complex.plus(expected, Complex.multiply(A.get(i), B.get(i)));
-    }
-    assertEquals(expected, actual, TOL);
-  }
-
-  void testAssign() {
-    AbstractComplexVector Acopy = A.copy();
-    A.apply(acos);
-    for (int i = 0; i < A.length; i++) {
-      Float64List expected = Complex.acos(Acopy.get(i));
-      assertEquals(expected, A.get(i), TOL);
-    }
-  }
-
-  void testAssignMatrix() {
-    A.copyFrom(B);
-    expect(A.length == B.length, isTrue);
-    for (int i = 0; i < A.length; i++) {
-      assertEquals(B.get(i), A.get(i), TOL);
-    }
-  }
-
-  void testAssignMatrixFunc() {
-    AbstractComplexVector Acopy = A.copy();
-    A.forEachWith(B, div);
-    for (int i = 0; i < A.length; i++) {
-      assertEquals(Complex.div_(Acopy.get(i), B.get(i)), A.get(i), TOL);
-    }
-  }
-
-  void testAssignProc() {
-    bool procedure(Float64List element) {
-      if (Complex.abs(element) > 0.1) {
-        return true;
-      } else {
-        return false;
-      }
-    }
-    AbstractComplexVector Acopy = A.copy();
-    A.forEachWhere(procedure, tan);
-    for (int i = 0; i < A.length; i++) {
-      if (Complex.abs(Acopy.get(i)) > 0.1) {
-        assertEquals(Complex.tan(Acopy.get(i)), A.get(i), TOL);
-      } else {
-        assertEquals(Acopy.get(i), A.get(i), TOL);
-      }
-    }
-  }
-
-  void testAssignProcValue() {
-    bool procedure(Float64List element) {
-      if (Complex.abs(element) > 0.1) {
-        return true;
-      } else {
-        return false;
-      }
-    }
-    AbstractComplexVector Acopy = A.copy();
-    Float64List value = new Float64List.fromList([-1.0, -1.0]);
-    A.fillWhere(procedure, value);
-    for (int i = 0; i < A.length; i++) {
-      if (Complex.abs(Acopy.get(i)) > 0.1) {
-        assertEquals(value, A.get(i), TOL);
-      } else {
-        assertEquals(Acopy.get(i), A.get(i), TOL);
-      }
-    }
-  }
-
-  void testAssignRealFunc() {
-    AbstractComplexVector Acopy = A.copy();
-    A.forEachReal(abs);
-    for (int i = 0; i < A.length; i++) {
-      Float64List elem = A.get(i);
-      expect(Complex.abs(Acopy.get(i)), closeTo(elem[0], TOL));
-      expect(0, closeTo(elem[1], TOL));
-    }
-  }
-
-  void testAssignValues() {
-    Float64List expected = new Float64List(2 * A.length);
-    for (int i = 0; i < 2 * A.length; i++) {
-      expected[i] = random.nextDouble();
-    }
-    A.setValues(expected);
-    for (int i = 0; i < A.length; i++) {
-      Float64List elem = A.get(i);
-      expect(expected[2 * i], closeTo(elem[0], TOL));
-      expect(expected[2 * i + 1], closeTo(elem[1], TOL));
-    }
-
-  }
-
-  void testAssignValue() {
-    double re = random.nextDouble();
-    double im = random.nextDouble();
-    A.fill(re, im);
-    for (int i = 0; i < A.length; i++) {
-      Float64List elem = A.get(i);
-      expect(re, closeTo(elem[0], TOL));
-      expect(im, closeTo(elem[1], TOL));
-    }
-  }
-
-  void testAssignImaginary() {
-    AbstractComplexVector Acopy = A.copy();
-    AbstractDoubleVector Im = new DoubleVector.random(A.length);
-    A.setImaginary(Im);
-    for (int i = 0; i < A.length; i++) {
-      Float64List elem = A.get(i);
-      expect(Acopy.get(i)[0], closeTo(elem[0], TOL));
-      expect(Im.get(i), closeTo(elem[1], TOL));
-    }
-  }
-
-  void testAssignReal() {
-    AbstractComplexVector Acopy = A.copy();
-    AbstractDoubleVector Re = new DoubleVector.random(A.length);
-    A.setReal(Re);
-    for (int i = 0; i < A.length; i++) {
-      Float64List elem = A.get(i);
-      expect(Acopy.get(i)[1], closeTo(elem[1], TOL));
-      expect(Re.get(i), closeTo(elem[0], TOL));
-    }
-  }
-
-  void testCardinality() {
-    int card = A.cardinality;
-    expect(A.length, equals(card));
-  }
-
-  void testAll() {
-    Float64List value = new Float64List.fromList([1.0, 2.0]);
-    A.fill(value[0], value[1]);
-    expect(A.all(value), isTrue);
-    final eq = A.all(new Float64List.fromList([2.0, 2.0]));
-    expect(eq, isFalse);
-  }
-
-  void testEquals() {
-    expect(A.equals(A), isTrue);
-    expect(A.equals(B), isFalse);
-  }
-
-  void testGetImaginaryPart() {
-    AbstractDoubleVector Im = A.imaginary();
-    for (int i = 0; i < A.length; i++) {
-      expect(A.get(i)[1], closeTo(Im.get(i), TOL));
-    }
-  }
-
-  void testGetRealPart() {
-    AbstractDoubleVector Re = A.real();
-    for (int i = 0; i < A.length; i++) {
-      expect(A.get(i)[0], closeTo(Re.get(i), TOL));
-    }
-  }
-
-  void testGetNonZeros() {
-    List<int> indexList = new List<int>();
-    List<Float64List> valueList = new List<Float64List>();
-    A.nonZeros(indexList: indexList, valueList: valueList);
-    expect(A.length, equals(indexList.length));
-    expect(A.length, equals(valueList.length));
-    for (int i = 0; i < A.length; i++) {
-      assertEquals(A.get(indexList[i]), valueList[i], TOL);
-      expect(valueList[i][0] != 0 || valueList[i][1] != 0, isTrue);
-    }
-  }
-
-  void testReshape() {
-    int rows = 10;
-    int columns = 17;
-    AbstractComplexMatrix B = A.reshape(rows, columns);
-    int idx = 0;
-    for (int c = 0; c < columns; c++) {
-      for (int r = 0; r < rows; r++) {
-        assertEquals(A.get(idx++), B.get(r, c), TOL);
-      }
-    }
-  }
-
-  /*void testReshape3D() {
-    int slices = 2;
-    int rows = 5;
-    int columns = 17;
-    ComplexMatrix3D B = A.reshape3D(slices, rows, columns);
-    int idx = 0;
-    for (int s = 0; s < slices; s++) {
-      for (int c = 0; c < columns; c++) {
-        for (int r = 0; r < rows; r++) {
-          assertEquals(A.getQuick(idx++), B.getQuick(s, r, c), TOL);
-        }
-      }
-    }
-  }*/
-
-  void testSwap() {
-    AbstractComplexVector Acopy = A.copy();
-    AbstractComplexVector Bcopy = B.copy();
-    A.swap(B);
-    for (int i = 0; i < A.length; i++) {
-      assertEquals(Bcopy.get(i), A.get(i), TOL);
-      assertEquals(Acopy.get(i), B.get(i), TOL);
-    }
-  }
-
-  void testToArray() {
-    Float64List array = A.toList();
-    for (int i = 0; i < A.length; i++) {
-      Float64List elem = A.get(i);
-      expect(elem[0], closeTo(array[2 * i], TOL));
-      expect(elem[1], closeTo(array[2 * i + 1], TOL));
-    }
-  }
-
-  void testToArrayFill() {
-    Float64List array = new Float64List(2 * A.length);
-    A.fillList(array);
-    for (int i = 0; i < A.length; i++) {
-      Float64List elem = A.get(i);
-      expect(elem[0], closeTo(array[2 * i], TOL));
-      expect(elem[1], closeTo(array[2 * i + 1], TOL));
-    }
-  }
-
-  void testViewFlip() {
-    AbstractComplexVector B = A.flip();
-    for (int i = 0; i < A.length; i++) {
-      assertEquals(A.get(A.length - 1 - i), B.get(i), TOL);
-    }
-  }
-
-  void testViewPart() {
-    AbstractComplexVector B = A.part(A.length ~/ 2, A.length ~/ 3);
-    for (int i = 0; i < A.length / 3; i++) {
-      assertEquals(A.get(A.length ~/ 2 + i), B.get(i), TOL);
-    }
-  }
-
-  void testViewSelectionProc() {
-    AbstractComplexVector B = A.upon((Float64List element) {
-      if (element[0] < element[1]) {
-        return true;
-      } else {
-        return false;
-      }
-    });
-    for (int i = 0; i < B.length; i++) {
-      Float64List el = B.get(i);
-      if (el[0] >= el[1]) {
-        fail('viewSelectionProc');
-      }
-    }
-  }
-
-  void testViewSelection() {
-    Int32List indexes = new Int32List.fromList([A.length ~/ 6, A.length ~/ 5, A.length ~/ 4, A.length ~/ 3, A.length ~/ 2]);
-    AbstractComplexVector B = A.select(indexes);
-    for (int i = 0; i < indexes.length; i++) {
-      assertEquals(A.get(indexes[i]), B.get(i), TOL);
-    }
-  }
-
-  void testViewStrides() {
-    int stride = 3;
-    AbstractComplexVector B = A.strides(stride);
-    for (int i = 0; i < B.length; i++) {
-      assertEquals(A.get(i * stride), B.get(i), TOL);
-    }
-  }
-
-  void testZDotProduct() {
-    Float64List actual = A.dot(B);
-    Float64List expected = new Float64List(2);
-    for (int i = 0; i < A.length; i++) {
-      expected = Complex.plus(expected, Complex.multiply(Complex.conj(B.get(i)), A.get(i)));
-    }
-    assertEquals(expected, actual, TOL);
-  }
-
-  void testZDotProductRange() {
-    Float64List actual = A.dot(B, 5, B.length - 10);
-    Float64List expected = new Float64List(2);
-    for (int i = 5; i < A.length - 5; i++) {
-      expected = Complex.plus(expected, Complex.multiply(Complex.conj(B.get(i)), A.get(i)));
-    }
-    assertEquals(expected, actual, TOL);
-  }
-
-  void testZDotProductIndex() {
-    var indexList = <int>[];
-    var valueList = <Float64List>[];
-    B.nonZeros(indexList: indexList, valueList: valueList);
-    Float64List actual = A.dotNonZero(B,
-        new Int32List.fromList(indexList), 5, B.length - 10);
-    Float64List expected = new Float64List(2);
-    for (int i = 5; i < A.length - 5; i++) {
-      expected = Complex.plus(expected, Complex.multiply(A.get(i), Complex.conj(B.get(i))));
-    }
-    assertEquals(expected, actual, TOL);
-  }
-
-  void testZSum() {
-    Float64List actual = A.sum();
-    Float64List expected = new Float64List(2);
-    for (int i = 0; i < A.length; i++) {
-      expected = Complex.plus(expected, A.get(i));
-    }
-    assertEquals(expected, actual, TOL);
-  }
-
-  void assertEquals(Float64List expected, Float64List actual, double tol) {
-    for (int i = 0; i < actual.length; i++) {
-      expect(expected[i], closeTo(actual[i], tol));
-    }
-  }
-
 }

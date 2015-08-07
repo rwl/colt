@@ -25,7 +25,7 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
 
   /// Constructs a matrix with a given number of rows and columns. All entries
   /// are initially `0`.
-  DiagonalComplexMatrix(int rows, int columns, this._dindex) : super._(rows, columns) {
+  DiagonalComplexMatrix(int rows, int columns, [this._dindex = 0]) : super._(rows, columns) {
     if ((_dindex < -rows + 1) || (_dindex > columns - 1)) {
       throw new ArgumentError("index is out of bounds");
     }
@@ -59,6 +59,10 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
 
   DiagonalComplexMatrix._internal(int rows, int columns, this._elements, this._dlength, this._dindex) : super._(rows, columns);
 
+  static DiagonalComplexMatrix create(int rows, int columns) {
+    return new DiagonalComplexMatrix(rows, columns);
+  }
+
   void apply(final cfunc.ComplexComplexFunction fn) {
     if (fn is cfunc.ComplexMult) { // x[i] = mult*x[i]
       final Float64List alpha = fn.multiplicator;
@@ -77,7 +81,7 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
       for (int j = 0; j < _dlength; j++) {
         elem[0] = _elements[2 * j];
         elem[1] = _elements[2 * j + 1];
-        elem = Complex.multiply(elem, alpha);
+        elem = cmath.multiply(elem, alpha);
         _elements[2 * j] = elem[0];
         _elements[2 * j + 1] = elem[1];
       }
@@ -157,7 +161,7 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
             for (int j = 0; j < _dlength; j++) {
               elem[0] = otherElements[2 * j];
               elem[1] = otherElements[2 * j + 1];
-              elem = Complex.multiply(alpha, elem);
+              elem = cmath.multiply(alpha, elem);
               _elements[2 * j] += elem[0];
               _elements[2 * j + 1] += elem[1];
             }
@@ -170,11 +174,11 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
             otherElem[1] = otherElements[2 * j + 1];
             elem[0] = _elements[2 * j];
             elem[1] = _elements[2 * j + 1];
-            elem = Complex.multiply(elem, otherElem);
+            elem = cmath.multiply(elem, otherElem);
             _elements[2 * j] = elem[0];
             _elements[2 * j + 1] = elem[1];
           }
-        } else if (function == cfunc.div) { // x[i] = x[i] /  y[i]
+        } else if (fn == cfunc.div) { // x[i] = x[i] /  y[i]
           var elem = new Float64List(2);
           var otherElem = new Float64List(2);
           for (int j = 0; j < _dlength; j++) {
@@ -182,7 +186,7 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
             otherElem[1] = otherElements[2 * j + 1];
             elem[0] = _elements[2 * j];
             elem[1] = _elements[2 * j + 1];
-            elem = Complex.div_(elem, otherElem);
+            elem = cmath.div_(elem, otherElem);
             _elements[2 * j] = elem[0];
             _elements[2 * j + 1] = elem[1];
           }
@@ -201,7 +205,7 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
         }
       return;
     } else {
-      super.assign(y, function);
+      super.assign(y, fn);
       return;
     }
   }
@@ -227,7 +231,7 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
       x[1] = _elements[2 * i + 1];
       diff[0] = (value[0] - x[0]).abs();
       diff[1] = (value[1] - x[1]).abs();
-      if (((diff[0] != diff[0]) || (diff[1] != diff[1])) && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1])))) || (Complex.isEqual(value, x, epsilon))) {
+      if (((diff[0] != diff[0]) || (diff[1] != diff[1])) && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1])))) || (cmath.isEqual(value, x, epsilon))) {
         diff[0] = 0.0;
         diff[1] = 0.0;
       }
@@ -265,7 +269,7 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
         value[1] = otherElements[2 * i + 1];
         diff[0] = (value[0] - x[0]).abs();
         diff[1] = (value[1] - x[1]).abs();
-        if (((diff[0] != diff[0]) || (diff[1] != diff[1])) && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1])))) || (Complex.isEqual(value, x, epsilon))) {
+        if (((diff[0] != diff[0]) || (diff[1] != diff[1])) && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1])))) || (cmath.isEqual(value, x, epsilon))) {
           diff[0] = 0.0;
           diff[1] = 0.0;
         }
@@ -431,8 +435,8 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
           elemA[1] = _elements[2 * i + 1];
           elemY[0] = elementsY[2 * _dindex + zeroY + strideY * i];
           elemY[1] = elementsY[2 * _dindex + zeroY + strideY * i + 1];
-          elemA = Complex.multiply(elemA, elemY);
-          elemA = Complex.multiply(alpha, elemA);
+          elemA = cmath.multiply(elemA, elemY);
+          elemA = cmath.multiply(alpha, elemA);
           elementsZ[zeroZ + strideZ * i] += elemA[0];
           elementsZ[zeroZ + strideZ * i + 1] += elemA[1];
         }
@@ -442,8 +446,8 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
           elemA[1] = _elements[2 * i + 1];
           elemY[0] = elementsY[zeroY + strideY * i];
           elemY[1] = elementsY[zeroY + strideY * i + 1];
-          elemA = Complex.multiply(elemA, elemY);
-          elemA = Complex.multiply(alpha, elemA);
+          elemA = cmath.multiply(elemA, elemY);
+          elemA = cmath.multiply(alpha, elemA);
           elementsZ[-2 * _dindex + zeroZ + strideZ * i] += elemA[0];
           elementsZ[-2 * _dindex + zeroZ + strideZ * i + 1] += elemA[1];
         }
@@ -455,8 +459,8 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
           elemA[1] = -_elements[2 * i + 1];
           elemY[0] = elementsY[zeroY + strideY * i];
           elemY[1] = elementsY[zeroY + strideY * i + 1];
-          elemA = Complex.multiply(elemA, elemY);
-          elemA = Complex.multiply(alpha, elemA);
+          elemA = cmath.multiply(elemA, elemY);
+          elemA = cmath.multiply(alpha, elemA);
           elementsZ[2 * _dindex + zeroZ + strideZ * i] += elemA[0];
           elementsZ[2 * _dindex + zeroZ + strideZ * i + 1] += elemA[1];
         }
@@ -466,8 +470,8 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
           elemA[1] = -_elements[2 * i + 1];
           elemY[0] = elementsY[-2 * _dindex + zeroY + strideY * i];
           elemY[1] = elementsY[-2 * _dindex + zeroY + strideY * i + 1];
-          elemA = Complex.multiply(elemA, elemY);
-          elemA = Complex.multiply(alpha, elemA);
+          elemA = cmath.multiply(elemA, elemY);
+          elemA = cmath.multiply(alpha, elemA);
           elementsZ[zeroZ + strideZ * i] += elemA[0];
           elementsZ[zeroZ + strideZ * i + 1] += elemA[1];
         }

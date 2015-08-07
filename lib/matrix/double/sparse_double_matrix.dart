@@ -58,6 +58,10 @@ class SparseDoubleMatrix extends AbstractDoubleMatrix {
     _elements = elements;
   }
 
+  static SparseDoubleMatrix create(int rows, int columns) {
+    return new SparseDoubleMatrix(rows, columns);
+  }
+
   factory SparseDoubleMatrix.compose(List<List<AbstractDoubleMatrix>> parts) {
     return dfactory.compose(
         parts, (rows, columns) => new SparseDoubleMatrix(rows, columns));
@@ -92,7 +96,7 @@ class SparseDoubleMatrix extends AbstractDoubleMatrix {
 
     checkShape(this, y);
 
-    if (fn is DoublePlusMultSecond) {
+    if (fn is func.DoublePlusMultSecond) {
       // x[i] = x[i] + alpha*y[i]
       final double alpha = fn.multiplicator;
       if (alpha == 0) {
@@ -346,7 +350,7 @@ class SparseDoubleMatrix extends AbstractDoubleMatrix {
       Crows[i] = C.row(i);
     }
 
-    var fun = new DoublePlusMultSecond.plusMult(0.0);
+    var fun = new func.DoublePlusMultSecond.plusMult(0.0);
 
     _elements.forEach((int key, double value) {
       int i = key ~/ columns;

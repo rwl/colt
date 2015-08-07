@@ -47,7 +47,7 @@ class WrapperDoubleMatrix extends AbstractDoubleMatrix {
     }
   }
 
-  void assign(
+  /*void assign(
       final AbstractDoubleMatrix y, final func.DoubleDoubleFunction fn) {
     checkShape(this, y);
     if (y is WrapperDoubleMatrix) {
@@ -60,7 +60,7 @@ class WrapperDoubleMatrix extends AbstractDoubleMatrix {
     } else {
       super.assign(y, fn);
     }
-  }
+  }*/
 
   Object get elements => _content.elements;
 

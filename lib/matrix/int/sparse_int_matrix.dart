@@ -70,6 +70,10 @@ class SparseIntMatrix extends AbstractIntMatrix {
     _elements = elements;
   }
 
+  static SparseIntMatrix create(int rows, int columns) {
+    return new SparseIntMatrix(rows, columns);
+  }
+
   void fill(int value) {
     if (!isView && value == 0) {
       _elements.clear();

@@ -165,7 +165,7 @@ class IntVector extends AbstractIntVector {
   void assign(final AbstractIntVector y, final ifunc.IntIntFunction fn) {
     // overriden for performance only
     if (!(y is IntVector)) {
-      super.forEachWith(y, fn);
+      super.assign(y, fn);
       return;
     }
     checkSize(this, y);

@@ -140,6 +140,10 @@ class SparseRCIntMatrix extends WrapperIntMatrix {
     _values = values;
   }
 
+  static SparseRCIntMatrix create(int rows, int columns) {
+    return new SparseRCIntMatrix(rows, columns);
+  }
+
   void apply(final ifunc.IntFunction fn) {
     if (fn is ifunc.IntMult) {
       // x[i] = mult*x[i]
@@ -742,7 +746,7 @@ class SparseRCIntMatrix extends WrapperIntMatrix {
         for (int ka = rowPointersA[ii]; ka < highA; ka++) {
           int scal = valuesA[ka] * alpha;
           int jj = columnIndexesA[ka];
-          CC.row(ii).forEachWith(BB.row(jj), ifunc.plusMultSecond(scal));
+          CC.row(ii).assign(BB.row(jj), ifunc.plusMultSecond(scal));
         }
       }
     } else if ((B is SparseRCIntMatrix) && (C is SparseRCIntMatrix)) {
@@ -842,9 +846,11 @@ class SparseRCIntMatrix extends WrapperIntMatrix {
           int j = columnIndexesA[k];
           fn.multiplicator = valuesA[k] * alpha;
           if (!transposeA) {
-            Crows[i].forEachWith(Brows[j], fn);
+            Crows[i].assign(Brows[j], fn);
           }
-          else Crows[j].forEachWith(Brows[i], fn);
+          else {
+            Crows[j].assign(Brows[i], fn);
+          }
         }
       }
     }

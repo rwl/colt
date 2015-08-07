@@ -150,8 +150,12 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
     _values = values;
   }
 
+  static SparseRCDoubleMatrix create(int rows, int columns) {
+    return new SparseRCDoubleMatrix(rows, columns);
+  }
+
   void apply(final func.DoubleFunction fn) {
-    if (fn is DoubleMult) {
+    if (fn is func.DoubleMult) {
       // x[i] = mult*x[i]
       final double alpha = fn.multiplicator;
       if (alpha == 1) {
@@ -292,7 +296,7 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
       }
     }
 
-    if (fn is DoublePlusMultSecond) {
+    if (fn is func.DoublePlusMultSecond) {
       // x[i] = x[i] + alpha*y[i]
       final double alpha = fn.multiplicator;
       if (alpha == 0) {
@@ -305,7 +309,7 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
       return;
     }
 
-    if (fn is DoublePlusMultFirst) {
+    if (fn is func.DoublePlusMultFirst) {
       // x[i] = alpha*x[i] + y[i]
       final double alpha = fn.multiplicator;
       if (alpha == 0) {
@@ -369,10 +373,10 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
   SparseCCDoubleMatrix columnCompressed() {
     SparseRCDoubleMatrix tr = transpose();
     SparseCCDoubleMatrix cc = new SparseCCDoubleMatrix(rows, columns);
-    cc._dcs.i = tr._columnIndexes;
-    cc._dcs.p = tr._rowPointers;
-    cc._dcs.x = tr._values;
-    cc._dcs.nzmax = tr._values.length;
+    cc._rowIndexes = tr._columnIndexes;
+    cc._columnPointers = tr._rowPointers;
+    cc._values = tr._values;
+    //cc._dcs.nzmax = tr._values.length;
     cc._rowIndexesSorted = true;
     return cc;
   }
@@ -826,7 +830,7 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
         Crows[i] = C.row(i);
       }
 
-      var fn = new DoublePlusMultSecond.plusMult(0.0);
+      var fn = new func.DoublePlusMultSecond.plusMult(0.0);
 
       final Int32List columnIndexesA = _columnIndexes;
       final Float64List valuesA = _values;

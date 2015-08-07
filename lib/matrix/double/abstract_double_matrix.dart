@@ -361,7 +361,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
 
   /// Returns a string representation using default formatting.
   String toString() {
-    return new DoubleFormatter().toStringDouble2D(this);
+    return new DoubleFormatter().toStringDoubleMatrix(this);
   }
 
   /// Constructs and returns a new *slice view* representing the rows of

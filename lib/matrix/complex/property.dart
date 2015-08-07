@@ -13,28 +13,30 @@ library cern.colt.matrix.complex.property;
 import 'dart:typed_data';
 
 import 'matrix.dart';
-import '../former.dart';
-import '../../math.dart';
+//import '../formatter.dart';
 
-void _checkDense(AbstractComplexVector A) {
+import '../../math.dart' show EPSILON;
+import '../../math.dart' as cmath;
+
+/*void _checkDense(AbstractComplexVector A) {
   if (A is! ComplexVector) {
     throw new ArgumentError("Matrix must be dense");
   }
-}
+}*/
 
 /// Checks whether the given matrix `A` is square.
-void _checkSquare(AbstractComplexMatrix A) {
+/*void _checkSquare(AbstractComplexMatrix A) {
   if (A.rows != A.columns) {
     throw new ArgumentError(
-        "Matrix must be square: " + AbstractFormatter.shape2D(A));
+        "Matrix must be square: " + AbstractFormatter.shapeMatrix(A));
   }
-}
+}*/
 
-void _checkSparse(AbstractComplexMatrix A) {
+/*void _checkSparse(AbstractComplexMatrix A) {
   if (A is! SparseCCComplexMatrix && A is! SparseRCComplexMatrix) {
     throw new ArgumentError("Matrix must be sparse");
   }
-}
+}*/
 
 /// Returns whether all cells of the given matrix [A] are equal to the
 /// given value.
@@ -43,8 +45,6 @@ bool allVector(final AbstractComplexVector A, final Float64List value,
   if (A == null) {
     return false;
   }
-  var result = false;
-  var size = A.size;
   var diff = new Float64List(2);
   for (int i = 0; i < A.size; i++) {
     Float64List x = A.get(i);
@@ -53,7 +53,7 @@ bool allVector(final AbstractComplexVector A, final Float64List value,
     if (((diff[0] != diff[0]) || (diff[1] != diff[1])) &&
             ((((value[0] != value[0]) || (value[1] != value[1])) &&
                 ((x[0] != x[0]) || (x[1] != x[1])))) ||
-        (Complex.isEqual(value, x, epsilon))) {
+        (cmath.isEqual(value, x, epsilon))) {
       diff[0] = 0.0;
       diff[1] = 0.0;
     }
@@ -78,7 +78,6 @@ bool equalsVector(final AbstractComplexVector A, final AbstractComplexVector B,
     return false;
   }
 
-  var result = false;
   var diff = new Float64List(2);
   for (int i = 0; i < size; i++) {
     Float64List x = A.get(i);
@@ -88,7 +87,7 @@ bool equalsVector(final AbstractComplexVector A, final AbstractComplexVector B,
     if (((diff[0] != diff[0]) || (diff[1] != diff[1])) &&
             ((((value[0] != value[0]) || (value[1] != value[1])) &&
                 ((x[0] != x[0]) || (x[1] != x[1])))) ||
-        (Complex.isEqual(value, x, epsilon))) {
+        (cmath.isEqual(value, x, epsilon))) {
       diff[0] = 0.0;
       diff[1] = 0.0;
     }
@@ -108,7 +107,6 @@ bool allMatrix(final AbstractComplexMatrix A, final Float64List value,
   }
   int rows = A.rows;
   int columns = A.columns;
-  bool result = false;
   var diff = new Float64List(2);
   for (int r = 0; r < rows; r++) {
     for (int c = 0; c < columns; c++) {
@@ -118,7 +116,7 @@ bool allMatrix(final AbstractComplexMatrix A, final Float64List value,
       if (((diff[0] != diff[0]) || (diff[1] != diff[1])) &&
               ((((value[0] != value[0]) || (value[1] != value[1])) &&
                   ((x[0] != x[0]) || (x[1] != x[1])))) ||
-          (Complex.isEqual(value, x, epsilon))) {
+          (cmath.isEqual(value, x, epsilon))) {
         diff[0] = 0.0;
         diff[1] = 0.0;
       }
@@ -144,7 +142,6 @@ bool equalsMatrix(final AbstractComplexMatrix A, final AbstractComplexMatrix B,
   if (columns != B.columns || rows != B.rows) {
     return false;
   }
-  bool result = false;
   var diff = new Float64List(2);
   for (int r = 0; r < rows; r++) {
     for (int c = 0; c < columns; c++) {
@@ -155,7 +152,7 @@ bool equalsMatrix(final AbstractComplexMatrix A, final AbstractComplexMatrix B,
       if (((diff[0] != diff[0]) || (diff[1] != diff[1])) &&
               ((((value[0] != value[0]) || (value[1] != value[1])) &&
                   ((x[0] != x[0]) || (x[1] != x[1])))) ||
-          (Complex.isEqual(value, x, epsilon))) {
+          (cmath.isEqual(value, x, epsilon))) {
         diff[0] = 0.0;
         diff[1] = 0.0;
       }

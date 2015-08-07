@@ -1,23 +1,22 @@
 library cern.colt.matrix.int.property;
 
 import 'matrix.dart';
-import '../former.dart';
 
 /// Checks whether the given matrix [A] is rectangular.
-void _checkRectangular(AbstractIntMatrix A) {
+/*void _checkRectangular(AbstractIntMatrix A) {
   if (A.rows < A.columns) {
     throw new ArgumentError(
-        "Matrix must be rectangular: " + AbstractFormatter.shape2D(A));
+        "Matrix must be rectangular: " + AbstractFormatter.shapeMatrix(A));
   }
-}
+}*/
 
 /// Checks whether the given matrix [A] is square.
-void _checkSquare(AbstractIntMatrix A) {
+/*void _checkSquare(AbstractIntMatrix A) {
   if (A.rows != A.columns) {
     throw new ArgumentError(
-        "Matrix must be square: " + AbstractFormatter.shape2D(A));
+        "Matrix must be square: " + AbstractFormatter.shapeMatrix(A));
   }
-}
+}*/
 
 /// Returns the matrix's fraction of non-zero cells;
 /// `A.cardinality / A.size`.
@@ -34,7 +33,6 @@ bool allVector(final AbstractIntVector A, final int value) {
     return false;
   }
   int size = A.size;
-  bool result = false;
   for (int i = 0; i < size; i++) {
     if (!(A.get(i) == value)) {
       return false;
@@ -60,9 +58,10 @@ bool equalsVector(final AbstractIntVector A, final AbstractIntVector B) {
     return false;
   }
 
-  bool result = false;
   for (int i = 0; i < size; i++) {
-    if (!(A.get(i) == B.get(i))) return false;
+    if (!(A.get(i) == B.get(i))) {
+      return false;
+    }
   }
   return true;
 }
@@ -77,7 +76,6 @@ bool allMatrix(final AbstractIntMatrix A, final int value) {
   }
   final int rows = A.rows;
   final int columns = A.columns;
-  bool result = false;
   for (int r = 0; r < rows; r++) {
     for (int c = 0; c < columns; c++) {
       if (!(A.get(r, c) == value)) {
@@ -106,7 +104,6 @@ bool equalsMatrix(final AbstractIntMatrix A, final AbstractIntMatrix B) {
   if (columns != B.columns || rows != B.rows) {
     return false;
   }
-  bool result = false;
   for (int r = 0; r < rows; r++) {
     for (int c = 0; c < columns; c++) {
       if (!(A.get(r, c) == B.get(r, c))) {

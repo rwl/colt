@@ -32,6 +32,10 @@ class SparseComplexVector extends AbstractComplexVector {
     _elements = elements;
   }
 
+  static SparseComplexVector create(int size) {
+    return new SparseComplexVector(size);
+  }
+
   void fill(double re, double im) {
     // overriden for performance only
     if (!isView && re == 0 && im == 0) {

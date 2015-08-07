@@ -60,7 +60,7 @@ class DoubleVector extends AbstractDoubleVector {
 
   void apply(final DoubleFunction fn) {
     double multiplicator = 0.0;
-    if (fn is DoubleMult) {
+    if (fn is func.DoubleMult) {
       // x[i] = mult*x[i]
       multiplicator = fn.multiplicator;
       if (multiplicator == 1) {
@@ -70,7 +70,7 @@ class DoubleVector extends AbstractDoubleVector {
 
     int idx = zero - stride;
     // specialization for speed
-    if (fn is DoubleMult) {
+    if (fn is func.DoubleMult) {
       // x[i] = mult*x[i]
       for (int k = size; --k >= 0;) {
         _elements[idx += stride] *= multiplicator;
@@ -179,7 +179,7 @@ class DoubleVector extends AbstractDoubleVector {
         idx += stride;
         idxOther += strideOther;
       }
-    } else if (fn is DoublePlusMultSecond) {
+    } else if (fn is func.DoublePlusMultSecond) {
       double multiplicator = fn.multiplicator;
       if (multiplicator == 0) {
         // x[i] = x[i] + 0*y[i]

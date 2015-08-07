@@ -26,7 +26,7 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
 
   /// Constructs a matrix with a given number of rows and columns. All entries
   /// are initially `0`.
-  DiagonalDoubleMatrix(int rows, int columns, this._dindex)
+  DiagonalDoubleMatrix(int rows, int columns, [this._dindex = 0])
       : super._(rows, columns) {
     if ((_dindex < -rows + 1) || (_dindex > columns - 1)) {
       throw new ArgumentError("index is out of bounds");
@@ -63,6 +63,10 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
   DiagonalDoubleMatrix._internal(
       int rows, int columns, this._elements, this._dlength, this._dindex)
       : super._(rows, columns);
+
+  static DiagonalDoubleMatrix create(int rows, int columns) {
+    return new DiagonalDoubleMatrix(rows, columns);
+  }
 
   void apply(final func.DoubleFunction fn) {
     if (fn is DoubleMult) {

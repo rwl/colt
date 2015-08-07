@@ -11,11 +11,11 @@
 library cern.colt.matrix.tdouble.property;
 
 import 'matrix.dart';
-import '../former.dart';
+//import '../formatter.dart';
 import '../../math.dart';
 
 /// Returns a String with [length] blanks.
-String _blanks(int length) {
+/*String _blanks(int length) {
   if (length < 0) {
     length = 0;
   }
@@ -24,25 +24,25 @@ String _blanks(int length) {
     buf.write(' ');
   }
   return buf.toString();
-}
+}*/
 
 /// Checks whether the given matrix [A] is rectangular.
-void _checkRectangular(AbstractDoubleMatrix A) {
+/*void _checkRectangular(AbstractDoubleMatrix A) {
   if (A.rows < A.columns) {
     throw new ArgumentError(
-        "Matrix must be rectangular: " + AbstractFormatter.shape2D(A));
+        "Matrix must be rectangular: " + AbstractFormatter.shapeMatrix(A));
   }
-}
+}*/
 
 /// Checks whether the given matrix `A` is square.
-void _checkSquare(AbstractDoubleMatrix A) {
+/*void _checkSquare(AbstractDoubleMatrix A) {
   if (A.rows != A.columns) {
     throw new ArgumentError(
-        "Matrix must be square: " + AbstractFormatter.shape2D(A));
+        "Matrix must be square: " + AbstractFormatter.shapeMatrix(A));
   }
-}
+}*/
 
-void _checkDense(AbstractDoubleVector A) {
+/*void _checkDense(AbstractDoubleVector A) {
   if (A is! DoubleVector) {
     throw new ArgumentError("Matrix must be dense");
   }
@@ -60,7 +60,7 @@ void _checkSparseMatrix(AbstractDoubleMatrix A) {
       A is! SparseDoubleMatrix) {
     throw new ArgumentError("Matrix must be sparse");
   }
-}
+}*/
 
 /// Returns the matrix's fraction of non-zero cells;
 /// `A.cardinality / A.size`.
@@ -76,7 +76,6 @@ bool allVector(final AbstractDoubleVector A, final double value,
     return false;
   }
   int size = A.size;
-  bool result = false;
   for (int i = 0; i < size; i++) {
     double x = A.get(i);
     double diff = (value - x).abs();
@@ -103,12 +102,11 @@ bool equalsVector(final AbstractDoubleVector A, final AbstractDoubleVector B,
   if (!(A != null && B != null)) {
     return false;
   }
-  int size = A.length;
-  if (size != B.length) {
+  int size = A.size;
+  if (size != B.size) {
     return false;
   }
 
-  bool result = false;
   for (int i = 0; i < size; i++) {
     double x = A.get(i);
     double value = B.get(i);
@@ -134,7 +132,6 @@ bool allMatrix(final AbstractDoubleMatrix A, final double value,
   }
   final int rows = A.rows;
   final int columns = A.columns;
-  bool result = false;
   for (int r = 0; r < rows; r++) {
     for (int c = 0; c < columns; c++) {
       double x = A.get(r, c);
@@ -169,7 +166,6 @@ bool equalsMatrix(final AbstractDoubleMatrix A, final AbstractDoubleMatrix B,
   if (columns != B.columns || rows != B.rows) {
     return false;
   }
-  bool result = false;
   for (int r = 0; r < rows; r++) {
     for (int c = 0; c < columns; c++) {
       double x = A.get(r, c);

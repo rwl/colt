@@ -44,6 +44,8 @@ class SparseDoubleVector extends AbstractDoubleVector {
     _elements = elements;
   }
 
+  static SparseDoubleVector create(int sz) => new SparseDoubleVector(sz);
+
   factory SparseDoubleVector.append(
       AbstractDoubleVector A, AbstractDoubleVector B) {
     return dfactory.append(A, B, (n) => new SparseDoubleVector(n));

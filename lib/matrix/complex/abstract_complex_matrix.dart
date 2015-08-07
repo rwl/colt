@@ -458,10 +458,10 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
       s[0] = 0.0;
       s[1] = 0.0;
       for (int c = 0; c < columns; c++) {
-        s = Complex.plus(s, Complex.multiply(get(r, c), y.get(c)));
+        s = cmath.plus(s, cmath.multiply(get(r, c), y.get(c)));
       }
-      zz.set(r, Complex.plus(
-          Complex.multiply(s, alpha), Complex.multiply(zz.get(r), beta)));
+      zz.set(r, cmath.plus(
+          cmath.multiply(s, alpha), cmath.multiply(zz.get(r), beta)));
     }
     return zz;
   }
@@ -521,10 +521,10 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
         s[0] = 0.0;
         s[1] = 0.0;
         for (int c = 0; c < n; c++) {
-          s = Complex.plus(s, Complex.multiply(get(b, c), B.get(c, a)));
+          s = cmath.plus(s, cmath.multiply(get(b, c), B.get(c, a)));
         }
-        CC.set(b, a, Complex.plus(
-            Complex.multiply(s, alpha), Complex.multiply(CC.get(b, a), beta)));
+        CC.set(b, a, cmath.plus(
+            cmath.multiply(s, alpha), cmath.multiply(CC.get(b, a), beta)));
       }
     }
     return CC;

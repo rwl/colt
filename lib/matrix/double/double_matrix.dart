@@ -66,7 +66,7 @@ class DoubleMatrix extends AbstractDoubleMatrix {
     final int zero = index(0, 0);
     int idx = zero + (rows - 1) * rowStride + (columns - 1) * columnStride;
     // specialization for speed
-    if (fn is DoubleMult) {
+    if (fn is func.DoubleMult) {
       // x[i] =
       // mult*x[i]
       double multiplicator = fn.multiplicator;
@@ -226,7 +226,7 @@ class DoubleMatrix extends AbstractDoubleMatrix {
         idx += rowStride;
         idxOther += rowStrideOther;
       }
-    } else if (fn is DoublePlusMultSecond) {
+    } else if (fn is func.DoublePlusMultSecond) {
       double multiplicator = fn.multiplicator;
       if (multiplicator == 0) {
         // x[i] = x[i] + 0*y[i]
@@ -380,7 +380,7 @@ class DoubleMatrix extends AbstractDoubleMatrix {
     }
   }
 
-  void nonero(final List<int> rowList, final List<int> columnList,
+  void nonzero(final List<int> rowList, final List<int> columnList,
       final List<double> valueList) {
     rowList.clear();
     columnList.clear();

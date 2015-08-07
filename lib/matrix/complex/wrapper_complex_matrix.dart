@@ -77,7 +77,7 @@ class WrapperComplexMatrix extends AbstractComplexMatrix {
         if (((diff[0] != diff[0]) || (diff[1] != diff[1])) &&
                 ((((value[0] != value[0]) || (value[1] != value[1])) &&
                     ((x[0] != x[0]) || (x[1] != x[1])))) ||
-            (Complex.isEqual(value, x, epsilon))) {
+            (cmath.isEqual(value, x, epsilon))) {
           diff[0] = 0.0;
           diff[1] = 0.0;
         }

@@ -172,7 +172,7 @@ AbstractComplexMatrix appendRow(AbstractComplexMatrix A, AbstractComplexVector b
 
 /// Checks whether the given array is rectangular, that is, whether all rows
 /// have the same number of columns.
-void _checkRectangularShape(List<Float64List> array) {
+/*void _checkRectangularShape(List<Float64List> array) {
   int columns = -1;
   for (int r = 0; r < array.length; r++) {
     if (array[r] != null) {
@@ -182,7 +182,7 @@ void _checkRectangularShape(List<Float64List> array) {
       }
     }
   }
-}
+}*/
 
 /// Checks whether the given array is rectangular, that is, whether all rows
 /// have the same number of columns.

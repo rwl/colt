@@ -30,20 +30,23 @@ import '../matrix.dart'
         setColumns;
 
 import '../../function/double.dart'
-    show DoubleFunction, DoubleDoubleFunction; //,
-//        DoubleDoubleProcedure,
-//        DoubleIntProcedure,
-//        DoubleProcedure;
+    show
+        DoubleFunction,
+        DoubleDoubleFunction,
+        DoublePlusMultSecond,
+        DoubleMult,
+        DoublePlusMultFirst;
 
 import '../../function/double.dart' as func;
 
 import 'factory.dart' as dfactory;
 
-import '../../math.dart' show DoubleMult, DoublePlusMultSecond, DoublePlusMultFirst, EPSILON;
+import '../../math.dart' show EPSILON;
 
-import 'algo/algo.dart' as dprop;
+import 'property.dart' as dprop;
+import 'algorithm.dart' as dalgo;
 
-import '../former.dart';
+import '../formatter.dart';
 
 part 'double_vector.dart';
 part 'double_matrix.dart';
@@ -57,7 +60,6 @@ part 'wrapper_double_matrix.dart';
 part 'delegate_double_vector.dart';
 part 'abstract_double_vector.dart';
 part 'abstract_double_matrix.dart';
-
 
 class DoubleVectorLocation {
   final double value;

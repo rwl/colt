@@ -373,7 +373,7 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
   void set(int row, int column, int value);
 
   /// Returns a string representation using default formatting.
-  String toString() => new IntFormatter().toString2D(this);
+  String toString() => new IntFormatter().toStringMatrix(this);
 
   /// Constructs and returns a new view equal to the receiver. The view is a
   /// shallow clone.

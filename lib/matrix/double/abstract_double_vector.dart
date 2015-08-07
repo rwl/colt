@@ -547,7 +547,7 @@ abstract class AbstractDoubleVector extends AbstractVector {
 
   AbstractDoubleVector operator -() => copy()..apply(func.neg);
 
-  double normInfinity() => dprop.normInfinity(this);
+  double normInfinity() => dalgo.normInfinity(this);
 
   AbstractDoubleVector abs() => copy()..apply(func.abs);
 

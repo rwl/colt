@@ -174,7 +174,7 @@ abstract class AbstractComplexVector extends AbstractVector {
   /// non-zero values.
   ///
   /// In general, fill order is unspecified.
-  void nonZeros({List<int> indexList, final List<List<double>> valueList}) {
+  void nonzero({List<int> indexList, final List<List<double>> valueList}) {
     bool fillIndexList = indexList != null;
     bool fillValueList = valueList != null;
     if (fillIndexList) {
@@ -359,7 +359,7 @@ abstract class AbstractComplexVector extends AbstractVector {
       var idx = k + from;
       var tmp = y.get(idx);
       tmp[1] = -tmp[1]; // complex conjugate
-      sum = Complex.plus(sum, Complex.multiply(tmp, get(idx)));
+      sum = cmath.plus(sum, cmath.multiply(tmp, get(idx)));
     }
     return sum;
   }
@@ -368,7 +368,7 @@ abstract class AbstractComplexVector extends AbstractVector {
   Float64List sum() {
     var sum = new Float64List(2);
     for (int k = 0; k < size; k++) {
-      sum = Complex.plus(sum, get(k));
+      sum = cmath.plus(sum, get(k));
     }
     return sum;
   }

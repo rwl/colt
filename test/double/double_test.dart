@@ -6,40 +6,56 @@ import 'dart:typed_data';
 import 'package:test/test.dart';
 import 'package:colt/colt.dart';
 import 'package:colt/function/double.dart' hide equals;
+import 'package:colt/math.dart' show MAX_INT;
 
 part 'double_vector_test.dart';
 part 'double_matrix_test.dart';
-part 'dense_double_vector_test.dart';
 part 'dense_double_matrix_test.dart';
 part 'diagonal_double_matrix_test.dart';
 part 'sparse_double_matrix_test.dart';
 
-final math.Random random = new math.Random(0);
+final math.Random _r = new math.Random(0);
 
 doubleVectorTests() {
-  testDoubleVector('DenseDoubleVector', new DenseDoubleVectorTest());
-  testDoubleVector(
-      'DenseDoubleVector viewFlip', new DenseDoubleVectorViewTest());
+  testAbstractDoubleVector('dense', DoubleVector.create);
+  testAbstractDoubleVector('dense view', _flip(DoubleVector.create));
 
-  testDoubleVector('SparseDoubleVector', new SparseDoubleVectorTest());
-  testDoubleVector(
-      'SparseDoubleVector viewFlip', new SparseDoubleVectorViewTest());
+  testAbstractDoubleVector('sparse', SparseDoubleVector.create);
+  testAbstractDoubleVector('sparse view', _flip(SparseDoubleVector.create));
 }
 
 doubleMatrixTests() {
-  testDenseDoubleMatrix('DenseDoubleMatrix', new DenseDoubleMatrixTest());
-  testDenseDoubleMatrix(
-      'DenseDoubleMatrix viewDice', new DenseDoubleMatrixViewTest());
-  testDoubleMatrix('DiagonalDoubleMatrix', new DiagonalDoubleMatrixTest());
-  testDoubleMatrix(
-      'DiagonalDoubleMatrix viewDice', new DiagonalDoubleMatrixViewTest());
+  testAbstractDoubleMatrix('dense', DoubleMatrix.create);
+  testAbstractDoubleMatrix('dense view', _dice(DoubleMatrix.create));
+  testDenseDoubleMatrix('raw', DoubleMatrix.create);
+  testDenseDoubleMatrix('view', _dice(DoubleMatrix.create));
 
-//  testSparseDoubleMatrix('SparseCCDoubleMatrix', new SparseCCDoubleMatrixTest());
-//  testSparseDoubleMatrix('SparseCCDoubleMatrix viewDice', new SparseCCDoubleMatrixViewTest());
-  testSparseDoubleMatrix('SparseDoubleMatrix', new SparseDoubleMatrixTest());
-  testSparseDoubleMatrix(
-      'SparseDoubleMatrix viewDice', new SparseDoubleMatrixViewTest());
-  testSparseDoubleMatrix('SparseRCDoubleMatrix', new SparseRCDoubleMatrixTest());
-  testSparseDoubleMatrix(
-      'SparseRCDoubleMatrix viewDice', new SparseRCDoubleMatrixViewTest());
+//  testDiagonalDoubleMatrix(true);
+//  testDiagonalDoubleMatrix(false);
+
+  testAbstractDoubleMatrix('sparse', SparseDoubleMatrix.create);
+  testAbstractDoubleMatrix('sparse view', _dice(SparseDoubleMatrix.create));
+//  testSparseDoubleMatrix();
+//  testSparseDoubleMatrix();
+
+  testAbstractDoubleMatrix('sparse rc', SparseRCDoubleMatrix.create);
+  testAbstractDoubleMatrix('sparse rc view', _dice(SparseRCDoubleMatrix.create));
+
+//  testAbstractDoubleMatrix('sparse cc', SparseCCDoubleMatrix.create);
+//  testAbstractDoubleMatrix('sparse cc view', _view(SparseCCDoubleMatrix.create));
+}
+
+_flip(make) => (sz) => make(sz).flip();
+
+_dice(make) => (r, c) => make(r, c).dice();
+
+List<Float64List> toList(AbstractDoubleMatrix m) {
+  var values = new List.generate(m.rows, (_) => new Float64List(m.columns));
+  for (int r = 0; r < m.rows; r++) {
+    Float64List currentRow = values[r];
+    for (int c = 0; c < m.columns; c++) {
+      currentRow[c] = m.get(r, c);
+    }
+  }
+  return values;
 }

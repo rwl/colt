@@ -25,6 +25,10 @@ class SparseComplexMatrix extends AbstractComplexMatrix {
     _elements = elements;
   }
 
+  static SparseComplexMatrix create(int rows, int columns) {
+    return new SparseComplexMatrix(rows, columns);
+  }
+
   void fill(double re, double im) {
     // overriden for performance only
     if (!isView && re == 0 && im == 0) {
@@ -69,7 +73,7 @@ class SparseComplexMatrix extends AbstractComplexMatrix {
         return; // nothing to do
       }
       y.forEachNonZero((int i, int j, Float64List value) {
-        set(i, j, Complex.plus(get(i, j), Complex.multiply(alpha, value)));
+        set(i, j, cmath.plus(get(i, j), cmath.multiply(alpha, value)));
         return value;
       });
       return;
@@ -86,7 +90,7 @@ class SparseComplexMatrix extends AbstractComplexMatrix {
   }
 
   Float64List get(int row, int column) {
-    Float64List elem = this._elements[rowZero + row * rowStride + columnZero + column * columnStride];
+    Float64List elem = _elements[rowZero + row * rowStride + columnZero + column * columnStride];
     if (elem != null) {
       return new Float64List.fromList([elem[0], elem[1]]);
     } else {

@@ -80,6 +80,10 @@ class ComplexVector extends AbstractComplexVector {
     return new ComplexVector.fromParts(real, imag);
   }
 
+  static ComplexVector create(int size) {
+    return new ComplexVector(size);
+  }
+
   Float64List aggregate(final cfunc.ComplexComplexComplexFunction aggr,
       final cfunc.ComplexComplexFunction fn) {
     if (size == 0) {
