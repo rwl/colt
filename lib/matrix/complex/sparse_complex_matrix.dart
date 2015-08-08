@@ -14,14 +14,18 @@ part of cern.colt.matrix.complex;
 ///
 /// This implementation uses [Map].
 class SparseComplexMatrix extends AbstractComplexMatrix {
-  Map<int, Float64List> _elements;
+  Map<int, Complex> _elements;
 
   factory SparseComplexMatrix(int rows, int columns) {
-      return new SparseComplexMatrix._internal(rows, columns, {}, 0, 0, columns, 1, true);
+    return new SparseComplexMatrix._internal(
+        rows, columns, {}, 0, 0, columns, 1, true);
   }
 
-  SparseComplexMatrix._internal(int rows, int columns, Map<int, Float64List> elements, int rowZero, int columnZero, int rowStride, int columnStride, bool isNoView)
-      : super(rows, columns, rowZero, columnZero, rowStride, columnStride, isNoView) {
+  SparseComplexMatrix._internal(int rows, int columns,
+      Map<int, Complex> elements, int rowZero, int columnZero, int rowStride,
+      int columnStride, bool isNoView)
+      : super(rows, columns, rowZero, columnZero, rowStride, columnStride,
+          isNoView) {
     _elements = elements;
   }
 
@@ -50,7 +54,8 @@ class SparseComplexMatrix extends AbstractComplexMatrix {
     }
     checkShape(this, other);
 
-    if (!isView && !other.isView) { // quickest
+    if (!isView && !other.isView) {
+      // quickest
       _elements.clear();
       _elements.addAll(other._elements);
       return;
@@ -58,7 +63,8 @@ class SparseComplexMatrix extends AbstractComplexMatrix {
     super.copyFrom(source);
   }
 
-  void assign(final AbstractComplexMatrix y, cfunc.ComplexComplexComplexFunction fn) {
+  void assign(
+      final AbstractComplexMatrix y, cfunc.ComplexComplexComplexFunction fn) {
     if (isView) {
       super.assign(y, fn);
       return;
@@ -68,12 +74,12 @@ class SparseComplexMatrix extends AbstractComplexMatrix {
 
     if (fn is cfunc.ComplexPlusMultSecond) {
       // x[i] = x[i] + alpha*y[i]
-      Float64List alpha = fn.multiplicator;
-      if (alpha[0] == 0 && alpha[1] == 1) {
+      Complex alpha = fn.multiplicator;
+      if (alpha.real == 0 && alpha.imaginary == 1) {
         return; // nothing to do
       }
-      y.forEachNonZero((int i, int j, Float64List value) {
-        set(i, j, cmath.plus(get(i, j), cmath.multiply(alpha, value)));
+      y.forEachNonZero((int i, int j, Complex value) {
+        set(i, j, get(i, j) + (alpha * value));
         return value;
       });
       return;
@@ -89,16 +95,17 @@ class SparseComplexMatrix extends AbstractComplexMatrix {
     }
   }
 
-  Float64List get(int row, int column) {
-    Float64List elem = _elements[rowZero + row * rowStride + columnZero + column * columnStride];
+  Complex get(int row, int column) {
+    Complex elem = _elements[
+        rowZero + row * rowStride + columnZero + column * columnStride];
     if (elem != null) {
-      return new Float64List.fromList([elem[0], elem[1]]);
+      return elem;
     } else {
-      return new Float64List(2);
+      return Complex.ZERO;
     }
   }
 
-  Object get elements => _elements;
+  dynamic get elements => _elements;
 
   bool _haveSharedCellsRaw(AbstractComplexMatrix other) {
     if (other is SelectedSparseComplexMatrix) {
@@ -120,15 +127,16 @@ class SparseComplexMatrix extends AbstractComplexMatrix {
   AbstractComplexVector like1D(int size) => new SparseComplexVector(size);
 
   AbstractComplexVector _like1D(int size, int offset, int stride) {
-    return new SparseComplexVector._internal(size, this._elements, offset, stride, true);
+    return new SparseComplexVector._internal(
+        size, this._elements, offset, stride, true);
   }
 
-  void set(int row, int column, Float64List value) {
+  void set(int row, int column, Complex value) {
     int index = rowZero + row * rowStride + columnZero + column * columnStride;
-    if (value[0] == 0 && value[1] == 0) {
+    if (value.real == 0 && value.imaginary == 0) {
       _elements.remove(index);
     } else {
-      _elements[index] = new Float64List.fromList(value);
+      _elements[index] = value;
     }
   }
 
@@ -137,19 +145,21 @@ class SparseComplexMatrix extends AbstractComplexMatrix {
     if (re == 0 && im == 0) {
       _elements.remove(index);
     } else {
-      _elements[index] = new Float64List.fromList([re, im]);
+      _elements[index] = new Complex(re, im);
     }
   }
 
-  AbstractComplexMatrix _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets) {
-    return new SelectedSparseComplexMatrix(this._elements, rowOffsets, columnOffsets, 0);
+  AbstractComplexMatrix _viewSelectionLike(
+      Int32List rowOffsets, Int32List columnOffsets) {
+    return new SelectedSparseComplexMatrix(
+        this._elements, rowOffsets, columnOffsets, 0);
   }
 
   AbstractDoubleMatrix imaginary() {
     AbstractDoubleMatrix Im = new SparseDoubleMatrix(rows, columns);
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < columns; c++) {
-        Im.set(r, c, get(r, c)[1]);
+        Im.set(r, c, get(r, c).imaginary);
       }
     }
     return Im;
@@ -159,46 +169,55 @@ class SparseComplexMatrix extends AbstractComplexMatrix {
     final AbstractDoubleMatrix Re = new SparseDoubleMatrix(rows, columns);
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < columns; c++) {
-        Re.set(r, c, get(r, c)[0]);
+        Re.set(r, c, get(r, c).real);
       }
     }
     return Re;
   }
 
   Object clone() {
-    return new SparseComplexMatrix._internal(rows, columns, _elements, rowZero, columnZero, rowStride, columnStride, !isView);
+    return new SparseComplexMatrix._internal(rows, columns, _elements, rowZero,
+        columnZero, rowStride, columnStride, !isView);
   }
 }
 
 /// Selection view on sparse 2-d matrices holding `complex` elements. This
 /// implementation uses [Map].
 class SelectedSparseComplexMatrix extends AbstractComplexMatrix {
-
-  Map<int, Float64List> _elements;
+  Map<int, Complex> _elements;
 
   /// The offsets of the visible cells of this matrix.
   Int32List _rowOffsets, _columnOffsets;
 
   int _offset;
 
-  SelectedSparseComplexMatrix._internal(int rows, int columns, Map<int, Float64List> elements, int rowZero, int columnZero, int rowStride, int columnStride, Int32List rowOffsets, Int32List columnOffsets, int offset)
-      : super(rows, columns, rowZero, columnZero, rowStride, columnStride, false) {
+  SelectedSparseComplexMatrix._internal(int rows, int columns,
+      Map<int, Complex> elements, int rowZero, int columnZero, int rowStride,
+      int columnStride, Int32List rowOffsets, Int32List columnOffsets,
+      int offset)
+      : super(
+          rows, columns, rowZero, columnZero, rowStride, columnStride, false) {
     _elements = elements;
     _rowOffsets = rowOffsets;
     _columnOffsets = columnOffsets;
     _offset = offset;
   }
 
-  factory SelectedSparseComplexMatrix(Map<int, Float64List> elements, Int32List rowOffsets, Int32List columnOffsets, int offset) {
-    return new SelectedSparseComplexMatrix._internal(rowOffsets.length, columnOffsets.length, elements, 0, 0, 1, 1, rowOffsets, columnOffsets, offset);
+  factory SelectedSparseComplexMatrix(Map<int, Complex> elements,
+      Int32List rowOffsets, Int32List columnOffsets, int offset) {
+    return new SelectedSparseComplexMatrix._internal(rowOffsets.length,
+        columnOffsets.length, elements, 0, 0, 1, 1, rowOffsets, columnOffsets,
+        offset);
   }
 
   int columnOffset(int absRank) => _columnOffsets[absRank];
 
   int rowOffset(int absRank) => _rowOffsets[absRank];
 
-  Float64List get(int row, int column) {
-    return _elements[_offset + _rowOffsets[rowZero + row * rowStride] + _columnOffsets[columnZero + column * columnStride]];
+  Complex get(int row, int column) {
+    return _elements[_offset +
+        _rowOffsets[rowZero + row * rowStride] +
+        _columnOffsets[columnZero + column * columnStride]];
   }
 
   /// This method is not supported.
@@ -216,7 +235,9 @@ class SelectedSparseComplexMatrix extends AbstractComplexMatrix {
   }
 
   int index(int row, int column) {
-    return this._offset + _rowOffsets[rowZero + row * rowStride] + _columnOffsets[columnZero + column * columnStride];
+    return this._offset +
+        _rowOffsets[rowZero + row * rowStride] +
+        _columnOffsets[columnZero + column * columnStride];
   }
 
   AbstractComplexMatrix like2D(int rows, int columns) {
@@ -229,10 +250,12 @@ class SelectedSparseComplexMatrix extends AbstractComplexMatrix {
     throw new Error(); // never called since row() and column() are overridden
   }
 
-  void set(int row, int column, Float64List value) {
-    int index = _offset + _rowOffsets[rowZero + row * rowStride] + _columnOffsets[columnZero + column * columnStride];
+  void set(int row, int column, Complex value) {
+    int index = _offset +
+        _rowOffsets[rowZero + row * rowStride] +
+        _columnOffsets[columnZero + column * columnStride];
 
-    if (value[0] == 0 && value[1] == 0) {
+    if (value.real == 0 && value.imaginary == 0) {
       _elements.remove(index);
     } else {
       _elements[index] = value;
@@ -240,12 +263,14 @@ class SelectedSparseComplexMatrix extends AbstractComplexMatrix {
   }
 
   void setParts(int row, int column, double re, double im) {
-    int index = _offset + _rowOffsets[rowZero + row * rowStride] + _columnOffsets[columnZero + column * columnStride];
+    int index = _offset +
+        _rowOffsets[rowZero + row * rowStride] +
+        _columnOffsets[columnZero + column * columnStride];
 
     if (re == 0 && im == 0) {
       _elements.remove(index);
     } else {
-      _elements[index] = new Float64List.fromList([re, im]);
+      _elements[index] = new Complex(re, im);
     }
   }
 
@@ -270,7 +295,8 @@ class SelectedSparseComplexMatrix extends AbstractComplexMatrix {
     int viewStride = rowStride;
     Int32List viewOffsets = _rowOffsets;
     int viewOffset = _offset + columnOffset(columnRank(column));
-    return new SelectedSparseComplexVector(viewSize, _elements, viewZero, viewStride, viewOffsets, viewOffset);
+    return new SelectedSparseComplexVector(
+        viewSize, _elements, viewZero, viewStride, viewOffsets, viewOffset);
   }
 
   AbstractComplexVector row(int row) {
@@ -280,11 +306,14 @@ class SelectedSparseComplexMatrix extends AbstractComplexMatrix {
     int viewStride = columnStride;
     Int32List viewOffsets = _columnOffsets;
     int viewOffset = _offset + rowOffset(rowRank(row));
-    return new SelectedSparseComplexVector(viewSize, _elements, viewZero, viewStride, viewOffsets, viewOffset);
+    return new SelectedSparseComplexVector(
+        viewSize, _elements, viewZero, viewStride, viewOffsets, viewOffset);
   }
 
-  AbstractComplexMatrix _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets) {
-    return new SelectedSparseComplexMatrix(_elements, rowOffsets, columnOffsets, _offset);
+  AbstractComplexMatrix _viewSelectionLike(
+      Int32List rowOffsets, Int32List columnOffsets) {
+    return new SelectedSparseComplexMatrix(
+        _elements, rowOffsets, columnOffsets, _offset);
   }
 
   /// This method is not supported.
@@ -298,6 +327,8 @@ class SelectedSparseComplexMatrix extends AbstractComplexMatrix {
   }
 
   Object clone() {
-    return new SelectedSparseComplexMatrix._internal(rows, columns, _elements, rowZero, columnZero, rowStride, columnStride, _rowOffsets, _columnOffsets, _offset);
+    return new SelectedSparseComplexMatrix._internal(rows, columns, _elements,
+        rowZero, columnZero, rowStride, columnStride, _rowOffsets,
+        _columnOffsets, _offset);
   }
 }

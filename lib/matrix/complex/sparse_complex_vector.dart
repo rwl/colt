@@ -13,7 +13,7 @@ part of cern.colt.matrix.complex;
 /// Sparse hashed 1-d matrix (aka vector) holding `complex` elements in
 /// a [Map].
 class SparseComplexVector extends AbstractComplexVector {
-  Map<int, Float64List> _elements;
+  Map<int, Complex> _elements;
 
   /// Constructs a matrix with a copy of the given [values]. The [values] are
   /// copied.
@@ -26,7 +26,7 @@ class SparseComplexVector extends AbstractComplexVector {
     return new SparseComplexVector._internal(size, {}, 0, 1, true);
   }
 
-  SparseComplexVector._internal(int size, Map<int, Float64List> elements,
+  SparseComplexVector._internal(int size, Map<int, Complex> elements,
       int offset, int stride, bool isNoView)
       : super(size, offset, stride, isNoView) {
     _elements = elements;
@@ -53,12 +53,12 @@ class SparseComplexVector extends AbstractComplexVector {
     }
   }
 
-  Float64List get(int index) {
-    Float64List elem = _elements[zero + index * stride];
+  Complex get(int index) {
+    var elem = _elements[zero + index * stride];
     if (elem != null) {
-      return new Float64List.fromList([elem[0], elem[1]]);
+      return elem;
     } else {
-      return new Float64List(2);
+      return Complex.ZERO;
     }
   }
 
@@ -89,8 +89,8 @@ class SparseComplexVector extends AbstractComplexVector {
     int idx = 0;
     for (int c = 0; c < columns; c++) {
       for (int r = 0; r < rows; r++) {
-        Float64List elem = get(idx++);
-        if ((elem[0] != 0) || (elem[1] != 0)) {
+        var elem = get(idx++);
+        if ((elem.real != 0) || (elem.imaginary != 0)) {
           M.set(r, c, elem);
         }
       }
@@ -98,9 +98,9 @@ class SparseComplexVector extends AbstractComplexVector {
     return M;
   }
 
-  void set(int index, Float64List value) {
+  void set(int index, Complex value) {
     int i = zero + index * stride;
-    if (value[0] == 0 && value[1] == 0) {
+    if (value.real == 0 && value.imaginary == 0) {
       _elements.remove(i);
     } else {
       _elements[i] = value;
@@ -112,7 +112,7 @@ class SparseComplexVector extends AbstractComplexVector {
     if (re == 0 && im == 0) {
       _elements.remove(i);
     } else {
-      _elements[i] = new Float64List.fromList([re, im]);
+      _elements[i] = new Complex(re, im);
     }
   }
 
@@ -123,7 +123,7 @@ class SparseComplexVector extends AbstractComplexVector {
   AbstractDoubleVector imaginary() {
     var Im = new SparseDoubleVector(size);
     for (int i = 0; i < size; i++) {
-      Im.set(i, get(i)[1]);
+      Im.set(i, get(i).imaginary);
     }
     return Im;
   }
@@ -131,7 +131,7 @@ class SparseComplexVector extends AbstractComplexVector {
   AbstractDoubleVector real() {
     var Re = new SparseDoubleVector(size);
     for (int i = 0; i < size; i++) {
-      Re.set(i, get(i)[0]);
+      Re.set(i, get(i).real);
     }
     return Re;
   }
@@ -145,14 +145,14 @@ class SparseComplexVector extends AbstractComplexVector {
 /// Selection view on sparse 1-d matrices holding `complex` elements. This
 /// implementation uses [Map].
 class SelectedSparseComplexVector extends AbstractComplexVector {
-  Map<int, Float64List> _elements;
+  Map<int, Complex> _elements;
 
   /// The offsets of visible indexes of this matrix.
   Int32List _offsets;
 
   int __offset;
 
-  SelectedSparseComplexVector(int size, Map<int, Float64List> elements,
+  SelectedSparseComplexVector(int size, Map<int, Complex> elements,
       int zero, int stride, Int32List offsets, int offset)
       : super(size, zero, stride, false) {
     _elements = elements;
@@ -161,14 +161,14 @@ class SelectedSparseComplexVector extends AbstractComplexVector {
   }
 
   factory SelectedSparseComplexVector.withOffsets(
-      Map<int, Float64List> elements, Int32List offsets) {
+      Map<int, Complex> elements, Int32List offsets) {
     return new SelectedSparseComplexVector(
         offsets.length, elements, 0, 1, offsets, 0);
   }
 
   int _offset(int absRank) => _offsets[absRank];
 
-  Float64List get(int index) {
+  Complex get(int index) {
     return _elements[__offset + _offsets[zero + index * stride]];
   }
 
@@ -199,9 +199,9 @@ class SelectedSparseComplexVector extends AbstractComplexVector {
     throw new UnsupportedError("This method is not supported.");
   }
 
-  void set(int index, Float64List value) {
+  void set(int index, Complex value) {
     int i = __offset + _offsets[zero + index * stride];
-    if (value[0] == 0 && value[1] == 0) {
+    if (value.real == 0 && value.imaginary == 0) {
       _elements.remove(i);
     } else {
       _elements[i] = value;
@@ -213,7 +213,7 @@ class SelectedSparseComplexVector extends AbstractComplexVector {
     if (re == 0 && im == 0) {
       _elements.remove(i);
     } else {
-      _elements[i] = new Float64List.fromList([re, im]);
+      _elements[i] = new Complex(re, im);
     }
   }
 

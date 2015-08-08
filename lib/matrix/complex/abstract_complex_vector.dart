@@ -19,15 +19,12 @@ abstract class AbstractComplexVector extends AbstractVector {
       : super(size, zero, stride, isNoView);
 
   /// Applies a function to each cell and aggregates the results.
-  Float64List aggregate(final cfunc.ComplexComplexComplexFunction aggr,
+  Complex aggregate(final cfunc.ComplexComplexComplexFunction aggr,
       final cfunc.ComplexComplexFunction f) {
-    Float64List b = new Float64List(2);
     if (size == 0) {
-      b[0] = double.NAN;
-      b[1] = double.NAN;
-      return b;
+      return Complex.NAN;
     }
-    Float64List a = f(get(0));
+    var a = f(get(0));
     for (int i = 1; i < size; i++) {
       a = aggr(a, f(get(i)));
     }
@@ -106,7 +103,7 @@ abstract class AbstractComplexVector extends AbstractVector {
   void setImaginary(final AbstractDoubleVector other) {
     checkSize(this, other);
     for (int i = 0; i < size; i++) {
-      double re = get(i)[0];
+      double re = get(i).real;
       double im = other.get(i);
       setParts(i, re, im);
     }
@@ -119,7 +116,7 @@ abstract class AbstractComplexVector extends AbstractVector {
     checkSize(this, other);
     for (int i = 0; i < size; i++) {
       double re = other.get(i);
-      double im = get(i)[1];
+      double im = get(i).imaginary;
       setParts(i, re, im);
     }
   }
@@ -129,7 +126,7 @@ abstract class AbstractComplexVector extends AbstractVector {
     int cardinality = 0;
     for (int i = 0; i < size; i++) {
       var tmp = get(i);
-      if ((tmp[0] != 0.0) || (tmp[1] != 0.0)) {
+      if ((tmp.real != 0.0) || (tmp.imaginary != 0.0)) {
         cardinality++;
       }
     }
@@ -157,7 +154,7 @@ abstract class AbstractComplexVector extends AbstractVector {
   }
 
   /// Returns the matrix cell value at coordinate `index`.
-  Float64List operator [](int index) {
+  Complex operator [](int index) {
     checkIndex(this, index);
     return get(index);
   }
@@ -174,7 +171,7 @@ abstract class AbstractComplexVector extends AbstractVector {
   /// non-zero values.
   ///
   /// In general, fill order is unspecified.
-  void nonzero({List<int> indexList, final List<List<double>> valueList}) {
+  void nonzero({List<int> indexList, final List<Complex> valueList}) {
     bool fillIndexList = indexList != null;
     bool fillValueList = valueList != null;
     if (fillIndexList) {
@@ -186,8 +183,8 @@ abstract class AbstractComplexVector extends AbstractVector {
     indexList.clear();
     valueList.clear();
     for (int i = 0; i < size; i++) {
-      Float64List value = get(i);
-      if (value[0] != 0 || value[1] != 0) {
+      var value = get(i);
+      if (value.real != 0 || value.imaginary != 0) {
         if (fillIndexList) {
           indexList.add(i);
         }
@@ -203,7 +200,7 @@ abstract class AbstractComplexVector extends AbstractVector {
   /// Provided with invalid parameters this method may return invalid objects
   /// without throwing any exception. You should only use this method when
   /// you are absolutely sure that the coordinate is within bounds.
-  Float64List get(int index);
+  Complex get(int index);
 
   /// Returns the real part of this matrix
   AbstractDoubleVector real();
@@ -233,7 +230,7 @@ abstract class AbstractComplexVector extends AbstractVector {
   }
 
   /// Sets the matrix cell at coordinate [index] to the specified value.
-  void operator []=(int index, Float64List value) {
+  void operator []=(int index, Complex value) {
     checkIndex(this, index);
     set(index, value);
   }
@@ -242,7 +239,7 @@ abstract class AbstractComplexVector extends AbstractVector {
   void setParts(int index, double re, double im);
 
   /// Sets the matrix cell at coordinate [index] to the specified value.
-  void set(int index, Float64List value);
+  void set(int index, Complex value);
 
   /// Constructs and returns a 1-dimensional array containing the cell values.
   Float64List toList() {
@@ -258,8 +255,8 @@ abstract class AbstractComplexVector extends AbstractVector {
     }
     for (int i = 0; i < size; i++) {
       var tmp = get(i);
-      values[2 * i] = tmp[0];
-      values[2 * i + 1] = tmp[1];
+      values[2 * i] = tmp.real;
+      values[2 * i + 1] = tmp.imaginary;
     }
   }
 
@@ -270,9 +267,8 @@ abstract class AbstractComplexVector extends AbstractVector {
   String toStringFormat(String format) {
     var f = new NumberFormat(format);
     var s = new StringBuffer("ComplexVector: ${size} elements\n\n");
-    Float64List elem = new Float64List(2);
     for (int i = 0; i < size; i++) {
-      elem = get(i);
+      var elem = get(i);
       /*if (elem[1] == 0) {
         s.write(f.format(elem[0]) + "\n");
         continue;
@@ -281,11 +277,12 @@ abstract class AbstractComplexVector extends AbstractVector {
         s.write(f.format(elem[1]) + "i\n");
         continue;
       }*/
-      if (elem[1] < 0) {
-        s.write(f.format(elem[0]) + " - " + f.format(-elem[1]) + "i\n");
+      if (elem.real < 0) {
+        s.write(
+            f.format(elem.real) + " - " + f.format(-elem.imaginary) + "i\n");
         continue;
       }
-      s.write(f.format(elem[0]) + " + " + f.format(elem[1]) + "i\n");
+      s.write(f.format(elem.real) + " + " + f.format(elem.imaginary) + "i\n");
     }
     return s.toString();
   }
@@ -336,13 +333,13 @@ abstract class AbstractComplexVector extends AbstractVector {
 
   /// Returns the dot product of two vectors x and y. Operates on cells at
   /// indexes `from .. Min(size(),y.size(),from+length)-1`.
-  Float64List dot(final AbstractComplexVector y,
+  Complex dot(final AbstractComplexVector y,
       [final int from = 0, int length = null]) {
     if (length == null) {
       length = this.size;
     }
     if (from < 0 || length <= 0) {
-      return new Float64List.fromList([0.0, 0.0]);
+      return Complex.ZERO;
     }
 
     int tail = from + length;
@@ -353,22 +350,21 @@ abstract class AbstractComplexVector extends AbstractVector {
       tail = y.size;
     }
     length = tail - from;
-    var sum = new Float64List(2);
+    var sum = Complex.ZERO;
 
     for (int k = 0; k < length; k++) {
       var idx = k + from;
       var tmp = y.get(idx);
-      tmp[1] = -tmp[1]; // complex conjugate
-      sum = cmath.plus(sum, cmath.multiply(tmp, get(idx)));
+      sum += tmp.conjugate() * get(idx);
     }
     return sum;
   }
 
   /// Returns the sum of all cells.
-  Float64List sum() {
-    var sum = new Float64List(2);
+  Complex sum() {
+    var sum = Complex.ZERO;
     for (int k = 0; k < size; k++) {
-      sum = cmath.plus(sum, get(k));
+      sum += get(k);
     }
     return sum;
   }

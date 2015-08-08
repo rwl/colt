@@ -694,20 +694,18 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
     }
 
     if (rowsB != columnsA) {
-      throw new ArgumentError(
-        "Matrix inner dimensions must agree:" +
-            toStringShort() +
-            ", " +
-            (transposeB ? B.dice() : B).toStringShort());
+      throw new ArgumentError("Matrix inner dimensions must agree:" +
+          toStringShort() +
+          ", " +
+          (transposeB ? B.dice() : B).toStringShort());
     }
     if (C.rows != rowsA || C.columns != p) {
-      throw new ArgumentError(
-        "Incompatible result matrix: " +
-            toStringShort() +
-            ", " +
-            (transposeB ? B.dice() : B).toStringShort() +
-            ", " +
-            C.toStringShort());
+      throw new ArgumentError("Incompatible result matrix: " +
+          toStringShort() +
+          ", " +
+          (transposeB ? B.dice() : B).toStringShort() +
+          ", " +
+          C.toStringShort());
     }
     if (this == C || B == C) {
       throw new ArgumentError("Matrices must not be identical");
@@ -913,4 +911,11 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
     return new SparseRCDoubleMatrix._internal(
         rows, columns, _rowPointers, _columnIndexes, _values);
   }
+}
+
+/// For internal use.
+SparseRCDoubleMatrix makeSparseRCDoubleMatrix(int rows, int columns,
+    Int32List rowPointers, Int32List columnIndexes, Float64List values) {
+  return new SparseRCDoubleMatrix._internal(
+      rows, columns, rowPointers, columnIndexes, values);
 }

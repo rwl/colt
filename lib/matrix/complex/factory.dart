@@ -14,6 +14,7 @@ import 'dart:math' as Math;
 import 'dart:typed_data';
 import 'package:colt/function/complex.dart' as cfunc;
 import 'matrix.dart';
+import 'package:complex/complex.dart';
 
 typedef AbstractComplexVector VectorFn(int);
 typedef AbstractComplexMatrix MatrixFn(int r, int c);
@@ -51,8 +52,8 @@ AbstractComplexVector concat(List<AbstractComplexVector> parts, VectorFn make) {
 
 /// Constructs a matrix with the given shape, each cell initialized with the
 /// given value.
-AbstractComplexVector fill(int size, Float64List initialValue, VectorFn make) {
-  return make(size)..fill(initialValue[0], initialValue[1]);
+AbstractComplexVector fill(int size, Complex initialValue, VectorFn make) {
+  return make(size)..fill(initialValue.real, initialValue.imaginary);
 }
 
 /// Constructs a matrix with uniformly distributed values in `(0,1)`
@@ -429,20 +430,19 @@ AbstractComplexVector diagonal(AbstractComplexMatrix A, MatrixFn make) {
 /// elsewhere).
 AbstractComplexMatrix identity(int rowsAndColumns, MatrixFn make) {
   AbstractComplexMatrix matrix = make(rowsAndColumns, rowsAndColumns);
-  Float64List one = new Float64List.fromList([1.0, 0.0]);
   for (int i = rowsAndColumns; --i >= 0; ) {
-    matrix.set(i, i, one);
+    matrix.set(i, i, Complex.ONE);
   }
   return matrix;
 }
 
 /// Constructs a matrix with the given shape, each cell initialized with the
 /// given value.
-AbstractComplexMatrix fillMatrix(int rows, int columns, Float64List initialValue, MatrixFn make) {
-  if (initialValue[0] == 0 && initialValue[1] == 0) {
+AbstractComplexMatrix fillMatrix(int rows, int columns, Complex initialValue, MatrixFn make) {
+  if (initialValue.real == 0 && initialValue.imaginary == 0) {
     return make(rows, columns);
   }
-  return make(rows, columns)..setAll(initialValue);
+  return make(rows, columns)..fill(initialValue.real, initialValue.imaginary);
 }
 
 /// Constructs a matrix with uniformly distributed values in `(0,1)`

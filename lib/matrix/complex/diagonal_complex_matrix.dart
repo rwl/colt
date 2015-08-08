@@ -25,7 +25,8 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
 
   /// Constructs a matrix with a given number of rows and columns. All entries
   /// are initially `0`.
-  DiagonalComplexMatrix(int rows, int columns, [this._dindex = 0]) : super._(rows, columns) {
+  DiagonalComplexMatrix(int rows, int columns, [this._dindex = 0])
+      : super._(rows, columns) {
     if ((_dindex < -rows + 1) || (_dindex > columns - 1)) {
       throw new ArgumentError("index is out of bounds");
     }
@@ -57,42 +58,41 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
     _elements = new Float64List(2 * _dlength);
   }
 
-  DiagonalComplexMatrix._internal(int rows, int columns, this._elements, this._dlength, this._dindex) : super._(rows, columns);
+  DiagonalComplexMatrix._internal(
+      int rows, int columns, this._elements, this._dlength, this._dindex)
+      : super._(rows, columns);
 
   static DiagonalComplexMatrix create(int rows, int columns) {
     return new DiagonalComplexMatrix(rows, columns);
   }
 
   void apply(final cfunc.ComplexComplexFunction fn) {
-    if (fn is cfunc.ComplexMult) { // x[i] = mult*x[i]
-      final Float64List alpha = fn.multiplicator;
-      if (alpha[0] == 1 && alpha[1] == 0) {
+    if (fn is cfunc.ComplexMult) {
+      // x[i] = mult*x[i]
+      Complex alpha = fn.multiplicator;
+      if (alpha.real == 1 && alpha.imaginary == 0) {
         return;
       }
-      if (alpha[0] == 0 && alpha[1] == 0) {
-        fill(alpha[0], alpha[1]);
+      if (alpha.real == 0 && alpha.imaginary == 0) {
+        fill(alpha.real, alpha.imaginary);
         return;
       }
-      if (alpha[0] != alpha[0] || alpha[1] != alpha[1]) {
-        fill(alpha[0], alpha[1]); // isNaN. This should not happen.
+      if (alpha.real != alpha.real || alpha.imaginary != alpha.imaginary) {
+        fill(alpha.real, alpha.imaginary); // isNaN. This should not happen.
         return;
       }
-      Float64List elem = new Float64List(2);
       for (int j = 0; j < _dlength; j++) {
-        elem[0] = _elements[2 * j];
-        elem[1] = _elements[2 * j + 1];
-        elem = cmath.multiply(elem, alpha);
-        _elements[2 * j] = elem[0];
-        _elements[2 * j + 1] = elem[1];
+        var elem = new Complex(_elements[2 * j], _elements[2 * j + 1]);
+        elem = elem * alpha;
+        _elements[2 * j] = elem.real;
+        _elements[2 * j + 1] = elem.imaginary;
       }
     } else {
-      Float64List elem = new Float64List(2);
       for (int j = 0; j < _dlength; j++) {
-        elem[0] = _elements[2 * j];
-        elem[1] = _elements[2 * j + 1];
+        var elem = new Complex(_elements[2 * j], _elements[2 * j + 1]);
         elem = fn(elem);
-        _elements[2 * j] = elem[0];
-        _elements[2 * j + 1] = elem[1];
+        _elements[2 * j] = elem.real;
+        _elements[2 * j + 1] = elem.imaginary;
       }
     }
   }
@@ -106,7 +106,8 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
 
   void setAll(final Float64List values) {
     if (values.length != 2 * _dlength) {
-      throw new ArgumentError("Must have same length: length=${values.length} 2*dlength=${2 * _dlength}");
+      throw new ArgumentError(
+          "Must have same length: length=${values.length} 2*dlength=${2 * _dlength}");
     }
     for (int i = 0; i < _dlength; i++) {
       _elements[2 * i] = values[2 * i];
@@ -117,14 +118,15 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
   void copyFrom(AbstractComplexMatrix source) {
     // overriden for performance only
     if (source == this) {
-      return ; // nothing to do
+      return; // nothing to do
     }
     checkShape(this, source);
 
     if (source is DiagonalComplexMatrix) {
       DiagonalComplexMatrix other = source;
       if ((_dindex != other._dindex) || (_dlength != other._dlength)) {
-        throw new ArgumentError("source is DiagonalComplexMatrix with different diagonal stored.");
+        throw new ArgumentError(
+            "source is DiagonalComplexMatrix with different diagonal stored.");
       }
       // quickest
       _elements.setAll(0, other._elements);
@@ -135,74 +137,70 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
     }
   }
 
-  void assign(final AbstractComplexMatrix y, final cfunc.ComplexComplexComplexFunction fn) {
+  void assign(final AbstractComplexMatrix y,
+      final cfunc.ComplexComplexComplexFunction fn) {
     checkShape(this, y);
     if (y is DiagonalComplexMatrix) {
       DiagonalComplexMatrix other = y;
       if ((_dindex != other._dindex) || (_dlength != other._dlength)) {
-        throw new ArgumentError("y is DiagonalComplexMatrix with different diagonal stored.");
+        throw new ArgumentError(
+            "y is DiagonalComplexMatrix with different diagonal stored.");
       }
-      if (fn is cfunc.ComplexPlusMultSecond) { // x[i] = x[i] + alpha*y[i]
-        var alpha = fn.multiplicator;
-        if (alpha[0] == 0 && alpha[1] == 0) {
+      if (fn is cfunc.ComplexPlusMultSecond) {
+        // x[i] = x[i] + alpha*y[i]
+        Complex alpha = fn.multiplicator;
+        if (alpha.real == 0 && alpha.imaginary == 0) {
           return; // nothing to do
         }
       }
       Float64List otherElements = other._elements;
-        if (fn is cfunc.ComplexPlusMultSecond) { // x[i] = x[i] + alpha*y[i]
-          Float64List alpha = fn.multiplicator;
-          if (alpha[0] == 1 && alpha[1] == 0) {
-            for (int j = 0; j < _dlength; j++) {
-              _elements[2 * j] += otherElements[2 * j];
-              _elements[2 * j + 1] += otherElements[2 * j + 1];
-            }
-          } else {
-            var elem = new Float64List(2);
-            for (int j = 0; j < _dlength; j++) {
-              elem[0] = otherElements[2 * j];
-              elem[1] = otherElements[2 * j + 1];
-              elem = cmath.multiply(alpha, elem);
-              _elements[2 * j] += elem[0];
-              _elements[2 * j + 1] += elem[1];
-            }
-          }
-        } else if (fn == cfunc.mult) { // x[i] = x[i] * y[i]
-          var elem = new Float64List(2);
-          var otherElem = new Float64List(2);
+      if (fn is cfunc.ComplexPlusMultSecond) {
+        // x[i] = x[i] + alpha*y[i]
+        Complex alpha = fn.multiplicator;
+        if (alpha.real == 1 && alpha.imaginary == 0) {
           for (int j = 0; j < _dlength; j++) {
-            otherElem[0] = otherElements[2 * j];
-            otherElem[1] = otherElements[2 * j + 1];
-            elem[0] = _elements[2 * j];
-            elem[1] = _elements[2 * j + 1];
-            elem = cmath.multiply(elem, otherElem);
-            _elements[2 * j] = elem[0];
-            _elements[2 * j + 1] = elem[1];
-          }
-        } else if (fn == cfunc.div) { // x[i] = x[i] /  y[i]
-          var elem = new Float64List(2);
-          var otherElem = new Float64List(2);
-          for (int j = 0; j < _dlength; j++) {
-            otherElem[0] = otherElements[2 * j];
-            otherElem[1] = otherElements[2 * j + 1];
-            elem[0] = _elements[2 * j];
-            elem[1] = _elements[2 * j + 1];
-            elem = cmath.div_(elem, otherElem);
-            _elements[2 * j] = elem[0];
-            _elements[2 * j + 1] = elem[1];
+            _elements[2 * j] += otherElements[2 * j];
+            _elements[2 * j + 1] += otherElements[2 * j + 1];
           }
         } else {
-          var elem = new Float64List(2);
-          var otherElem = new Float64List(2);
           for (int j = 0; j < _dlength; j++) {
-            otherElem[0] = otherElements[2 * j];
-            otherElem[1] = otherElements[2 * j + 1];
-            elem[0] = _elements[2 * j];
-            elem[1] = _elements[2 * j + 1];
-            elem = fn(elem, otherElem);
-            _elements[2 * j] = elem[0];
-            _elements[2 * j + 1] = elem[1];
+            var elem =
+                new Complex(otherElements[2 * j], otherElements[2 * j + 1]);
+            elem = alpha * elem;
+            _elements[2 * j] += elem.real;
+            _elements[2 * j + 1] += elem.imaginary;
           }
         }
+      } else if (fn == cfunc.mult) {
+        // x[i] = x[i] * y[i]
+        for (int j = 0; j < _dlength; j++) {
+          var otherElem =
+              new Complex(otherElements[2 * j], otherElements[2 * j + 1]);
+          var elem = new Complex(_elements[2 * j], _elements[2 * j + 1]);
+          elem = elem * otherElem;
+          _elements[2 * j] = elem.real;
+          _elements[2 * j + 1] = elem.imaginary;
+        }
+      } else if (fn == cfunc.div) {
+        // x[i] = x[i] /  y[i]
+        for (int j = 0; j < _dlength; j++) {
+          var otherElem =
+              new Complex(otherElements[2 * j], otherElements[2 * j + 1]);
+          var elem = new Complex(_elements[2 * j], _elements[2 * j + 1]);
+          elem = elem / otherElem;
+          _elements[2 * j] = elem.real;
+          _elements[2 * j + 1] = elem.imaginary;
+        }
+      } else {
+        for (int j = 0; j < _dlength; j++) {
+          var otherElem =
+              new Complex(otherElements[2 * j], otherElements[2 * j + 1]);
+          var elem = new Complex(_elements[2 * j], _elements[2 * j + 1]);
+          elem = fn(elem, otherElem);
+          _elements[2 * j] = elem.real;
+          _elements[2 * j + 1] = elem.imaginary;
+        }
+      }
       return;
     } else {
       super.assign(y, fn);
@@ -212,35 +210,15 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
 
   int get cardinality {
     int cardinality = 0;
-      for (int i = 0; i < _dlength; i++) {
-        if (_elements[2 * i] != 0 || _elements[2 * i + 1] != 0) {
-          cardinality++;
-        }
+    for (int i = 0; i < _dlength; i++) {
+      if (_elements[2 * i] != 0 || _elements[2 * i + 1] != 0) {
+        cardinality++;
       }
+    }
     return cardinality;
   }
 
   Object get elements => _elements;
-
-  bool all(Float64List value) {
-    double epsilon = EPSILON;
-    var x = new Float64List(2);
-    var diff = new Float64List(2);
-    for (int i = 0; i < _dlength; i++) {
-      x[0] = _elements[2 * i];
-      x[1] = _elements[2 * i + 1];
-      diff[0] = (value[0] - x[0]).abs();
-      diff[1] = (value[1] - x[1]).abs();
-      if (((diff[0] != diff[0]) || (diff[1] != diff[1])) && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1])))) || (cmath.isEqual(value, x, epsilon))) {
-        diff[0] = 0.0;
-        diff[1] = 0.0;
-      }
-      if ((diff[0] > epsilon) || (diff[1] > epsilon)) {
-        return false;
-      }
-    }
-    return true;
-  }
 
   bool equals(AbstractComplexMatrix obj) {
     if (obj is DiagonalComplexMatrix) {
@@ -259,21 +237,19 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
         return false;
       }
       Float64List otherElements = other._elements;
-      var x = new Float64List(2);
-      var value = new Float64List(2);
-      var diff = new Float64List(2);
       for (int i = 0; i < _dlength; i++) {
-        x[0] = _elements[2 * i];
-        x[1] = _elements[2 * i + 1];
-        value[0] = otherElements[2 * i];
-        value[1] = otherElements[2 * i + 1];
-        diff[0] = (value[0] - x[0]).abs();
-        diff[1] = (value[1] - x[1]).abs();
-        if (((diff[0] != diff[0]) || (diff[1] != diff[1])) && ((((value[0] != value[0]) || (value[1] != value[1])) && ((x[0] != x[0]) || (x[1] != x[1])))) || (cmath.isEqual(value, x, epsilon))) {
-          diff[0] = 0.0;
-          diff[1] = 0.0;
+        var x = new Complex(_elements[2 * i], _elements[2 * i + 1]);
+        var value = new Complex(otherElements[2 * i], otherElements[2 * i + 1]);
+        var diff =
+            new Complex((value.real - x.real).abs(), (value.imaginary - x.imaginary).abs());
+        if (((diff.real != diff.real) || (diff.imaginary != diff.imaginary)) &&
+                ((((value.real != value.real) ||
+                        (value.imaginary != value.imaginary)) &&
+                    ((x.real != x.real) || (x.imaginary != x.imaginary)))) ||
+            (isEqual(value, x, epsilon))) {
+          diff = Complex.ZERO;
         }
-        if ((diff[0] > epsilon) || (diff[1] > epsilon)) {
+        if ((diff.real > epsilon) || (diff.imaginary > epsilon)) {
           return false;
         }
       }
@@ -284,14 +260,12 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
   }
 
   void forEachNonZero(final cfunc.IntIntComplexFunction fn) {
-    var value = new Float64List(2);
     for (int i = 0; i < _dlength; i++) {
-      value[0] = _elements[2 * i];
-      value[1] = _elements[2 * i + 1];
-      if (value[0] != 0 || value[1] != 0) {
+      var value = new Complex(_elements[2 * i], _elements[2 * i + 1]);
+      if (value.real != 0 || value.imaginary != 0) {
         value = fn(i, i, value);
-        _elements[2 * i] = value[0];
-        _elements[2 * i + 1] = value[1];
+        _elements[2 * i] = value.real;
+        _elements[2 * i + 1] = value.imaginary;
       }
     }
   }
@@ -300,25 +274,25 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
 
   int get diagonalIndex => _dindex;
 
-  Float64List get(int row, int column) {
+  Complex get(int row, int column) {
     if (_dindex >= 0) {
       if (column < _dindex) {
-        return new Float64List(2);
+        return Complex.ZERO;
       } else {
         if ((row < _dlength) && (row + _dindex == column)) {
-          return new Float64List.fromList([_elements[2 * row], _elements[2 * row + 1]]);
+          return new Complex(_elements[2 * row], _elements[2 * row + 1]);
         } else {
-          return new Float64List(2);
+          return Complex.ZERO;
         }
       }
     } else {
       if (row < -_dindex) {
-        return new Float64List(2);
+        return Complex.ZERO;
       } else {
         if ((column < _dlength) && (row + _dindex == column)) {
-          return new Float64List.fromList([_elements[2 * column], _elements[2 * column + 1]]);
+          return new Complex(_elements[2 * column], _elements[2 * column + 1]);
         } else {
-          return new Float64List(2);
+          return Complex.ZERO;
         }
       }
     }
@@ -330,14 +304,14 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
 
   AbstractComplexVector like1D(int size) => new SparseComplexVector(size);
 
-  void set(int row, int column, Float64List value) {
+  void set(int row, int column, Complex value) {
     if (_dindex >= 0) {
       if (column < _dindex) {
         //do nothing
       } else {
         if ((row < _dlength) && (row + _dindex == column)) {
-          _elements[2 * row] = value[0];
-          _elements[2 * row + 1] = value[1];
+          _elements[2 * row] = value.real;
+          _elements[2 * row + 1] = value.imaginary;
         } else {
           // do nothing
         }
@@ -347,8 +321,8 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
         //do nothing
       } else {
         if ((column < _dlength) && (row + _dindex == column)) {
-          _elements[2 * column] = value[0];
-          _elements[2 * column + 1] = value[1];
+          _elements[2 * column] = value.real;
+          _elements[2 * column + 1] = value.imaginary;
         } else {
           //do nothing;
         }
@@ -382,12 +356,14 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
     }
   }
 
-  AbstractComplexVector mult(AbstractComplexVector y, [AbstractComplexVector z = null, Float64List alpha = null, Float64List beta = null, bool transposeA = false]) {
+  AbstractComplexVector mult(AbstractComplexVector y,
+      [AbstractComplexVector z = null, Complex alpha = null,
+      Complex beta = null, bool transposeA = false]) {
     if (alpha == null) {
-      alpha = new Float64List.fromList([1.0, 0.0]);
+      alpha = Complex.ONE;
     }
     if (beta == null) {
-      beta = (z == null ? new Float64List.fromList([1.0, 0.0]) : new Float64List.fromList([0.0, 0.0]));
+      beta = (z == null ? Complex.ONE : Complex.ZERO);
     }
     int rowsA = rows;
     int columnsA = columns;
@@ -406,10 +382,15 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
     }
 
     if (columnsA != y.size || rowsA > z.size) {
-      throw new ArgumentError("Incompatible args: " + ((transposeA ? dice() : this).toStringShort()) + ", " + y.toStringShort() + ", " + z.toStringShort());
+      throw new ArgumentError("Incompatible args: " +
+          ((transposeA ? dice() : this).toStringShort()) +
+          ", " +
+          y.toStringShort() +
+          ", " +
+          z.toStringShort());
     }
 
-    if ((!ignore) && !((beta[0] == 1) && (beta[1] == 0))) {
+    if ((!ignore) && !((beta.real == 1) && (beta.imaginary == 0))) {
       z.apply(cfunc.multiply(beta));
     }
 
@@ -426,57 +407,50 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
     if (elementsY == null || elementsZ == null) {
       throw new Error();
     }
-    var elemA = new Float64List(2);
-    var elemY = new Float64List(2);
     if (!transposeA) {
       if (_dindex >= 0) {
         for (int i = 0; i < _dlength; i++) {
-          elemA[0] = _elements[2 * i];
-          elemA[1] = _elements[2 * i + 1];
-          elemY[0] = elementsY[2 * _dindex + zeroY + strideY * i];
-          elemY[1] = elementsY[2 * _dindex + zeroY + strideY * i + 1];
-          elemA = cmath.multiply(elemA, elemY);
-          elemA = cmath.multiply(alpha, elemA);
-          elementsZ[zeroZ + strideZ * i] += elemA[0];
-          elementsZ[zeroZ + strideZ * i + 1] += elemA[1];
+          var elemA = new Complex(_elements[2 * i], _elements[2 * i + 1]);
+          var elemY = new Complex(elementsY[2 * _dindex + zeroY + strideY * i],
+              elementsY[2 * _dindex + zeroY + strideY * i + 1]);
+          elemA = elemA * elemY;
+          elemA = alpha * elemA;
+          elementsZ[zeroZ + strideZ * i] += elemA.real;
+          elementsZ[zeroZ + strideZ * i + 1] += elemA.imaginary;
         }
       } else {
         for (int i = 0; i < _dlength; i++) {
-          elemA[0] = _elements[2 * i];
-          elemA[1] = _elements[2 * i + 1];
-          elemY[0] = elementsY[zeroY + strideY * i];
-          elemY[1] = elementsY[zeroY + strideY * i + 1];
-          elemA = cmath.multiply(elemA, elemY);
-          elemA = cmath.multiply(alpha, elemA);
-          elementsZ[-2 * _dindex + zeroZ + strideZ * i] += elemA[0];
-          elementsZ[-2 * _dindex + zeroZ + strideZ * i + 1] += elemA[1];
+          var elemA = new Complex(_elements[2 * i], _elements[2 * i + 1]);
+          var elemY = new Complex(elementsY[zeroY + strideY * i],
+              elementsY[zeroY + strideY * i + 1]);
+          elemA = elemA * elemY;
+          elemA = alpha * elemA;
+          elementsZ[-2 * _dindex + zeroZ + strideZ * i] += elemA.real;
+          elementsZ[-2 * _dindex + zeroZ + strideZ * i + 1] += elemA.imaginary;
         }
       }
     } else {
       if (_dindex >= 0) {
         for (int i = 0; i < _dlength; i++) {
-          elemA[0] = _elements[2 * i];
-          elemA[1] = -_elements[2 * i + 1];
-          elemY[0] = elementsY[zeroY + strideY * i];
-          elemY[1] = elementsY[zeroY + strideY * i + 1];
-          elemA = cmath.multiply(elemA, elemY);
-          elemA = cmath.multiply(alpha, elemA);
-          elementsZ[2 * _dindex + zeroZ + strideZ * i] += elemA[0];
-          elementsZ[2 * _dindex + zeroZ + strideZ * i + 1] += elemA[1];
+          var elemA = new Complex(_elements[2 * i], -_elements[2 * i + 1]);
+          var elemY = new Complex(elementsY[zeroY + strideY * i],
+              elementsY[zeroY + strideY * i + 1]);
+          elemA = elemA * elemY;
+          elemA = alpha * elemA;
+          elementsZ[2 * _dindex + zeroZ + strideZ * i] += elemA.real;
+          elementsZ[2 * _dindex + zeroZ + strideZ * i + 1] += elemA.imaginary;
         }
       } else {
         for (int i = 0; i < _dlength; i++) {
-          elemA[0] = _elements[2 * i];
-          elemA[1] = -_elements[2 * i + 1];
-          elemY[0] = elementsY[-2 * _dindex + zeroY + strideY * i];
-          elemY[1] = elementsY[-2 * _dindex + zeroY + strideY * i + 1];
-          elemA = cmath.multiply(elemA, elemY);
-          elemA = cmath.multiply(alpha, elemA);
-          elementsZ[zeroZ + strideZ * i] += elemA[0];
-          elementsZ[zeroZ + strideZ * i + 1] += elemA[1];
+          var elemA = new Complex(_elements[2 * i], -_elements[2 * i + 1]);
+          var elemY = new Complex(elementsY[-2 * _dindex + zeroY + strideY * i],
+              elementsY[-2 * _dindex + zeroY + strideY * i + 1]);
+          elemA = elemA * elemY;
+          elemA = alpha * elemA;
+          elementsZ[zeroZ + strideZ * i] += elemA.real;
+          elementsZ[zeroZ + strideZ * i + 1] += elemA.imaginary;
         }
       }
-
     }
     return z;
   }
@@ -484,6 +458,7 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
   AbstractComplexMatrix _getContent() => this;
 
   Object clone() {
-    return new DiagonalComplexMatrix._internal(rows, columns, _elements, _dlength, _dindex);
+    return new DiagonalComplexMatrix._internal(
+        rows, columns, _elements, _dlength, _dindex);
   }
 }

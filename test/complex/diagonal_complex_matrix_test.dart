@@ -58,13 +58,13 @@ testDiagonalComplexMatrix(bool view) {
       A.setAll(expected);
       if (DINDEX >= 0) {
         for (int r = 0; r < DLENGTH; r++) {
-          expect(expected[2 * r], closeTo(A.get(r, r + DINDEX)[0], TOL));
-          expect(expected[2 * r + 1], closeTo(A.get(r, r + DINDEX)[1], TOL));
+          expect(expected[2 * r], closeTo(A.get(r, r + DINDEX).real, TOL));
+          expect(expected[2 * r + 1], closeTo(A.get(r, r + DINDEX).imaginary, TOL));
         }
       } else {
         for (int r = 0; r < DLENGTH; r++) {
-          expect(expected[2 * r], closeTo(A.get(r - DINDEX, r)[0], TOL));
-          expect(expected[2 * r + 1], closeTo(A.get(r - DINDEX, r)[1], TOL));
+          expect(expected[2 * r], closeTo(A.get(r - DINDEX, r).real, TOL));
+          expect(expected[2 * r + 1], closeTo(A.get(r - DINDEX, r).imaginary, TOL));
         }
       }
     });
@@ -75,15 +75,15 @@ testDiagonalComplexMatrix(bool view) {
       A.setImaginary(Im);
       if (DINDEX >= 0) {
         for (int r = 0; r < DLENGTH; r++) {
-          expect(Acopy.get(r, r + DINDEX)[0],
-              closeTo(A.get(r, r + DINDEX)[0], TOL));
-          expect(Im.get(r, r + DINDEX), closeTo(A.get(r, r + DINDEX)[1], TOL));
+          expect(Acopy.get(r, r + DINDEX).real,
+              closeTo(A.get(r, r + DINDEX).real, TOL));
+          expect(Im.get(r, r + DINDEX), closeTo(A.get(r, r + DINDEX).imaginary, TOL));
         }
       } else {
         for (int r = 0; r < DLENGTH; r++) {
-          expect(Acopy.get(r - DINDEX, r)[0],
-              closeTo(A.get(r - DINDEX, r)[0], TOL));
-          expect(Im.get(r - DINDEX, r), closeTo(A.get(r - DINDEX, r)[1], TOL));
+          expect(Acopy.get(r - DINDEX, r).real,
+              closeTo(A.get(r - DINDEX, r).real, TOL));
+          expect(Im.get(r - DINDEX, r), closeTo(A.get(r - DINDEX, r).imaginary, TOL));
         }
       }
     });
@@ -94,15 +94,15 @@ testDiagonalComplexMatrix(bool view) {
       A.setReal(Re);
       if (DINDEX >= 0) {
         for (int r = 0; r < DLENGTH; r++) {
-          expect(Acopy.get(r, r + DINDEX)[1],
-              closeTo(A.get(r, r + DINDEX)[1], TOL));
-          expect(Re.get(r, r + DINDEX), closeTo(A.get(r, r + DINDEX)[0], TOL));
+          expect(Acopy.get(r, r + DINDEX).imaginary,
+              closeTo(A.get(r, r + DINDEX).imaginary, TOL));
+          expect(Re.get(r, r + DINDEX), closeTo(A.get(r, r + DINDEX).real, TOL));
         }
       } else {
         for (int r = 0; r < DLENGTH; r++) {
-          expect(Acopy.get(r - DINDEX, r)[1],
-              closeTo(A.get(r - DINDEX, r)[1], TOL));
-          expect(Re.get(r - DINDEX, r), closeTo(A.get(r - DINDEX, r)[0], TOL));
+          expect(Acopy.get(r - DINDEX, r).imaginary,
+              closeTo(A.get(r - DINDEX, r).imaginary, TOL));
+          expect(Re.get(r - DINDEX, r), closeTo(A.get(r - DINDEX, r).real, TOL));
         }
       }
     });
@@ -112,15 +112,15 @@ testDiagonalComplexMatrix(bool view) {
       A.apply(acos);
       if (DINDEX >= 0) {
         for (int r = 0; r < DLENGTH; r++) {
-          Float64List expected = cmath.acos(Acopy.get(r, r + DINDEX));
-          expect(expected[0], closeTo(A.get(r, r + DINDEX)[0], TOL));
-          expect(expected[1], closeTo(A.get(r, r + DINDEX)[1], TOL));
+          var expected = Acopy.get(r, r + DINDEX).acos();
+          expect(expected.real, closeTo(A.get(r, r + DINDEX).real, TOL));
+          expect(expected.imaginary, closeTo(A.get(r, r + DINDEX).imaginary, TOL));
         }
       } else {
         for (int r = 0; r < DLENGTH; r++) {
-          Float64List expected = cmath.acos(Acopy.get(r - DINDEX, r));
-          expect(expected[0], closeTo(A.get(r - DINDEX, r)[0], TOL));
-          expect(expected[1], closeTo(A.get(r - DINDEX, r)[1], TOL));
+          var expected = Acopy.get(r - DINDEX, r).acos();
+          expect(expected.real, closeTo(A.get(r - DINDEX, r).real, TOL));
+          expect(expected.imaginary, closeTo(A.get(r - DINDEX, r).imaginary, TOL));
         }
       }
     });
@@ -130,17 +130,17 @@ testDiagonalComplexMatrix(bool view) {
       A.assign(B, div);
       if (DINDEX >= 0) {
         for (int r = 0; r < DLENGTH; r++) {
-          expect(cmath.div_(Acopy.get(r, r + DINDEX), B.get(r, r + DINDEX))[0],
-              closeTo(A.get(r, r + DINDEX)[0], TOL));
-          expect(cmath.div_(Acopy.get(r, r + DINDEX), B.get(r, r + DINDEX))[1],
-              closeTo(A.get(r, r + DINDEX)[1], TOL));
+          expect((Acopy.get(r, r + DINDEX) / B.get(r, r + DINDEX)).real,
+              closeTo(A.get(r, r + DINDEX).real, TOL));
+          expect((Acopy.get(r, r + DINDEX) / B.get(r, r + DINDEX)).imaginary,
+              closeTo(A.get(r, r + DINDEX).imaginary, TOL));
         }
       } else {
         for (int r = 0; r < DLENGTH; r++) {
-          expect(cmath.div_(Acopy.get(r - DINDEX, r), B.get(r - DINDEX, r))[0],
-              closeTo(A.get(r - DINDEX, r)[0], TOL));
-          expect(cmath.div_(Acopy.get(r - DINDEX, r), B.get(r - DINDEX, r))[1],
-              closeTo(A.get(r - DINDEX, r)[1], TOL));
+          expect((Acopy.get(r - DINDEX, r) / B.get(r - DINDEX, r)).real,
+              closeTo(A.get(r - DINDEX, r).real, TOL));
+          expect((Acopy.get(r - DINDEX, r) / B.get(r - DINDEX, r)).imaginary,
+              closeTo(A.get(r - DINDEX, r).imaginary, TOL));
         }
       }
     });
@@ -152,14 +152,14 @@ testDiagonalComplexMatrix(bool view) {
 
     test('nonzero', () {
       A.fill(0.0, 0.0);
-      Float64List elem1 = new Float64List.fromList([0.7, 0.8]);
-      Float64List elem2 = new Float64List.fromList([0.1, 0.2]);
+      var elem1 = new Complex(0.7, 0.8);
+      var elem2 = new Complex(0.1, 0.2);
       if (DINDEX >= 0) {
         A.set(NROWS ~/ 3, NROWS ~/ 3 + DINDEX, elem1);
         A.set(NROWS ~/ 2, NROWS ~/ 2 + DINDEX, elem2);
-        List<int> rowList = new List<int>();
-        List<int> columnList = new List<int>();
-        List<Float64List> valueList = new List<Float64List>();
+        var rowList = new List<int>();
+        var columnList = new List<int>();
+        var valueList = new List<Complex>();
         A.nonzero(rowList, columnList, valueList);
         expect(2, equals(rowList.length));
         expect(2, equals(columnList.length));
@@ -173,9 +173,9 @@ testDiagonalComplexMatrix(bool view) {
       } else {
         A.set(NROWS ~/ 3 - DINDEX, NROWS ~/ 3, elem1);
         A.set(NROWS ~/ 2 - DINDEX, NROWS ~/ 2, elem2);
-        List<int> rowList = new List<int>();
-        List<int> columnList = new List<int>();
-        List<Float64List> valueList = new List<Float64List>();
+        var rowList = new List<int>();
+        var columnList = new List<int>();
+        var valueList = new List<Complex>();
         A.nonzero(rowList, columnList, valueList);
         expect(2, equals(rowList.length));
         expect(2, equals(columnList.length));
@@ -282,33 +282,31 @@ testDiagonalComplexMatrix(bool view) {
     });
 
     test('multiply', () {
-      Float64List alpha = new Float64List.fromList([3.0, 4.0]);
-      Float64List beta = new Float64List.fromList([5.0, 6.0]);
+      var alpha = new Complex(3.0, 4.0);
+      var beta = new Complex(5.0, 6.0);
       AbstractComplexMatrix C = new DiagonalComplexMatrix(NROWS, NROWS, 0);
       for (int i = 0; i < DLENGTH; i++) {
         C.setParts(i, i, random.nextDouble(), random.nextDouble());
       }
       List<Float64List> expected = toList(C);
       C = A.multiply(Bt, C, alpha, beta, false, false);
-      Float64List elem = new Float64List(2);
       for (int j = 0; j < NROWS; j++) {
         for (int i = 0; i < NROWS; i++) {
-          Float64List s = new Float64List(2);
+          var s = Complex.ZERO;
           for (int k = 0; k < NCOLUMNS; k++) {
-            s = cmath.plus(s, cmath.multiply(A.get(i, k), Bt.get(k, j)));
+            s += A.get(i, k) * Bt.get(k, j);
           }
-          elem[0] = expected[i][2 * j];
-          elem[1] = expected[i][2 * j + 1];
-          elem = cmath.multiply(beta, elem);
-          s = cmath.multiply(alpha, s);
-          expected[i][2 * j] = s[0] + elem[0];
-          expected[i][2 * j + 1] = s[1] + elem[1];
+          var elem = new Complex(expected[i][2 * j], expected[i][2 * j + 1]);
+          elem = beta * elem;
+          s = alpha * s;
+          expected[i][2 * j] = s.real + elem.real;
+          expected[i][2 * j + 1] = s.imaginary + elem.imaginary;
         }
       }
       for (int r = 0; r < NROWS; r++) {
         for (int c = 0; c < NROWS; c++) {
-          expect(expected[r][2 * c], closeTo(C.at(r, c)[0], TOL));
-          expect(expected[r][2 * c + 1], closeTo(C.at(r, c)[1], TOL));
+          expect(expected[r][2 * c], closeTo(C.at(r, c).real, TOL));
+          expect(expected[r][2 * c + 1], closeTo(C.at(r, c).imaginary, TOL));
         }
       }
 
@@ -319,19 +317,19 @@ testDiagonalComplexMatrix(bool view) {
           NROWS, (_) => new Float64List(2 * NROWS));
       for (int j = 0; j < NROWS; j++) {
         for (int i = 0; i < NROWS; i++) {
-          Float64List s = new Float64List(2);
+          var s = Complex.ZERO;
           for (int k = 0; k < NCOLUMNS; k++) {
-            s = cmath.plus(s, cmath.multiply(A.get(i, k), Bt.get(k, j)));
+            s += A.get(i, k) * Bt.get(k, j);
           }
-          s = cmath.multiply(alpha, s);
-          expected[i][2 * j] = s[0];
-          expected[i][2 * j + 1] = s[1];
+          s = alpha * s;
+          expected[i][2 * j] = s.real;
+          expected[i][2 * j + 1] = s.imaginary;
         }
       }
       for (int r = 0; r < NROWS; r++) {
         for (int c = 0; c < NROWS; c++) {
-          expect(expected[r][2 * c], closeTo(C.at(r, c)[0], TOL));
-          expect(expected[r][2 * c + 1], closeTo(C.at(r, c)[1], TOL));
+          expect(expected[r][2 * c], closeTo(C.at(r, c).real, TOL));
+          expect(expected[r][2 * c + 1], closeTo(C.at(r, c).imaginary, TOL));
         }
       }
 
@@ -344,23 +342,21 @@ testDiagonalComplexMatrix(bool view) {
       C = A.multiply(B, C, alpha, beta, true, false);
       for (int j = 0; j < NCOLUMNS; j++) {
         for (int i = 0; i < NCOLUMNS; i++) {
-          Float64List s = new Float64List(2);
+          var s = Complex.ZERO;
           for (int k = 0; k < NROWS; k++) {
-            s = cmath.plus(
-                s, cmath.multiply(cmath.conj(A.get(k, i)), B.get(k, j)));
+            s += A.get(k, i).conjugate() * B.get(k, j);
           }
-          elem[0] = expected[i][2 * j];
-          elem[1] = expected[i][2 * j + 1];
-          elem = cmath.multiply(beta, elem);
-          s = cmath.multiply(alpha, s);
-          expected[i][2 * j] = s[0] + elem[0];
-          expected[i][2 * j + 1] = s[1] + elem[1];
+          var elem = new Complex(expected[i][2 * j], expected[i][2 * j + 1]);
+          elem = beta * elem;
+          s = alpha * s;
+          expected[i][2 * j] = s.real + elem.real;
+          expected[i][2 * j + 1] = s.imaginary + elem.imaginary;
         }
       }
       for (int r = 0; r < NCOLUMNS; r++) {
         for (int c = 0; c < NCOLUMNS; c++) {
-          expect(expected[r][2 * c], closeTo(C.at(r, c)[0], TOL));
-          expect(expected[r][2 * c + 1], closeTo(C.at(r, c)[1], TOL));
+          expect(expected[r][2 * c], closeTo(C.at(r, c).real, TOL));
+          expect(expected[r][2 * c + 1], closeTo(C.at(r, c).imaginary, TOL));
         }
       }
       //---
@@ -370,20 +366,19 @@ testDiagonalComplexMatrix(bool view) {
           NCOLUMNS, (_) => new Float64List(2 * NCOLUMNS));
       for (int j = 0; j < NCOLUMNS; j++) {
         for (int i = 0; i < NCOLUMNS; i++) {
-          Float64List s = new Float64List(2);
+          var s = Complex.ZERO;
           for (int k = 0; k < NROWS; k++) {
-            s = cmath.plus(
-                s, cmath.multiply(cmath.conj(A.get(k, i)), B.get(k, j)));
+            s += A.get(k, i).conjugate() * B.get(k, j);
           }
-          s = cmath.multiply(alpha, s);
-          expected[i][2 * j] = s[0];
-          expected[i][2 * j + 1] = s[1];
+          s = alpha * s;
+          expected[i][2 * j] = s.real;
+          expected[i][2 * j + 1] = s.imaginary;
         }
       }
       for (int r = 0; r < NCOLUMNS; r++) {
         for (int c = 0; c < NCOLUMNS; c++) {
-          expect(expected[r][2 * c], closeTo(C.at(r, c)[0], TOL));
-          expect(expected[r][2 * c + 1], closeTo(C.at(r, c)[1], TOL));
+          expect(expected[r][2 * c], closeTo(C.at(r, c).real, TOL));
+          expect(expected[r][2 * c + 1], closeTo(C.at(r, c).imaginary, TOL));
         }
       }
 
@@ -396,23 +391,21 @@ testDiagonalComplexMatrix(bool view) {
       C = A.multiply(B, C, alpha, beta, false, true);
       for (int j = 0; j < NROWS; j++) {
         for (int i = 0; i < NROWS; i++) {
-          Float64List s = new Float64List(2);
+          var s = Complex.ZERO;
           for (int k = 0; k < NCOLUMNS; k++) {
-            s = cmath.plus(
-                s, cmath.multiply(A.get(i, k), cmath.conj(B.get(j, k))));
+            s += A.get(i, k) * B.get(j, k).conjugate();
           }
-          elem[0] = expected[i][2 * j];
-          elem[1] = expected[i][2 * j + 1];
-          elem = cmath.multiply(beta, elem);
-          s = cmath.multiply(alpha, s);
-          expected[i][2 * j] = s[0] + elem[0];
-          expected[i][2 * j + 1] = s[1] + elem[1];
+          var elem = new Complex(expected[i][2 * j], expected[i][2 * j + 1]);
+          elem = beta * elem;
+          s = alpha * s;
+          expected[i][2 * j] = s.real + elem.real;
+          expected[i][2 * j + 1] = s.imaginary + elem.imaginary;
         }
       }
       for (int r = 0; r < NROWS; r++) {
         for (int c = 0; c < NROWS; c++) {
-          expect(expected[r][2 * c], closeTo(C.at(r, c)[0], TOL));
-          expect(expected[r][2 * c + 1], closeTo(C.at(r, c)[1], TOL));
+          expect(expected[r][2 * c], closeTo(C.at(r, c).real, TOL));
+          expect(expected[r][2 * c + 1], closeTo(C.at(r, c).imaginary, TOL));
         }
       }
       //---
@@ -422,20 +415,19 @@ testDiagonalComplexMatrix(bool view) {
           NROWS, (_) => new Float64List(2 * NROWS));
       for (int j = 0; j < NROWS; j++) {
         for (int i = 0; i < NROWS; i++) {
-          Float64List s = new Float64List(2);
+          var s = Complex.ZERO;
           for (int k = 0; k < NCOLUMNS; k++) {
-            s = cmath.plus(
-                s, cmath.multiply(A.get(i, k), cmath.conj(B.get(j, k))));
+            s += A.get(i, k) * B.get(j, k).conjugate();
           }
-          s = cmath.multiply(alpha, s);
-          expected[i][2 * j] = s[0];
-          expected[i][2 * j + 1] = s[1];
+          s = alpha * s;
+          expected[i][2 * j] = s.real;
+          expected[i][2 * j + 1] = s.imaginary;
         }
       }
       for (int r = 0; r < NROWS; r++) {
         for (int c = 0; c < NROWS; c++) {
-          expect(expected[r][2 * c], closeTo(C.at(r, c)[0], TOL));
-          expect(expected[r][2 * c + 1], closeTo(C.at(r, c)[1], TOL));
+          expect(expected[r][2 * c], closeTo(C.at(r, c).real, TOL));
+          expect(expected[r][2 * c + 1], closeTo(C.at(r, c).imaginary, TOL));
         }
       }
       //transposeA and transposeB
@@ -447,23 +439,21 @@ testDiagonalComplexMatrix(bool view) {
       C = A.multiply(Bt, C, alpha, beta, true, true);
       for (int j = 0; j < NCOLUMNS; j++) {
         for (int i = 0; i < NCOLUMNS; i++) {
-          Float64List s = new Float64List(2);
+          var s = Complex.ZERO;
           for (int k = 0; k < NROWS; k++) {
-            s = cmath.plus(s, cmath.multiply(
-                cmath.conj(A.get(k, i)), cmath.conj(Bt.get(j, k))));
+            s += A.get(k, i).conjugate() * Bt.get(j, k).conjugate();
           }
-          elem[0] = expected[i][2 * j];
-          elem[1] = expected[i][2 * j + 1];
-          elem = cmath.multiply(beta, elem);
-          s = cmath.multiply(alpha, s);
-          expected[i][2 * j] = s[0] + elem[0];
-          expected[i][2 * j + 1] = s[1] + elem[1];
+          var elem = new Complex(expected[i][2 * j], expected[i][2 * j + 1]);
+          elem = beta * elem;
+          s = alpha * s;
+          expected[i][2 * j] = s.real + elem.real;
+          expected[i][2 * j + 1] = s.imaginary + elem.imaginary;
         }
       }
       for (int r = 0; r < NCOLUMNS; r++) {
         for (int c = 0; c < NCOLUMNS; c++) {
-          expect(expected[r][2 * c], closeTo(C.at(r, c)[0], TOL));
-          expect(expected[r][2 * c + 1], closeTo(C.at(r, c)[1], TOL));
+          expect(expected[r][2 * c], closeTo(C.at(r, c).real, TOL));
+          expect(expected[r][2 * c + 1], closeTo(C.at(r, c).real, TOL));
         }
       }
       //---
@@ -473,19 +463,19 @@ testDiagonalComplexMatrix(bool view) {
           NCOLUMNS, (_) => new Float64List(2 * NCOLUMNS));
       for (int j = 0; j < NCOLUMNS; j++) {
         for (int i = 0; i < NCOLUMNS; i++) {
-          Float64List s = new Float64List(2);
+          var s = Complex.ZERO;
           for (int k = 0; k < NROWS; k++) {
-            s = cmath.plus(s, cmath.multiply(A.get(k, i), Bt.get(j, k)));
+            s += A.get(k, i) * Bt.get(j, k);
           }
-          s = cmath.multiply(alpha, s);
-          expected[i][2 * j] = s[0];
-          expected[i][2 * j + 1] = s[1];
+          s = alpha * s;
+          expected[i][2 * j] = s.real;
+          expected[i][2 * j + 1] = s.imaginary;
         }
       }
       for (int r = 0; r < NCOLUMNS; r++) {
         for (int c = 0; c < NCOLUMNS; c++) {
-          expect(expected[r][2 * c], closeTo(C.at(r, c)[0], TOL));
-          expect(expected[r][2 * c + 1], closeTo(C.at(r, c)[1], TOL));
+          expect(expected[r][2 * c], closeTo(C.at(r, c).real, TOL));
+          expect(expected[r][2 * c + 1], closeTo(C.at(r, c).imaginary, TOL));
         }
       }
     });

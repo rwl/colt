@@ -22,14 +22,14 @@ class LargeComplexMatrix extends WrapperComplexMatrix {
     _content = this;
   }
 
-  Float64List get(int row, int column) {
-    return new Float64List.fromList(
-        [_elements[row][2 * column], _elements[row][2 * column + 1]]);
+  Complex get(int row, int column) {
+    return new Complex(
+        _elements[row][2 * column], _elements[row][2 * column + 1]);
   }
 
-  void set(int row, int column, Float64List value) {
-    _elements[row][2 * column] = value[0];
-    _elements[row][2 * column + 1] = value[1];
+  void set(int row, int column, Complex value) {
+    _elements[row][2 * column] = value.real;
+    _elements[row][2 * column + 1] = value.imaginary;
   }
 
   void setParts(int row, int column, double re, double im) {

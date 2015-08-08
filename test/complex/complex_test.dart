@@ -4,6 +4,7 @@ import 'dart:math' as math;
 import 'dart:typed_data';
 
 import 'package:test/test.dart';
+import 'package:complex/complex.dart';
 import 'package:colt/colt.dart';
 import 'package:colt/math.dart' as cmath;
 import 'package:colt/function/complex.dart' hide equals;
@@ -48,8 +49,8 @@ List<Float64List> toList(AbstractComplexMatrix m) {
   for (int r = 0; r < m.rows; r++) {
     for (int c = 0; c < m.columns; c++) {
       var tmp = m.get(r, c);
-      values[r][2 * c] = tmp[0];
-      values[r][2 * c + 1] = tmp[1];
+      values[r][2 * c] = tmp.real;
+      values[r][2 * c + 1] = tmp.imaginary;
     }
   }
   return values;

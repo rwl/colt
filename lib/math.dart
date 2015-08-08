@@ -12,6 +12,7 @@ library cern.jet.math;
 
 import 'dart:math' as Math;
 import 'dart:typed_data';
+import 'package:complex/complex.dart';
 
 const MAX_INT = 2147483647; // 2^31-1
 //const MAX_INT = 576460752303423487;// 2^59-1
@@ -39,6 +40,11 @@ const double big = 4.503599627370496e15;
 
 const double biginv = 2.22044604925031308085e-16;
 
+bool isEqual(Complex x, Complex y, double tol) {
+  return (x - y).abs() <= tol.abs();
+}
+
+/*
 double abs(List<double> x) {
   double absX = x[0].abs();
   double absY = x[1].abs();
@@ -211,14 +217,6 @@ double equals(List<double> x, List<double> y, double tol) {
     return 1.0;
   } else {
     return 0.0;
-  }
-}
-
-bool isEqual(List<double> x, List<double> y, double tol) {
-  if (abs_(x[0] - y[0], x[1] - y[1]) <= tol.abs()) {
-    return true;
-  } else {
-    return false;
   }
 }
 
@@ -427,3 +425,4 @@ List<double> tan(List<double> x) {
 
   return z;
 }
+*/

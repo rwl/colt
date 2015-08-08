@@ -84,21 +84,16 @@ class ComplexVector extends AbstractComplexVector {
     return new ComplexVector(size);
   }
 
-  Float64List aggregate(final cfunc.ComplexComplexComplexFunction aggr,
+  Complex aggregate(final cfunc.ComplexComplexComplexFunction aggr,
       final cfunc.ComplexComplexFunction fn) {
     if (size == 0) {
-      var b = new Float64List(2);
-      b[0] = double.NAN;
-      b[1] = double.NAN;
-      return b;
+      return Complex.NAN;
     }
-    var a =
-        fn(new Float64List.fromList([_elements[zero], _elements[zero + 1]]));
+    var a = fn(new Complex(_elements[zero], _elements[zero + 1]));
     int idx = zero;
     for (int i = 1; i < size; i++) {
       idx += stride;
-      a = aggr(a,
-          fn(new Float64List.fromList([_elements[idx], _elements[idx + 1]])));
+      a = aggr(a, fn(new Complex(_elements[idx], _elements[idx + 1])));
     }
     return a;
   }
@@ -108,29 +103,27 @@ class ComplexVector extends AbstractComplexVector {
       throw new Error();
     }
     if (fn is cfunc.ComplexMult) {
-      var multiplicator = fn.multiplicator;
-      if (multiplicator[0] == 1 && multiplicator[1] == 0) {
+      Complex multiplicator = fn.multiplicator;
+      if (multiplicator.real == 1 && multiplicator.imaginary == 0) {
         return;
       }
     }
-    var tmp = new Float64List(2);
     int idx = zero;
     if (fn is cfunc.ComplexMult) {
-      var multiplicator = fn.multiplicator;
+      Complex multiplicator = fn.multiplicator;
       for (int k = 0; k < size; k++) {
-        _elements[idx] = _elements[idx] * multiplicator[0] -
-            _elements[idx + 1] * multiplicator[1];
-        _elements[idx + 1] = _elements[idx + 1] * multiplicator[0] +
-            _elements[idx] * multiplicator[1];
+        _elements[idx] = _elements[idx] * multiplicator.real -
+            _elements[idx + 1] * multiplicator.imaginary;
+        _elements[idx + 1] = _elements[idx + 1] * multiplicator.real +
+            _elements[idx] * multiplicator.imaginary;
         idx += stride;
       }
     } else {
       for (int k = 0; k < size; k++) {
-        tmp[0] = _elements[idx];
-        tmp[1] = _elements[idx + 1];
+        var tmp = new Complex(_elements[idx], _elements[idx + 1]);
         tmp = fn(tmp);
-        _elements[idx] = tmp[0];
-        _elements[idx + 1] = tmp[1];
+        _elements[idx] = tmp.real;
+        _elements[idx + 1] = tmp.imaginary;
         idx += stride;
       }
     }
@@ -158,12 +151,9 @@ class ComplexVector extends AbstractComplexVector {
         idx += stride;
       }
     } else {
-      var tmp = new Float64List(2);
       for (int k = 0; k < size; k++) {
-        tmp[0] = _elements[idx];
-        tmp[1] = _elements[idx + 1];
-        tmp[0] = fn(tmp);
-        _elements[idx] = tmp[0];
+        var tmp = new Complex(_elements[idx], _elements[idx + 1]);
+        _elements[idx] = fn(tmp);
         _elements[idx + 1] = 0.0;
         idx += stride;
       }
@@ -243,71 +233,66 @@ class ComplexVector extends AbstractComplexVector {
         idxOther += strideOther;
       }
     } else if (fn == cfunc.div) {
-      var tmp = new Float64List(2);
       for (int k = 0; k < size; k++) {
         double re = elemsOther[idxOther];
         double im = elemsOther[idxOther + 1];
+        Complex tmp;
         if (re.abs() >= im.abs()) {
           var scalar = (1.0 / (re + im * (im / re)));
-          tmp[0] = scalar * (_elements[idx] + _elements[idx + 1] * (im / re));
-          tmp[1] = scalar * (_elements[idx + 1] - _elements[idx] * (im / re));
+          tmp = new Complex(
+              scalar * (_elements[idx] + _elements[idx + 1] * (im / re)),
+              scalar * (_elements[idx + 1] - _elements[idx] * (im / re)));
         } else {
           var scalar = (1.0 / (re * (re / im) + im));
-          tmp[0] = scalar * (_elements[idx] * (re / im) + _elements[idx + 1]);
-          tmp[1] = scalar * (_elements[idx + 1] * (re / im) - _elements[idx]);
+          tmp = new Complex(
+              scalar * (_elements[idx] * (re / im) + _elements[idx + 1]),
+              scalar * (_elements[idx + 1] * (re / im) - _elements[idx]));
         }
-        _elements[idx] = tmp[0];
-        _elements[idx + 1] = tmp[1];
+        _elements[idx] = tmp.real;
+        _elements[idx + 1] = tmp.imaginary;
         idx += stride;
         idxOther += strideOther;
       }
     } else if (fn == cfunc.mult) {
-      var tmp = new Float64List(2);
       for (int k = 0; k < size; k++) {
-        tmp[0] = _elements[idx] * elemsOther[idxOther] -
-            _elements[idx + 1] * elemsOther[idxOther + 1];
-        tmp[1] = _elements[idx + 1] * elemsOther[idxOther] +
-            _elements[idx] * elemsOther[idxOther + 1];
-        _elements[idx] = tmp[0];
-        _elements[idx + 1] = tmp[1];
+        var tmp = new Complex(_elements[idx] * elemsOther[idxOther] -
+                _elements[idx + 1] * elemsOther[idxOther + 1],
+            _elements[idx + 1] * elemsOther[idxOther] +
+                _elements[idx] * elemsOther[idxOther + 1]);
+        _elements[idx] = tmp.real;
+        _elements[idx + 1] = tmp.imaginary;
         idx += stride;
         idxOther += strideOther;
       }
     } else if (fn == cfunc.multConjFirst) {
-      var tmp = new Float64List(2);
       for (int k = 0; k < size; k++) {
-        tmp[0] = _elements[idx] * elemsOther[idxOther] +
-            _elements[idx + 1] * elemsOther[idxOther + 1];
-        tmp[1] = -_elements[idx + 1] * elemsOther[idxOther] +
-            _elements[idx] * elemsOther[idxOther + 1];
-        _elements[idx] = tmp[0];
-        _elements[idx + 1] = tmp[1];
+        var tmp = new Complex(_elements[idx] * elemsOther[idxOther] +
+                _elements[idx + 1] * elemsOther[idxOther + 1],
+            -_elements[idx + 1] * elemsOther[idxOther] +
+                _elements[idx] * elemsOther[idxOther + 1]);
+        _elements[idx] = tmp.real;
+        _elements[idx + 1] = tmp.imaginary;
         idx += stride;
         idxOther += strideOther;
       }
     } else if (fn == cfunc.multConjSecond) {
-      var tmp = new Float64List(2);
       for (int k = 0; k < size; k++) {
-        tmp[0] = _elements[idx] * elemsOther[idxOther] +
-            _elements[idx + 1] * elemsOther[idxOther + 1];
-        tmp[1] = _elements[idx + 1] * elemsOther[idxOther] -
-            _elements[idx] * elemsOther[idxOther + 1];
-        _elements[idx] = tmp[0];
-        _elements[idx + 1] = tmp[1];
+        var tmp = new Complex(_elements[idx] * elemsOther[idxOther] +
+                _elements[idx + 1] * elemsOther[idxOther + 1],
+            _elements[idx + 1] * elemsOther[idxOther] -
+                _elements[idx] * elemsOther[idxOther + 1]);
+        _elements[idx] = tmp.real;
+        _elements[idx + 1] = tmp.imaginary;
         idx += stride;
         idxOther += strideOther;
       }
     } else {
-      var tmp1 = new Float64List(2);
-      var tmp2 = new Float64List(2);
       for (int k = 0; k < size; k++) {
-        tmp1[0] = _elements[idx];
-        tmp1[1] = _elements[idx + 1];
-        tmp2[0] = elemsOther[idxOther];
-        tmp2[1] = elemsOther[idxOther + 1];
+        var tmp1 = new Complex(_elements[idx], _elements[idx + 1]);
+        var tmp2 = new Complex(elemsOther[idxOther], elemsOther[idxOther + 1]);
         tmp1 = fn(tmp1, tmp2);
-        _elements[idx] = tmp1[0];
-        _elements[idx + 1] = tmp1[1];
+        _elements[idx] = tmp1.real;
+        _elements[idx + 1] = tmp1.imaginary;
         idx += stride;
         idxOther += strideOther;
       }
@@ -388,7 +373,7 @@ class ComplexVector extends AbstractComplexVector {
     return Im;
   }
 
-  void nonzero({List<int> indexList, List<List<double>> valueList}) {
+  void nonzero({List<int> indexList, List<Complex> valueList}) {
     bool fillIndexList = indexList != null;
     bool fillValueList = valueList != null;
     if (fillIndexList) {
@@ -400,10 +385,8 @@ class ComplexVector extends AbstractComplexVector {
 
     int idx = zero;
     for (int k = 0; k < size; k++) {
-      var value = new Float64List(2);
-      value[0] = _elements[idx];
-      value[1] = _elements[idx + 1];
-      if (value[0] != 0 || value[1] != 0) {
+      var value = new Complex(_elements[idx], _elements[idx + 1]);
+      if (value.real != 0 || value.imaginary != 0) {
         if (fillIndexList) {
           indexList.add(k);
         }
@@ -415,9 +398,9 @@ class ComplexVector extends AbstractComplexVector {
     }
   }
 
-  Float64List get(int index) {
+  Complex get(int index) {
     int idx = zero + index * stride;
-    return new Float64List.fromList([_elements[idx], _elements[idx + 1]]);
+    return new Complex(_elements[idx], _elements[idx + 1]);
   }
 
   AbstractDoubleVector real() {
@@ -469,10 +452,10 @@ class ComplexVector extends AbstractComplexVector {
     _elements[idx + 1] = im;
   }
 
-  void set(int index, Float64List value) {
+  void set(int index, Complex value) {
     int idx = zero + index * stride;
-    _elements[idx] = value[0];
-    _elements[idx + 1] = value[1];
+    _elements[idx] = value.real;
+    _elements[idx + 1] = value.imaginary;
   }
 
   void fillList(Float64List values) {
@@ -486,14 +469,14 @@ class ComplexVector extends AbstractComplexVector {
     }
   }
 
-  Float64List dot(final AbstractComplexVector y,
+  Complex dot(final AbstractComplexVector y,
       [final int from = 0, int length = null]) {
     if (length == null) {
       length = this.size;
     }
     int size = this.size;
     if (from < 0 || length <= 0) {
-      return new Float64List.fromList([0, 0]);
+      return Complex.ZERO;
     }
 
     int tail = from + length;
@@ -511,23 +494,24 @@ class ComplexVector extends AbstractComplexVector {
     int strideOther = y.stride;
     int zero = index(from);
     int zeroOther = y.index(from);
-    var sum = new Float64List(2);
+    var sum = Complex.ZERO;
 
     int idx = zero;
     int idxOther = zeroOther;
     for (int k = 0; k < length; k++) {
-      sum[0] += _elements[idx] * elemsOther[idxOther] +
+      var re = _elements[idx] * elemsOther[idxOther] +
           _elements[idx + 1] * elemsOther[idxOther + 1];
-      sum[1] += _elements[idx + 1] * elemsOther[idxOther] -
+      var im = _elements[idx + 1] * elemsOther[idxOther] -
           _elements[idx] * elemsOther[idxOther + 1];
+      sum += new Complex(re, im);
       idx += stride;
       idxOther += strideOther;
     }
     return sum;
   }
 
-  Float64List sum() {
-    var sum = new Float64List(2);
+  Complex sum() {
+    var sum = Complex.ZERO;
     if (_elements == null) {
       throw new Error();
     }
@@ -592,19 +576,17 @@ class SelectedDenseComplexVector extends AbstractComplexVector {
 
   int _offset(int absRank) => _offsets[absRank];
 
-  Float64List get(int index) {
+  Complex get(int index) {
     int idx = zero + index * stride;
-    return new Float64List.fromList([
-      _elements[__offset + _offsets[idx]],
-      _elements[__offset + _offsets[idx] + 1]
-    ]);
+    return new Complex(_elements[__offset + _offsets[idx]],
+        _elements[__offset + _offsets[idx] + 1]);
   }
 
   AbstractDoubleVector real() {
     var R = new DoubleVector(size);
     for (int i = 0; i < size; i++) {
       var tmp = get(i);
-      R.set(i, tmp[0]);
+      R.set(i, tmp.real);
     }
     return R;
   }
@@ -613,7 +595,7 @@ class SelectedDenseComplexVector extends AbstractComplexVector {
     var Im = new DoubleVector(size);
     for (int i = 0; i < size; i++) {
       var tmp = get(i);
-      Im.set(i, tmp[1]);
+      Im.set(i, tmp.imaginary);
     }
     return Im;
   }
@@ -645,10 +627,10 @@ class SelectedDenseComplexVector extends AbstractComplexVector {
     throw new UnsupportedError("This method is not supported.");
   }
 
-  void set(int index, Float64List value) {
+  void set(int index, Complex value) {
     int idx = zero + index * stride;
-    _elements[__offset + _offsets[idx]] = value[0];
-    _elements[__offset + _offsets[idx] + 1] = value[1];
+    _elements[__offset + _offsets[idx]] = value.real;
+    _elements[__offset + _offsets[idx] + 1] = value.imaginary;
   }
 
   void setParts(int index, double re, double im) {

@@ -19,19 +19,16 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
           isNoView);
 
   /// Applies a function to each cell and aggregates the results.
-  Float64List aggregate(final cfunc.ComplexComplexComplexFunction aggr,
-      final cfunc.ComplexComplexFunction f) {
-    var b = new Float64List(2);
+  Complex aggregate(final cfunc.ComplexComplexComplexFunction aggr,
+      final cfunc.ComplexComplexFunction fn) {
     if (size == 0) {
-      b[0] = double.NAN;
-      b[1] = double.NAN;
-      return b;
+      return Complex.NAN;
     }
-    var a = f(get(0, 0));
+    var a = fn(get(0, 0));
     int d = 1; // first cell already done
     for (int r = 0; r < rows; r++) {
       for (int c = d; c < columns; c++) {
-        a = aggr(a, f(get(r, c)));
+        a = aggr(a, fn(get(r, c)));
       }
       d = 0;
     }
@@ -39,20 +36,20 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
   }
 
   /// Applies a function to each cell.
-  void apply(final cfunc.ComplexComplexFunction f) {
+  void apply(final cfunc.ComplexComplexFunction fn) {
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < columns; c++) {
-        set(r, c, f(get(r, c)));
+        set(r, c, fn(get(r, c)));
       }
     }
   }
 
   /// Assigns the result of a function to the real part of the receiver. The
   /// imaginary part of the receiver is reset to zero.
-  void applyReal(final cfunc.ComplexRealFunction f) {
+  void applyReal(final cfunc.ComplexRealFunction fn) {
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < columns; c++) {
-        double re = f(get(r, c));
+        double re = fn(get(r, c));
         setParts(r, c, re, 0.0);
       }
     }
@@ -127,7 +124,7 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
     checkShape(this, other);
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < columns; c++) {
-        double re = get(r, c)[0];
+        double re = get(r, c).real;
         double im = other.get(r, c);
         setParts(r, c, re, im);
       }
@@ -142,7 +139,7 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < columns; c++) {
         double re = other.get(r, c);
-        double im = get(r, c)[1];
+        double im = get(r, c).imaginary;
         setParts(r, c, re, im);
       }
     }
@@ -154,7 +151,7 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < columns; c++) {
         var tmp = get(r, c);
-        if (tmp[0] != 0 || tmp[1] != 0) {
+        if (tmp.real != 0 || tmp.imaginary != 0) {
           cardinality++;
         }
       }
@@ -183,12 +180,12 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
 
   /// Assigns the result of a function to each non-zero cell. Use this
   /// method for fast special-purpose iteration.
-  void forEachNonZero(final cfunc.IntIntComplexFunction function) {
+  void forEachNonZero(final cfunc.IntIntComplexFunction fn) {
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < columns; c++) {
-        Float64List value = get(r, c);
-        if (value[0] != 0 || value[1] != 0) {
-          Float64List v = function(r, c, value);
+        var value = get(r, c);
+        if (value.real != 0 || value.imaginary != 0) {
+          var v = fn(r, c, value);
           set(r, c, v);
         }
       }
@@ -196,7 +193,7 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
   }
 
   /// Returns the matrix cell value at coordinate `[row,column]`.
-  Float64List at(int row, int column) {
+  Complex at(int row, int column) {
     if (column < 0 || column >= columns || row < 0 || row >= rows) {
       throw new RangeError("row:$row, column:$column");
     }
@@ -211,8 +208,7 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
     for (int r = 0; r < columns; r++) {
       for (int c = 0; c < rows; c++) {
         var tmp = transpose.get(r, c);
-        tmp[1] = -tmp[1];
-        transpose.set(r, c, tmp);
+        transpose.set(r, c, tmp.conjugate());
       }
     }
     return transpose;
@@ -231,14 +227,14 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
   /// call returns the specified lists all have a new size, the number of
   /// non-zero values.
   void nonzero(final List<int> rowList, final List<int> columnList,
-      final List<List<double>> valueList) {
+      final List<Complex> valueList) {
     rowList.clear();
     columnList.clear();
     valueList.clear();
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < columns; c++) {
-        Float64List value = get(r, c);
-        if (value[0] != 0 || value[1] != 0) {
+        var value = get(r, c);
+        if (value.real != 0 || value.imaginary != 0) {
           rowList.add(r);
           columnList.add(c);
           valueList.add(value);
@@ -252,7 +248,7 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
   /// Provided with invalid parameters this method may return invalid objects
   /// without throwing any exception. You should only use this method when
   /// you are absolutely sure that the coordinate is within bounds.
-  Float64List get(int row, int column);
+  Complex get(int row, int column);
 
   /// Returns the real part of this matrix.
   AbstractDoubleMatrix real();
@@ -271,7 +267,7 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
 
   /// Sets the matrix cell at coordinate `[row,column]` to the specified
   /// value.
-  void put(int row, int column, Float64List value) {
+  void put(int row, int column, Complex value) {
     if (column < 0 || column >= columns || row < 0 || row >= rows) {
       throw new RangeError("row:$row, column:$column");
     }
@@ -293,7 +289,7 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
 
   /// Sets the matrix cell at coordinate `[row,column]` to the specified
   /// value.
-  void set(int row, int column, Float64List value);
+  void set(int row, int column, Complex value);
 
   /// Returns a string representation using default formatting ("%.4f").
   String toString() {
@@ -307,19 +303,19 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < columns; c++) {
         var elem = get(r, c);
-        if (elem[1] == 0) {
-          s.write(f.format(elem[0]) + "\t");
+        if (elem.imaginary == 0) {
+          s.write(f.format(elem.real) + "\t");
           continue;
         }
-        if (elem[0] == 0) {
-          s.write(f.format(elem[1]) + "i\t");
+        if (elem.real == 0) {
+          s.write(f.format(elem.imaginary) + "i\t");
           continue;
         }
-        if (elem[1] < 0) {
-          s.write(f.format(elem[0]) + " - " + f.format(-elem[1]) + "i\t");
+        if (elem.imaginary < 0) {
+          s.write(f.format(elem.real) + " - " + f.format(-elem.imaginary) + "i\t");
           continue;
         }
-        s.write(f.format(elem[0]) + " + " + f.format(elem[1]) + "i\t");
+        s.write(f.format(elem.real) + " + " + f.format(elem.imaginary) + "i\t");
       }
       s.write("\n");
     }
@@ -426,15 +422,13 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
   /// Linear algebraic matrix-vector multiplication;
   /// `z = alpha * A * y + beta*z`. Where `A == this`.
   AbstractComplexVector mult(final AbstractComplexVector y,
-      [AbstractComplexVector z = null, Float64List alpha = null,
-      Float64List beta = null, bool transposeA = false]) {
+      [AbstractComplexVector z = null, Complex alpha = null,
+      Complex beta = null, bool transposeA = false]) {
     if (alpha == null) {
-      alpha = new Float64List.fromList([1.0, 0.0]);
+      alpha = Complex.ONE;
     }
     if (beta == null) {
-      beta = (z == null
-          ? new Float64List.fromList([1.0, 0.0])
-          : new Float64List.fromList([0.0, 0.0]));
+      beta = (z == null ? Complex.ONE : Complex.ZERO);
     }
     if (transposeA) {
       return conjugateTranspose().mult(y, z, alpha, beta, false);
@@ -453,15 +447,14 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
           ", " +
           zz.toStringShort());
     }
-    var s = new Float64List(2);
+    var s = Complex.ZERO;
     for (int r = 0; r < rows; r++) {
       s[0] = 0.0;
       s[1] = 0.0;
       for (int c = 0; c < columns; c++) {
-        s = cmath.plus(s, cmath.multiply(get(r, c), y.get(c)));
+        s += get(r, c) * y.get(c);
       }
-      zz.set(r, cmath.plus(
-          cmath.multiply(s, alpha), cmath.multiply(zz.get(r), beta)));
+      zz.set(r, (s * alpha) + (zz.get(r) * beta));
     }
     return zz;
   }
@@ -470,16 +463,13 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
   /// `C = alpha * A x B + beta*C`. Matrix shapes:
   /// `A(m x n), B(n x p), C(m x p)`.
   AbstractComplexMatrix multiply(final AbstractComplexMatrix B,
-      [AbstractComplexMatrix C = null, Float64List alpha = null,
-      Float64List beta = null, bool transposeA = false,
-      bool transposeB = false]) {
+      [AbstractComplexMatrix C = null, Complex alpha = null,
+      Complex beta = null, bool transposeA = false, bool transposeB = false]) {
     if (alpha == null) {
-      alpha = new Float64List.fromList([1.0, 0.0]);
+      alpha = Complex.ONE;
     }
     if (beta == null) {
-      beta = (C == null
-          ? new Float64List.fromList([1.0, 0.0])
-          : new Float64List.fromList([0.0, 0.0]));
+      beta = (C == null ? Complex.ONE : Complex.ZERO);
     }
     if (transposeA) {
       return conjugateTranspose().multiply(
@@ -515,25 +505,22 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
     if (this == CC || B == CC) {
       throw new ArgumentError("Matrices must not be identical");
     }
-    Float64List s = new Float64List(2);
     for (int a = 0; a < p; a++) {
       for (int b = 0; b < m; b++) {
-        s[0] = 0.0;
-        s[1] = 0.0;
+        var s = Complex.ZERO;
         for (int c = 0; c < n; c++) {
-          s = cmath.plus(s, cmath.multiply(get(b, c), B.get(c, a)));
+          s += get(b, c) * B.get(c, a);
         }
-        CC.set(b, a, cmath.plus(
-            cmath.multiply(s, alpha), cmath.multiply(CC.get(b, a), beta)));
+        CC.set(b, a, (s * alpha) + (CC.get(b, a) * beta));
       }
     }
     return CC;
   }
 
   /// Returns the sum of all cells.
-  Float64List sum() {
+  Complex sum() {
     if (size == 0) {
-      return new Float64List.fromList([0.0, 0.0]);
+      return Complex.ZERO;
     }
     return aggregate(cfunc.plus, cfunc.identity);
   }

@@ -12,6 +12,8 @@ library cern.colt.matrix.complex.property;
 
 import 'dart:typed_data';
 
+import 'package:complex/complex.dart';
+
 import 'matrix.dart';
 //import '../formatter.dart';
 
@@ -40,24 +42,21 @@ import '../../math.dart' as cmath;
 
 /// Returns whether all cells of the given matrix [A] are equal to the
 /// given value.
-bool allVector(final AbstractComplexVector A, final Float64List value,
+bool allVector(final AbstractComplexVector A, final Complex value,
     [double epsilon = EPSILON]) {
   if (A == null) {
     return false;
   }
-  var diff = new Float64List(2);
   for (int i = 0; i < A.size; i++) {
-    Float64List x = A.get(i);
-    diff[0] = (value[0] - x[0]).abs();
-    diff[1] = (value[1] - x[1]).abs();
-    if (((diff[0] != diff[0]) || (diff[1] != diff[1])) &&
-            ((((value[0] != value[0]) || (value[1] != value[1])) &&
-                ((x[0] != x[0]) || (x[1] != x[1])))) ||
+    var x = A.get(i);
+    var diff = new Complex((value.real - x.real).abs(), (value.imaginary - x.imaginary).abs());
+    if (((diff.real != diff.real) || (diff.imaginary != diff.imaginary)) &&
+            ((((value.real != value.real) || (value.imaginary != value.imaginary)) &&
+                ((x.real != x.real) || (x.imaginary != x.imaginary)))) ||
         (cmath.isEqual(value, x, epsilon))) {
-      diff[0] = 0.0;
-      diff[1] = 0.0;
+      diff = Complex.ZERO;
     }
-    if ((diff[0] > epsilon) || (diff[1] > epsilon)) {
+    if ((diff.real > epsilon) || (diff.imaginary > epsilon)) {
       return false;
     }
   }
@@ -78,20 +77,17 @@ bool equalsVector(final AbstractComplexVector A, final AbstractComplexVector B,
     return false;
   }
 
-  var diff = new Float64List(2);
   for (int i = 0; i < size; i++) {
-    Float64List x = A.get(i);
-    Float64List value = B.get(i);
-    diff[0] = (value[0] - x[0]).abs();
-    diff[1] = (value[1] - x[1]).abs();
-    if (((diff[0] != diff[0]) || (diff[1] != diff[1])) &&
-            ((((value[0] != value[0]) || (value[1] != value[1])) &&
-                ((x[0] != x[0]) || (x[1] != x[1])))) ||
+    var x = A.get(i);
+    var value = B.get(i);
+    var diff = new Complex((value.real - x.real).abs(), (value.imaginary - x.imaginary).abs());
+    if (((diff.real != diff.real) || (diff.imaginary != diff.imaginary)) &&
+            ((((value.real != value.real) || (value.imaginary != value.imaginary)) &&
+                ((x.real != x.real) || (x.imaginary != x.imaginary)))) ||
         (cmath.isEqual(value, x, epsilon))) {
-      diff[0] = 0.0;
-      diff[1] = 0.0;
+      diff = Complex.ZERO;
     }
-    if ((diff[0] > epsilon) || (diff[1] > epsilon)) {
+    if ((diff.real > epsilon) || (diff.imaginary > epsilon)) {
       return false;
     }
   }
@@ -100,27 +96,24 @@ bool equalsVector(final AbstractComplexVector A, final AbstractComplexVector B,
 
 /// Returns whether all cells of the given matrix [A] are equal to the
 /// given value.
-bool allMatrix(final AbstractComplexMatrix A, final Float64List value,
+bool allMatrix(final AbstractComplexMatrix A, final Complex value,
     [double epsilon = EPSILON]) {
   if (A == null) {
     return false;
   }
   int rows = A.rows;
   int columns = A.columns;
-  var diff = new Float64List(2);
   for (int r = 0; r < rows; r++) {
     for (int c = 0; c < columns; c++) {
-      Float64List x = A.get(r, c);
-      diff[0] = (value[0] - x[0]).abs();
-      diff[1] = (value[1] - x[1]).abs();
-      if (((diff[0] != diff[0]) || (diff[1] != diff[1])) &&
-              ((((value[0] != value[0]) || (value[1] != value[1])) &&
-                  ((x[0] != x[0]) || (x[1] != x[1])))) ||
+      var x = A.get(r, c);
+      var diff = new Complex((value.real - x.real).abs(), (value.imaginary - x.imaginary).abs());
+      if (((diff.real != diff.real) || (diff.imaginary != diff.imaginary)) &&
+              ((((value.real != value.real) || (value.imaginary != value.imaginary)) &&
+                  ((x.real != x.real) || (x.imaginary != x.imaginary)))) ||
           (cmath.isEqual(value, x, epsilon))) {
-        diff[0] = 0.0;
-        diff[1] = 0.0;
+        diff = Complex.ZERO;
       }
-      if ((diff[0] > epsilon) || (diff[1] > epsilon)) {
+      if ((diff.real > epsilon) || (diff.imaginary > epsilon)) {
         return false;
       }
     }
@@ -142,21 +135,18 @@ bool equalsMatrix(final AbstractComplexMatrix A, final AbstractComplexMatrix B,
   if (columns != B.columns || rows != B.rows) {
     return false;
   }
-  var diff = new Float64List(2);
   for (int r = 0; r < rows; r++) {
     for (int c = 0; c < columns; c++) {
-      Float64List x = A.get(r, c);
-      Float64List value = B.get(r, c);
-      diff[0] = (value[0] - x[0]).abs();
-      diff[1] = (value[1] - x[1]).abs();
-      if (((diff[0] != diff[0]) || (diff[1] != diff[1])) &&
-              ((((value[0] != value[0]) || (value[1] != value[1])) &&
-                  ((x[0] != x[0]) || (x[1] != x[1])))) ||
+      var x = A.get(r, c);
+      var value = B.get(r, c);
+      var diff = new Complex((value.real - x.real).abs(), (value.imaginary - x.imaginary).abs());
+      if (((diff.real != diff.real) || (diff.imaginary != diff.imaginary)) &&
+              ((((value.real != value.real) || (value.imaginary != value.imaginary)) &&
+                  ((x.real != x.real) || (x.imaginary != x.imaginary)))) ||
           (cmath.isEqual(value, x, epsilon))) {
-        diff[0] = 0.0;
-        diff[1] = 0.0;
+        diff = Complex.ZERO;
       }
-      if ((diff[0] > epsilon) || (diff[1] > epsilon)) {
+      if ((diff.real > epsilon) || (diff.imaginary > epsilon)) {
         return false;
       }
     }

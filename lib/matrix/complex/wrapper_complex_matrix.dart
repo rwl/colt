@@ -41,7 +41,7 @@ class WrapperComplexMatrix extends AbstractComplexMatrix {
     }
   }
 
-  Object get elements => _content.elements;
+  dynamic get elements => _content.elements;
 
   bool equals(AbstractComplexMatrix obj) {
     if (_content is DiagonalComplexMatrix && obj is DiagonalComplexMatrix) {
@@ -64,24 +64,17 @@ class WrapperComplexMatrix extends AbstractComplexMatrix {
       }
       Float64List otherElements = other._elements;
       Float64List elements = (_content as DiagonalComplexMatrix)._elements;
-      var x = new Float64List(2);
-      var value = new Float64List(2);
-      var diff = new Float64List(2);
       for (int i = 0; i < dlength; i++) {
-        x[0] = elements[2 * i];
-        x[1] = elements[2 * i + 1];
-        value[0] = otherElements[2 * i];
-        value[1] = otherElements[2 * i + 1];
-        diff[0] = (value[0] - x[0]).abs();
-        diff[1] = (value[1] - x[1]).abs();
-        if (((diff[0] != diff[0]) || (diff[1] != diff[1])) &&
-                ((((value[0] != value[0]) || (value[1] != value[1])) &&
-                    ((x[0] != x[0]) || (x[1] != x[1])))) ||
-            (cmath.isEqual(value, x, epsilon))) {
-          diff[0] = 0.0;
-          diff[1] = 0.0;
+        var x = new Complex(elements[2 * i], elements[2 * i + 1]);
+        var value = new Complex(otherElements[2 * i], otherElements[2 * i + 1]);
+        var diff = new Complex((value.real - x.real).abs(), (value.imaginary - x.imaginary).abs());
+        if (((diff.real != diff.real) || (diff.imaginary != diff.imaginary)) &&
+                ((((value.real != value.real) || (value.imaginary != value.imaginary)) &&
+                    ((x.real != x.real) || (x.imaginary != x.imaginary)))) ||
+            (isEqual(value, x, epsilon))) {
+          diff = Complex.ZERO;
         }
-        if ((diff[0] > epsilon) || (diff[1] > epsilon)) {
+        if ((diff.real > epsilon) || (diff.imaginary > epsilon)) {
           return false;
         }
       }
@@ -91,7 +84,7 @@ class WrapperComplexMatrix extends AbstractComplexMatrix {
     }
   }
 
-  Float64List get(int row, int column) => _content.get(row, column);
+  Complex get(int row, int column) => _content.get(row, column);
 
   AbstractComplexMatrix like2D(int rows, int columns) {
     return _content.like2D(rows, columns);
@@ -99,7 +92,7 @@ class WrapperComplexMatrix extends AbstractComplexMatrix {
 
   AbstractComplexVector like1D(int size) => _content.like1D(size);
 
-  void set(int row, int column, Float64List value) {
+  void set(int row, int column, Complex value) {
     _content.set(row, column, value);
   }
 
@@ -207,7 +200,7 @@ class WrapperComplexMatrix extends AbstractComplexMatrix {
     var Im = new LargeDoubleMatrix(rows, columns);
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < columns; c++) {
-        Im.set(r, c, get(r, c)[1]);
+        Im.set(r, c, get(r, c).imaginary);
       }
     }
     return Im;
@@ -217,7 +210,7 @@ class WrapperComplexMatrix extends AbstractComplexMatrix {
     var Re = new LargeDoubleMatrix(rows, columns);
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < columns; c++) {
-        Re.set(r, c, get(r, c)[0]);
+        Re.set(r, c, get(r, c).real);
       }
     }
     return Re;
@@ -230,11 +223,11 @@ class ColumnFlipWrapperComplexMatrix extends WrapperComplexMatrix {
   ColumnFlipWrapperComplexMatrix(AbstractComplexMatrix newContent)
       : super._wrap(newContent);
 
-  Float64List get(int row, int column) {
+  Complex get(int row, int column) {
     return _content.get(row, columns - 1 - column);
   }
 
-  void set(int row, int column, Float64List value) {
+  void set(int row, int column, Complex value) {
     _content.set(row, columns - 1 - column, value);
   }
 
@@ -242,11 +235,11 @@ class ColumnFlipWrapperComplexMatrix extends WrapperComplexMatrix {
     _content.setParts(row, columns - 1 - column, re, im);
   }
 
-  Float64List at(int row, int column) {
+  Complex at(int row, int column) {
     return _content.at(row, columns - 1 - column);
   }
 
-  void put(int row, int column, Float64List value) {
+  void put(int row, int column, Complex value) {
     _content.put(row, columns - 1 - column, value);
   }
 
@@ -263,11 +256,11 @@ class DiceWrapperComplexMatrix extends WrapperComplexMatrix {
   DiceWrapperComplexMatrix(AbstractComplexMatrix newContent)
       : super._wrap(newContent);
 
-  Float64List get(int row, int column) {
+  Complex get(int row, int column) {
     return _content.get(column, row);
   }
 
-  void set(int row, int column, Float64List value) {
+  void set(int row, int column, Complex value) {
     _content.set(column, row, value);
   }
 
@@ -275,11 +268,11 @@ class DiceWrapperComplexMatrix extends WrapperComplexMatrix {
     _content.setParts(column, row, re, im);
   }
 
-  Float64List at(int row, int column) {
+  Complex at(int row, int column) {
     return _content.at(column, row);
   }
 
-  void put(int row, int column, Float64List value) {
+  void put(int row, int column, Complex value) {
     _content.put(column, row, value);
   }
 
@@ -302,11 +295,11 @@ class PartWrapperComplexMatrix extends WrapperComplexMatrix {
         _row = row,
         _column = column;
 
-  Float64List get(int i, int j) {
+  Complex get(int i, int j) {
     return _content.get(_row + i, _column + j);
   }
 
-  void set(int i, int j, Float64List value) {
+  void set(int i, int j, Complex value) {
     _content.set(_row + i, _column + j, value);
   }
 
@@ -314,11 +307,11 @@ class PartWrapperComplexMatrix extends WrapperComplexMatrix {
     _content.setParts(_row + i, _column + j, re, im);
   }
 
-  Float64List at(int i, int j) {
+  Complex at(int i, int j) {
     return _content.at(_row + i, _column + j);
   }
 
-  void put(int i, int j, Float64List value) {
+  void put(int i, int j, Complex value) {
     _content.put(_row + i, _column + j, value);
   }
 
@@ -335,11 +328,11 @@ class RowWrapperComplexMatrix extends WrapperComplexMatrix {
   RowWrapperComplexMatrix(AbstractComplexMatrix newContent)
       : super._wrap(newContent);
 
-  Float64List get(int row, int column) {
+  Complex get(int row, int column) {
     return _content.get(rows - 1 - row, column);
   }
 
-  void set(int row, int column, Float64List value) {
+  void set(int row, int column, Complex value) {
     _content.set(rows - 1 - row, column, value);
   }
 
@@ -347,11 +340,11 @@ class RowWrapperComplexMatrix extends WrapperComplexMatrix {
     _content.setParts(rows - 1 - row, column, re, im);
   }
 
-  Float64List at(int row, int column) {
+  Complex at(int row, int column) {
     return _content.at(rows - 1 - row, column);
   }
 
-  void put(int row, int column, Float64List value) {
+  void put(int row, int column, Complex value) {
     _content.put(rows - 1 - row, column, value);
   }
 
@@ -374,11 +367,11 @@ class SelectionWrapperComplexMatrix extends WrapperComplexMatrix {
         cix = cix,
         rix = rix;
 
-  Float64List get(int i, int j) {
+  Complex get(int i, int j) {
     return _content.get(rix[i], cix[j]);
   }
 
-  void set(int i, int j, Float64List value) {
+  void set(int i, int j, Complex value) {
     _content.set(rix[i], cix[j], value);
   }
 
@@ -386,11 +379,11 @@ class SelectionWrapperComplexMatrix extends WrapperComplexMatrix {
     _content.setParts(rix[i], cix[j], re, im);
   }
 
-  Float64List at(int i, int j) {
+  Complex at(int i, int j) {
     return _content.at(rix[i], cix[j]);
   }
 
-  void put(int i, int j, Float64List value) {
+  void put(int i, int j, Complex value) {
     _content.put(rix[i], cix[j], value);
   }
 
@@ -413,11 +406,11 @@ class StridesWrapperComplexMatrix extends WrapperComplexMatrix {
         _rowStride = rowStride,
         _columnStride = columnStride;
 
-  Float64List get(int row, int column) {
+  Complex get(int row, int column) {
     return _content.get(_rowStride * row, _columnStride * column);
   }
 
-  void set(int row, int column, Float64List value) {
+  void set(int row, int column, Complex value) {
     _content.set(_rowStride * row, _columnStride * column, value);
   }
 
@@ -425,11 +418,11 @@ class StridesWrapperComplexMatrix extends WrapperComplexMatrix {
     _content.setParts(_rowStride * row, _columnStride * column, re, im);
   }
 
-  Float64List at(int row, int column) {
+  Complex at(int row, int column) {
     return _content.at(_rowStride * row, _columnStride * column);
   }
 
-  void put(int row, int column, Float64List value) {
+  void put(int row, int column, Complex value) {
     _content.put(_rowStride * row, _columnStride * column, value);
   }
 

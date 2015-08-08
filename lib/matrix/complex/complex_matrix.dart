@@ -47,24 +47,19 @@ class ComplexMatrix extends AbstractComplexMatrix {
     return new ComplexMatrix(rows, columns);
   }
 
-  Float64List aggregate(final cfunc.ComplexComplexComplexFunction aggr,
+  Complex aggregate(final cfunc.ComplexComplexComplexFunction aggr,
       final cfunc.ComplexComplexFunction fn) {
     if (size == 0) {
-      var b = new Float64List(2);
-      b[0] = double.NAN;
-      b[1] = double.NAN;
-      return b;
+      return Complex.NAN;
     }
     int zero = index(0, 0);
-    Float64List a =
-        fn(new Float64List.fromList([_elements[zero], _elements[zero + 1]]));
+    var a = fn(new Complex(_elements[zero], _elements[zero + 1]));
     int d = 1; // first cell already done
     int idx;
     for (int r = 0; r < rows; r++) {
       for (int c = d; c < columns; c++) {
         idx = zero + r * rowStride + c * columnStride;
-        a = aggr(a,
-            fn(new Float64List.fromList([_elements[idx], _elements[idx + 1]])));
+        a = aggr(a, fn(new Complex(_elements[idx], _elements[idx + 1])));
       }
       d = 0;
     }
@@ -74,17 +69,16 @@ class ComplexMatrix extends AbstractComplexMatrix {
   void apply(final cfunc.ComplexComplexFunction fn) {
     final int zero = index(0, 0);
     int idx = zero;
-    var tmp = new Float64List(2);
     if (fn is cfunc.ComplexMult) {
-      Float64List multiplicator = fn.multiplicator;
+      var multiplicator = fn.multiplicator;
       // x[i] = mult*x[i]
       for (int r = 0; r < rows; r++) {
         for (int i = idx, c = 0; c < columns; c++) {
-          tmp[0] = _elements[i];
-          tmp[1] = _elements[i + 1];
-          _elements[i] = tmp[0] * multiplicator[0] - tmp[1] * multiplicator[1];
-          _elements[i + 1] =
-              tmp[1] * multiplicator[0] + tmp[0] * multiplicator[1];
+          var tmp = new Complex(_elements[i], _elements[i + 1]);
+          _elements[i] = tmp.real * multiplicator.real -
+              tmp.imaginary * multiplicator.imaginary;
+          _elements[i + 1] = tmp.imaginary * multiplicator.real +
+              tmp.real * multiplicator.imaginary;
           i += columnStride;
         }
         idx += rowStride;
@@ -92,9 +86,9 @@ class ComplexMatrix extends AbstractComplexMatrix {
     } else {
       for (int r = 0; r < rows; r++) {
         for (int i = idx, c = 0; c < columns; c++) {
-          tmp = fn(new Float64List.fromList([_elements[i], _elements[i + 1]]));
-          _elements[i] = tmp[0];
-          _elements[i + 1] = tmp[1];
+          var tmp = fn(new Complex(_elements[i], _elements[i + 1]));
+          _elements[i] = tmp.real;
+          _elements[i + 1] = tmp.imaginary;
           i += columnStride;
         }
         idx += rowStride;
@@ -105,21 +99,19 @@ class ComplexMatrix extends AbstractComplexMatrix {
   void applyReal(final cfunc.ComplexRealFunction fn) {
     final int zero = index(0, 0);
     int idx = zero;
-    var tmp = new Float64List(2);
     if (fn == cfunc.abs) {
       for (int r = 0; r < rows; r++) {
         for (int i = idx, c = 0; c < columns; c++) {
-          tmp[0] = _elements[i];
-          tmp[1] = _elements[i + 1];
-          double absX = tmp[0].abs();
-          double absY = tmp[1].abs();
+          var tmp = new Complex(_elements[i], _elements[i + 1]);
+          double absX = tmp.real.abs();
+          double absY = tmp.imaginary.abs();
           if (absX == 0 && absY == 0) {
             _elements[i] = 0.0;
           } else if (absX >= absY) {
-            double d = tmp[1] / tmp[0];
+            double d = tmp.imaginary / tmp.real;
             _elements[i] = absX * Math.sqrt(1 + d * d);
           } else {
-            double d = tmp[0] / tmp[1];
+            double d = tmp.real / tmp.imaginary;
             _elements[i] = absY * Math.sqrt(1 + d * d);
           }
           _elements[i + 1] = 0.0;
@@ -130,10 +122,9 @@ class ComplexMatrix extends AbstractComplexMatrix {
     } else {
       for (int r = 0; r < rows; r++) {
         for (int i = idx, c = 0; c < columns; c++) {
-          tmp[0] = _elements[i];
-          tmp[1] = _elements[i + 1];
-          tmp[0] = fn(tmp);
-          _elements[i] = tmp[0];
+          var tmp = new Complex(_elements[i], _elements[i + 1]);
+          var re = fn(tmp);
+          _elements[i] = re;
           _elements[i + 1] = 0.0;
           i += columnStride;
         }
@@ -206,19 +197,17 @@ class ComplexMatrix extends AbstractComplexMatrix {
     int rowStrideOther = y.rowStride;
     int zeroOther = y.index(0, 0);
     int zero = index(0, 0);
-    Float64List tmp1 = new Float64List(2);
-    Float64List tmp2 = new Float64List(2);
     int idx = zero;
     int idxOther = zeroOther;
     if (fn == cfunc.mult) {
       for (int r = 0; r < rows; r++) {
         for (int i = idx, j = idxOther, c = 0; c < columns; c++) {
-          tmp1[0] = _elements[i];
-          tmp1[1] = _elements[i + 1];
-          tmp2[0] = elemsOther[j];
-          tmp2[1] = elemsOther[j + 1];
-          _elements[i] = tmp1[0] * tmp2[0] - tmp1[1] * tmp2[1];
-          _elements[i + 1] = tmp1[1] * tmp2[0] + tmp1[0] * tmp2[1];
+          var tmp1 = new Complex(_elements[i], _elements[i + 1]);
+          var tmp2 = new Complex(elemsOther[j], elemsOther[j + 1]);
+          _elements[i] =
+              tmp1.real * tmp2.real - tmp1.imaginary * tmp2.imaginary;
+          _elements[i + 1] =
+              tmp1.imaginary * tmp2.real + tmp1.real * tmp2.imaginary;
           i += columnStride;
           j += columnStrideOther;
         }
@@ -228,12 +217,12 @@ class ComplexMatrix extends AbstractComplexMatrix {
     } else if (fn == cfunc.multConjFirst) {
       for (int r = 0; r < rows; r++) {
         for (int i = idx, j = idxOther, c = 0; c < columns; c++) {
-          tmp1[0] = _elements[i];
-          tmp1[1] = _elements[i + 1];
-          tmp2[0] = elemsOther[j];
-          tmp2[1] = elemsOther[j + 1];
-          _elements[i] = tmp1[0] * tmp2[0] + tmp1[1] * tmp2[1];
-          _elements[i + 1] = -tmp1[1] * tmp2[0] + tmp1[0] * tmp2[1];
+          var tmp1 = new Complex(_elements[i], _elements[i + 1]);
+          var tmp2 = new Complex(elemsOther[j], elemsOther[j + 1]);
+          _elements[i] =
+              tmp1.real * tmp2.real + tmp1.imaginary * tmp2.imaginary;
+          _elements[i + 1] =
+              -tmp1.imaginary * tmp2.real + tmp1.real * tmp2.imaginary;
           i += columnStride;
           j += columnStrideOther;
         }
@@ -243,12 +232,12 @@ class ComplexMatrix extends AbstractComplexMatrix {
     } else if (fn == cfunc.multConjSecond) {
       for (int r = 0; r < rows; r++) {
         for (int i = idx, j = idxOther, c = 0; c < columns; c++) {
-          tmp1[0] = _elements[i];
-          tmp1[1] = _elements[i + 1];
-          tmp2[0] = elemsOther[j];
-          tmp2[1] = elemsOther[j + 1];
-          _elements[i] = tmp1[0] * tmp2[0] + tmp1[1] * tmp2[1];
-          _elements[i + 1] = tmp1[1] * tmp2[0] - tmp1[0] * tmp2[1];
+          var tmp1 = new Complex(_elements[i], _elements[i + 1]);
+          var tmp2 = new Complex(elemsOther[j], elemsOther[j + 1]);
+          _elements[i] =
+              tmp1.real * tmp2.real + tmp1.imaginary * tmp2.imaginary;
+          _elements[i + 1] =
+              tmp1.imaginary * tmp2.real - tmp1.real * tmp2.imaginary;
           i += columnStride;
           j += columnStrideOther;
         }
@@ -258,13 +247,11 @@ class ComplexMatrix extends AbstractComplexMatrix {
     } else {
       for (int r = 0; r < rows; r++) {
         for (int i = idx, j = idxOther, c = 0; c < columns; c++) {
-          tmp1[0] = _elements[i];
-          tmp1[1] = _elements[i + 1];
-          tmp2[0] = elemsOther[j];
-          tmp2[1] = elemsOther[j + 1];
+          var tmp1 = new Complex(_elements[i], _elements[i + 1]);
+          var tmp2 = new Complex(elemsOther[j], elemsOther[j + 1]);
           tmp1 = fn(tmp1, tmp2);
-          _elements[i] = tmp1[0];
-          _elements[i + 1] = tmp1[1];
+          _elements[i] = tmp1.real;
+          _elements[i + 1] = tmp1.imaginary;
           i += columnStride;
           j += columnStrideOther;
         }
@@ -365,18 +352,16 @@ class ComplexMatrix extends AbstractComplexMatrix {
     return cardinality;
   }
 
-  void forEachNonZero(final cfunc.IntIntComplexFunction function) {
+  void forEachNonZero(final cfunc.IntIntComplexFunction fn) {
     final int zero = index(0, 0);
     int idx = zero;
-    var value = new Float64List(2);
     for (int r = 0; r < rows; r++) {
       for (int i = idx, c = 0; c < columns; c++) {
-        value[0] = _elements[i];
-        value[1] = _elements[i + 1];
-        if (value[0] != 0 || value[1] != 0) {
-          Float64List v = function(r, c, value);
-          _elements[i] = v[0];
-          _elements[i + 1] = v[1];
+        var value = new Complex(_elements[i], _elements[i + 1]);
+        if (value.real != 0 || value.imaginary != 0) {
+          var v = fn(r, c, value);
+          _elements[i] = v.real;
+          _elements[i + 1] = v.imaginary;
         }
         i += columnStride;
       }
@@ -402,7 +387,7 @@ class ComplexMatrix extends AbstractComplexMatrix {
     return transpose;
   }
 
-  Float64List get elements => _elements;
+  dynamic get elements => _elements;
 
   AbstractDoubleMatrix imaginary() {
     var Im = new DoubleMatrix(rows, columns);
@@ -426,17 +411,15 @@ class ComplexMatrix extends AbstractComplexMatrix {
   }
 
   void nonzero(final List<int> rowList, final List<int> columnList,
-      final List<List<double>> valueList) {
+      final List<Complex> valueList) {
     rowList.clear();
     columnList.clear();
     valueList.clear();
     int idx = index(0, 0);
-    var value = new Float64List(2);
     for (int r = 0; r < rows; r++) {
       for (int i = idx, c = 0; c < columns; c++) {
-        value[0] = _elements[i];
-        value[1] = _elements[i + 1];
-        if (value[0] != 0 || value[1] != 0) {
+        var value = new Complex(_elements[i], _elements[i + 1]);
+        if (value.real != 0 || value.imaginary != 0) {
           rowList.add(r);
           columnList.add(c);
           valueList.add(value);
@@ -447,9 +430,9 @@ class ComplexMatrix extends AbstractComplexMatrix {
     }
   }
 
-  Float64List get(int row, int column) {
+  Complex get(int row, int column) {
     int idx = rowZero + row * rowStride + columnZero + column * columnStride;
-    return new Float64List.fromList([_elements[idx], _elements[idx + 1]]);
+    return new Complex(_elements[idx], _elements[idx + 1]);
   }
 
   AbstractDoubleMatrix real() {
@@ -485,22 +468,20 @@ class ComplexMatrix extends AbstractComplexMatrix {
     _elements[idx + 1] = im;
   }
 
-  void set(int row, int column, Float64List value) {
+  void set(int row, int column, Complex value) {
     int idx = rowZero + row * rowStride + columnZero + column * columnStride;
-    _elements[idx] = value[0];
-    _elements[idx + 1] = value[1];
+    _elements[idx] = value.real;
+    _elements[idx + 1] = value.imaginary;
   }
 
   AbstractComplexVector mult(final AbstractComplexVector y,
-      [AbstractComplexVector z = null, Float64List alpha = null,
-      Float64List beta = null, bool transposeA = false]) {
+      [AbstractComplexVector z = null, Complex alpha = null,
+      Complex beta = null, bool transposeA = false]) {
     if (alpha == null) {
-      alpha = new Float64List.fromList([1.0, 0.0]);
+      alpha = Complex.ONE;
     }
     if (beta == null) {
-      beta = (z == null
-          ? new Float64List.fromList([1.0, 0.0])
-          : new Float64List.fromList([0.0, 0.0]));
+      beta = (z == null ? Complex.ONE : Complex.ZERO);
     }
     if (transposeA) {
       return conjugateTranspose().mult(y, z, alpha, beta, false);
@@ -550,9 +531,9 @@ class ComplexMatrix extends AbstractComplexMatrix {
       var reZ = elemsZ[idxZeroZ];
       var imZ = elemsZ[idxZeroZ + 1];
       elemsZ[idxZeroZ] =
-          reS * alpha[0] - imS * alpha[1] + reZ * beta[0] - imZ * beta[1];
+          reS * alpha.real - imS * alpha.imaginary + reZ * beta.real - imZ * beta.imaginary;
       elemsZ[idxZeroZ + 1] =
-          imS * alpha[0] + reS * alpha[1] + imZ * beta[0] + reZ * beta[1];
+          imS * alpha.real + reS * alpha.imaginary + imZ * beta.real + reZ * beta.imaginary;
       idxZero += rowStride;
       idxZeroZ += strideZ;
     }
@@ -560,16 +541,14 @@ class ComplexMatrix extends AbstractComplexMatrix {
   }
 
   AbstractComplexMatrix multiply(AbstractComplexMatrix B,
-      [AbstractComplexMatrix C = null, Float64List alpha = null,
-      Float64List beta = null, final bool transposeA = false,
+      [AbstractComplexMatrix C = null, Complex alpha = null,
+      Complex beta = null, final bool transposeA = false,
       final bool transposeB = false]) {
     if (alpha == null) {
-      alpha = new Float64List.fromList([1.0, 0.0]);
+      alpha = Complex.ONE;
     }
     if (beta == null) {
-      beta = (C == null
-          ? new Float64List.fromList([1.0, 0.0])
-          : new Float64List.fromList([0.0, 0.0]));
+      beta = (C == null ? Complex.ONE : Complex.ZERO);
     }
     if (transposeA) {
       return conjugateTranspose().multiply(
@@ -703,9 +682,9 @@ class ComplexMatrix extends AbstractComplexMatrix {
           var reC = CElems[iC];
           var imC = CElems[iC + 1];
           CElems[iC] =
-              alpha[0] * reS - alpha[1] * imS + beta[0] * reC - beta[1] * imC;
+              alpha.real * reS - alpha.imaginary * imS + beta.real * reC - beta.imaginary * imC;
           CElems[iC + 1] =
-              alpha[1] * reS + alpha[0] * imS + beta[1] * reC + beta[0] * imC;
+              alpha.imaginary * reS + alpha.real * imS + beta.imaginary * reC + beta.real * imC;
           iA += rA;
           iC += rC;
         }
@@ -716,14 +695,13 @@ class ComplexMatrix extends AbstractComplexMatrix {
     return C;
   }
 
-  Float64List sum() {
-    var sum = new Float64List(2);
+  Complex sum() {
+    var sum = Complex.ZERO;
     int zero = index(0, 0);
     int idx = zero;
     for (int r = 0; r < rows; r++) {
       for (int i = idx, c = 0; c < columns; c++) {
-        sum[0] += _elements[i];
-        sum[1] += _elements[i + 1];
+        sum += new Complex(_elements[i], _elements[i + 1]);
         i += columnStride;
       }
       idx += rowStride;
@@ -801,13 +779,12 @@ class SelectedDenseComplexMatrix extends AbstractComplexMatrix {
 
   int rowOffset(int absRank) => _rowOffsets[absRank];
 
-  Float64List get(int row, int column) {
+  Complex get(int row, int column) {
     int idxr = rowZero + row * rowStride;
     int idxc = columnZero + column * columnStride;
-    return new Float64List.fromList([
-      _elements[_offset + _rowOffsets[idxr] + _columnOffsets[idxc]],
-      _elements[_offset + _rowOffsets[idxr] + _columnOffsets[idxc] + 1]
-    ]);
+    return new Complex(
+        _elements[_offset + _rowOffsets[idxr] + _columnOffsets[idxc]],
+        _elements[_offset + _rowOffsets[idxr] + _columnOffsets[idxc] + 1]);
   }
 
   // This method is not supported.
@@ -841,12 +818,12 @@ class SelectedDenseComplexMatrix extends AbstractComplexMatrix {
     throw new Error();
   }
 
-  void set(int row, int column, Float64List value) {
+  void set(int row, int column, Complex value) {
     int idxr = rowZero + row * rowStride;
     int idxc = columnZero + column * columnStride;
-    _elements[_offset + _rowOffsets[idxr] + _columnOffsets[idxc]] = value[0];
+    _elements[_offset + _rowOffsets[idxr] + _columnOffsets[idxc]] = value.real;
     _elements[_offset + _rowOffsets[idxr] + _columnOffsets[idxc] + 1] =
-        value[1];
+        value.imaginary;
   }
 
   // This method is not supported.
@@ -904,7 +881,7 @@ class SelectedDenseComplexMatrix extends AbstractComplexMatrix {
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < columns; c++) {
         final tmp = get(r, c);
-        R.set(r, c, tmp[0]);
+        R.set(r, c, tmp.real);
       }
     }
     return R;
@@ -915,7 +892,7 @@ class SelectedDenseComplexMatrix extends AbstractComplexMatrix {
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < columns; c++) {
         final tmp = get(r, c);
-        Im.set(r, c, tmp[1]);
+        Im.set(r, c, tmp.imaginary);
       }
     }
     return Im;

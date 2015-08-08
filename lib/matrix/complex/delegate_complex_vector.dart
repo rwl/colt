@@ -27,7 +27,7 @@ class DelegateComplexVector extends AbstractComplexVector {
     _content = newContent;
   }
 
-  Float64List get(int index) => _content.get(_row, index);
+  Complex get(int index) => _content.get(_row, index);
 
   AbstractComplexVector like1D(int size) => _content.like1D(size);
 
@@ -35,7 +35,7 @@ class DelegateComplexVector extends AbstractComplexVector {
     return _content.like2D(rows, columns);
   }
 
-  void set(int index, Float64List value) {
+  void set(int index, Complex value) {
     _content.set(_row, index, value);
   }
 

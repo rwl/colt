@@ -4,6 +4,7 @@ import 'dart:math' as Math;
 import 'dart:typed_data';
 //import 'dart:collection' show ListMixin;
 import 'package:intl/intl.dart' show NumberFormat;
+import 'package:complex/complex.dart';
 
 import '../matrix.dart'
     show
@@ -42,11 +43,10 @@ import '../double/matrix.dart'
         LargeDoubleMatrix,
         SparseDoubleVector,
         SparseDoubleMatrix,
-        SparseRCDoubleMatrix;
+        SparseRCDoubleMatrix,
+        makeSparseRCDoubleMatrix;
 
-
-import '../../math.dart' show EPSILON, DEG_RAD, MAX_INT;
-import '../../math.dart' as cmath;
+import '../../math.dart' show EPSILON, DEG_RAD, MAX_INT, isEqual;
 
 import 'property.dart' as cprop;
 
