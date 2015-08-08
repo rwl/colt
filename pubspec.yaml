@@ -3,5 +3,8 @@ version: 0.0.1
 description: A pub package
 dependencies:
   intl: any
+  complex: any
 dev_dependencies:
   test: any
+  benchmark_harness: ">=1.0.0 <2.0.0"
+  browser: any
