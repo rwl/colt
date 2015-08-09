@@ -110,7 +110,7 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
     }
   }
 
-  void copyFrom(AbstractDoubleMatrix source) {
+  void copyFrom(DoubleMatrix source) {
     // overriden for performance only
     if (source == this) {
       return; // nothing to do
@@ -132,7 +132,7 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
   }
 
   void assign(
-      final AbstractDoubleMatrix y, final func.DoubleDoubleFunction fn) {
+      final DoubleMatrix y, final func.DoubleDoubleFunction fn) {
     checkShape(this, y);
     if (y is DiagonalDoubleMatrix) {
       DiagonalDoubleMatrix other = y;
@@ -209,7 +209,7 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
     return true;
   }
 
-  bool equals(AbstractDoubleMatrix obj) {
+  bool equals(DoubleMatrix obj) {
     if (obj is DiagonalDoubleMatrix) {
       DiagonalDoubleMatrix other = obj;
       double epsilon = EPSILON;
@@ -338,11 +338,11 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
     }
   }
 
-  AbstractDoubleMatrix like2D(int rows, int columns) {
+  DoubleMatrix like2D(int rows, int columns) {
     return new SparseDoubleMatrix(rows, columns);
   }
 
-  AbstractDoubleVector like1D(int size) {
+  DoubleVector like1D(int size) {
     return new SparseDoubleVector(size);
   }
 
@@ -370,8 +370,8 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
     }
   }
 
-  AbstractDoubleVector mult(AbstractDoubleVector y,
-      [AbstractDoubleVector z = null, double alpha = 1.0, double beta = 0.0,
+  DoubleVector mult(DoubleVector y,
+      [DoubleVector z = null, double alpha = 1.0, double beta = 0.0,
       final bool transposeA = false]) {
     int rowsA = rows;
     int columnsA = columns;
@@ -382,10 +382,10 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
 
     bool ignore = (z == null);
     if (z == null) {
-      z = new DoubleVector(rowsA);
+      z = new DenseDoubleVector(rowsA);
     }
 
-    if (!(!isView && y is DoubleVector && z is DoubleVector)) {
+    if (!(!isView && y is DenseDoubleVector && z is DenseDoubleVector)) {
       return super.mult(y, z, alpha, beta, transposeA);
     }
 
@@ -402,12 +402,12 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
       z.apply(func.multiply(beta));
     }
 
-    DoubleVector zz = z as DoubleVector;
+    DenseDoubleVector zz = z as DenseDoubleVector;
     final Float64List elementsZ = zz._elements;
     final int strideZ = zz.stride;
     final int zeroZ = z.index(0);
 
-    DoubleVector yy = y as DoubleVector;
+    DenseDoubleVector yy = y as DenseDoubleVector;
     final Float64List elementsY = yy._elements;
     final int strideY = yy.stride;
     final int zeroY = y.index(0);
@@ -443,7 +443,7 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
     return z;
   }
 
-  AbstractDoubleMatrix _getContent() => this;
+  DoubleMatrix _getContent() => this;
 
   Object clone() {
     return new DiagonalDoubleMatrix._internal(

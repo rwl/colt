@@ -4,10 +4,10 @@ const NROWS = 13;
 const NCOLUMNS = 17;
 //const TOL = 1e-10;
 
-testAbstractComplexMatrix(
-    String kind, AbstractComplexMatrix make(int rows, int columns)) {
-  group("AbstractComplexMatrix ($kind)", () {
-    AbstractComplexMatrix A, B, Bt;
+testComplexMatrix(
+    String kind, ComplexMatrix make(int rows, int columns)) {
+  group("ComplexMatrix ($kind)", () {
+    ComplexMatrix A, B, Bt;
     setUp(() {
       A = make(NROWS, NCOLUMNS);
       B = make(NROWS, NCOLUMNS);
@@ -34,7 +34,7 @@ testAbstractComplexMatrix(
     });
 
     test('apply', () {
-      AbstractComplexMatrix Acopy = A.copy();
+      ComplexMatrix Acopy = A.copy();
       A.apply(acos);
       for (int r = 0; r < A.rows; r++) {
         for (int c = 0; c < A.columns; c++) {
@@ -54,7 +54,7 @@ testAbstractComplexMatrix(
     });
 
     test('assign', () {
-      AbstractComplexMatrix Acopy = A.copy();
+      ComplexMatrix Acopy = A.copy();
       A.assign(B, div);
       for (int r = 0; r < A.rows; r++) {
         for (int c = 0; c < A.columns; c++) {
@@ -65,7 +65,7 @@ testAbstractComplexMatrix(
     });
 
     test('applyReal', () {
-      AbstractComplexMatrix Acopy = A.copy();
+      ComplexMatrix Acopy = A.copy();
       A.applyReal(abs);
       for (int r = 0; r < A.rows; r++) {
         for (int c = 0; c < A.columns; c++) {
@@ -94,8 +94,8 @@ testAbstractComplexMatrix(
     });
 
     test('fill', () {
-      final value = [random.nextDouble(), random.nextDouble()];
-      A.fill(value[0], value[1]);
+      var value = new Complex(random.nextDouble(), random.nextDouble());
+      A.fill(value.real, value.imaginary);
       for (int r = 0; r < A.rows; r++) {
         for (int c = 0; c < A.columns; c++) {
           var elem = A.get(r, c);
@@ -105,8 +105,8 @@ testAbstractComplexMatrix(
     });
 
     test('setImaginary', () {
-      AbstractDoubleMatrix Im = new DoubleMatrix.random(A.rows, A.columns);
-      AbstractComplexMatrix Acopy = A.copy();
+      DoubleMatrix Im = new DenseDoubleMatrix.random(A.rows, A.columns);
+      ComplexMatrix Acopy = A.copy();
       A.setImaginary(Im);
       for (int r = 0; r < A.rows; r++) {
         for (int c = 0; c < A.columns; c++) {
@@ -117,8 +117,8 @@ testAbstractComplexMatrix(
     });
 
     test('setReal', () {
-      AbstractDoubleMatrix Re = new DoubleMatrix.random(A.rows, A.columns);
-      AbstractComplexMatrix Acopy = A.copy();
+      DoubleMatrix Re = new DenseDoubleMatrix.random(A.rows, A.columns);
+      ComplexMatrix Acopy = A.copy();
       A.setReal(Re);
       for (int r = 0; r < A.rows; r++) {
         for (int c = 0; c < A.columns; c++) {
@@ -139,7 +139,7 @@ testAbstractComplexMatrix(
     });
 
     test('forEachNonZero', () {
-      AbstractComplexMatrix Acopy = A.copy();
+      ComplexMatrix Acopy = A.copy();
       Complex fn(int first, int second, Complex third) {
         return third.sqrt();
       }
@@ -152,7 +152,7 @@ testAbstractComplexMatrix(
     });
 
     test('conjugateTranspose', () {
-      AbstractComplexMatrix Aconj = A.conjugateTranspose();
+      ComplexMatrix Aconj = A.conjugateTranspose();
       expect(A.rows, equals(Aconj.columns));
       expect(A.columns, equals(Aconj.rows));
       for (int r = 0; r < A.rows; r++) {
@@ -164,7 +164,7 @@ testAbstractComplexMatrix(
     });
 
     test('imaginary', () {
-      AbstractDoubleMatrix Im = A.imaginary();
+      DoubleMatrix Im = A.imaginary();
       for (int r = 0; r < A.rows; r++) {
         for (int c = 0; c < A.columns; c++) {
           expect(A.get(r, c).imaginary, closeTo(Im.get(r, c), TOL));
@@ -190,7 +190,7 @@ testAbstractComplexMatrix(
     });
 
     test('real', () {
-      AbstractDoubleMatrix Re = A.real();
+      DoubleMatrix Re = A.real();
       for (int r = 0; r < A.rows; r++) {
         for (int c = 0; c < A.columns; c++) {
           expect(A.get(r, c).real, closeTo(Re.get(r, c), TOL));
@@ -199,7 +199,7 @@ testAbstractComplexMatrix(
     });
 
     test('column', () {
-      AbstractComplexVector B = A.column(A.columns ~/ 2);
+      ComplexVector B = A.column(A.columns ~/ 2);
       expect(A.rows, equals(B.size));
       for (int r = 0; r < A.rows; r++) {
         assertEquals(A.get(r, A.columns ~/ 2), B.get(r), TOL);
@@ -207,7 +207,7 @@ testAbstractComplexMatrix(
     });
 
     test('columnFlip', () {
-      AbstractComplexMatrix B = A.columnFlip();
+      ComplexMatrix B = A.columnFlip();
       expect(A.size, equals(B.size));
       for (int r = 0; r < A.rows; r++) {
         for (int c = 0; c < A.columns; c++) {
@@ -217,7 +217,7 @@ testAbstractComplexMatrix(
     });
 
     test('dice', () {
-      AbstractComplexMatrix B = A.dice();
+      ComplexMatrix B = A.dice();
       expect(A.rows, equals(B.columns));
       expect(A.columns, equals(B.rows));
       for (int r = 0; r < A.rows; r++) {
@@ -228,7 +228,7 @@ testAbstractComplexMatrix(
     });
 
     test('part', () {
-      AbstractComplexMatrix B =
+      ComplexMatrix B =
           A.part(A.rows ~/ 2, A.columns ~/ 2, A.rows ~/ 3, A.columns ~/ 3);
       for (int r = 0; r < A.rows / 3; r++) {
         for (int c = 0; c < A.columns / 3; c++) {
@@ -239,7 +239,7 @@ testAbstractComplexMatrix(
     });
 
     test('row', () {
-      AbstractComplexVector B = A.row(A.rows ~/ 2);
+      ComplexVector B = A.row(A.rows ~/ 2);
       expect(A.columns, equals(B.size));
       for (int c = 0; c < A.columns; c++) {
         assertEquals(A.get(A.rows ~/ 2, c), B.get(c), TOL);
@@ -247,7 +247,7 @@ testAbstractComplexMatrix(
     });
 
     test('rowFlip', () {
-      AbstractComplexMatrix B = A.rowFlip();
+      ComplexMatrix B = A.rowFlip();
       expect(A.size, equals(B.size));
       for (int r = 0; r < A.rows; r++) {
         for (int c = 0; c < A.columns; c++) {
@@ -267,7 +267,7 @@ testAbstractComplexMatrix(
         A.columns ~/ 2,
         A.columns - 1
       ]);
-      AbstractComplexMatrix B = A.select(rowIndexes, colIndexes);
+      ComplexMatrix B = A.select(rowIndexes, colIndexes);
       expect(rowIndexes.length, equals(B.rows));
       expect(colIndexes.length, equals(B.columns));
       for (int r = 0; r < rowIndexes.length; r++) {
@@ -280,7 +280,7 @@ testAbstractComplexMatrix(
     test('strides', () {
       int rowStride = 3;
       int colStride = 5;
-      AbstractComplexMatrix B = A.strides(rowStride, colStride);
+      ComplexMatrix B = A.strides(rowStride, colStride);
       for (int r = 0; r < B.rows; r++) {
         for (int c = 0; c < B.columns; c++) {
           assertEquals(A.get(r * rowStride, c * colStride), B.get(r, c), TOL);
@@ -289,13 +289,13 @@ testAbstractComplexMatrix(
     });
 
     test('mult', () {
-      AbstractComplexVector y = new ComplexVector(A.columns);
+      ComplexVector y = new DenseComplexVector(A.columns);
       for (int i = 0; i < y.size; i++) {
         y.set(i, new Complex(random.nextDouble(), random.nextDouble()));
       }
       final alpha = new Complex(3.0, 2.0);
       final beta = new Complex(5.0, 4.0);
-      AbstractComplexVector z = null;
+      ComplexVector z = null;
       z = A.mult(y, z, alpha, beta, false);
       var expected = new Float64List(2 * A.rows);
       for (int r = 0; r < A.rows; r++) {
@@ -315,7 +315,7 @@ testAbstractComplexMatrix(
         expect(expected[2 * r + 1], closeTo(z.get(r).imaginary, TOL));
       }
       //transpose
-      y = new ComplexVector(A.rows);
+      y = new DenseComplexVector(A.rows);
       for (int i = 0; i < y.size; i++) {
         y.set(i, new Complex(random.nextDouble(), random.nextDouble()));
       }
@@ -342,7 +342,7 @@ testAbstractComplexMatrix(
     test('multiply', () {
       var alpha = new Complex(3.0, 2.0);
       var beta = new Complex(5.0, 4.0);
-      AbstractComplexMatrix C = null;
+      ComplexMatrix C = null;
       C = A.multiply(Bt, C, alpha, beta, false, false);
       var expected = new List.generate(A.rows, (_) => new Float64List(2 * A.rows));
       for (int j = 0; j < A.rows; j++) {

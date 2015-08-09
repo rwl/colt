@@ -12,8 +12,8 @@ part of cern.colt.matrix.double;
 
 /// Abstract base class for 1-d matrices (aka vectors) holding
 /// [double] elements.
-abstract class AbstractDoubleVector extends AbstractVector {
-  AbstractDoubleVector(int size, [int zero = 0, int stride = 1, bool isNoView = true])
+abstract class DoubleVector extends AbstractVector {
+  DoubleVector(int size, [int zero = 0, int stride = 1, bool isNoView = true])
       : super(size, zero, stride, isNoView);
 
   /// Applies a function to each cell and aggregates the results. Returns a
@@ -79,12 +79,12 @@ abstract class AbstractDoubleVector extends AbstractVector {
   /// same cells (as is the case if they are views derived from the same
   /// matrix) and intersect in an ambiguous way, then replaces as if
   /// using an intermediate auxiliary deep copy of [other].
-  void copyFrom(AbstractDoubleVector other) {
+  void copyFrom(DoubleVector other) {
     if (other == this) {
       return;
     }
     checkSize(this, other);
-    AbstractDoubleVector source;
+    DoubleVector source;
     if (_haveSharedCells(other)) {
       source = other.copy();
     } else {
@@ -105,7 +105,7 @@ abstract class AbstractDoubleVector extends AbstractVector {
   ///     m1.assign(m2, F.pow);
   ///     -->
   ///     m1 == 1 1 16 729
-  void assign(AbstractDoubleVector y, DoubleDoubleFunction fn) {
+  void assign(DoubleVector y, DoubleDoubleFunction fn) {
     checkSize(this, y);
     for (int i = 0; i < size; i++) {
       set(i, fn(get(i), y.get(i)));
@@ -122,8 +122,8 @@ abstract class AbstractDoubleVector extends AbstractVector {
   }
 
   /// Constructs and returns a deep copy of the receiver.
-  AbstractDoubleVector copy() {
-    AbstractDoubleVector copy = like();
+  DoubleVector copy() {
+    DoubleVector copy = like();
     copy.copyFrom(this);
     return copy;
   }
@@ -133,9 +133,9 @@ abstract class AbstractDoubleVector extends AbstractVector {
 
   /// Compares this object against the specified object. The result is
   /// `true` if and only if the argument is not `null` and is at least
-  /// a [AbstractDoubleVector] object that has the same size as the
+  /// a [DoubleVector] object that has the same size as the
   /// receiver and has exactly the same values at the same indexes.
-  bool equals(AbstractDoubleVector obj) {
+  bool equals(DoubleVector obj) {
     if (identical(this, obj)) {
       return true;
     }
@@ -331,23 +331,23 @@ abstract class AbstractDoubleVector extends AbstractVector {
 
   /// Constructs and returns a new empty matrix of the same dynamic type
   /// as the receiver, having the same size. For example, if the receiver is an
-  /// instance of type [DoubleVector] the new matrix will also be of type
-  /// [DoubleVector]
-  AbstractDoubleVector like() => like1D(size);
+  /// instance of type [DenseDoubleVector] the new matrix will also be of type
+  /// [DenseDoubleVector]
+  DoubleVector like() => like1D(size);
 
   /// Constructs and returns a new empty matrix of the same dynamic type
   /// as the receiver, having the specified size.
-  AbstractDoubleVector like1D(int size);
+  DoubleVector like1D(int size);
 
   /// Constructs and returns a new 2-d matrix of the corresponding dynamic
   /// type, entirelly independent of the receiver. For example, if the
-  /// receiver is an instance of type [DoubleVector] the new matrix must be
-  /// of type [DoubleMatrix]
-  AbstractDoubleMatrix like2D(int rows, int columns);
+  /// receiver is an instance of type [DenseDoubleVector] the new matrix must be
+  /// of type [DenseDoubleMatrix]
+  DoubleMatrix like2D(int rows, int columns);
 
   /// Returns new matrix of size [rows] x [columns] whose elements are
   /// taken column-wise from this matrix.
-  AbstractDoubleMatrix reshape(int rows, int columns);
+  DoubleMatrix reshape(int rows, int columns);
 
   /// Returns the matrix cell value at coordinate [index].
   double operator [](int index) {
@@ -401,7 +401,7 @@ abstract class AbstractDoubleVector extends AbstractVector {
 
   /// Returns a new *flip view*. What used to be index `0` is now
   /// index `size() - 1`.
-  AbstractDoubleVector flip() {
+  DoubleVector flip() {
     var v = _view();
     vFlip(v);
     return v;
@@ -409,7 +409,7 @@ abstract class AbstractDoubleVector extends AbstractVector {
 
   /// Returns a new *sub-range view* that is a [width] sub matrix starting
   /// at [index].
-  AbstractDoubleVector part(int index, int width) {
+  DoubleVector part(int index, int width) {
     var v = _view();
     vPart(this, index, width);
     return v;
@@ -423,7 +423,7 @@ abstract class AbstractDoubleVector extends AbstractVector {
   ///     indexes  = (0,2,4,2)
   ///     -->
   ///     view     = (0,8,7,8)
-  AbstractDoubleVector select(Int32List indexes) {
+  DoubleVector select(Int32List indexes) {
     // check for "all"
     if (indexes == null) {
       indexes = new Int32List(size);
@@ -442,7 +442,7 @@ abstract class AbstractDoubleVector extends AbstractVector {
 
   /// Returns a new *stride view* which is a sub matrix consisting of
   /// every i-th cell.
-  AbstractDoubleVector strides(int stride) {
+  DoubleVector strides(int stride) {
     var v = _view();
     vStride(this, stride);
     return v;
@@ -451,7 +451,7 @@ abstract class AbstractDoubleVector extends AbstractVector {
   /// Returns the dot product of two vectors x and y, which is
   /// `Sum(x[i]*y[i])`. Operates on cells at indexes
   /// `from .. Min(size(), y.size(), from+length)-1`.
-  double dot(final AbstractDoubleVector y,
+  double dot(final DoubleVector y,
       [final int from = 0, int length = null]) {
     if (length == null) {
       length = size;
@@ -486,10 +486,10 @@ abstract class AbstractDoubleVector extends AbstractVector {
   }
 
   /// Returns the content of this matrix if it is a wrapper; or `this`
-  AbstractDoubleVector _getContent() => this;
+  DoubleVector _getContent() => this;
 
   /// Returns `true` if both matrices share at least one identical cell.
-  bool _haveSharedCells(AbstractDoubleVector other) {
+  bool _haveSharedCells(DoubleVector other) {
     if (other == null) {
       return false;
     }
@@ -500,58 +500,58 @@ abstract class AbstractDoubleVector extends AbstractVector {
   }
 
   /// Returns `true` if both matrices share at least one identical cell.
-  bool _haveSharedCellsRaw(AbstractDoubleVector other) => false;
+  bool _haveSharedCellsRaw(DoubleVector other) => false;
 
   /// Returns a new view equal to the receiver. The view is a shallow clone.
   /// Use [copy] to construct an independent deep copy rather than a new view.
-  AbstractDoubleVector _view() {
-    return clone() as AbstractDoubleVector;
+  DoubleVector _view() {
+    return clone() as DoubleVector;
   }
 
   /// Returns a new selection view.
-  AbstractDoubleVector _viewSelectionLike(Int32List offsets);
+  DoubleVector _viewSelectionLike(Int32List offsets);
 
   Object clone();
 
-  AbstractDoubleVector operator *(AbstractDoubleVector y) {
+  DoubleVector operator *(DoubleVector y) {
     return copy()..assign(y, func.mult);
   }
 
-  AbstractDoubleVector operator /(AbstractDoubleVector y) {
+  DoubleVector operator /(DoubleVector y) {
     return copy()..assign(y, func.div);
   }
 
-  AbstractDoubleVector operator +(AbstractDoubleVector y) {
+  DoubleVector operator +(DoubleVector y) {
     return copy()..assign(y, func.plus);
   }
 
-  AbstractDoubleVector operator -(AbstractDoubleVector y) {
+  DoubleVector operator -(DoubleVector y) {
     return copy()..assign(y, func.minus);
   }
 
-  AbstractDoubleVector operator >(double b) {
+  DoubleVector operator >(double b) {
     return copy()..apply(func.greaterThan(b));
   }
 
-  AbstractDoubleVector operator <(double b) {
+  DoubleVector operator <(double b) {
     return copy()..apply(func.lessThan(b));
   }
 
-  AbstractDoubleVector operator |(AbstractDoubleVector y) {
+  DoubleVector operator |(DoubleVector y) {
     return copy()..assign(y, func.or);
   }
 
-  AbstractDoubleVector operator &(AbstractDoubleVector y) {
+  DoubleVector operator &(DoubleVector y) {
     return copy()..assign(y, func.and);
   }
 
-  AbstractDoubleVector operator -() => copy()..apply(func.neg);
+  DoubleVector operator -() => copy()..apply(func.neg);
 
   double normInfinity() => dalgo.normInfinity(this);
 
-  AbstractDoubleVector abs() => copy()..apply(func.abs);
+  DoubleVector abs() => copy()..apply(func.abs);
 
-  AbstractDoubleVector pow(num x) {
+  DoubleVector pow(num x) {
     return copy()..apply(func.power(x.toDouble()));
   }
 }

@@ -176,7 +176,7 @@ class SparseCCIntMatrix extends WrapperIntMatrix {
     }
   }
 
-  void copyFrom(AbstractIntMatrix source) {
+  void copyFrom(IntMatrix source) {
     if (source == this) {
       return; // nothing to do
     }
@@ -208,7 +208,7 @@ class SparseCCIntMatrix extends WrapperIntMatrix {
     }
   }
 
-  void assign(final AbstractIntMatrix y, ifunc.IntIntFunction fn) {
+  void assign(final IntMatrix y, ifunc.IntIntFunction fn) {
     checkShape(this, y);
 
     if ((y is SparseCCIntMatrix) && (fn == ifunc.plus)) {
@@ -328,8 +328,8 @@ class SparseCCIntMatrix extends WrapperIntMatrix {
 
   /// Returns a new matrix that has the same elements as this matrix, but is in
   /// a dense form.
-  IntMatrix dense() {
-    var dense = new IntMatrix(rows, columns);
+  DenseIntMatrix dense() {
+    var dense = new DenseIntMatrix(rows, columns);
     forEachNonZero((int i, int j, int value) {
       dense.set(i, j, get(i, j));
       return value;
@@ -393,11 +393,11 @@ class SparseCCIntMatrix extends WrapperIntMatrix {
 
   bool get rowIndexesSorted => _rowIndexesSorted;
 
-  AbstractIntMatrix like2D(int rows, int columns) {
+  IntMatrix like2D(int rows, int columns) {
     return new SparseCCIntMatrix(rows, columns);
   }
 
-  AbstractIntVector like1D(int size) => new SparseIntVector(size);
+  IntVector like1D(int size) => new SparseIntVector(size);
 
   void set(int row, int column, int value) {
     //int k = Sorting.binarySearchFromTo(dcs.i, row, dcs.p[column], dcs.p[column + 1] - 1);
@@ -500,7 +500,7 @@ class SparseCCIntMatrix extends WrapperIntMatrix {
     return buf.toString();
   }
 
-  AbstractIntVector mult(AbstractIntVector y, [AbstractIntVector z = null,
+  IntVector mult(IntVector y, [IntVector z = null,
       final int alpha = 1, int beta = null, final bool transposeA = false]) {
     if (beta == null) {
       beta = z == null ? 1 : 0;
@@ -510,10 +510,10 @@ class SparseCCIntMatrix extends WrapperIntMatrix {
 
     bool ignore = (z == null || transposeA);
     if (z == null) {
-      z = new IntVector(rowsA);
+      z = new DenseIntVector(rowsA);
     }
 
-    if (!(y is IntVector && z is IntVector)) {
+    if (!(y is DenseIntVector && z is DenseIntVector)) {
       return super.mult(y, z, alpha, beta, transposeA);
     }
 
@@ -526,12 +526,12 @@ class SparseCCIntMatrix extends WrapperIntMatrix {
           z.toStringShort());
     }
 
-    IntVector zz = z as IntVector;
+    DenseIntVector zz = z as DenseIntVector;
     Int32List elementsZ = zz._elements;
     int strideZ = zz.stride;
     int zeroZ = zz.index(0);
 
-    IntVector yy = y as IntVector;
+    DenseIntVector yy = y as DenseIntVector;
     Int32List elementsY = yy._elements;
     int strideY = yy.stride;
     int zeroY = yy.index(0);
@@ -583,7 +583,7 @@ class SparseCCIntMatrix extends WrapperIntMatrix {
     return z;
   }
 
-  AbstractIntMatrix multiply(AbstractIntMatrix B, [AbstractIntMatrix C = null,
+  IntMatrix multiply(IntMatrix B, [IntMatrix C = null,
       final int alpha = 1, int beta = null, final bool transposeA = false,
       final bool transposeB = false]) {
     if (beta == null) {
@@ -607,7 +607,7 @@ class SparseCCIntMatrix extends WrapperIntMatrix {
       if (B is SparseCCIntMatrix) {
         C = new SparseCCIntMatrix(rowsA, p, (rowsA * p));
       } else {
-        C = new IntMatrix(rowsA, p);
+        C = new DenseIntMatrix(rowsA, p);
       }
     }
 
@@ -633,20 +633,20 @@ class SparseCCIntMatrix extends WrapperIntMatrix {
       C.apply(ifunc.multiply(beta));
     }
 
-    if ((B is IntMatrix) && (C is IntMatrix)) {
+    if ((B is DenseIntMatrix) && (C is DenseIntMatrix)) {
       SparseCCIntMatrix AA;
       if (transposeA) {
         AA = transpose();
       } else {
         AA = this;
       }
-      IntMatrix BB;
+      DenseIntMatrix BB;
       if (transposeB) {
-        BB = B.dice() as IntMatrix;
+        BB = B.dice() as DenseIntMatrix;
       } else {
         BB = B;
       }
-      IntMatrix CC = C;
+      DenseIntMatrix CC = C;
       Int32List columnPointersA = AA._columnPointers;
       Int32List rowIndexesA = AA._rowIndexes;
       Int32List valuesA = AA._values;
@@ -724,11 +724,11 @@ class SparseCCIntMatrix extends WrapperIntMatrix {
         B = B.dice();
       }
       // cache views
-      var Brows = new List<AbstractIntVector>(columnsA);
+      var Brows = new List<IntVector>(columnsA);
       for (int i = columnsA; --i >= 0;) {
         Brows[i] = B.row(i);
       }
-      var Crows = new List<AbstractIntVector>(rowsA);
+      var Crows = new List<IntVector>(rowsA);
       for (int i = rowsA; --i >= 0;) {
         Crows[i] = C.row(i);
       }
@@ -754,7 +754,7 @@ class SparseCCIntMatrix extends WrapperIntMatrix {
     return C;
   }
 
-  AbstractIntMatrix _getContent() => this;
+  IntMatrix _getContent() => this;
 
   void _insert(int row, int column, int index, int value) {
     var rowIndexesList = new List.from(_rowIndexes);

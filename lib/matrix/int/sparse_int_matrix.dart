@@ -20,9 +20,9 @@ part of cern.colt.matrix.int;
 /// This class offers expected time complexity `O(1)` (i.e. constant time)
 /// for the basic operations `get`, `set`, and `size`. As such this sparse
 /// class is expected to have no worse time complexity than its dense
-/// counterpart [IntMatrix]. However, constant factors are considerably
+/// counterpart [DenseIntMatrix]. However, constant factors are considerably
 /// larger.
-class SparseIntMatrix extends AbstractIntMatrix {
+class SparseIntMatrix extends IntMatrix {
   Map<int, int> _elements;
 
   /// Constructs a matrix with a given number of rows and columns. All
@@ -83,7 +83,7 @@ class SparseIntMatrix extends AbstractIntMatrix {
     return;
   }
 
-  void copyFrom(AbstractIntMatrix source) {
+  void copyFrom(IntMatrix source) {
     // overriden for performance only
     if (source is! SparseIntMatrix) {
       super.copyFrom(source);
@@ -102,7 +102,7 @@ class SparseIntMatrix extends AbstractIntMatrix {
     super.copyFrom(source);
   }
 
-  void assign(final AbstractIntMatrix y, ifunc.IntIntFunction fn) {
+  void assign(final IntMatrix y, ifunc.IntIntFunction fn) {
     if (isView) {
       super.assign(y, fn);
       return;
@@ -212,11 +212,11 @@ class SparseIntMatrix extends AbstractIntMatrix {
     return rowZero + row * rowStride + columnZero + column * columnStride;
   }
 
-  AbstractIntMatrix like2D(int rows, int columns) {
+  IntMatrix like2D(int rows, int columns) {
     return new SparseIntMatrix(rows, columns);
   }
 
-  AbstractIntVector like1D(int size) => new SparseIntVector(size);
+  IntVector like1D(int size) => new SparseIntVector(size);
 
   void set(int row, int column, int value) {
     int index = rowZero + row * rowStride + columnZero + column * columnStride;
@@ -249,7 +249,7 @@ class SparseIntMatrix extends AbstractIntMatrix {
     return buf.toString();
   }
 
-  AbstractIntVector vectorize() {
+  IntVector vectorize() {
     var v = new SparseIntVector(size);
     int idx = 0;
     for (int c = 0; c < columns; c++) {
@@ -261,7 +261,7 @@ class SparseIntMatrix extends AbstractIntMatrix {
     return v;
   }
 
-  AbstractIntVector mult(AbstractIntVector y, [AbstractIntVector z = null, final int alpha = 1, int beta = null, final bool transposeA = false]) {
+  IntVector mult(IntVector y, [IntVector z = null, final int alpha = 1, int beta = null, final bool transposeA = false]) {
     if (beta == null) {
       beta = z == null ? 1 : 0;
     }
@@ -274,10 +274,10 @@ class SparseIntMatrix extends AbstractIntMatrix {
 
     bool ignore = (z == null);
     if (z == null) {
-      z = new IntVector(rowsA);
+      z = new DenseIntVector(rowsA);
     }
 
-    if (!(!isView && y is IntVector && z is IntVector)) {
+    if (!(!isView && y is DenseIntVector && z is DenseIntVector)) {
       return super.mult(y, z, alpha, beta, transposeA);
     }
 
@@ -289,12 +289,12 @@ class SparseIntMatrix extends AbstractIntMatrix {
       z.apply(ifunc.multiply(beta));
     }
 
-    IntVector zz = z as IntVector;
+    DenseIntVector zz = z as DenseIntVector;
     Int32List elementsZ = zz._elements;
     int strideZ = zz.stride;
     int zeroZ = z.index(0);
 
-    IntVector yy = y as IntVector;
+    DenseIntVector yy = y as DenseIntVector;
     Int32List elementsY = yy._elements;
     int strideY = yy.stride;
     int zeroY = y.index(0);
@@ -318,7 +318,7 @@ class SparseIntMatrix extends AbstractIntMatrix {
     return z;
   }
 
-  AbstractIntMatrix multiply(AbstractIntMatrix B, [AbstractIntMatrix C = null, final int alpha = 1, int beta = null, final bool transposeA = false, final bool transposeB = false]) {
+  IntMatrix multiply(IntMatrix B, [IntMatrix C = null, final int alpha = 1, int beta = null, final bool transposeA = false, final bool transposeB = false]) {
     if (beta == null) {
       beta = C == null ? 1 : 0;
     }
@@ -337,7 +337,7 @@ class SparseIntMatrix extends AbstractIntMatrix {
     int p = B.columns;
     bool ignore = (C == null);
     if (C == null) {
-      C = new IntMatrix(rowsA, p);
+      C = new DenseIntMatrix(rowsA, p);
     }
 
     if (B.rows != columnsA) {
@@ -353,11 +353,11 @@ class SparseIntMatrix extends AbstractIntMatrix {
     }
 
     // cache views
-    var Brows = new List<AbstractIntVector>(columnsA);
+    var Brows = new List<IntVector>(columnsA);
     for (int i = columnsA; --i >= 0; ) {
       Brows[i] = B.row(i);
     }
-    var Crows = new List<AbstractIntVector>(rowsA);
+    var Crows = new List<IntVector>(rowsA);
     for (int i = rowsA; --i >= 0; ) {
       Crows[i] = C.row(i);
     }
@@ -430,7 +430,7 @@ class SparseIntMatrix extends AbstractIntMatrix {
     }
   }
 
-  bool _haveSharedCellsRaw(AbstractIntMatrix other) {
+  bool _haveSharedCellsRaw(IntMatrix other) {
     if (other is SelectedSparseIntMatrix) {
       return _elements == other._elements;
     } else if (other is SparseIntMatrix) {
@@ -439,11 +439,11 @@ class SparseIntMatrix extends AbstractIntMatrix {
     return false;
   }
 
-  AbstractIntVector _like1D(int size, int offset, int stride) {
+  IntVector _like1D(int size, int offset, int stride) {
     return new SparseIntVector._internal(size, _elements, offset, stride);
   }
 
-  AbstractIntMatrix _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets) {
+  IntMatrix _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets) {
     return new SelectedSparseIntMatrix(_elements, rowOffsets, columnOffsets, 0);
   }
 
@@ -462,7 +462,7 @@ class SparseIntMatrix extends AbstractIntMatrix {
 /// the same signatures and semantics as its abstract superclass(es) while
 /// introducing no additional functionality. Thus, this class need not be
 /// visible to users.
-class SelectedSparseIntMatrix extends AbstractIntMatrix {
+class SelectedSparseIntMatrix extends IntMatrix {
   Map<int, int> _elements;
 
   /// The offsets of the visible cells of this matrix.
@@ -497,11 +497,11 @@ class SelectedSparseIntMatrix extends AbstractIntMatrix {
     return _offset + _rowOffsets[rowZero + row * rowStride] + _columnOffsets[columnZero + column * columnStride];
   }
 
-  AbstractIntMatrix like2D(int rows, int columns) {
+  IntMatrix like2D(int rows, int columns) {
     return new SparseIntMatrix(rows, columns);
   }
 
-  AbstractIntVector like1D(int size) => new SparseIntVector(size);
+  IntVector like1D(int size) => new SparseIntVector(size);
 
   void set(int row, int column, int value) {
     int index = _offset + _rowOffsets[rowZero + row * rowStride] + _columnOffsets[columnZero + column * columnStride];
@@ -513,7 +513,7 @@ class SelectedSparseIntMatrix extends AbstractIntMatrix {
     }
   }
 
-  AbstractIntVector column(int column) {
+  IntVector column(int column) {
     checkColumn(this, column);
     int viewSize = rows;
     int viewZero = rowZero;
@@ -523,7 +523,7 @@ class SelectedSparseIntMatrix extends AbstractIntMatrix {
     return new SelectedSparseIntVector._internal(viewSize, _elements, viewZero, viewStride, viewOffsets, viewOffset);
   }
 
-  AbstractIntVector row(int row) {
+  IntVector row(int row) {
     checkRow(this, row);
     int viewSize = columns;
     int viewZero = columnZero;
@@ -537,7 +537,7 @@ class SelectedSparseIntMatrix extends AbstractIntMatrix {
 
   int rowOffset(int absRank) => _rowOffsets[absRank];
 
-  bool _haveSharedCellsRaw(AbstractIntMatrix other) {
+  bool _haveSharedCellsRaw(IntMatrix other) {
     if (other is SelectedSparseIntMatrix) {
       return _elements == other._elements;
     } else if (other is SparseIntMatrix) {
@@ -546,12 +546,12 @@ class SelectedSparseIntMatrix extends AbstractIntMatrix {
     return false;
   }
 
-  AbstractIntVector _like1D(int size, int zero, int stride) {
+  IntVector _like1D(int size, int zero, int stride) {
     // never called since row() and column() are overridden.
     throw new Error();
   }
 
-  AbstractIntMatrix dice() {
+  IntMatrix dice() {
     var v = _view();
     vDice(v);
     Int32List tmp = v._rowOffsets;
@@ -561,7 +561,7 @@ class SelectedSparseIntMatrix extends AbstractIntMatrix {
     return v;
   }
 
-  AbstractIntMatrix _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets) {
+  IntMatrix _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets) {
     return new SelectedSparseIntMatrix(this._elements, rowOffsets, columnOffsets, this._offset);
   }
 

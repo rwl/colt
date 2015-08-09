@@ -17,8 +17,8 @@ part of cern.colt.matrix.double;
 /// are accessed via `[row,column]` coordinates. Legal coordinates range
 /// from `[0,0]` to `[rows-1,columns-1]`. Any attempt to access
 /// an element at a coordinate outside this rangewill throw a [RangeError].
-abstract class AbstractDoubleMatrix extends AbstractMatrix {
-  AbstractDoubleMatrix(int rows, int columns, [int rowZero = 0,
+abstract class DoubleMatrix extends AbstractMatrix {
+  DoubleMatrix(int rows, int columns, [int rowZero = 0,
       int columnZero = 0, int rowStride = null, int columnStride = 1,
       bool isNoView = true])
       : super(rows, columns, rowZero, columnZero, rowStride, columnStride,
@@ -105,12 +105,12 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
   /// If both matrices share the same cells (as is the case if they are views
   /// derived from the same matrix) and intersect in an ambiguous way, then
   /// replaces as if using an intermediate auxiliary deep copy of [other].
-  void copyFrom(AbstractDoubleMatrix other) {
+  void copyFrom(DoubleMatrix other) {
     if (other == this) {
       return;
     }
     checkShape(this, other);
-    AbstractDoubleMatrix source;
+    DoubleMatrix source;
     if (_haveSharedCells(other)) {
       source = other.copy();
     } else {
@@ -142,7 +142,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
   ///      m1 == 2 x 2 matrix
   ///      1   1
   ///      16 729
-  void assign(final AbstractDoubleMatrix y, final DoubleDoubleFunction fn) {
+  void assign(final DoubleMatrix y, final DoubleDoubleFunction fn) {
     checkShape(this, y);
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < columns; c++) {
@@ -163,17 +163,17 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
   }
 
   /// Constructs and returns a deep copy of the receiver.
-  AbstractDoubleMatrix copy() => like()..copyFrom(this);
+  DoubleMatrix copy() => like()..copyFrom(this);
 
   /// Returns the elements of this matrix.
   dynamic get elements;
 
   /// Compares this object against the specified object. The result is
   /// `true` if and only if the argument is not `null` and is at least
-  /// a [AbstractDoubleMatrix] object that has the same number of columns
+  /// a [DoubleMatrix] object that has the same number of columns
   /// and rows as the receiver and has exactly the same values at the same
   /// coordinates.
-  bool equals(AbstractDoubleMatrix obj) {
+  bool equals(DoubleMatrix obj) {
     if (identical(this, obj)) {
       return true;
     }
@@ -332,15 +332,15 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
 
   /// Construct and returns a new empty matrix of the same dynamic type
   /// as the receiver, having the same number of rows and columns.
-  AbstractDoubleMatrix like() => like2D(rows, columns);
+  DoubleMatrix like() => like2D(rows, columns);
 
   /// Construct and returns a new empty matrix of the same dynamic type
   /// as the receiver, having the specified number of rows and columns.
-  AbstractDoubleMatrix like2D(int rows, int columns);
+  DoubleMatrix like2D(int rows, int columns);
 
   /// Construct and returns a new 1-d matrix of the corresponding dynamic
   /// type, entirelly independent of the receiver.
-  AbstractDoubleVector like1D(int size);
+  DoubleVector like1D(int size);
 
   /// Sets the matrix cell at coordinate `[row,column]` to the specified
   /// value.
@@ -366,7 +366,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
 
   /// Constructs and returns a new *slice view* representing the rows of
   /// the given column.
-  AbstractDoubleVector column(int column) {
+  DoubleVector column(int column) {
     checkColumn(this, column);
     int viewSize = rows;
     int viewZero = index(0, column);
@@ -376,7 +376,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
 
   /// Constructs and returns a new *flip view* along the column axis. What
   /// used to be column `0` is now column `columns-1`
-  AbstractDoubleMatrix columnFlip() {
+  DoubleMatrix columnFlip() {
     var v = _view();
     vColumnFlip(v);
     return v;
@@ -399,18 +399,18 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
   ///     2 x 3 matrix:
   ///     1, 2, 3
   ///     4, 5, 6
-  AbstractDoubleMatrix dice() {
+  DoubleMatrix dice() {
     var v = _view();
     vDice(v);
     return v;
   }
 
   /// Synonym for [dice].
-  AbstractDoubleMatrix get T => dice();
+  DoubleMatrix get T => dice();
 
   /// Constructs and returns a new *sub-range view* that is a
   /// `height x width` sub matrix starting at `[row,column]`.
-  AbstractDoubleMatrix part(int row, int column, int height, int width) {
+  DoubleMatrix part(int row, int column, int height, int width) {
     var v = _view();
     vBox(v, row, column, height, width);
     return v;
@@ -418,7 +418,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
 
   /// Constructs and returns a new *slice view* representing the columns
   /// of the given row.
-  AbstractDoubleVector row(int r) {
+  DoubleVector row(int r) {
     checkRow(this, r);
     int viewSize = columns;
     int viewZero = index(r, 0);
@@ -427,11 +427,11 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
   }
 
   // Synonymous with [row].
-  AbstractDoubleVector operator [](int r) => row(r);
+  DoubleVector operator [](int r) => row(r);
 
   /// Constructs and returns a new *flip view* along the row axis. What
   /// used to be row `0` is now row `rows-1`.
-  AbstractDoubleMatrix rowFlip() {
+  DoubleMatrix rowFlip() {
     var v = _view();
     vRowFlip(v);
     return v;
@@ -457,7 +457,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
   ///
   /// To indicate "all" rows or "all columns", simply set the respective
   /// parameter to `null`.
-  AbstractDoubleMatrix select(Int32List rowIndexes, Int32List columnIndexes) {
+  DoubleMatrix select(Int32List rowIndexes, Int32List columnIndexes) {
     // check for "all"
     if (rowIndexes == null) {
       rowIndexes = new Int32List(rows);
@@ -490,7 +490,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
   /// `this.rows/rowStride` rows and `this.columns/columnStride` columns
   /// holding cells `this.get(i*rowStride,j*columnStride)` for all
   /// `i = 0..rows/rowStride - 1, j = 0..columns/columnStride - 1`.
-  AbstractDoubleMatrix strides(int rowStride, int columnStride) {
+  DoubleMatrix strides(int rowStride, int columnStride) {
     var v = _view();
     vStrides(v, rowStride, columnStride);
     return v;
@@ -499,13 +499,13 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
   /// Linear algebraic matrix-vector multiplication;
   /// `z = alpha * A * y + beta*z`.
   /// `z[i] = alpha*Sum(A[i,j] * y[j]) + beta*z[i], i=0..A.rows-1, j=0..y.size-1`.
-  AbstractDoubleVector mult(final AbstractDoubleVector y,
-      [AbstractDoubleVector z = null, double alpha = 1.0, double beta = 0.0,
+  DoubleVector mult(final DoubleVector y,
+      [DoubleVector z = null, double alpha = 1.0, double beta = 0.0,
       bool transposeA = false]) {
     if (transposeA) {
       return dice().mult(y, z, alpha, beta, false);
     }
-    AbstractDoubleVector zz;
+    DoubleVector zz;
     if (z == null) {
       zz = y.like1D(rows);
     } else {
@@ -535,8 +535,8 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
   /// `C[i,j] = alpha*Sum(A[i,k] * B[k,j]) + beta*C[i,j], k=0..n-1`.
   ///
   /// Matrix shapes: `A(m x n), B(n x p), C(m x p)`.
-  AbstractDoubleMatrix multiply(final AbstractDoubleMatrix B,
-      [AbstractDoubleMatrix C = null, double alpha = 1.0, double beta = 0.0,
+  DoubleMatrix multiply(final DoubleMatrix B,
+      [DoubleMatrix C = null, double alpha = 1.0, double beta = 0.0,
       bool transposeA = false, bool transposeB = false]) {
     if (transposeA) {
       return dice().multiply(B, C, alpha, beta, false, transposeB);
@@ -548,7 +548,7 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
     var m = rows;
     var n = columns;
     var p = B.columns;
-    AbstractDoubleMatrix CC;
+    DoubleMatrix CC;
     if (C == null) {
       CC = like2D(m, p);
     } else {
@@ -593,10 +593,10 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
 
   /// Returns the content of this matrix if it is a wrapper; or `this`
   /// otherwise. Override this method in wrappers.
-  AbstractDoubleMatrix _getContent() => this;
+  DoubleMatrix _getContent() => this;
 
   /// Returns `true` if both matrices share at least one identical cell.
-  bool _haveSharedCells(AbstractDoubleMatrix other) {
+  bool _haveSharedCells(DoubleMatrix other) {
     if (other == null) {
       return false;
     }
@@ -607,39 +607,39 @@ abstract class AbstractDoubleMatrix extends AbstractMatrix {
   }
 
   /// Returns `true` if both matrices share at least one identical cell.
-  bool _haveSharedCellsRaw(AbstractDoubleMatrix other) => false;
+  bool _haveSharedCellsRaw(DoubleMatrix other) => false;
 
   /// Construct and returns a new 1-d matrix of the corresponding dynamic
   /// type, sharing the same cells.
-  AbstractDoubleVector _like1D(int size, int zero, int stride);
+  DoubleVector _like1D(int size, int zero, int stride);
 
   /// Constructs and returns a new view equal to the receiver. The view is a
   /// shallow clone.
-  AbstractDoubleMatrix _view() => clone() as AbstractDoubleMatrix;
+  DoubleMatrix _view() => clone() as DoubleMatrix;
 
   /// Construct and returns a new selection view.
-  AbstractDoubleMatrix _viewSelectionLike(
+  DoubleMatrix _viewSelectionLike(
       Int32List rowOffsets, Int32List columnOffsets);
 
   Object clone();
 
-  AbstractDoubleMatrix operator *(AbstractDoubleMatrix y) {
+  DoubleMatrix operator *(DoubleMatrix y) {
     return copy()..assign(y, func.mult);
   }
 
-  AbstractDoubleMatrix operator /(AbstractDoubleMatrix y) {
+  DoubleMatrix operator /(DoubleMatrix y) {
     return copy()..assign(y, func.div);
   }
 
-  AbstractDoubleMatrix operator +(AbstractDoubleMatrix y) {
+  DoubleMatrix operator +(DoubleMatrix y) {
     return copy()..assign(y, func.plus);
   }
 
-  AbstractDoubleMatrix operator -(AbstractDoubleMatrix y) {
+  DoubleMatrix operator -(DoubleMatrix y) {
     return copy()..assign(y, func.minus);
   }
 
-  AbstractDoubleMatrix operator -() {
+  DoubleMatrix operator -() {
     return copy()..apply(func.neg);
   }
 }

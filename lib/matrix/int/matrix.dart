@@ -39,7 +39,7 @@ import 'property.dart' as iprop;
 
 import '../formatter.dart';
 
-import '../double/matrix.dart' show DoubleVector;
+import '../double/matrix.dart' show DenseDoubleVector;
 
 part 'abstract_int_vector.dart';
 part 'abstract_int_matrix.dart';

@@ -104,7 +104,7 @@ class DiagonalIntMatrix extends WrapperIntMatrix {
     return;
   }
 
-  void copyFrom(AbstractIntMatrix source) {
+  void copyFrom(IntMatrix source) {
     // overriden for performance only
     if (source == this) {
       return; // nothing to do
@@ -125,7 +125,7 @@ class DiagonalIntMatrix extends WrapperIntMatrix {
     }
   }
 
-  void assign(final AbstractIntMatrix y, final ifunc.IntIntFunction fn) {
+  void assign(final IntMatrix y, final ifunc.IntIntFunction fn) {
     checkShape(this, y);
     if (y is DiagonalIntMatrix) {
       DiagonalIntMatrix other = y;
@@ -185,7 +185,7 @@ class DiagonalIntMatrix extends WrapperIntMatrix {
 
   Object get elements => _elements;
 
-  bool equals(AbstractIntMatrix obj) {
+  bool equals(IntMatrix obj) {
     if (obj is DiagonalIntMatrix) {
       DiagonalIntMatrix other = obj;
       if (this == obj) {
@@ -305,11 +305,11 @@ class DiagonalIntMatrix extends WrapperIntMatrix {
     }
   }
 
-  AbstractIntMatrix like2D(int rows, int columns) {
+  IntMatrix like2D(int rows, int columns) {
     return new SparseIntMatrix(rows, columns);
   }
 
-  AbstractIntVector like1D(int size) => new SparseIntVector(size);
+  IntVector like1D(int size) => new SparseIntVector(size);
 
   void set(int row, int column, int value) {
     if (_dindex >= 0) {
@@ -335,7 +335,7 @@ class DiagonalIntMatrix extends WrapperIntMatrix {
     }
   }
 
-  AbstractIntVector mult(AbstractIntVector y, [AbstractIntVector z = null,
+  IntVector mult(IntVector y, [IntVector z = null,
       final int alpha = 1, int beta = null, final bool transposeA = false]) {
     if (beta == null) {
       beta = z == null ? 1 : 0;
@@ -349,10 +349,10 @@ class DiagonalIntMatrix extends WrapperIntMatrix {
 
     bool ignore = (z == null);
     if (z == null) {
-      z = new IntVector(rowsA);
+      z = new DenseIntVector(rowsA);
     }
 
-    if (!(!isView && y is IntVector && z is IntVector)) {
+    if (!(!isView && y is DenseIntVector && z is DenseIntVector)) {
       return super.mult(y, z, alpha, beta, transposeA);
     }
 
@@ -369,12 +369,12 @@ class DiagonalIntMatrix extends WrapperIntMatrix {
       z.apply(ifunc.multiply(beta));
     }
 
-    IntVector zz = z as IntVector;
+    DenseIntVector zz = z as DenseIntVector;
     Int32List elementsZ = zz._elements;
     int strideZ = zz.stride;
     int zeroZ = z.index(0);
 
-    IntVector yy = y as IntVector;
+    DenseIntVector yy = y as DenseIntVector;
     Int32List elementsY = yy._elements;
     int strideY = yy.stride;
     int zeroY = y.index(0);
@@ -410,7 +410,7 @@ class DiagonalIntMatrix extends WrapperIntMatrix {
     return z;
   }
 
-  AbstractIntMatrix _getContent() => this;
+  IntMatrix _getContent() => this;
 
   Object clone() => new DiagonalIntMatrix(rows, columns, _dindex);
 }

@@ -12,9 +12,9 @@ part of cern.colt.matrix.int;
 
 /// Abstract base class for 1-d matrices (aka vectors) holding [int]
 /// elements.
-abstract class AbstractIntVector
+abstract class IntVector
     extends AbstractVector /*with ListMixin<int>*/ {
-  AbstractIntVector(int size,
+  IntVector(int size,
       [int zero = 0, int stride = 1, bool isNoView = true])
       : super(size, zero, stride, isNoView);
 
@@ -79,12 +79,12 @@ abstract class AbstractIntVector
   /// same cells (as is the case if they are views derived from the same
   /// matrix) and intersect in an ambiguous way, then replaces *as if*
   /// using an intermediate auxiliary deep copy of [other].
-  void copyFrom(AbstractIntVector other) {
+  void copyFrom(IntVector other) {
     if (other == this) {
       return;
     }
     checkSize(this, other);
-    AbstractIntVector other_loc;
+    IntVector other_loc;
     if (_haveSharedCells(other)) {
       other_loc = other.copy();
     } else {
@@ -105,7 +105,7 @@ abstract class AbstractIntVector
   ///     m1.assign(m2, F.pow);
   ///     -->
   ///     m1 == 1 1 16 729
-  void assign(final AbstractIntVector y, final ifunc.IntIntFunction fn) {
+  void assign(final IntVector y, final ifunc.IntIntFunction fn) {
     checkSize(this, y);
     for (int i = 0; i < size; i++) {
       set(i, fn(get(i), y.get(i)));
@@ -122,8 +122,8 @@ abstract class AbstractIntVector
   }
 
   /// Constructs and returns a deep copy of the receiver.
-  AbstractIntVector copy() {
-    AbstractIntVector copy = like();
+  IntVector copy() {
+    IntVector copy = like();
     copy.copyFrom(this);
     return copy;
   }
@@ -134,14 +134,14 @@ abstract class AbstractIntVector
   /// `true` if and only if the argument is not `null` and is at least
   /// a `IntVector` object that has the same sizes as the receiver and
   /// has exactly the same values at the same indexes.
-  bool equals(AbstractIntVector obj) {
+  bool equals(IntVector obj) {
     if (identical(this, obj)) {
       return true;
     }
     if (obj == null) {
       return false;
     }
-    if (!(obj is AbstractIntVector)) {
+    if (!(obj is IntVector)) {
       return false;
     }
 
@@ -156,7 +156,7 @@ abstract class AbstractIntVector
 
   /// Returns the content of this matrix if it is a wrapper; or `this`
   /// otherwise. Override this method in wrappers.
-  AbstractIntVector _getContent() => this;
+  IntVector _getContent() => this;
 
   /// Fills the coordinates and values of cells having negative values into
   /// the specified lists. Fills into the lists, starting at index 0. After
@@ -321,7 +321,7 @@ abstract class AbstractIntVector
   int get(int index);
 
   /// Returns `true` if both matrices share at least one identical cell.
-  bool _haveSharedCells(AbstractIntVector other) {
+  bool _haveSharedCells(IntVector other) {
     if (other == null) {
       return false;
     }
@@ -332,19 +332,19 @@ abstract class AbstractIntVector
   }
 
   /// Returns `true` if both matrices share at least one identical cell.
-  bool _haveSharedCellsRaw(AbstractIntVector other) => false;
+  bool _haveSharedCellsRaw(IntVector other) => false;
 
   /// Construct and returns a new empty matrix of the same dynamic type
   /// as the receiver, having the same size.
-  AbstractIntVector like() => like1D(size);
+  IntVector like() => like1D(size);
 
   /// Construct and returns a new empty matrix of the same dynamic type
   /// as the receiver, having the specified size.
-  AbstractIntVector like1D(int size);
+  IntVector like1D(int size);
 
   /// Construct and returns a new 2-d matrix of the corresponding dynamic
   /// type, entirelly independent of the receiver.
-  AbstractIntMatrix like2D(int rows, int columns);
+  IntMatrix like2D(int rows, int columns);
 
   /// Return the maximum value of this matrix together with its location.
   IntVectorLocation max() {
@@ -378,7 +378,7 @@ abstract class AbstractIntVector
 
   /// Returns new IntMatrix of size rows x columns whose elements are taken
   /// column-wise from this matrix.
-  AbstractIntMatrix reshape(int rows, int columns);
+  IntMatrix reshape(int rows, int columns);
 
   /// Sets the matrix cell at coordinate `index` to the specified value.
   void operator []=(int index, int value) {
@@ -417,11 +417,11 @@ abstract class AbstractIntVector
   }
 
   /// Constructs and returns a new view equal to the receiver.
-  AbstractIntVector _view() => clone() as AbstractIntVector;
+  IntVector _view() => clone() as IntVector;
 
   /// Constructs and returns a new *flip view*. What used to be index
   /// `0` is now index `size-1`.
-  AbstractIntVector flip() {
+  IntVector flip() {
     var v = _view();
     vFlip(v);
     return v;
@@ -429,7 +429,7 @@ abstract class AbstractIntVector
 
   /// Constructs and returns a new *sub-range view* that is a [width]
   /// sub matrix starting at [index].
-  AbstractIntVector part(int index, int width) {
+  IntVector part(int index, int width) {
     var v = _view();
     vPart(v, index, width);
     return v;
@@ -447,7 +447,7 @@ abstract class AbstractIntVector
   ///     indexes  = (0,2,4,2)
   ///     -->
   ///     view     = (0,8,7,8)
-  AbstractIntVector select(Int32List indexes) {
+  IntVector select(Int32List indexes) {
     // check for "all"
     if (indexes == null) {
       indexes = new Int32List(size);
@@ -465,11 +465,11 @@ abstract class AbstractIntVector
   }
 
   /// Construct and returns a new selection view.
-  AbstractIntVector _viewSelectionLike(Int32List offsets);
+  IntVector _viewSelectionLike(Int32List offsets);
 
   /// Constructs and returns a new *stride view* which is a sub matrix
   /// consisting of every i-th cell.
-  AbstractIntVector strides(int stride) {
+  IntVector strides(int stride) {
     var v = _view();
     vStride(v, stride);
     return v;
@@ -478,7 +478,7 @@ abstract class AbstractIntVector
   /// Returns the dot product of two vectors x and y, which is
   /// `Sum(x[i]*y[i])`. Where `x == this`. Operates on cells at
   /// indexes `from .. Min(size(),y.size(),from+length)-1`.
-  int dot(final AbstractIntVector y, [final int from = 0, int length = null]) {
+  int dot(final IntVector y, [final int from = 0, int length = null]) {
     if (length == null) {
       length = size;
     }
@@ -513,15 +513,15 @@ abstract class AbstractIntVector
 
   Object clone();
 
-  AbstractIntVector operator &(AbstractIntVector a) {
+  IntVector operator &(IntVector a) {
     return copy()..assign(a, ifunc.and);
   }
 
-  AbstractIntVector operator |(AbstractIntVector a) {
+  IntVector operator |(IntVector a) {
     return copy()..assign(a, ifunc.or);
   }
 
-  AbstractIntVector operator ~() {
+  IntVector operator ~() {
     return copy()..apply(ifunc.not);
   }
 }

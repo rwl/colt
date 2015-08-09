@@ -2,9 +2,9 @@ part of cern.colt.matrix.int.test;
 
 const SIZE = 2 * 17 * 5;
 
-testAbstractIntVector(String kind, AbstractIntVector make(int size)) {
-  group("AbstractIntVector ($kind)", () {
-    AbstractIntVector A, B;
+testIntVector(String kind, IntVector make(int size)) {
+  group("IntVector ($kind)", () {
+    IntVector A, B;
     setUp(() {
       A = make(SIZE);
       B = make(SIZE);
@@ -43,7 +43,7 @@ testAbstractIntVector(String kind, AbstractIntVector make(int size)) {
     });
 
     test('apply', () {
-      AbstractIntVector Acopy = A.copy();
+      IntVector Acopy = A.copy();
       A.apply(ifunc.neg);
       for (int i = 0; i < A.size; i++) {
         int expected = -Acopy.get(i);
@@ -60,7 +60,7 @@ testAbstractIntVector(String kind, AbstractIntVector make(int size)) {
     });
 
     test('assign', () {
-      AbstractIntVector Acopy = A.copy();
+      IntVector Acopy = A.copy();
       A.assign(B, ifunc.plus);
       for (int i = 0; i < A.size; i++) {
         expect(Acopy.get(i) + B.get(i), equals(A.get(i)));
@@ -163,7 +163,7 @@ testAbstractIntVector(String kind, AbstractIntVector make(int size)) {
     test('reshape', () {
       int rows = 10;
       int columns = 17;
-      AbstractIntMatrix B = A.reshape(rows, columns);
+      IntMatrix B = A.reshape(rows, columns);
       int idx = 0;
       for (int c = 0; c < columns; c++) {
         for (int r = 0; r < rows; r++) {
@@ -173,7 +173,7 @@ testAbstractIntVector(String kind, AbstractIntVector make(int size)) {
     });
 
     test('flip', () {
-      AbstractIntVector b = A.flip();
+      IntVector b = A.flip();
       expect(A.size, b.size);
       for (int i = 0; i < A.size; i++) {
         expect(A.get(i), equals(b.get(A.size - 1 - i)));
@@ -181,7 +181,7 @@ testAbstractIntVector(String kind, AbstractIntVector make(int size)) {
     });
 
     test('part', () {
-      AbstractIntVector b = A.part(15, 11);
+      IntVector b = A.part(15, 11);
       for (int i = 0; i < 11; i++) {
         expect(A.get(15 + i), equals(b.get(i)));
       }
@@ -189,7 +189,7 @@ testAbstractIntVector(String kind, AbstractIntVector make(int size)) {
 
     test('select', () {
       final indexes = new Int32List.fromList([5, 11, 22, 37, 101]);
-      AbstractIntVector b = A.select(indexes);
+      IntVector b = A.select(indexes);
       for (int i = 0; i < indexes.length; i++) {
         expect(A.get(indexes[i]), equals(b.get(i)));
       }
@@ -197,7 +197,7 @@ testAbstractIntVector(String kind, AbstractIntVector make(int size)) {
 
     test('strides', () {
       int stride = 3;
-      AbstractIntVector b = A.strides(stride);
+      IntVector b = A.strides(stride);
       for (int i = 0; i < b.size; i++) {
         expect(A.get(i * stride), equals(b.get(i)));
       }

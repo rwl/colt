@@ -115,7 +115,7 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
     }
   }
 
-  void copyFrom(AbstractComplexMatrix source) {
+  void copyFrom(ComplexMatrix source) {
     // overriden for performance only
     if (source == this) {
       return; // nothing to do
@@ -137,7 +137,7 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
     }
   }
 
-  void assign(final AbstractComplexMatrix y,
+  void assign(final ComplexMatrix y,
       final cfunc.ComplexComplexComplexFunction fn) {
     checkShape(this, y);
     if (y is DiagonalComplexMatrix) {
@@ -220,7 +220,7 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
 
   Object get elements => _elements;
 
-  bool equals(AbstractComplexMatrix obj) {
+  bool equals(ComplexMatrix obj) {
     if (obj is DiagonalComplexMatrix) {
       DiagonalComplexMatrix other = obj;
       double epsilon = EPSILON;
@@ -298,11 +298,11 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
     }
   }
 
-  AbstractComplexMatrix like2D(int rows, int columns) {
+  ComplexMatrix like2D(int rows, int columns) {
     return new SparseComplexMatrix(rows, columns);
   }
 
-  AbstractComplexVector like1D(int size) => new SparseComplexVector(size);
+  ComplexVector like1D(int size) => new SparseComplexVector(size);
 
   void set(int row, int column, Complex value) {
     if (_dindex >= 0) {
@@ -356,8 +356,8 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
     }
   }
 
-  AbstractComplexVector mult(AbstractComplexVector y,
-      [AbstractComplexVector z = null, Complex alpha = null,
+  ComplexVector mult(ComplexVector y,
+      [ComplexVector z = null, Complex alpha = null,
       Complex beta = null, bool transposeA = false]) {
     if (alpha == null) {
       alpha = Complex.ONE;
@@ -374,10 +374,10 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
 
     bool ignore = (z == null);
     if (z == null) {
-      z = new ComplexVector(rowsA);
+      z = new DenseComplexVector(rowsA);
     }
 
-    if (!(!isView && y is ComplexVector && z is ComplexVector)) {
+    if (!(!isView && y is DenseComplexVector && z is DenseComplexVector)) {
       return super.mult(y, z, alpha, beta, transposeA);
     }
 
@@ -394,12 +394,12 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
       z.apply(cfunc.multiply(beta));
     }
 
-    ComplexVector zz = z as ComplexVector;
+    DenseComplexVector zz = z as DenseComplexVector;
     Float64List elementsZ = zz._elements;
     int strideZ = zz.stride;
     int zeroZ = z.index(0);
 
-    ComplexVector yy = y as ComplexVector;
+    DenseComplexVector yy = y as DenseComplexVector;
     Float64List elementsY = yy._elements;
     int strideY = yy.stride;
     int zeroY = y.index(0);
@@ -455,7 +455,7 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
     return z;
   }
 
-  AbstractComplexMatrix _getContent() => this;
+  ComplexMatrix _getContent() => this;
 
   Object clone() {
     return new DiagonalComplexMatrix._internal(

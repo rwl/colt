@@ -12,12 +12,12 @@ part of cern.colt.matrix.complex;
 
 /// 2-d matrix holding `complex` elements; either a view wrapping another
 /// matrix or a matrix whose views are wrappers.
-class WrapperComplexMatrix extends AbstractComplexMatrix {
-  AbstractComplexMatrix _content;
+class WrapperComplexMatrix extends ComplexMatrix {
+  ComplexMatrix _content;
 
   WrapperComplexMatrix._(int rows, int columns) : super(rows, columns);
 
-  WrapperComplexMatrix._wrap(AbstractComplexMatrix newContent)
+  WrapperComplexMatrix._wrap(ComplexMatrix newContent)
       : super(newContent.rows, newContent.columns) {
     _content = newContent;
   }
@@ -43,7 +43,7 @@ class WrapperComplexMatrix extends AbstractComplexMatrix {
 
   dynamic get elements => _content.elements;
 
-  bool equals(AbstractComplexMatrix obj) {
+  bool equals(ComplexMatrix obj) {
     if (_content is DiagonalComplexMatrix && obj is DiagonalComplexMatrix) {
       DiagonalComplexMatrix other = obj;
       int dlength = (_content as DiagonalComplexMatrix)._dlength;
@@ -86,11 +86,11 @@ class WrapperComplexMatrix extends AbstractComplexMatrix {
 
   Complex get(int row, int column) => _content.get(row, column);
 
-  AbstractComplexMatrix like2D(int rows, int columns) {
+  ComplexMatrix like2D(int rows, int columns) {
     return _content.like2D(rows, columns);
   }
 
-  AbstractComplexVector like1D(int size) => _content.like1D(size);
+  ComplexVector like1D(int size) => _content.like1D(size);
 
   void set(int row, int column, Complex value) {
     _content.set(row, column, value);
@@ -100,9 +100,9 @@ class WrapperComplexMatrix extends AbstractComplexMatrix {
     _content.setParts(row, column, re, im);
   }
 
-  AbstractComplexVector column(int column) => dice().row(column);
+  ComplexVector column(int column) => dice().row(column);
 
-  AbstractComplexMatrix columnFlip() {
+  ComplexMatrix columnFlip() {
     if (columns == 0) {
       return this;
     }
@@ -111,7 +111,7 @@ class WrapperComplexMatrix extends AbstractComplexMatrix {
     return view;
   }
 
-  AbstractComplexMatrix dice() {
+  ComplexMatrix dice() {
     var view = new DiceWrapperComplexMatrix(this);
     setRows(view, columns);
     setColumns(view, rows);
@@ -119,7 +119,7 @@ class WrapperComplexMatrix extends AbstractComplexMatrix {
     return view;
   }
 
-  AbstractComplexMatrix part(
+  ComplexMatrix part(
       final int row, final int column, int height, int width) {
     checkBox(this, row, column, height, width);
     var view = new PartWrapperComplexMatrix(this, row, column);
@@ -129,12 +129,12 @@ class WrapperComplexMatrix extends AbstractComplexMatrix {
     return view;
   }
 
-  AbstractComplexVector row(int row) {
+  ComplexVector row(int row) {
     checkRow(this, row);
     return new DelegateComplexVector(this, row);
   }
 
-  AbstractComplexMatrix rowFlip() {
+  ComplexMatrix rowFlip() {
     if (rows == 0) {
       return this;
     }
@@ -143,7 +143,7 @@ class WrapperComplexMatrix extends AbstractComplexMatrix {
     return view;
   }
 
-  AbstractComplexMatrix select(Int32List rowIndexes, Int32List columnIndexes) {
+  ComplexMatrix select(Int32List rowIndexes, Int32List columnIndexes) {
     // check for "all"
     if (rowIndexes == null) {
       rowIndexes = new Int32List(rows);
@@ -170,7 +170,7 @@ class WrapperComplexMatrix extends AbstractComplexMatrix {
     return view;
   }
 
-  AbstractComplexMatrix strides(final int rowStride, final int columnStride) {
+  ComplexMatrix strides(final int rowStride, final int columnStride) {
     if (rowStride <= 0 || columnStride <= 0) {
       throw new RangeError("illegal stride");
     }
@@ -185,18 +185,18 @@ class WrapperComplexMatrix extends AbstractComplexMatrix {
     return view;
   }
 
-  AbstractComplexMatrix _getContent() => _content;
+  ComplexMatrix _getContent() => _content;
 
-  AbstractComplexVector _like1D(int size, int offset, int stride) {
+  ComplexVector _like1D(int size, int offset, int stride) {
     throw new Error(); // should never get called
   }
 
-  AbstractComplexMatrix _viewSelectionLike(
+  ComplexMatrix _viewSelectionLike(
       Int32List rowOffsets, Int32List columnOffsets) {
     throw new Error(); // should never be called
   }
 
-  AbstractDoubleMatrix imaginary() {
+  DoubleMatrix imaginary() {
     var Im = new LargeDoubleMatrix(rows, columns);
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < columns; c++) {
@@ -206,7 +206,7 @@ class WrapperComplexMatrix extends AbstractComplexMatrix {
     return Im;
   }
 
-  AbstractDoubleMatrix real() {
+  DoubleMatrix real() {
     var Re = new LargeDoubleMatrix(rows, columns);
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < columns; c++) {
@@ -220,7 +220,7 @@ class WrapperComplexMatrix extends AbstractComplexMatrix {
 }
 
 class ColumnFlipWrapperComplexMatrix extends WrapperComplexMatrix {
-  ColumnFlipWrapperComplexMatrix(AbstractComplexMatrix newContent)
+  ColumnFlipWrapperComplexMatrix(ComplexMatrix newContent)
       : super._wrap(newContent);
 
   Complex get(int row, int column) {
@@ -253,7 +253,7 @@ class ColumnFlipWrapperComplexMatrix extends WrapperComplexMatrix {
 }
 
 class DiceWrapperComplexMatrix extends WrapperComplexMatrix {
-  DiceWrapperComplexMatrix(AbstractComplexMatrix newContent)
+  DiceWrapperComplexMatrix(ComplexMatrix newContent)
       : super._wrap(newContent);
 
   Complex get(int row, int column) {
@@ -290,7 +290,7 @@ class PartWrapperComplexMatrix extends WrapperComplexMatrix {
   final int _column;
 
   PartWrapperComplexMatrix(
-      AbstractComplexMatrix newContent, int row, int column)
+      ComplexMatrix newContent, int row, int column)
       : super._wrap(newContent),
         _row = row,
         _column = column;
@@ -325,7 +325,7 @@ class PartWrapperComplexMatrix extends WrapperComplexMatrix {
 }
 
 class RowWrapperComplexMatrix extends WrapperComplexMatrix {
-  RowWrapperComplexMatrix(AbstractComplexMatrix newContent)
+  RowWrapperComplexMatrix(ComplexMatrix newContent)
       : super._wrap(newContent);
 
   Complex get(int row, int column) {
@@ -362,7 +362,7 @@ class SelectionWrapperComplexMatrix extends WrapperComplexMatrix {
   final Int32List rix;
 
   SelectionWrapperComplexMatrix(
-      AbstractComplexMatrix newContent, Int32List cix, Int32List rix)
+      ComplexMatrix newContent, Int32List cix, Int32List rix)
       : super._wrap(newContent),
         cix = cix,
         rix = rix;
@@ -401,7 +401,7 @@ class StridesWrapperComplexMatrix extends WrapperComplexMatrix {
   final int _columnStride;
 
   StridesWrapperComplexMatrix(
-      AbstractComplexMatrix newContent, int rowStride, int columnStride)
+      ComplexMatrix newContent, int rowStride, int columnStride)
       : super._wrap(newContent),
         _rowStride = rowStride,
         _columnStride = columnStride;

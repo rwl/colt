@@ -14,28 +14,28 @@ part of cern.colt.matrix.double;
 ///
 /// Internally holds one single contigous one-dimensional array, addressed in row
 /// major order.
-class DoubleMatrix extends AbstractDoubleMatrix {
+class DenseDoubleMatrix extends DoubleMatrix {
   Float64List _elements;
 
   /// Constructs a matrix with a given number of rows and columns. All entries
   /// are initially `0`.
-  factory DoubleMatrix(int rows, int columns) {
+  factory DenseDoubleMatrix(int rows, int columns) {
     final elements = new Float64List(rows * columns);
-    return new DoubleMatrix._internal(
+    return new DenseDoubleMatrix._internal(
         rows, columns, elements, 0, 0, columns, 1, false);
   }
 
   /// Constructs a matrix with the given parameters.
-  DoubleMatrix._internal(int rows, int columns, Float64List elements,
+  DenseDoubleMatrix._internal(int rows, int columns, Float64List elements,
       int rowZero, int columnZero, int rowStride, int columnStride, bool isView)
       : super(rows, columns, rowZero, columnZero, rowStride, columnStride,
           !isView) {
     this._elements = elements;
   }
 
-  static DoubleMatrix create(int r, int c) => new DoubleMatrix(r, c);
+  static DenseDoubleMatrix create(int r, int c) => new DenseDoubleMatrix(r, c);
 
-  factory DoubleMatrix.random(int rows, int columns) {
+  factory DenseDoubleMatrix.random(int rows, int columns) {
     return dfactory.randomMatrix(rows, columns, create);
   }
 
@@ -131,13 +131,13 @@ class DoubleMatrix extends AbstractDoubleMatrix {
     }
   }
 
-  void copyFrom(final AbstractDoubleMatrix source) {
+  void copyFrom(final DoubleMatrix source) {
     // overriden for performance only
-    if (source is! DoubleMatrix) {
+    if (source is! DenseDoubleMatrix) {
       super.copyFrom(source);
       return;
     }
-    DoubleMatrix other = source as DoubleMatrix;
+    DenseDoubleMatrix other = source as DenseDoubleMatrix;
     if (other == this) {
       return; // nothing to do
     }
@@ -149,13 +149,13 @@ class DoubleMatrix extends AbstractDoubleMatrix {
       return;
     }
     if (_haveSharedCells(other)) {
-      AbstractDoubleMatrix c = other.copy();
-      if (c is! DoubleMatrix) {
+      DoubleMatrix c = other.copy();
+      if (c is! DenseDoubleMatrix) {
         // should not happen
         super.copyFrom(other);
         return;
       }
-      other = c as DoubleMatrix;
+      other = c as DenseDoubleMatrix;
     }
 
     Float64List elementsOther = other._elements;
@@ -180,13 +180,13 @@ class DoubleMatrix extends AbstractDoubleMatrix {
     }
   }
 
-  void assign(final AbstractDoubleMatrix y, DoubleDoubleFunction fn) {
+  void assign(final DoubleMatrix y, DoubleDoubleFunction fn) {
     // overriden for performance only
-    if (!(y is DoubleMatrix)) {
+    if (!(y is DenseDoubleMatrix)) {
       super.assign(y, fn);
       return;
     }
-    DoubleMatrix other = y as DoubleMatrix;
+    DenseDoubleMatrix other = y as DenseDoubleMatrix;
     checkShape(this, y);
     Float64List elementsOther = other._elements;
     if (_elements == null || elementsOther == null) {
@@ -429,27 +429,27 @@ class DoubleMatrix extends AbstractDoubleMatrix {
     return rowZero + row * rowStride + columnZero + column * columnStride;
   }
 
-  AbstractDoubleMatrix like2D(int rows, int columns) {
-    return new DoubleMatrix(rows, columns);
+  DoubleMatrix like2D(int rows, int columns) {
+    return new DenseDoubleMatrix(rows, columns);
   }
 
-  AbstractDoubleVector like1D(int size) => new DoubleVector(size);
+  DoubleVector like1D(int size) => new DenseDoubleVector(size);
 
   void set(int row, int column, double value) {
     _elements[rowZero + row * rowStride + columnZero + column * columnStride] =
         value;
   }
 
-  AbstractDoubleVector mult(final AbstractDoubleVector y,
-      [AbstractDoubleVector z = null, final double alpha = 1.0,
+  DoubleVector mult(final DoubleVector y,
+      [DoubleVector z = null, final double alpha = 1.0,
       final double beta = 0.0, final bool transposeA = false]) {
     if (transposeA) {
       return dice().mult(y, z, alpha, beta, false);
     }
     if (z == null) {
-      z = new DoubleVector(rows);
+      z = new DenseDoubleVector(rows);
     }
-    if (!(y is DoubleVector && z is DoubleVector)) {
+    if (!(y is DenseDoubleVector && z is DenseDoubleVector)) {
       return super.mult(y, z, alpha, beta, transposeA);
     }
 
@@ -491,8 +491,8 @@ class DoubleMatrix extends AbstractDoubleMatrix {
     return z;
   }
 
-  AbstractDoubleMatrix multiply(AbstractDoubleMatrix B,
-      [AbstractDoubleMatrix C = null, final double alpha = 1.0,
+  DoubleMatrix multiply(DoubleMatrix B,
+      [DoubleMatrix C = null, final double alpha = 1.0,
       final double beta = 0.0, final bool transposeA = false,
       bool transposeB = false]) {
     if (transposeA) {
@@ -518,9 +518,9 @@ class DoubleMatrix extends AbstractDoubleMatrix {
     int columnsA = columns;
     int p = B.columns;
     if (C == null) {
-      C = new DoubleMatrix(rowsA, p);
+      C = new DenseDoubleMatrix(rowsA, p);
     }
-    if (B is! DoubleMatrix || C is! DoubleMatrix) {
+    if (B is! DenseDoubleMatrix || C is! DenseDoubleMatrix) {
       return super.multiply(B, C, alpha, beta, transposeA, transposeB);
     }
     if (B.rows != columnsA) {
@@ -541,8 +541,8 @@ class DoubleMatrix extends AbstractDoubleMatrix {
       throw new ArgumentError("Matrices must not be identical");
     }
 
-    DoubleMatrix BB = B as DoubleMatrix;
-    DoubleMatrix CC = C as DoubleMatrix;
+    DenseDoubleMatrix BB = B as DenseDoubleMatrix;
+    DenseDoubleMatrix CC = C as DenseDoubleMatrix;
     Float64List AElems = this._elements;
     Float64List BElems = BB._elements;
     Float64List CElems = CC._elements;
@@ -625,27 +625,27 @@ class DoubleMatrix extends AbstractDoubleMatrix {
     return sum;
   }
 
-  bool _haveSharedCellsRaw(AbstractDoubleMatrix other) {
+  bool _haveSharedCellsRaw(DoubleMatrix other) {
     if (other is SelectedDenseDoubleMatrix) {
       return _elements == other._elements;
-    } else if (other is DoubleMatrix) {
+    } else if (other is DenseDoubleMatrix) {
       return _elements == other._elements;
     }
     return false;
   }
 
-  AbstractDoubleVector _like1D(int size, int zero, int stride) {
-    return new DoubleVector._internal(size, _elements, zero, stride, true);
+  DoubleVector _like1D(int size, int zero, int stride) {
+    return new DenseDoubleVector._internal(size, _elements, zero, stride, true);
   }
 
-  AbstractDoubleMatrix _viewSelectionLike(
+  DoubleMatrix _viewSelectionLike(
       Int32List rowOffsets, Int32List columnOffsets) {
     return new SelectedDenseDoubleMatrix._(
         _elements, rowOffsets, columnOffsets, 0);
   }
 
   Object clone() {
-    return new DoubleMatrix._internal(rows, columns, _elements, rowZero,
+    return new DenseDoubleMatrix._internal(rows, columns, _elements, rowZero,
         columnZero, rowStride, columnStride, isView);
   }
 }
@@ -660,7 +660,7 @@ class DoubleMatrix extends AbstractDoubleMatrix {
 /// introducing no additional functionality.
 ///
 /// This class uses no delegation. Its instances point directly to the data.
-class SelectedDenseDoubleMatrix extends AbstractDoubleMatrix {
+class SelectedDenseDoubleMatrix extends DoubleMatrix {
   Float64List _elements;
 
   /// The offsets of the visible cells of this matrix.
@@ -703,11 +703,11 @@ class SelectedDenseDoubleMatrix extends AbstractDoubleMatrix {
         _columnOffsets[columnZero + column * columnStride];
   }
 
-  AbstractDoubleMatrix like2D(int rows, int columns) {
-    return new DoubleMatrix(rows, columns);
+  DoubleMatrix like2D(int rows, int columns) {
+    return new DenseDoubleMatrix(rows, columns);
   }
 
-  AbstractDoubleVector like1D(int size) => new DoubleVector(size);
+  DoubleVector like1D(int size) => new DenseDoubleVector(size);
 
   void set(int row, int column, double value) {
     _elements[_offset +
@@ -715,7 +715,7 @@ class SelectedDenseDoubleMatrix extends AbstractDoubleMatrix {
         _columnOffsets[columnZero + column * columnStride]] = value;
   }
 
-  AbstractDoubleVector column(int column) {
+  DoubleVector column(int column) {
     checkColumn(this, column);
     int viewSize = rows;
     int viewZero = rowZero;
@@ -726,7 +726,7 @@ class SelectedDenseDoubleMatrix extends AbstractDoubleMatrix {
         viewSize, _elements, viewZero, viewStride, viewOffsets, viewOffset);
   }
 
-  AbstractDoubleVector row(int row) {
+  DoubleVector row(int row) {
     checkRow(this, row);
     int viewSize = columns;
     int viewZero = columnZero;
@@ -741,21 +741,21 @@ class SelectedDenseDoubleMatrix extends AbstractDoubleMatrix {
 
   int rowOffset(int absRank) => _rowOffsets[absRank];
 
-  bool _haveSharedCellsRaw(AbstractDoubleMatrix other) {
+  bool _haveSharedCellsRaw(DoubleMatrix other) {
     if (other is SelectedDenseDoubleMatrix) {
       return _elements == other._elements;
-    } else if (other is DoubleMatrix) {
+    } else if (other is DenseDoubleMatrix) {
       return _elements == other._elements;
     }
     return false;
   }
 
-  AbstractDoubleVector _like1D(int size, int zero, int stride) {
+  DoubleVector _like1D(int size, int zero, int stride) {
     // This method is never called since `row` and `column` are overridden.
     throw new Error();
   }
 
-  AbstractDoubleMatrix dice() {
+  DoubleMatrix dice() {
     var v = _view();
     vDice(v);
     // swap
@@ -765,7 +765,7 @@ class SelectedDenseDoubleMatrix extends AbstractDoubleMatrix {
     return v;
   }
 
-  AbstractDoubleMatrix _viewSelectionLike(
+  DoubleMatrix _viewSelectionLike(
       Int32List rowOffsets, Int32List columnOffsets) {
     return new SelectedDenseDoubleMatrix._(
         _elements, rowOffsets, columnOffsets, _offset);

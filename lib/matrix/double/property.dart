@@ -26,7 +26,7 @@ import '../../math.dart';
 }*/
 
 /// Checks whether the given matrix [A] is rectangular.
-/*void _checkRectangular(AbstractDoubleMatrix A) {
+/*void _checkRectangular(DoubleMatrix A) {
   if (A.rows < A.columns) {
     throw new ArgumentError(
         "Matrix must be rectangular: " + AbstractFormatter.shapeMatrix(A));
@@ -34,26 +34,26 @@ import '../../math.dart';
 }*/
 
 /// Checks whether the given matrix `A` is square.
-/*void _checkSquare(AbstractDoubleMatrix A) {
+/*void _checkSquare(DoubleMatrix A) {
   if (A.rows != A.columns) {
     throw new ArgumentError(
         "Matrix must be square: " + AbstractFormatter.shapeMatrix(A));
   }
 }*/
 
-/*void _checkDense(AbstractDoubleVector A) {
+/*void _checkDense(DoubleVector A) {
   if (A is! DoubleVector) {
     throw new ArgumentError("Matrix must be dense");
   }
 }
 
-void _checkSparse(AbstractDoubleVector A) {
+void _checkSparse(DoubleVector A) {
   if (A is! SparseDoubleVector) {
     throw new ArgumentError("Matrix must be sparse");
   }
 }
 
-void _checkSparseMatrix(AbstractDoubleMatrix A) {
+void _checkSparseMatrix(DoubleMatrix A) {
   if (A is! SparseCCDoubleMatrix &&
       A is! SparseRCDoubleMatrix &&
       A is! SparseDoubleMatrix) {
@@ -63,13 +63,13 @@ void _checkSparseMatrix(AbstractDoubleMatrix A) {
 
 /// Returns the matrix's fraction of non-zero cells;
 /// `A.cardinality / A.size`.
-double density(AbstractDoubleMatrix A) => A.cardinality / A.size.toDouble();
+double density(DoubleMatrix A) => A.cardinality / A.size.toDouble();
 
 /// Returns whether all cells of the given matrix [A] are equal to the
 /// given value. The result is `true` if and only if
 /// `A != null` and `! (Math.abs(value - A[i]) > tolerance())`
 /// holds for all coordinates.
-bool allVector(final AbstractDoubleVector A, final double value,
+bool allVector(final DoubleVector A, final double value,
     [double epsilon = EPSILON]) {
   if (A == null) {
     return false;
@@ -93,7 +93,7 @@ bool allVector(final AbstractDoubleVector A, final double value,
 /// `true` if and only if both arguments are `!= null`, have
 /// the same size and `! (Math.abs(A[i] - B[i]) > tolerance())`
 /// holds for all indexes.
-bool equalsVector(final AbstractDoubleVector A, final AbstractDoubleVector B,
+bool equalsVector(final DoubleVector A, final DoubleVector B,
     [double epsilon = EPSILON]) {
   if (identical(A, B)) {
     return true;
@@ -124,7 +124,7 @@ bool equalsVector(final AbstractDoubleVector A, final AbstractDoubleVector B,
 /// given value. The result is `true` if and only if `A != null` and
 /// `! (Math.abs(value - A[row,col]) > tolerance())` holds for all
 /// coordinates.
-bool allMatrix(final AbstractDoubleMatrix A, final double value,
+bool allMatrix(final DoubleMatrix A, final double value,
     [double epsilon = EPSILON]) {
   if (A == null) {
     return false;
@@ -152,7 +152,7 @@ bool allMatrix(final AbstractDoubleMatrix A, final double value,
 /// the same number of columns and rows and
 /// `! (Math.abs(A[row,col] - B[row,col]) > tolerance())` holds
 /// for all coordinates.
-bool equalsMatrix(final AbstractDoubleMatrix A, final AbstractDoubleMatrix B,
+bool equalsMatrix(final DoubleMatrix A, final DoubleMatrix B,
     [double epsilon = EPSILON]) {
   if (identical(A, B)) {
     return true;

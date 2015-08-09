@@ -11,8 +11,8 @@
 part of cern.colt.matrix.complex;
 
 /// Abstract base class for 2-d matrices holding `complex` elements.
-abstract class AbstractComplexMatrix extends AbstractMatrix {
-  AbstractComplexMatrix(int rows, int columns, [int rowZero = 0,
+abstract class ComplexMatrix extends AbstractMatrix {
+  ComplexMatrix(int rows, int columns, [int rowZero = 0,
       int columnZero = 0, int rowStride = null, int columnStride = 1,
       bool isNoView = true])
       : super(rows, columns, rowZero, columnZero, rowStride, columnStride,
@@ -60,12 +60,12 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
   /// If both matrices share the same cells (as is the case if they are views
   /// derived from the same matrix) and intersect in an ambiguous way, then
   /// replaces as if using an intermediate auxiliary deep copy of [other].
-  void copyFrom(AbstractComplexMatrix other) {
+  void copyFrom(ComplexMatrix other) {
     if (other == this) {
       return;
     }
     checkShape(this, other);
-    AbstractComplexMatrix otherLoc;
+    ComplexMatrix otherLoc;
     if (_haveSharedCells(other)) {
       otherLoc = other.copy();
     } else {
@@ -79,7 +79,7 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
   }
 
   /// Assigns the result of a function to each cell.
-  void assign(final AbstractComplexMatrix y,
+  void assign(final ComplexMatrix y,
       final cfunc.ComplexComplexComplexFunction f) {
     checkShape(this, y);
     for (int r = 0; r < rows; r++) {
@@ -120,7 +120,7 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
   /// Replaces imaginary part of the receiver with the values of another real
   /// matrix. The real part of the receiver remains unchanged. Both matrices
   /// must have the same size.
-  void setImaginary(final AbstractDoubleMatrix other) {
+  void setImaginary(final DoubleMatrix other) {
     checkShape(this, other);
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < columns; c++) {
@@ -134,7 +134,7 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
   /// Replaces real part of the receiver with the values of another real
   /// matrix. The imaginary part of the receiver remains unchanged. Both
   /// matrices must have the same size.
-  void setReal(final AbstractDoubleMatrix other) {
+  void setReal(final DoubleMatrix other) {
     checkShape(this, other);
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < columns; c++) {
@@ -160,14 +160,14 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
   }
 
   /// Constructs and returns a deep copy of the receiver.
-  AbstractComplexMatrix copy() => like()..copyFrom(this);
+  ComplexMatrix copy() => like()..copyFrom(this);
 
   /// Compares this object against the specified object. The result is
   /// `true` if and only if the argument is not `null` and is at least
-  /// a [AbstractDoubleMatrix] object that has the same number of columns
+  /// a [DoubleMatrix] object that has the same number of columns
   /// and rows as the receiver and has exactly the same values at the
   /// same coordinates.
-  bool equals(AbstractComplexMatrix obj) {
+  bool equals(ComplexMatrix obj) {
     if (identical(this, obj)) {
       return true;
     }
@@ -203,8 +203,8 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
   /// Returns a new matrix that is a complex conjugate of this matrix. If
   /// unconjugated complex transposition is needed, one should use [dice]
   /// method.
-  AbstractComplexMatrix conjugateTranspose() {
-    AbstractComplexMatrix transpose = dice().copy();
+  ComplexMatrix conjugateTranspose() {
+    ComplexMatrix transpose = dice().copy();
     for (int r = 0; r < columns; r++) {
       for (int c = 0; c < rows; c++) {
         var tmp = transpose.get(r, c);
@@ -215,12 +215,12 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
   }
 
   // Synonym for [conjugateTranspose].
-  AbstractComplexMatrix get H => conjugateTranspose();
+  ComplexMatrix get H => conjugateTranspose();
 
   Object get elements;
 
   /// Returns the imaginary part of this matrix
-  AbstractDoubleMatrix imaginary();
+  DoubleMatrix imaginary();
 
   /// Fills the coordinates and values of cells having non-zero values into the
   /// specified lists. Fills into the lists, starting at index 0. After this
@@ -251,19 +251,19 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
   Complex get(int row, int column);
 
   /// Returns the real part of this matrix.
-  AbstractDoubleMatrix real();
+  DoubleMatrix real();
 
   /// Construct and returns a new empty matrix of the same dynamic type
   /// as the receiver, having the same number of rows and columns.
-  AbstractComplexMatrix like() => like2D(rows, columns);
+  ComplexMatrix like() => like2D(rows, columns);
 
   /// Construct and returns a new empty matrix of the same dynamic type
   /// as the receiver, having the specified number of rows and columns.
-  AbstractComplexMatrix like2D(int rows, int columns);
+  ComplexMatrix like2D(int rows, int columns);
 
   /// Construct and returns a new 1-d matrix of the corresponding dynamic
   /// type, entirelly independent of the receiver.
-  AbstractComplexVector like1D(int size);
+  ComplexVector like1D(int size);
 
   /// Sets the matrix cell at coordinate `[row,column]` to the specified
   /// value.
@@ -324,7 +324,7 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
 
   /// Constructs and returns a new *slice view* representing the rows of
   /// the given column.
-  AbstractComplexVector column(int column) {
+  ComplexVector column(int column) {
     checkColumn(this, column);
     int viewSize = rows;
     int viewZero = index(0, column);
@@ -334,7 +334,7 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
 
   /// Constructs and returns a new *flip view* along the column axis. What
   /// used to be column `0` is now column `columns()-1`.
-  AbstractComplexMatrix columnFlip() {
+  ComplexMatrix columnFlip() {
     var v = _view();
     vColumnFlip(v);
     return v;
@@ -342,18 +342,18 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
 
   /// Constructs and returns a new *dice (transposition) view*; Swaps
   /// axes; example: 3 x 4 matrix --> 4 x 3 matrix.
-  AbstractComplexMatrix dice() {
+  ComplexMatrix dice() {
     var v = _view();
     vDice(v);
     return v;
   }
 
   // Synonym for [dice].
-  AbstractComplexMatrix get T => dice();
+  ComplexMatrix get T => dice();
 
   /// Constructs and returns a new *sub-range view* that is a
   /// `height x width` sub matrix starting at `[row,column]`.
-  AbstractComplexMatrix part(int row, int column, int height, int width) {
+  ComplexMatrix part(int row, int column, int height, int width) {
     var v = _view();
     vBox(v, row, column, height, width);
     return v;
@@ -361,7 +361,7 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
 
   /// Constructs and returns a new *slice view* representing the columns
   /// of the given row.
-  AbstractComplexVector row(int row) {
+  ComplexVector row(int row) {
     checkRow(this, row);
     int viewSize = columns;
     int viewZero = index(row, 0);
@@ -371,7 +371,7 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
 
   /// Constructs and returns a new *flip view* along the row axis. What
   /// used to be row `0` is now row `rows()-1`.
-  AbstractComplexMatrix rowFlip() {
+  ComplexMatrix rowFlip() {
     var v = _view();
     vRowFlip(v);
     return v;
@@ -383,7 +383,7 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
   ///
   /// To indicate "all" rows or "all columns", simply set the respective
   /// parameter
-  AbstractComplexMatrix select(Int32List rowIndexes, Int32List columnIndexes) {
+  ComplexMatrix select(Int32List rowIndexes, Int32List columnIndexes) {
     // check for "all"
     if (rowIndexes == null) {
       rowIndexes = new Int32List(rows);
@@ -413,7 +413,7 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
 
   /// Constructs and returns a new *stride view* which is a sub matrix
   /// consisting of every i-th cell.
-  AbstractComplexMatrix strides(int rowStride, int columnStride) {
+  ComplexMatrix strides(int rowStride, int columnStride) {
     var v = _view();
     vStrides(v, rowStride, columnStride);
     return v;
@@ -421,8 +421,8 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
 
   /// Linear algebraic matrix-vector multiplication;
   /// `z = alpha * A * y + beta*z`. Where `A == this`.
-  AbstractComplexVector mult(final AbstractComplexVector y,
-      [AbstractComplexVector z = null, Complex alpha = null,
+  ComplexVector mult(final ComplexVector y,
+      [ComplexVector z = null, Complex alpha = null,
       Complex beta = null, bool transposeA = false]) {
     if (alpha == null) {
       alpha = Complex.ONE;
@@ -433,7 +433,7 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
     if (transposeA) {
       return conjugateTranspose().mult(y, z, alpha, beta, false);
     }
-    AbstractComplexVector zz;
+    ComplexVector zz;
     if (z == null) {
       zz = y.like1D(rows);
     } else {
@@ -462,8 +462,8 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
   /// Linear algebraic matrix-matrix multiplication;
   /// `C = alpha * A x B + beta*C`. Matrix shapes:
   /// `A(m x n), B(n x p), C(m x p)`.
-  AbstractComplexMatrix multiply(final AbstractComplexMatrix B,
-      [AbstractComplexMatrix C = null, Complex alpha = null,
+  ComplexMatrix multiply(final ComplexMatrix B,
+      [ComplexMatrix C = null, Complex alpha = null,
       Complex beta = null, bool transposeA = false, bool transposeB = false]) {
     if (alpha == null) {
       alpha = Complex.ONE;
@@ -482,7 +482,7 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
     int m = rows;
     int n = columns;
     int p = B.columns;
-    AbstractComplexMatrix CC;
+    ComplexMatrix CC;
     if (C == null) {
       CC = like2D(m, p);
     } else {
@@ -527,10 +527,10 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
 
   /// Returns the content of this matrix if it is a wrapper; or `this`
   /// otherwise. Override this method in wrappers.
-  AbstractComplexMatrix _getContent() => this;
+  ComplexMatrix _getContent() => this;
 
   /// Returns `true` if both matrices share at least one identical cell.
-  bool _haveSharedCells(AbstractComplexMatrix other) {
+  bool _haveSharedCells(ComplexMatrix other) {
     if (other == null) {
       return false;
     }
@@ -541,38 +541,38 @@ abstract class AbstractComplexMatrix extends AbstractMatrix {
   }
 
   // Always returns false.
-  bool _haveSharedCellsRaw(AbstractComplexMatrix other) => false;
+  bool _haveSharedCellsRaw(ComplexMatrix other) => false;
 
   /// Construct and returns a new 1-d matrix of the corresponding dynamic
   /// type, sharing the same cells.
-  AbstractComplexVector _like1D(int size, int zero, int stride);
+  ComplexVector _like1D(int size, int zero, int stride);
 
   /// Constructs and returns a new view equal to the receiver.
-  AbstractComplexMatrix _view() => clone() as AbstractComplexMatrix;
+  ComplexMatrix _view() => clone() as ComplexMatrix;
 
   /// Construct and returns a new selection view.
-  AbstractComplexMatrix _viewSelectionLike(
+  ComplexMatrix _viewSelectionLike(
       Int32List rowOffsets, Int32List columnOffsets);
 
   Object clone();
 
-  AbstractComplexMatrix operator *(AbstractComplexMatrix y) {
+  ComplexMatrix operator *(ComplexMatrix y) {
     return copy()..assign(y, cfunc.mult);
   }
 
-  AbstractComplexMatrix operator /(AbstractComplexMatrix y) {
+  ComplexMatrix operator /(ComplexMatrix y) {
     return copy()..assign(y, cfunc.div);
   }
 
-  AbstractComplexMatrix operator +(AbstractComplexMatrix y) {
+  ComplexMatrix operator +(ComplexMatrix y) {
     return copy()..assign(y, cfunc.plus);
   }
 
-  AbstractComplexMatrix operator -(AbstractComplexMatrix y) {
+  ComplexMatrix operator -(ComplexMatrix y) {
     return copy()..assign(y, cfunc.minus);
   }
 
-  AbstractComplexMatrix conj() {
+  ComplexMatrix conj() {
     return copy()..apply(cfunc.conj);
   }
 }

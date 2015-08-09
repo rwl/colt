@@ -180,7 +180,7 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
     }
   }
 
-  void copyFrom(AbstractDoubleMatrix source) {
+  void copyFrom(DoubleMatrix source) {
     if (source == this) {
       return; // nothing to do
     }
@@ -212,7 +212,7 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
     }
   }
 
-  void assign(final AbstractDoubleMatrix y, func.DoubleDoubleFunction fn) {
+  void assign(final DoubleMatrix y, func.DoubleDoubleFunction fn) {
     checkShape(this, y);
 
     if ((y is SparseCCDoubleMatrix) && (fn == func.plus)) {
@@ -335,8 +335,8 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
 
   /// Returns a new matrix that has the same elements as this matrix, but is
   /// in a dense form.
-  DoubleMatrix dense() {
-    var dense = new DoubleMatrix(rows, columns);
+  DenseDoubleMatrix dense() {
+    var dense = new DenseDoubleMatrix(rows, columns);
     forEachNonZero((int i, int j, double value) {
       dense.set(i, j, get(i, j));
       return value;
@@ -400,11 +400,11 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
 
   bool get rowIndexesSorted => _rowIndexesSorted;
 
-  AbstractDoubleMatrix like2D(int rows, int columns) {
+  DoubleMatrix like2D(int rows, int columns) {
     return new SparseCCDoubleMatrix(rows, columns);
   }
 
-  AbstractDoubleVector like1D(int size) => new SparseDoubleVector(size);
+  DoubleVector like1D(int size) => new SparseDoubleVector(size);
 
   void set(int row, int column, double value) {
     //int k = Sorting.binarySearchFromTo(dcs.i, row, dcs.p[column], dcs.p[column + 1] - 1);
@@ -507,18 +507,18 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
     return buf.toString();
   }
 
-  AbstractDoubleVector mult(AbstractDoubleVector y,
-      [AbstractDoubleVector z = null, final double alpha = 1.0,
+  DoubleVector mult(DoubleVector y,
+      [DoubleVector z = null, final double alpha = 1.0,
       final double beta = 0.0, final bool transposeA = false]) {
     int rowsA = transposeA ? columns : rows;
     int columnsA = transposeA ? rows : columns;
 
     bool ignore = (z == null || transposeA);
     if (z == null) {
-      z = new DoubleVector(rowsA);
+      z = new DenseDoubleVector(rowsA);
     }
 
-    if (!(y is DoubleVector && z is DoubleVector)) {
+    if (!(y is DenseDoubleVector && z is DenseDoubleVector)) {
       return super.mult(y, z, alpha, beta, transposeA);
     }
 
@@ -531,12 +531,12 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
           z.toStringShort());
     }
 
-    var zz = z as DoubleVector;
+    var zz = z as DenseDoubleVector;
     Float64List elementsZ = zz._elements;
     int strideZ = zz.stride;
     int zeroZ = zz.index(0);
 
-    DoubleVector yy = y as DoubleVector;
+    DenseDoubleVector yy = y as DenseDoubleVector;
     Float64List elementsY = yy._elements;
     int strideY = yy.stride;
     int zeroY = yy.index(0);
@@ -592,8 +592,8 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
     return z;
   }
 
-  AbstractDoubleMatrix multiply(AbstractDoubleMatrix B,
-      [AbstractDoubleMatrix C = null, final double alpha = 1.0,
+  DoubleMatrix multiply(DoubleMatrix B,
+      [DoubleMatrix C = null, final double alpha = 1.0,
       double beta = 0.0, final bool transposeA = false,
       bool transposeB = false]) {
     int rowsA = rows;
@@ -614,7 +614,7 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
       if (B is SparseCCDoubleMatrix) {
         C = new SparseCCDoubleMatrix(rowsA, p, (rowsA * p));
       } else {
-        C = new DoubleMatrix(rowsA, p);
+        C = new DenseDoubleMatrix(rowsA, p);
       }
     }
 
@@ -640,20 +640,20 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
       C.apply(func.multiply(beta));
     }
 
-    if ((B is DoubleMatrix) && (C is DoubleMatrix)) {
+    if ((B is DenseDoubleMatrix) && (C is DenseDoubleMatrix)) {
       SparseCCDoubleMatrix AA;
       if (transposeA) {
         AA = transpose();
       } else {
         AA = this;
       }
-      DoubleMatrix BB;
+      DenseDoubleMatrix BB;
       if (transposeB) {
-        BB = B.dice() as DoubleMatrix;
+        BB = B.dice() as DenseDoubleMatrix;
       } else {
         BB = B;
       }
-      DoubleMatrix CC = C;
+      DenseDoubleMatrix CC = C;
       Int32List columnPointersA = AA._columnPointers;
       Int32List rowIndexesA = AA._rowIndexes;
       Float64List valuesA = AA._values;
@@ -732,11 +732,11 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
         B = B.dice();
       }
       // cache views
-      var Brows = new List<AbstractDoubleVector>(columnsA);
+      var Brows = new List<DoubleVector>(columnsA);
       for (int i = columnsA; --i >= 0;) {
         Brows[i] = B.row(i);
       }
-      var Crows = new List<AbstractDoubleVector>(rowsA);
+      var Crows = new List<DoubleVector>(rowsA);
       for (int i = rowsA; --i >= 0;) {
         Crows[i] = C.row(i);
       }
@@ -762,7 +762,7 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
     return C;
   }
 
-  AbstractDoubleMatrix _getContent() => this;
+  DoubleMatrix _getContent() => this;
 
   void _insert(int row, int column, int index, double value) {
     List rowIndexes = new List<int>.from(_rowIndexes);

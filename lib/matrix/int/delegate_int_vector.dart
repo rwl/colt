@@ -22,14 +22,14 @@ part of cern.colt.matrix.int;
 //  /*
 //   * The elements of the matrix.
 //   */
-//  AbstractIntMatrix _content;
+//  IntMatrix _content;
 //
 //  /*
 //   * The row this view is bound to.
 //   */
 //  int _row;
 //
-//  DelegateIntVector(AbstractIntMatrix newContent, int row) : super(null) {
+//  DelegateIntVector(IntMatrix newContent, int row) : super(null) {
 //    if (row < 0 || row >= newContent.rows()) {
 //      throw new ArgumentError();
 //    }
@@ -68,7 +68,7 @@ part of cern.colt.matrix.int;
 //   *            the number of cell the matrix shall have.
 //   * @return a new empty matrix of the same dynamic type.
 //   */
-//  AbstractIntVector like(int size) {
+//  IntVector like(int size) {
 //    return _content.like1D(size);
 //  }
 //
@@ -86,7 +86,7 @@ part of cern.colt.matrix.int;
 //   *            the number of columns the matrix shall have.
 //   * @return a new matrix of the corresponding dynamic type.
 //   */
-//  AbstractIntMatrix like2D(int rows, int columns) {
+//  IntMatrix like2D(int rows, int columns) {
 //    return _content.like2D(rows, columns);
 //  }
 //
@@ -110,14 +110,14 @@ part of cern.colt.matrix.int;
 //}
 
 
-class DelegateIntVector extends AbstractIntVector {
-  AbstractIntMatrix _content;
+class DelegateIntVector extends IntVector {
+  IntMatrix _content;
 
   /// The row this view is bound to.
   int _row;
 
   /// Constructs a matrix view with a given content and row.
-  DelegateIntVector(AbstractIntMatrix newContent, int row)
+  DelegateIntVector(IntMatrix newContent, int row)
       : super(newContent.columns) {
     if (row < 0 || row >= newContent.rows) {
       throw new ArgumentError();
@@ -128,9 +128,9 @@ class DelegateIntVector extends AbstractIntVector {
 
   int get(int index) => _content.get(_row, index);
 
-  AbstractIntVector like1D(int size) => _content.like1D(size);
+  IntVector like1D(int size) => _content.like1D(size);
 
-  AbstractIntMatrix like2D(int rows, int columns) {
+  IntMatrix like2D(int rows, int columns) {
     return _content.like2D(rows, columns);
   }
 
@@ -138,11 +138,11 @@ class DelegateIntVector extends AbstractIntVector {
 
   Object get elements => _content.elements;
 
-  AbstractIntMatrix reshape(int rows, int columns) {
+  IntMatrix reshape(int rows, int columns) {
     throw new ArgumentError("This method is not supported.");
   }
 
-  AbstractIntVector _viewSelectionLike(Int32List offsets) {
+  IntVector _viewSelectionLike(Int32List offsets) {
     throw new Error(); // should never get called
   }
 

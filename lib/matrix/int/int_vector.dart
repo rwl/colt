@@ -13,22 +13,22 @@ part of cern.colt.matrix.int;
 /// Dense 1-d matrix (aka vector) holding [int} elements.
 ///
 /// Internally holds one single contigous one-dimensional array.
-class IntVector extends AbstractIntVector {
+class DenseIntVector extends IntVector {
   Int32List _elements;
 
   /// Constructs a matrix with a copy of the given [values].
-  factory IntVector.fromList(Int32List values) {
-    return new IntVector(values.length)..setAll(values);
+  factory DenseIntVector.fromList(Int32List values) {
+    return new DenseIntVector(values.length)..setAll(values);
   }
 
   /// Constructs a matrix with a given number of cells. All entries are
   /// initially `0`.
-  factory IntVector(int size) {
+  factory DenseIntVector(int size) {
     final elements = new Int32List(size);
-    return new IntVector._internal(size, elements, 0, 1, false);
+    return new DenseIntVector._internal(size, elements, 0, 1, false);
   }
 
-  IntVector._internal(
+  DenseIntVector._internal(
       int size, Int32List elements, int zero, int stride, bool isView)
       : super(size, zero, stride, !isView) {
     if (elements == null) {
@@ -37,9 +37,9 @@ class IntVector extends AbstractIntVector {
     _elements = elements;
   }
 
-  static IntVector create(int size) => new IntVector(size);
+  static DenseIntVector create(int size) => new DenseIntVector(size);
 
-  factory IntVector.nonzero(List<num> values) {
+  factory DenseIntVector.nonzero(List<num> values) {
     var idx = <int>[];
     int i = 0;
     values.forEach((num value) {
@@ -48,12 +48,12 @@ class IntVector extends AbstractIntVector {
       }
       i++;
     });
-    return new IntVector.fromList(idx);
+    return new DenseIntVector.fromList(idx);
   }
 
-  factory IntVector.random(int size) => ifactory.random(size, create);
+  factory DenseIntVector.random(int size) => ifactory.random(size, create);
 
-  factory IntVector.append(AbstractIntVector a, AbstractIntVector b) {
+  factory DenseIntVector.append(IntVector a, IntVector b) {
     return ifactory.append(a, b, create);
   }
 
@@ -121,13 +121,13 @@ class IntVector extends AbstractIntVector {
     }
   }
 
-  void copyFrom(AbstractIntVector source) {
+  void copyFrom(IntVector source) {
     // overriden for performance only
-    if (source is! IntVector) {
+    if (source is! DenseIntVector) {
       super.copyFrom(source);
       return;
     }
-    IntVector other = source as IntVector;
+    DenseIntVector other = source as DenseIntVector;
     if (other == this) {
       return;
     }
@@ -138,13 +138,13 @@ class IntVector extends AbstractIntVector {
       return;
     }
     if (_haveSharedCells(other)) {
-      AbstractIntVector c = other.copy();
-      if (c is! IntVector) {
+      IntVector c = other.copy();
+      if (c is! DenseIntVector) {
         // should not happen
         super.copyFrom(source);
         return;
       }
-      other = c as IntVector;
+      other = c as DenseIntVector;
     }
 
     Int32List elemsOther = other._elements;
@@ -162,9 +162,9 @@ class IntVector extends AbstractIntVector {
     }
   }
 
-  void assign(final AbstractIntVector y, final ifunc.IntIntFunction fn) {
+  void assign(final IntVector y, final ifunc.IntIntFunction fn) {
     // overriden for performance only
-    if (!(y is IntVector)) {
+    if (!(y is DenseIntVector)) {
       super.assign(y, fn);
       return;
     }
@@ -364,17 +364,17 @@ class IntVector extends AbstractIntVector {
 
   int get(int index) => _elements[zero + index * stride];
 
-  AbstractIntVector like1D(int size) => new IntVector(size);
+  IntVector like1D(int size) => new DenseIntVector(size);
 
-  AbstractIntMatrix like2D(int rows, int columns) {
-    return new IntMatrix(rows, columns);
+  IntMatrix like2D(int rows, int columns) {
+    return new DenseIntMatrix(rows, columns);
   }
 
-  AbstractIntMatrix reshape(final int rows, final int columns) {
+  IntMatrix reshape(final int rows, final int columns) {
     if (rows * columns != size) {
       throw new ArgumentError("rows*columns != size");
     }
-    var M = new IntMatrix(rows, columns);
+    var M = new DenseIntMatrix(rows, columns);
     Int32List elemsOther = M.elements as Int32List;
     int zeroOther = M.index(0, 0);
     int rowStrideOther = M.rowStride;
@@ -406,14 +406,14 @@ class IntVector extends AbstractIntVector {
     }
   }
 
-  int dot(AbstractIntVector y, [final int from = 0, int length = null]) {
+  int dot(IntVector y, [final int from = 0, int length = null]) {
     if (length == null) {
       length = size;
     }
-    if (!(y is IntVector)) {
+    if (!(y is DenseIntVector)) {
       return super.dot(y, from, length);
     }
-    IntVector yy = y as IntVector;
+    DenseIntVector yy = y as DenseIntVector;
 
     int tail = from + length;
     if (from < 0 || length < 0) {
@@ -467,10 +467,10 @@ class IntVector extends AbstractIntVector {
     return sum;
   }
 
-  bool _haveSharedCellsRaw(AbstractIntVector other) {
+  bool _haveSharedCellsRaw(IntVector other) {
     if (other is SelectedDenseIntVector) {
       return _elements == other._elements;
-    } else if (other is IntVector) {
+    } else if (other is DenseIntVector) {
       return _elements == other._elements;
     }
     return false;
@@ -478,17 +478,17 @@ class IntVector extends AbstractIntVector {
 
   int index(int rank) => zero + rank * stride;
 
-  AbstractIntVector _viewSelectionLike(Int32List offsets) {
+  IntVector _viewSelectionLike(Int32List offsets) {
     return new SelectedDenseIntVector(_elements, offsets);
   }
 
   Object clone() {
-    return new IntVector._internal(size, _elements, zero, stride, isView);
+    return new DenseIntVector._internal(size, _elements, zero, stride, isView);
   }
 
-  DoubleVector toDouble() {
+  DenseDoubleVector toDouble() {
     var l = new List<double>.generate(size, (int i) => get(i).toDouble());
-    return new DoubleVector(size)..setAll(new Float64List.fromList(l));
+    return new DenseDoubleVector(size)..setAll(new Float64List.fromList(l));
   }
 }
 
@@ -501,7 +501,7 @@ class IntVector extends AbstractIntVector {
 /// with the same signatures and semantics as its abstract superclass(es)
 /// while introducing no additional functionality. Thus, this class need not
 /// be visible to users.
-class SelectedDenseIntVector extends AbstractIntVector {
+class SelectedDenseIntVector extends IntVector {
   Int32List _elements;
 
   /// The offsets of visible indexes of this matrix.
@@ -530,14 +530,14 @@ class SelectedDenseIntVector extends AbstractIntVector {
 
   int index(int rank) => __offset + _offsets[zero + rank * stride];
 
-  AbstractIntVector like1D(int size) => new IntVector(size);
+  IntVector like1D(int size) => new DenseIntVector(size);
 
-  AbstractIntMatrix like2D(int rows, int columns) {
-    return new IntMatrix(rows, columns);
+  IntMatrix like2D(int rows, int columns) {
+    return new DenseIntMatrix(rows, columns);
   }
 
   /// This method is not supported.
-  AbstractIntMatrix reshape(int rows, int columns) {
+  IntMatrix reshape(int rows, int columns) {
     throw new ArgumentError("This method is not supported.");
   }
 
@@ -547,16 +547,16 @@ class SelectedDenseIntVector extends AbstractIntVector {
 
   int _offset(int absRank) => _offsets[absRank];
 
-  bool _haveSharedCellsRaw(AbstractIntVector other) {
+  bool _haveSharedCellsRaw(IntVector other) {
     if (other is SelectedDenseIntVector) {
       return _elements == other._elements;
-    } else if (other is IntVector) {
+    } else if (other is DenseIntVector) {
       return _elements == other._elements;
     }
     return false;
   }
 
-  AbstractIntVector _viewSelectionLike(Int32List offsets) {
+  IntVector _viewSelectionLike(Int32List offsets) {
     return new SelectedDenseIntVector(_elements, offsets);
   }
 

@@ -10,8 +10,6 @@
 // any purpose. It is provided "as is" without expressed or implied warranty.
 library cern.colt.matrix.complex.property;
 
-import 'dart:typed_data';
-
 import 'package:complex/complex.dart';
 
 import 'matrix.dart';
@@ -20,21 +18,21 @@ import 'matrix.dart';
 import '../../math.dart' show EPSILON;
 import '../../math.dart' as cmath;
 
-/*void _checkDense(AbstractComplexVector A) {
+/*void _checkDense(ComplexVector A) {
   if (A is! ComplexVector) {
     throw new ArgumentError("Matrix must be dense");
   }
 }*/
 
 /// Checks whether the given matrix `A` is square.
-/*void _checkSquare(AbstractComplexMatrix A) {
+/*void _checkSquare(ComplexMatrix A) {
   if (A.rows != A.columns) {
     throw new ArgumentError(
         "Matrix must be square: " + AbstractFormatter.shapeMatrix(A));
   }
 }*/
 
-/*void _checkSparse(AbstractComplexMatrix A) {
+/*void _checkSparse(ComplexMatrix A) {
   if (A is! SparseCCComplexMatrix && A is! SparseRCComplexMatrix) {
     throw new ArgumentError("Matrix must be sparse");
   }
@@ -42,7 +40,7 @@ import '../../math.dart' as cmath;
 
 /// Returns whether all cells of the given matrix [A] are equal to the
 /// given value.
-bool allVector(final AbstractComplexVector A, final Complex value,
+bool allVector(final ComplexVector A, final Complex value,
     [double epsilon = EPSILON]) {
   if (A == null) {
     return false;
@@ -64,7 +62,7 @@ bool allVector(final AbstractComplexVector A, final Complex value,
 }
 
 /// Returns whether both given matrices [A] and [B] are equal.
-bool equalsVector(final AbstractComplexVector A, final AbstractComplexVector B,
+bool equalsVector(final ComplexVector A, final ComplexVector B,
     [double epsilon = EPSILON]) {
   if (identical(A, B)) {
     return true;
@@ -96,7 +94,7 @@ bool equalsVector(final AbstractComplexVector A, final AbstractComplexVector B,
 
 /// Returns whether all cells of the given matrix [A] are equal to the
 /// given value.
-bool allMatrix(final AbstractComplexMatrix A, final Complex value,
+bool allMatrix(final ComplexMatrix A, final Complex value,
     [double epsilon = EPSILON]) {
   if (A == null) {
     return false;
@@ -122,7 +120,7 @@ bool allMatrix(final AbstractComplexMatrix A, final Complex value,
 }
 
 /// Returns whether both given matrices [A] and [B] are equal.
-bool equalsMatrix(final AbstractComplexMatrix A, final AbstractComplexMatrix B,
+bool equalsMatrix(final ComplexMatrix A, final ComplexMatrix B,
     [double epsilon = EPSILON]) {
   if (identical(A, B)) {
     return true;

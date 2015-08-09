@@ -39,11 +39,11 @@ class LargeComplexMatrix extends WrapperComplexMatrix {
 
   Object get elements => _elements;
 
-  AbstractComplexMatrix _getContent() => this;
+  ComplexMatrix _getContent() => this;
 
-  AbstractComplexMatrix like2D(int rows, int columns) {
+  ComplexMatrix like2D(int rows, int columns) {
     return new LargeComplexMatrix(rows, columns);
   }
 
-  AbstractComplexVector like1D(int size) => new ComplexVector(size);
+  ComplexVector like1D(int size) => new DenseComplexVector(size);
 }

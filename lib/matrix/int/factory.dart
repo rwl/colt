@@ -15,29 +15,29 @@ import 'dart:typed_data';
 import 'package:colt/function/int.dart' as ifunc;
 import 'matrix.dart';
 
-typedef AbstractIntVector VectorFn(int);
-typedef AbstractIntMatrix MatrixFn(int r, int c);
+typedef IntVector VectorFn(int);
+typedef IntMatrix MatrixFn(int r, int c);
 
 /// `C = A||B`; Constructs a new matrix which is the concatenation of two
 /// other matrices.
-AbstractIntVector append(
-    AbstractIntVector A, AbstractIntVector B, VectorFn make) {
+IntVector append(
+    IntVector A, IntVector B, VectorFn make) {
   // concatenate
-  AbstractIntVector matrix = make(A.size + B.size);
+  IntVector matrix = make(A.size + B.size);
   matrix.part(0, A.size).copyFrom(A);
   matrix.part(A.size, B.size).copyFrom(B);
   return matrix;
 }
 
 /// Constructs a matrix with cells having ascending values.
-AbstractIntVector ascending(int size, VectorFn make) {
+IntVector ascending(int size, VectorFn make) {
   return descending(size, make)
     ..apply(ifunc.chain2(ifunc.neg, ifunc.subtract(size)));
 }
 
 /// Constructs a matrix with cells having descending values.
-AbstractIntVector descending(int size, VectorFn make) {
-  AbstractIntVector matrix = make(size);
+IntVector descending(int size, VectorFn make) {
+  IntVector matrix = make(size);
   int v = 0;
   for (int i = size; --i >= 0;) {
     matrix.set(i, v++);
@@ -46,7 +46,7 @@ AbstractIntVector descending(int size, VectorFn make) {
 }
 
 /// Constructs a matrix which is the concatenation of all given parts.
-AbstractIntVector concat(List<AbstractIntVector> parts, VectorFn make) {
+IntVector concat(List<IntVector> parts, VectorFn make) {
   if (parts.length == 0) {
     return make(0);
   }
@@ -56,7 +56,7 @@ AbstractIntVector concat(List<AbstractIntVector> parts, VectorFn make) {
     size += parts[i].size;
   }
 
-  AbstractIntVector vector = make(size);
+  IntVector vector = make(size);
   size = 0;
   for (int i = 0; i < parts.length; i++) {
     vector.part(size, parts[i].size).copyFrom(parts[i]);
@@ -68,13 +68,13 @@ AbstractIntVector concat(List<AbstractIntVector> parts, VectorFn make) {
 
 /// Constructs a matrix with the given shape, each cell initialized with the
 /// given value.
-AbstractIntVector fill(int size, int initialValue, VectorFn make) {
+IntVector fill(int size, int initialValue, VectorFn make) {
   return make(size)..fill(initialValue);
 }
 
 /// Constructs a matrix with uniformly distributed values in `(0,1)`
 /// (exclusive).
-AbstractIntVector random(int size, VectorFn make) {
+IntVector random(int size, VectorFn make) {
   return make(size)..apply(ifunc.random());
 }
 
@@ -84,9 +84,9 @@ AbstractIntVector random(int size, VectorFn make) {
 ///     0 1
 ///     repeat(3) -->
 ///     0 1 0 1 0 1
-AbstractIntVector repeat(AbstractIntVector A, int repeat, VectorFn make) {
+IntVector repeat(IntVector A, int repeat, VectorFn make) {
   int size = A.size;
-  AbstractIntVector matrix = make(repeat * size);
+  IntVector matrix = make(repeat * size);
   for (int i = repeat; --i >= 0;) {
     matrix.part(size * i, size).copyFrom(A);
   }
@@ -104,8 +104,8 @@ AbstractIntVector repeat(AbstractIntVector A, int repeat, VectorFn make) {
 ///     -->
 ///     0 1 2 6 7
 ///     3 4 5 8 9
-AbstractIntMatrix appendColumns(
-    AbstractIntMatrix A, AbstractIntMatrix B, MatrixFn make) {
+IntMatrix appendColumns(
+    IntMatrix A, IntMatrix B, MatrixFn make) {
   // force both to have maximal shared number of rows.
   if (B.rows > A.rows) {
     B = B.part(0, 0, A.rows, B.columns);
@@ -117,14 +117,14 @@ AbstractIntMatrix appendColumns(
   int ac = A.columns;
   int bc = B.columns;
   int r = A.rows;
-  AbstractIntMatrix matrix = make(r, ac + bc);
+  IntMatrix matrix = make(r, ac + bc);
   matrix.part(0, 0, r, ac).copyFrom(A);
   matrix.part(0, ac, r, bc).copyFrom(B);
   return matrix;
 }
 
-AbstractIntMatrix appendColumn(
-    AbstractIntMatrix A, AbstractIntVector b, MatrixFn make) {
+IntMatrix appendColumn(
+    IntMatrix A, IntVector b, MatrixFn make) {
   // force both to have maximal shared number of rows.
   if (b.size > A.rows) {
     b = b.part(0, A.rows);
@@ -136,7 +136,7 @@ AbstractIntMatrix appendColumn(
   int ac = A.columns;
   int bc = 1;
   int r = A.rows;
-  AbstractIntMatrix matrix = make(r, ac + bc);
+  IntMatrix matrix = make(r, ac + bc);
   matrix.part(0, 0, r, ac).copyFrom(A);
   matrix.column(ac).copyFrom(b);
   return matrix;
@@ -157,8 +157,8 @@ AbstractIntMatrix appendColumn(
 ///     4 5
 ///     6 7
 ///     8 9
-AbstractIntMatrix appendRows(
-    AbstractIntMatrix A, AbstractIntMatrix B, MatrixFn make) {
+IntMatrix appendRows(
+    IntMatrix A, IntMatrix B, MatrixFn make) {
   // force both to have maximal shared number of columns.
   if (B.columns > A.columns) B = B.part(0, 0, B.rows, A.columns);
   else if (B.columns < A.columns) A = A.part(0, 0, A.rows, B.columns);
@@ -167,14 +167,14 @@ AbstractIntMatrix appendRows(
   int ar = A.rows;
   int br = B.rows;
   int c = A.columns;
-  AbstractIntMatrix matrix = make(ar + br, c);
+  IntMatrix matrix = make(ar + br, c);
   matrix.part(0, 0, ar, c).copyFrom(A);
   matrix.part(ar, 0, br, c).copyFrom(B);
   return matrix;
 }
 
-AbstractIntMatrix appendRow(
-    AbstractIntMatrix A, AbstractIntVector b, MatrixFn make) {
+IntMatrix appendRow(
+    IntMatrix A, IntVector b, MatrixFn make) {
   // force both to have maximal shared number of columns.
   if (b.size > A.columns) {
     b = b.part(0, A.columns);
@@ -186,7 +186,7 @@ AbstractIntMatrix appendRow(
   int ar = A.rows;
   int br = 1;
   int c = A.columns;
-  AbstractIntMatrix matrix = make(ar + br, c);
+  IntMatrix matrix = make(ar + br, c);
   matrix.part(0, 0, ar, c).copyFrom(A);
   matrix.row(ar).copyFrom(b);
   return matrix;
@@ -196,7 +196,7 @@ AbstractIntMatrix appendRow(
 ///
 ///     0 1 2
 ///     3 4 5
-AbstractIntMatrix ascendingMatrix(int rows, int columns, MatrixFn make) {
+IntMatrix ascendingMatrix(int rows, int columns, MatrixFn make) {
   return descendingMatrix(rows, columns, make)
     ..apply(ifunc.chain2(ifunc.neg, ifunc.subtract(columns * rows)));
 }
@@ -220,7 +220,7 @@ AbstractIntMatrix ascendingMatrix(int rows, int columns, MatrixFn make) {
 
 /// Checks whether the given array is rectangular, that is, whether all rows
 /// have the same number of columns.
-void _checkRectShape(List<List<AbstractIntMatrix>> array) {
+void _checkRectShape(List<List<IntMatrix>> array) {
   int columns = -1;
   for (int row = array.length; --row >= 0;) {
     if (array[row] != null) {
@@ -235,12 +235,12 @@ void _checkRectShape(List<List<AbstractIntMatrix>> array) {
   }
 }
 
-AbstractIntMatrix reshape(
-    AbstractIntVector a, int rows, int columns, MatrixFn make) {
+IntMatrix reshape(
+    IntVector a, int rows, int columns, MatrixFn make) {
   if (a.size != rows * columns) {
     throw new ArgumentError("a.length != rows*columns");
   }
-  AbstractIntMatrix A = make(rows, columns);
+  IntMatrix A = make(rows, columns);
   for (int c = 0; c < columns; c++) {
     A.column(c).copyFrom(a.part(c * rows, rows));
   }
@@ -254,14 +254,14 @@ AbstractIntMatrix reshape(
 /// have the same number of rows. Otherwise an [ArgumentError] is thrown.
 /// Note that `null`s within `parts[row,col]` are an exception to this
 /// rule: they are ignored.
-AbstractIntMatrix compose(List<List<AbstractIntMatrix>> parts, MatrixFn make) {
+IntMatrix compose(List<List<IntMatrix>> parts, MatrixFn make) {
   _checkRectShape(parts);
   int rows = parts.length;
   int columns = 0;
   if (parts.length > 0) {
     columns = parts[0].length;
   }
-  AbstractIntMatrix empty = make(0, 0);
+  IntMatrix empty = make(0, 0);
 
   if (rows == 0 || columns == 0) {
     return empty;
@@ -272,7 +272,7 @@ AbstractIntMatrix compose(List<List<AbstractIntMatrix>> parts, MatrixFn make) {
   for (int column = columns; --column >= 0;) {
     int maxWidth = 0;
     for (int row = rows; --row >= 0;) {
-      AbstractIntMatrix part = parts[row][column];
+      IntMatrix part = parts[row][column];
       if (part != null) {
         int width = part.columns;
         if (maxWidth > 0 && width > 0 && width != maxWidth) {
@@ -289,7 +289,7 @@ AbstractIntMatrix compose(List<List<AbstractIntMatrix>> parts, MatrixFn make) {
   for (int row = rows; --row >= 0;) {
     int maxHeight = 0;
     for (int column = columns; --column >= 0;) {
-      AbstractIntMatrix part = parts[row][column];
+      IntMatrix part = parts[row][column];
       if (part != null) {
         int height = part.rows;
         if (maxHeight > 0 && height > 0 && height != maxHeight) {
@@ -311,14 +311,14 @@ AbstractIntMatrix compose(List<List<AbstractIntMatrix>> parts, MatrixFn make) {
     resultCols += maxWidths[column];
   }
 
-  AbstractIntMatrix matrix = make(resultRows, resultCols);
+  IntMatrix matrix = make(resultRows, resultCols);
 
   // copy
   int r = 0;
   for (int row = 0; row < rows; row++) {
     int c = 0;
     for (int column = 0; column < columns; column++) {
-      AbstractIntMatrix part = parts[row][column];
+      IntMatrix part = parts[row][column];
       if (part != null) {
         matrix.part(r, c, part.rows, part.columns).copyFrom(part);
       }
@@ -335,13 +335,13 @@ AbstractIntMatrix compose(List<List<AbstractIntMatrix>> parts, MatrixFn make) {
 ///
 ///     A 0
 ///     0 B
-AbstractIntMatrix composeDiagonal(
-    AbstractIntMatrix A, AbstractIntMatrix B, MatrixFn make) {
+IntMatrix composeDiagonal(
+    IntMatrix A, IntMatrix B, MatrixFn make) {
   int ar = A.rows;
   int ac = A.columns;
   int br = B.rows;
   int bc = B.columns;
-  AbstractIntMatrix sum = make(ar + br, ac + bc);
+  IntMatrix sum = make(ar + br, ac + bc);
   sum.part(0, 0, ar, ac).copyFrom(A);
   sum.part(ar, ac, br, bc).copyFrom(B);
   return sum;
@@ -353,9 +353,9 @@ AbstractIntMatrix composeDiagonal(
 ///     A 0 0
 ///     0 B 0
 ///     0 0 C
-AbstractIntMatrix composeDiag(AbstractIntMatrix A, AbstractIntMatrix B,
-    AbstractIntMatrix C, MatrixFn make) {
-  AbstractIntMatrix diag =
+IntMatrix composeDiag(IntMatrix A, IntMatrix B,
+    IntMatrix C, MatrixFn make) {
+  IntMatrix diag =
       make(A.rows + B.rows + C.rows, A.columns + B.columns + C.columns);
   diag.part(0, 0, A.rows, A.columns).copyFrom(A);
   diag.part(A.rows, A.columns, B.rows, B.columns).copyFrom(B);
@@ -365,13 +365,13 @@ AbstractIntMatrix composeDiag(AbstractIntMatrix A, AbstractIntMatrix B,
   return diag;
 }
 
-AbstractIntMatrix composeBidiagonal(
-    AbstractIntMatrix A, AbstractIntMatrix B, MatrixFn make) {
+IntMatrix composeBidiagonal(
+    IntMatrix A, IntMatrix B, MatrixFn make) {
   int ar = A.rows;
   int ac = A.columns;
   int br = B.rows;
   int bc = B.columns;
-  AbstractIntMatrix sum = make(ar + br - 1, ac + bc);
+  IntMatrix sum = make(ar + br - 1, ac + bc);
   sum.part(0, 0, ar, ac).copyFrom(A);
   sum.part(ar - 1, ac, br, bc).copyFrom(B);
   return sum;
@@ -385,7 +385,7 @@ AbstractIntMatrix composeBidiagonal(
 /// have the same number of rows. Otherwise an [ArgumentError] is thrown.
 /// Note that `null`s within `parts[row,col]` are an exception to this
 /// rule: they are ignored.
-void decompose(List<List<AbstractIntMatrix>> parts, AbstractIntMatrix matrix) {
+void decompose(List<List<IntMatrix>> parts, IntMatrix matrix) {
   _checkRectShape(parts);
   int rows = parts.length;
   int columns = 0;
@@ -401,7 +401,7 @@ void decompose(List<List<AbstractIntMatrix>> parts, AbstractIntMatrix matrix) {
   for (int column = columns; --column >= 0;) {
     int maxWidth = 0;
     for (int row = rows; --row >= 0;) {
-      AbstractIntMatrix part = parts[row][column];
+      IntMatrix part = parts[row][column];
       if (part != null) {
         int width = part.columns;
         if (maxWidth > 0 && width > 0 && width != maxWidth) {
@@ -418,7 +418,7 @@ void decompose(List<List<AbstractIntMatrix>> parts, AbstractIntMatrix matrix) {
   for (int row = rows; --row >= 0;) {
     int maxHeight = 0;
     for (int column = columns; --column >= 0;) {
-      AbstractIntMatrix part = parts[row][column];
+      IntMatrix part = parts[row][column];
       if (part != null) {
         int height = part.rows;
         if (maxHeight > 0 && height > 0 && height != maxHeight) {
@@ -449,7 +449,7 @@ void decompose(List<List<AbstractIntMatrix>> parts, AbstractIntMatrix matrix) {
   for (int row = 0; row < rows; row++) {
     int c = 0;
     for (int column = 0; column < columns; column++) {
-      AbstractIntMatrix part = parts[row][column];
+      IntMatrix part = parts[row][column];
       if (part != null) {
         part.copyFrom(matrix.part(r, c, part.rows, part.columns));
       }
@@ -460,8 +460,8 @@ void decompose(List<List<AbstractIntMatrix>> parts, AbstractIntMatrix matrix) {
 }
 
 /// Constructs a matrix with cells having descending values.
-AbstractIntMatrix descendingMatrix(int rows, int columns, MatrixFn make) {
-  AbstractIntMatrix matrix = make(rows, columns);
+IntMatrix descendingMatrix(int rows, int columns, MatrixFn make) {
+  IntMatrix matrix = make(rows, columns);
   int v = 0;
   for (int row = rows; --row >= 0;) {
     for (int column = columns; --column >= 0;) {
@@ -478,9 +478,9 @@ AbstractIntMatrix descendingMatrix(int rows, int columns, MatrixFn make) {
 ///     5 0 0
 ///     0 4 0
 ///     0 0 3
-AbstractIntMatrix diagonal(AbstractIntVector vector, MatrixFn make) {
+IntMatrix diagonal(IntVector vector, MatrixFn make) {
   int size = vector.size;
-  AbstractIntMatrix diag = make(size, size);
+  IntMatrix diag = make(size, size);
   for (int i = size; --i >= 0;) {
     diag.set(i, i, vector.get(i));
   }
@@ -494,9 +494,9 @@ AbstractIntMatrix diagonal(AbstractIntVector vector, MatrixFn make) {
 ///     0 4 0 9
 ///     0 0 3 9
 ///     --> 5 4 3
-AbstractIntVector diagonal2D(AbstractIntMatrix A, MatrixFn make) {
+IntVector diagonal2D(IntMatrix A, MatrixFn make) {
   int min = Math.min(A.rows, A.columns);
-  AbstractIntVector diag = make(0, 0).like1D(min);
+  IntVector diag = make(0, 0).like1D(min);
   for (int i = min; --i >= 0;) {
     diag.set(i, A.get(i, i));
   }
@@ -505,8 +505,8 @@ AbstractIntVector diagonal2D(AbstractIntMatrix A, MatrixFn make) {
 
 /// Constructs an identity matrix (having ones on the diagonal and zeros
 /// elsewhere).
-AbstractIntMatrix identity(int rowsAndColumns, MatrixFn make) {
-  AbstractIntMatrix matrix = make(rowsAndColumns, rowsAndColumns);
+IntMatrix identity(int rowsAndColumns, MatrixFn make) {
+  IntMatrix matrix = make(rowsAndColumns, rowsAndColumns);
   for (int i = rowsAndColumns; --i >= 0;) {
     matrix.set(i, i, 1);
   }
@@ -516,13 +516,13 @@ AbstractIntMatrix identity(int rowsAndColumns, MatrixFn make) {
 /// Construct a matrix from a one-dimensional column-major packed array, ala
 /// Fortran. Has the form
 /// `matrix.get(row,column) == values[row + column*rows]`.
-AbstractIntMatrix columnMajor(Int32List values, int rows, MatrixFn make) {
+IntMatrix columnMajor(Int32List values, int rows, MatrixFn make) {
   int columns = (rows != 0 ? values.length / rows : 0);
   if (rows * columns != values.length) {
     throw new ArgumentError("Array length must be a multiple of m.");
   }
 
-  AbstractIntMatrix matrix = make(rows, columns);
+  IntMatrix matrix = make(rows, columns);
   for (int row = 0; row < rows; row++) {
     for (int column = 0; column < columns; column++) {
       matrix.set(row, column, values[row + column * rows]);
@@ -533,7 +533,7 @@ AbstractIntMatrix columnMajor(Int32List values, int rows, MatrixFn make) {
 
 /// Constructs a matrix with the given shape, each cell initialized with the
 /// given value.
-AbstractIntMatrix fillMatrix(
+IntMatrix fillMatrix(
     int rows, int columns, int initialValue, MatrixFn make) {
   if (initialValue == 0) return make(rows, columns);
   return make(rows, columns)..fill(initialValue);
@@ -541,7 +541,7 @@ AbstractIntMatrix fillMatrix(
 
 /// Constructs a matrix with uniformly distributed values in `(0,1)`
 /// (exclusive).
-AbstractIntMatrix randomMatrix(int rows, int columns, MatrixFn make) {
+IntMatrix randomMatrix(int rows, int columns, MatrixFn make) {
   return make(rows, columns)..apply(ifunc.random());
 }
 
@@ -555,11 +555,11 @@ AbstractIntMatrix randomMatrix(int rows, int columns, MatrixFn make) {
 ///     2 3 2 3 2 3
 ///     0 1 0 1 0 1
 ///     2 3 2 3 2 3
-AbstractIntMatrix repeatMatrix(
-    AbstractIntMatrix A, int rowRepeat, int columnRepeat, MatrixFn make) {
+IntMatrix repeatMatrix(
+    IntMatrix A, int rowRepeat, int columnRepeat, MatrixFn make) {
   int r = A.rows;
   int c = A.columns;
-  AbstractIntMatrix matrix = make(r * rowRepeat, c * columnRepeat);
+  IntMatrix matrix = make(r * rowRepeat, c * columnRepeat);
   for (int i = rowRepeat; --i >= 0;) {
     for (int j = columnRepeat; --j >= 0;) {
       matrix.part(r * i, c * j, r, c).copyFrom(A);

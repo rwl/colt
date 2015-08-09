@@ -15,7 +15,7 @@ main() {
 //    // List<String> columnNames = [ "0.1", "0.3" ];
 //    // List<String> rowNames = [ "SunJDK1.2.2 classic", "IBMJDK1.1.8"];
 //
-//    AbstractDoubleMatrix matrix = DoubleFactory2D.dense.make(values);
+//    DoubleMatrix matrix = DoubleFactory2D.dense.make(values);
 //    stdout.writeln("\n\n"
 //            + new DoubleFormatter("%G")._toTitleString(matrix, rowNames, columnNames, "rowAxis", "colAxis",
 //                    "VM Performance: Provider vs. matrix density"));

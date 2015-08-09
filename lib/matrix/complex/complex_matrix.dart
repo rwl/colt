@@ -17,25 +17,25 @@ part of cern.colt.matrix.complex;
 /// i.e. `elements[idx]` constitute the real part and `elements[idx+1]`
 /// constitute the imaginary part, where
 /// `idx = index(0,0) + row * rowStride + column * columnStride`.
-class ComplexMatrix extends AbstractComplexMatrix {
+class DenseComplexMatrix extends ComplexMatrix {
   Float64List _elements;
 
   /// Constructs a complex matrix with the same size as [realPart] matrix and
   /// fills the real part of this matrix with elements of [realPart].
-  factory ComplexMatrix.fromReal(AbstractDoubleMatrix realPart) {
-    return new ComplexMatrix(realPart.rows, realPart.columns)
+  factory DenseComplexMatrix.fromReal(DoubleMatrix realPart) {
+    return new DenseComplexMatrix(realPart.rows, realPart.columns)
       ..setReal(realPart);
   }
 
   /// Constructs a matrix with a given number of rows and columns. All entries
   /// are initially `0`.
-  factory ComplexMatrix(int rows, int columns) {
+  factory DenseComplexMatrix(int rows, int columns) {
     final elements = new Float64List(rows * 2 * columns);
-    return new ComplexMatrix._internal(
+    return new DenseComplexMatrix._internal(
         rows, columns, elements, 0, 0, 2 * columns, 2, true);
   }
 
-  ComplexMatrix._internal(int rows, int columns, Float64List elements,
+  DenseComplexMatrix._internal(int rows, int columns, Float64List elements,
       int rowZero, int columnZero, int rowStride, int columnStride,
       bool isNoView)
       : super(rows, columns, rowZero, columnZero, rowStride, columnStride,
@@ -43,8 +43,8 @@ class ComplexMatrix extends AbstractComplexMatrix {
     _elements = elements;
   }
 
-  static ComplexMatrix create(int rows, int columns) {
-    return new ComplexMatrix(rows, columns);
+  static DenseComplexMatrix create(int rows, int columns) {
+    return new DenseComplexMatrix(rows, columns);
   }
 
   Complex aggregate(final cfunc.ComplexComplexComplexFunction aggr,
@@ -133,13 +133,13 @@ class ComplexMatrix extends AbstractComplexMatrix {
     }
   }
 
-  void copyFrom(final AbstractComplexMatrix source) {
+  void copyFrom(final ComplexMatrix source) {
     // overriden for performance only
-    if (source is! ComplexMatrix) {
+    if (source is! DenseComplexMatrix) {
       super.copyFrom(source);
       return;
     }
-    ComplexMatrix other = source as ComplexMatrix;
+    DenseComplexMatrix other = source as DenseComplexMatrix;
     if (other == this) {
       return; // nothing to do
     }
@@ -150,13 +150,13 @@ class ComplexMatrix extends AbstractComplexMatrix {
       return;
     }
     if (_haveSharedCells(other)) {
-      AbstractComplexMatrix c = other.copy();
-      if (c is! ComplexMatrix) {
+      ComplexMatrix c = other.copy();
+      if (c is! DenseComplexMatrix) {
         // should not happen
         super.copyFrom(other);
         return;
       }
-      other = c as ComplexMatrix;
+      other = c as DenseComplexMatrix;
     }
 
     Float64List elemsOther = other._elements;
@@ -181,10 +181,10 @@ class ComplexMatrix extends AbstractComplexMatrix {
     }
   }
 
-  void assign(final AbstractComplexMatrix y,
+  void assign(final ComplexMatrix y,
       final cfunc.ComplexComplexComplexFunction fn) {
     // overriden for performance only
-    if (y is! ComplexMatrix) {
+    if (y is! DenseComplexMatrix) {
       super.assign(y, fn);
       return;
     }
@@ -296,13 +296,13 @@ class ComplexMatrix extends AbstractComplexMatrix {
     }
   }
 
-  void setImaginary(final AbstractDoubleMatrix other) {
+  void setImaginary(final DoubleMatrix other) {
     checkShape(this, other);
     int columnStrideOther = other.columnStride;
     int rowStrideOther = other.rowStride;
     int zeroOther = other.index(0, 0);
     int zero = index(0, 0);
-    Float64List elemsOther = (other as DoubleMatrix).elements;
+    Float64List elemsOther = (other as DenseDoubleMatrix).elements;
     int idx = zero;
     int idxOther = zeroOther;
     for (int r = 0; r < rows; r++) {
@@ -316,13 +316,13 @@ class ComplexMatrix extends AbstractComplexMatrix {
     }
   }
 
-  void setReal(final AbstractDoubleMatrix other) {
+  void setReal(final DoubleMatrix other) {
     checkShape(this, other);
     int columnStrideOther = other.columnStride;
     int rowStrideOther = other.rowStride;
     int zeroOther = other.index(0, 0);
     int zero = index(0, 0);
-    Float64List elemsOther = (other as DoubleMatrix).elements;
+    Float64List elemsOther = (other as DenseDoubleMatrix).elements;
     int idx = zero;
     int idxOther = zeroOther;
     for (int r = 0; r < rows; r++) {
@@ -369,9 +369,9 @@ class ComplexMatrix extends AbstractComplexMatrix {
     }
   }
 
-  AbstractComplexMatrix conjugateTranspose() {
-    AbstractComplexMatrix transpose = dice().copy();
-    Float64List elemsOther = (transpose as ComplexMatrix)._elements;
+  ComplexMatrix conjugateTranspose() {
+    ComplexMatrix transpose = dice().copy();
+    Float64List elemsOther = (transpose as DenseComplexMatrix)._elements;
     int zeroOther = transpose.index(0, 0);
     int columnStrideOther = transpose.columnStride;
     //int rowStrideOther = transpose.rowStride;
@@ -389,8 +389,8 @@ class ComplexMatrix extends AbstractComplexMatrix {
 
   dynamic get elements => _elements;
 
-  AbstractDoubleMatrix imaginary() {
-    var Im = new DoubleMatrix(rows, columns);
+  DoubleMatrix imaginary() {
+    var Im = new DenseDoubleMatrix(rows, columns);
     Float64List elemsOther = Im.elements;
     int columnStrideOther = Im.columnStride;
     int rowStrideOther = Im.rowStride;
@@ -435,8 +435,8 @@ class ComplexMatrix extends AbstractComplexMatrix {
     return new Complex(_elements[idx], _elements[idx + 1]);
   }
 
-  AbstractDoubleMatrix real() {
-    var R = new DoubleMatrix(rows, columns);
+  DoubleMatrix real() {
+    var R = new DenseDoubleMatrix(rows, columns);
     Float64List elemsOther = R.elements;
     int columnStrideOther = R.columnStride;
     int rowStrideOther = R.rowStride;
@@ -456,11 +456,11 @@ class ComplexMatrix extends AbstractComplexMatrix {
     return R;
   }
 
-  AbstractComplexMatrix like2D(int rows, int columns) {
-    return new ComplexMatrix(rows, columns);
+  ComplexMatrix like2D(int rows, int columns) {
+    return new DenseComplexMatrix(rows, columns);
   }
 
-  AbstractComplexVector like1D(int size) => new ComplexVector(size);
+  ComplexVector like1D(int size) => new DenseComplexVector(size);
 
   void setParts(int row, int column, double re, double im) {
     int idx = rowZero + row * rowStride + columnZero + column * columnStride;
@@ -474,8 +474,8 @@ class ComplexMatrix extends AbstractComplexMatrix {
     _elements[idx + 1] = value.imaginary;
   }
 
-  AbstractComplexVector mult(final AbstractComplexVector y,
-      [AbstractComplexVector z = null, Complex alpha = null,
+  ComplexVector mult(final ComplexVector y,
+      [ComplexVector z = null, Complex alpha = null,
       Complex beta = null, bool transposeA = false]) {
     if (alpha == null) {
       alpha = Complex.ONE;
@@ -486,9 +486,9 @@ class ComplexMatrix extends AbstractComplexMatrix {
     if (transposeA) {
       return conjugateTranspose().mult(y, z, alpha, beta, false);
     }
-    AbstractComplexVector zz;
+    ComplexVector zz;
     if (z == null) {
-      zz = new ComplexVector(rows);
+      zz = new DenseComplexVector(rows);
     } else {
       zz = z;
     }
@@ -540,8 +540,8 @@ class ComplexMatrix extends AbstractComplexMatrix {
     return zz;
   }
 
-  AbstractComplexMatrix multiply(AbstractComplexMatrix B,
-      [AbstractComplexMatrix C = null, Complex alpha = null,
+  ComplexMatrix multiply(ComplexMatrix B,
+      [ComplexMatrix C = null, Complex alpha = null,
       Complex beta = null, final bool transposeA = false,
       final bool transposeB = false]) {
     if (alpha == null) {
@@ -562,9 +562,9 @@ class ComplexMatrix extends AbstractComplexMatrix {
     int n = columns;
     int p = B.columns;
     if (C == null) {
-      C = new ComplexMatrix(m, p);
+      C = new DenseComplexMatrix(m, p);
     }
-    if (C is! ComplexMatrix) {
+    if (C is! DenseComplexMatrix) {
       return super.multiply(B, C, alpha, beta, transposeA, transposeB);
     }
     if (B.rows != n) {
@@ -585,8 +585,8 @@ class ComplexMatrix extends AbstractComplexMatrix {
       throw new ArgumentError("Matrices must not be identical");
     }
 
-    ComplexMatrix BB = B as ComplexMatrix;
-    ComplexMatrix CC = C as ComplexMatrix;
+    DenseComplexMatrix BB = B as DenseComplexMatrix;
+    DenseComplexMatrix CC = C as DenseComplexMatrix;
     Float64List AElems = _elements;
     Float64List BElems = BB._elements;
     Float64List CElems = CC._elements;
@@ -709,10 +709,10 @@ class ComplexMatrix extends AbstractComplexMatrix {
     return sum;
   }
 
-  bool _haveSharedCellsRaw(AbstractComplexMatrix other) {
+  bool _haveSharedCellsRaw(ComplexMatrix other) {
     if (other is SelectedDenseComplexMatrix) {
       return _elements == other._elements;
-    } else if (other is ComplexMatrix) {
+    } else if (other is DenseComplexMatrix) {
       return _elements == other._elements;
     }
     return false;
@@ -722,19 +722,19 @@ class ComplexMatrix extends AbstractComplexMatrix {
     return rowZero + row * rowStride + columnZero + column * columnStride;
   }
 
-  AbstractComplexVector _like1D(int size, int zero, int stride) {
-    return new ComplexVector._internal(
+  ComplexVector _like1D(int size, int zero, int stride) {
+    return new DenseComplexVector._internal(
         size, this._elements, zero, stride, false);
   }
 
-  AbstractComplexMatrix _viewSelectionLike(
+  ComplexMatrix _viewSelectionLike(
       Int32List rowOffsets, Int32List columnOffsets) {
     return new SelectedDenseComplexMatrix(
         this._elements, rowOffsets, columnOffsets, 0);
   }
 
   Object clone() {
-    return new ComplexMatrix._internal(rows, columns, _elements, rowZero,
+    return new DenseComplexMatrix._internal(rows, columns, _elements, rowZero,
         columnZero, rowStride, columnStride, !isView);
   }
 }
@@ -748,7 +748,7 @@ class ComplexMatrix extends AbstractComplexMatrix {
 /// the same signatures and semantics as its abstract superclass(es) while
 /// introducing no additional functionality. Thus, this class need not be
 /// visible to users.
-class SelectedDenseComplexMatrix extends AbstractComplexMatrix {
+class SelectedDenseComplexMatrix extends ComplexMatrix {
   Float64List _elements;
 
   /// The offsets of the visible cells of this matrix.
@@ -792,10 +792,10 @@ class SelectedDenseComplexMatrix extends AbstractComplexMatrix {
     throw new UnsupportedError("This method is not supported.");
   }
 
-  bool _haveSharedCellsRaw(AbstractComplexMatrix other) {
+  bool _haveSharedCellsRaw(ComplexMatrix other) {
     if (other is SelectedDenseComplexMatrix) {
       return _elements == other._elements;
-    } else if (other is ComplexMatrix) {
+    } else if (other is DenseComplexMatrix) {
       return _elements == other._elements;
     }
     return false;
@@ -807,13 +807,13 @@ class SelectedDenseComplexMatrix extends AbstractComplexMatrix {
         _columnOffsets[columnZero + column * columnStride];
   }
 
-  AbstractComplexMatrix like2D(int rows, int columns) {
-    return new ComplexMatrix(rows, columns);
+  ComplexMatrix like2D(int rows, int columns) {
+    return new DenseComplexMatrix(rows, columns);
   }
 
-  AbstractComplexVector like1D(int size) => new ComplexVector(size);
+  ComplexVector like1D(int size) => new DenseComplexVector(size);
 
-  AbstractComplexVector _like1D(int size, int zero, int stride) {
+  ComplexVector _like1D(int size, int zero, int stride) {
     // never called since row() and column() are overridden
     throw new Error();
   }
@@ -827,7 +827,7 @@ class SelectedDenseComplexMatrix extends AbstractComplexMatrix {
   }
 
   // This method is not supported.
-  AbstractComplexVector vectorize() {
+  ComplexVector vectorize() {
     throw new UnsupportedError("This method is not supported.");
   }
 
@@ -838,7 +838,7 @@ class SelectedDenseComplexMatrix extends AbstractComplexMatrix {
     _elements[_offset + _rowOffsets[idxr] + _columnOffsets[idxc] + 1] = im;
   }
 
-  AbstractComplexMatrix dice() {
+  ComplexMatrix dice() {
     var v = _view();
     vDice(v);
     Int32List tmp = _rowOffsets;
@@ -848,7 +848,7 @@ class SelectedDenseComplexMatrix extends AbstractComplexMatrix {
     return v;
   }
 
-  AbstractComplexVector column(int column) {
+  ComplexVector column(int column) {
     checkColumn(this, column);
     int viewSize = rows;
     int viewZero = rowZero;
@@ -859,7 +859,7 @@ class SelectedDenseComplexMatrix extends AbstractComplexMatrix {
         viewZero, viewStride, viewOffsets, viewOffset);
   }
 
-  AbstractComplexVector row(int row) {
+  ComplexVector row(int row) {
     checkRow(this, row);
     int viewSize = columns;
     int viewZero = columnZero;
@@ -870,14 +870,14 @@ class SelectedDenseComplexMatrix extends AbstractComplexMatrix {
         viewSize, _elements, viewZero, viewStride, viewOffsets, viewOffset);
   }
 
-  AbstractComplexMatrix _viewSelectionLike(
+  ComplexMatrix _viewSelectionLike(
       Int32List rowOffsets, Int32List columnOffsets) {
     return new SelectedDenseComplexMatrix(
         this._elements, rowOffsets, columnOffsets, _offset);
   }
 
-  AbstractDoubleMatrix real() {
-    var R = new DoubleMatrix(rows, columns);
+  DoubleMatrix real() {
+    var R = new DenseDoubleMatrix(rows, columns);
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < columns; c++) {
         final tmp = get(r, c);
@@ -887,8 +887,8 @@ class SelectedDenseComplexMatrix extends AbstractComplexMatrix {
     return R;
   }
 
-  AbstractDoubleMatrix imaginary() {
-    var Im = new DoubleMatrix(rows, columns);
+  DoubleMatrix imaginary() {
+    var Im = new DenseDoubleMatrix(rows, columns);
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < columns; c++) {
         final tmp = get(r, c);

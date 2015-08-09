@@ -11,8 +11,8 @@
 part of cern.colt.matrix.int;
 
 /// Abstract base class for 2-d matrices holding [int] elements.
-abstract class AbstractIntMatrix extends AbstractMatrix {
-  AbstractIntMatrix(int rows, int columns, [int rowZero = 0, int columnZero = 0,
+abstract class IntMatrix extends AbstractMatrix {
+  IntMatrix(int rows, int columns, [int rowZero = 0, int columnZero = 0,
       int rowStride = null, int columnStride = 1, bool isNoView = true])
       : super(rows, columns, rowZero, columnZero, rowStride, columnStride,
           isNoView);
@@ -99,12 +99,12 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
   /// both matrices share the same cells (as is the case if they are views
   /// derived from the same matrix) and intersect in an ambiguous way, then
   /// replaces as if using an intermediate auxiliary deep copy of [other].
-  void copyFrom(AbstractIntMatrix other) {
+  void copyFrom(IntMatrix other) {
     if (other == this) {
       return;
     }
     checkShape(this, other);
-    AbstractIntMatrix other_loc;
+    IntMatrix other_loc;
     if (_haveSharedCells(other)) {
       other_loc = other.copy();
     } else {
@@ -136,7 +136,7 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
   ///     m1 == 2 x 2 matrix
   ///     1   1
   ///     16 729
-  void assign(final AbstractIntMatrix y, final ifunc.IntIntFunction fn) {
+  void assign(final IntMatrix y, final ifunc.IntIntFunction fn) {
     checkShape(this, y);
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < columns; c++) {
@@ -157,16 +157,16 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
   }
 
   /// Constructs and returns a deep copy of the receiver.
-  AbstractIntMatrix copy() => like()..copyFrom(this);
+  IntMatrix copy() => like()..copyFrom(this);
 
   Object get elements;
 
   /// Compares this object against the specified object. The result is
   /// `true` if and only if the argument is not `null` and is at least
-  /// a [AbstractIntMatrix] object that has the same number of columns
+  /// a [IntMatrix] object that has the same number of columns
   /// and rows as the receiver and has exactly the same values at the
   /// same coordinates.
-  bool equals(AbstractIntMatrix obj) {
+  bool equals(IntMatrix obj) {
     if (identical(this, obj)) {
       return true;
     }
@@ -202,7 +202,7 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
 
   /// Returns the content of this matrix if it is a wrapper; or `this`
   /// otherwise. Override this method in wrappers.
-  AbstractIntMatrix _getContent() => this;
+  IntMatrix _getContent() => this;
 
   /// Fills the coordinates and values of cells having negative values into
   /// the specified lists. Fills into the lists, starting at index 0. After
@@ -288,7 +288,7 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
   int get(int row, int column);
 
   /// Returns `true` if both matrices share at least one identical cell.
-  bool _haveSharedCells(AbstractIntMatrix other) {
+  bool _haveSharedCells(IntMatrix other) {
     if (other == null) {
       return false;
     }
@@ -299,23 +299,23 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
   }
 
   /// Returns `true` if both matrices share at least one identical cell.
-  bool _haveSharedCellsRaw(AbstractIntMatrix other) => false;
+  bool _haveSharedCellsRaw(IntMatrix other) => false;
 
   /// Construct and returns a new empty matrix of the same dynamic type
   /// as the receiver, having the same number of rows and columns.
-  AbstractIntMatrix like() => like2D(rows, columns);
+  IntMatrix like() => like2D(rows, columns);
 
   /// Construct and returns a new empty matrix of the same dynamic type
   /// as the receiver, having the specified number of rows and columns.
-  AbstractIntMatrix like2D(int rows, int columns);
+  IntMatrix like2D(int rows, int columns);
 
   /// Construct and returns a new 1-d matrix of the corresponding dynamic
   /// type, entirelly independent of the receiver.
-  AbstractIntVector like1D(int size);
+  IntVector like1D(int size);
 
   /// Construct and returns a new 1-d matrix of the corresponding dynamic
   /// type, sharing the same cells.
-  AbstractIntVector _like1D(int size, int zero, int stride);
+  IntVector _like1D(int size, int zero, int stride);
 
   /// Return the maximum value of this matrix together with its location.
   IntMatrixLocation max() {
@@ -377,7 +377,7 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
 
   /// Constructs and returns a new view equal to the receiver. The view is a
   /// shallow clone.
-  AbstractIntMatrix _view() => clone() as AbstractIntMatrix;
+  IntMatrix _view() => clone() as IntMatrix;
 
   /// Constructs and returns a new *slice view* representing the rows of
   /// the given column.
@@ -390,7 +390,7 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
   ///     viewColumn(0) ==>
   ///     Vector of size 2:
   ///     1, 4
-  AbstractIntVector column(int column) {
+  IntVector column(int column) {
     checkColumn(this, column);
     int viewSize = rows;
     int viewZero = index(0, column);
@@ -415,7 +415,7 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
   ///     2 x 3 matrix:
   ///     1, 2, 3
   ///     4, 5, 6
-  AbstractIntMatrix columnFlip() {
+  IntMatrix columnFlip() {
     var v = _view();
     vColumnFlip(v);
     return v;
@@ -437,7 +437,7 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
   ///     2 x 3 matrix:
   ///     1, 2, 3
   ///     4, 5, 6
-  AbstractIntMatrix dice() {
+  IntMatrix dice() {
     var v = _view();
     vDice(v);
     return v;
@@ -445,7 +445,7 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
 
   /// Constructs and returns a new *sub-range view* that is a
   /// `height x width` sub matrix starting at `[row,column]`.
-  AbstractIntMatrix part(int row, int column, int height, int width) {
+  IntMatrix part(int row, int column, int height, int width) {
     var v = _view();
     vBox(v, row, column, height, width);
     return v;
@@ -461,7 +461,7 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
   ///     row(0) ==>
   ///     Vector of size 3:
   ///     1, 2, 3
-  AbstractIntVector row(int row) {
+  IntVector row(int row) {
     checkRow(this, row);
     int viewSize = columns;
     int viewZero = index(row, 0);
@@ -484,7 +484,7 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
   ///     2 x 3 matrix:
   ///     1, 2, 3
   ///     4, 5, 6
-  AbstractIntMatrix rowFlip() {
+  IntMatrix rowFlip() {
     var v = _view();
     vRowFlip(v);
     return v;
@@ -507,7 +507,7 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
   ///
   /// To indicate "all" rows or "all columns", simply set the respective
   /// parameter
-  AbstractIntMatrix select(Int32List rowIndexes, Int32List columnIndexes) {
+  IntMatrix select(Int32List rowIndexes, Int32List columnIndexes) {
     // check for "all"
     if (rowIndexes == null) {
       rowIndexes = new Int32List(rows);
@@ -536,12 +536,12 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
   }
 
   /// Construct and returns a new selection view.
-  AbstractIntMatrix _viewSelectionLike(
+  IntMatrix _viewSelectionLike(
       Int32List rowOffsets, Int32List columnOffsets);
 
   /// Constructs and returns a new *stride view* which is a sub matrix
   /// consisting of every i-th cell.
-  AbstractIntMatrix strides(int rowStride, int columnStride) {
+  IntMatrix strides(int rowStride, int columnStride) {
     var v = _view();
     vStrides(v, rowStride, columnStride);
     return v;
@@ -551,7 +551,7 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
   /// `z = alpha * A * y + beta*z`.
   /// `z[i] = alpha*Sum(A[i,j] * y[j]) + beta*z[i], i=0..A.rows()-1, j=0..y.length-1`.
   /// Where `A == this`.
-  AbstractIntVector mult(final AbstractIntVector y, [AbstractIntVector z = null,
+  IntVector mult(final IntVector y, [IntVector z = null,
       final int alpha = 1, int beta = null, final bool transposeA = false]) {
     if (beta == null) {
       beta = z == null ? 1 : 0;
@@ -559,9 +559,9 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
     if (transposeA) {
       return dice().mult(y, z, alpha, beta, false);
     }
-    AbstractIntVector z_loc;
+    IntVector z_loc;
     if (z == null) {
-      z_loc = new IntVector(rows);
+      z_loc = new DenseIntVector(rows);
     } else {
       z_loc = z;
     }
@@ -588,8 +588,8 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
   /// `C = alpha * A x B + beta*C`.
   /// `C[i,j] = alpha*Sum(A[i,k] * B[k,j]) + beta*C[i,j], k=0..n-1`.
   /// Matrix shapes: `A(m x n), B(n x p), C(m x p)`.
-  AbstractIntMatrix multiply(final AbstractIntMatrix B,
-      [AbstractIntMatrix C = null, final int alpha = 1, int beta = null,
+  IntMatrix multiply(final IntMatrix B,
+      [IntMatrix C = null, final int alpha = 1, int beta = null,
       final bool transposeA = false, final bool transposeB = false]) {
     if (beta == null) {
       beta = C == null ? 1 : 0;
@@ -604,9 +604,9 @@ abstract class AbstractIntMatrix extends AbstractMatrix {
     int m = rows;
     int n = columns;
     int p = B.columns;
-    AbstractIntMatrix C_loc;
+    IntMatrix C_loc;
     if (C == null) {
-      C_loc = new IntMatrix(m, p);
+      C_loc = new DenseIntMatrix(m, p);
     } else {
       C_loc = C;
     }

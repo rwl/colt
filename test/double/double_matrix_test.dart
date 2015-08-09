@@ -3,10 +3,10 @@ part of cern.colt.matrix.double.test;
 const int NROWS = 13;
 const int NCOLUMNS = 17;
 
-void testAbstractDoubleMatrix(
-    String kind, AbstractDoubleMatrix make(int rows, int columns)) {
-  group("AbstractDoubleMatrix ($kind)", () {
-    AbstractDoubleMatrix A, B, Bt;
+void testDoubleMatrix(
+    String kind, DoubleMatrix make(int rows, int columns)) {
+  group("DoubleMatrix ($kind)", () {
+    DoubleMatrix A, B, Bt;
 
     setUp(() {
       A = make(NROWS, NCOLUMNS);
@@ -44,7 +44,7 @@ void testAbstractDoubleMatrix(
     });
 
     test('apply', () {
-      AbstractDoubleMatrix Acopy = A.copy();
+      DoubleMatrix Acopy = A.copy();
       A.apply(acos);
       for (int r = 0; r < A.rows; r++) {
         for (int c = 0; c < A.columns; c++) {
@@ -64,7 +64,7 @@ void testAbstractDoubleMatrix(
     });
 
     test('assign', () {
-      AbstractDoubleMatrix Acopy = A.copy();
+      DoubleMatrix Acopy = A.copy();
       A.assign(B, plus);
       for (int r = 0; r < A.rows; r++) {
         for (int c = 0; c < A.columns; c++) {
@@ -84,7 +84,7 @@ void testAbstractDoubleMatrix(
     });
 
     test('forEachNonZero', () {
-      AbstractDoubleMatrix Acopy = A.copy();
+      DoubleMatrix Acopy = A.copy();
       double fn(int first, int second, double third) {
         return math.sqrt(third);
       }
@@ -174,7 +174,7 @@ void testAbstractDoubleMatrix(
     });
 
     test('column', () {
-      AbstractDoubleVector col = A.column(A.columns ~/ 2);
+      DoubleVector col = A.column(A.columns ~/ 2);
       expect(A.rows, equals(col.size));
       for (int r = 0; r < A.rows; r++) {
         expect(A.get(r, A.columns ~/ 2), closeTo(col.get(r), TOL));
@@ -182,7 +182,7 @@ void testAbstractDoubleMatrix(
     });
 
     test('columnFlip', () {
-      AbstractDoubleMatrix B = A.columnFlip();
+      DoubleMatrix B = A.columnFlip();
       expect(A.size, equals(B.size));
       for (int r = 0; r < A.rows; r++) {
         for (int c = 0; c < A.columns; c++) {
@@ -192,7 +192,7 @@ void testAbstractDoubleMatrix(
     });
 
     test('dice', () {
-      AbstractDoubleMatrix B = A.dice();
+      DoubleMatrix B = A.dice();
       expect(A.rows, equals(B.columns));
       expect(A.columns, equals(B.rows));
       for (int r = 0; r < A.rows; r++) {
@@ -203,7 +203,7 @@ void testAbstractDoubleMatrix(
     });
 
     test('part', () {
-      AbstractDoubleMatrix B =
+      DoubleMatrix B =
           A.part(A.rows ~/ 2, A.columns ~/ 2, A.rows ~/ 3, A.columns ~/ 3);
       expect(A.rows ~/ 3, equals(B.rows));
       expect(A.columns ~/ 3, equals(B.columns));
@@ -216,7 +216,7 @@ void testAbstractDoubleMatrix(
     });
 
     test('row', () {
-      AbstractDoubleVector B = A.row(A.rows ~/ 2);
+      DoubleVector B = A.row(A.rows ~/ 2);
       expect(A.columns, equals(B.size));
       for (int r = 0; r < A.columns; r++) {
         expect(A.get(A.rows ~/ 2, r), closeTo(B.get(r), TOL));
@@ -224,7 +224,7 @@ void testAbstractDoubleMatrix(
     });
 
     test('rowFlip', () {
-      AbstractDoubleMatrix B = A.rowFlip();
+      DoubleMatrix B = A.rowFlip();
       expect(A.size, equals(B.size));
       for (int r = 0; r < A.rows; r++) {
         for (int c = 0; c < A.columns; c++) {
@@ -244,7 +244,7 @@ void testAbstractDoubleMatrix(
         A.columns ~/ 2,
         A.columns - 1
       ]);
-      AbstractDoubleMatrix B = A.select(rowIndexes, colIndexes);
+      DoubleMatrix B = A.select(rowIndexes, colIndexes);
       expect(rowIndexes.length, equals(B.rows));
       expect(colIndexes.length, equals(B.columns));
       for (int r = 0; r < rowIndexes.length; r++) {
@@ -258,7 +258,7 @@ void testAbstractDoubleMatrix(
     test('strides', () {
       int rowStride = 3;
       int colStride = 5;
-      AbstractDoubleMatrix B = A.strides(rowStride, colStride);
+      DoubleMatrix B = A.strides(rowStride, colStride);
       for (int r = 0; r < B.rows; r++) {
         for (int c = 0; c < B.columns; c++) {
           expect(
@@ -268,13 +268,13 @@ void testAbstractDoubleMatrix(
     });
 
     test('mult', () {
-      AbstractDoubleVector y = new DoubleVector(A.columns);
+      DoubleVector y = new DenseDoubleVector(A.columns);
       for (int i = 0; i < y.size; i++) {
         y.set(i, _r.nextDouble());
       }
       double alpha = 3.0;
       double beta = 5.0;
-      AbstractDoubleVector z = new DoubleVector.random(A.rows);
+      DoubleVector z = new DenseDoubleVector.random(A.rows);
       Float64List expected = z.toList();
       z = A.mult(y, z, alpha, beta, false);
       for (int r = 0; r < A.rows; r++) {
@@ -304,11 +304,11 @@ void testAbstractDoubleMatrix(
       }
 
       //transpose
-      y = new DoubleVector(A.rows);
+      y = new DenseDoubleVector(A.rows);
       for (int i = 0; i < y.size; i++) {
         y.set(i, _r.nextDouble());
       }
-      z = new DoubleVector.random(A.columns);
+      z = new DenseDoubleVector.random(A.columns);
       expected = z.toList();
       z = A.mult(y, z, alpha, beta, true);
       for (int r = 0; r < A.columns; r++) {
@@ -340,7 +340,7 @@ void testAbstractDoubleMatrix(
     test('multiply', () {
       double alpha = 3.0;
       double beta = 5.0;
-      AbstractDoubleMatrix C = new DoubleMatrix.random(A.rows, A.rows);
+      DoubleMatrix C = new DenseDoubleMatrix.random(A.rows, A.rows);
       List<Float64List> expected = toList(C);
       C = A.multiply(Bt, C, alpha, beta, false, false);
       for (int j = 0; j < A.rows; j++) {
@@ -379,7 +379,7 @@ void testAbstractDoubleMatrix(
       }
 
       //transposeA
-      C = new DoubleMatrix.random(A.columns, A.columns);
+      C = new DenseDoubleMatrix.random(A.columns, A.columns);
       expected = toList(C);
       C = A.multiply(B, C, alpha, beta, true, false);
       for (int j = 0; j < A.columns; j++) {
@@ -417,7 +417,7 @@ void testAbstractDoubleMatrix(
       }
 
       //transposeB
-      C = new DoubleMatrix.random(A.rows, A.rows);
+      C = new DenseDoubleMatrix.random(A.rows, A.rows);
       expected = toList(C);
       C = A.multiply(B, C, alpha, beta, false, true);
       for (int j = 0; j < A.rows; j++) {
@@ -454,7 +454,7 @@ void testAbstractDoubleMatrix(
         }
       }
       //transposeA and transposeB
-      C = new DoubleMatrix.random(A.columns, A.columns);
+      C = new DenseDoubleMatrix.random(A.columns, A.columns);
       expected = toList(C);
       C = A.multiply(Bt, C, alpha, beta, true, true);
       for (int j = 0; j < A.columns; j++) {

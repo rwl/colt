@@ -17,45 +17,45 @@ part of cern.colt.matrix.complex;
 /// `elements[zero + 2 * k * stride]` constitute real part and
 /// `elements[zero + 2 * k * stride + 1]`
 /// constitute imaginary part `(k=0,...,size()-1)`.
-class ComplexVector extends AbstractComplexVector {
+class DenseComplexVector extends ComplexVector {
   Float64List _elements;
 
   /// Constructs a matrix with a copy of the given values. Due to the fact
   /// that complex data is represented by 2 double values in sequence: the
   /// real and imaginary parts, the size of new matrix will be equal to
   /// `values.length / 2`.
-  factory ComplexVector.fromList(Float64List values) {
-    return new ComplexVector(values.length ~/ 2)..setAll(values);
+  factory DenseComplexVector.fromList(Float64List values) {
+    return new DenseComplexVector(values.length ~/ 2)..setAll(values);
   }
 
   /// Constructs a complex matrix with the same size as [realPart] matrix
   /// and fills the real part of this matrix with elements of [realPart].
-  factory ComplexVector.fromReal(AbstractDoubleVector realPart) {
-    return new ComplexVector(realPart.size)..setReal(realPart);
+  factory DenseComplexVector.fromReal(DoubleVector realPart) {
+    return new DenseComplexVector(realPart.size)..setReal(realPart);
   }
 
-  factory ComplexVector.fromImaginary(AbstractDoubleVector imagPart) {
-    return new ComplexVector(imagPart.size)..setImaginary(imagPart);
+  factory DenseComplexVector.fromImaginary(DoubleVector imagPart) {
+    return new DenseComplexVector(imagPart.size)..setImaginary(imagPart);
   }
 
   /// Constructs a complex matrix with the same size as [realPart] matrix
   /// and fills the real part of this matrix with elements of [realPart]
   /// and fills the imaginary part of this matrix with elements of
   /// [imaginaryPart].
-  factory ComplexVector.fromParts(
-      AbstractDoubleVector realPart, AbstractDoubleVector imaginaryPart) {
-    return new ComplexVector(realPart.size)
+  factory DenseComplexVector.fromParts(
+      DoubleVector realPart, DoubleVector imaginaryPart) {
+    return new DenseComplexVector(realPart.size)
       ..setReal(realPart)
       ..setImaginary(imaginaryPart);
   }
 
   /// Constructs a matrix with the given size.
-  factory ComplexVector(int size) {
+  factory DenseComplexVector(int size) {
     final elements = new Float64List(2 * size);
-    return new ComplexVector._internal(size, elements, 0, 2, true);
+    return new DenseComplexVector._internal(size, elements, 0, 2, true);
   }
 
-  ComplexVector._internal(
+  DenseComplexVector._internal(
       int size, Float64List elements, int zero, int stride, bool isNoView)
       : super(size, zero, stride, isNoView) {
     _elements = elements;
@@ -63,8 +63,8 @@ class ComplexVector extends AbstractComplexVector {
 
   /// Constructs a matrix from the given polar representation. [r] is the
   /// polar radius. [theta] is the polar angle.
-  factory ComplexVector.fromPolar(
-      AbstractDoubleVector r, AbstractDoubleVector theta,
+  factory DenseComplexVector.fromPolar(
+      DoubleVector r, DoubleVector theta,
       [bool radians = true]) {
     final real = theta.copy();
     final imag = theta.copy();
@@ -77,11 +77,11 @@ class ComplexVector extends AbstractComplexVector {
     imag.apply(func.sin);
     imag.assign(r, func.mult);
 
-    return new ComplexVector.fromParts(real, imag);
+    return new DenseComplexVector.fromParts(real, imag);
   }
 
-  static ComplexVector create(int size) {
-    return new ComplexVector(size);
+  static DenseComplexVector create(int size) {
+    return new DenseComplexVector(size);
   }
 
   Complex aggregate(final cfunc.ComplexComplexComplexFunction aggr,
@@ -160,12 +160,12 @@ class ComplexVector extends AbstractComplexVector {
     }
   }
 
-  void copyFrom(AbstractComplexVector source) {
-    if (source is! ComplexVector) {
+  void copyFrom(ComplexVector source) {
+    if (source is! DenseComplexVector) {
       super.copyFrom(source);
       return;
     }
-    ComplexVector other = source as ComplexVector;
+    DenseComplexVector other = source as DenseComplexVector;
     if (other == this) {
       return;
     }
@@ -176,13 +176,13 @@ class ComplexVector extends AbstractComplexVector {
       return;
     }
     if (_haveSharedCells(other)) {
-      AbstractComplexVector c = other.copy();
-      if (c is! ComplexVector) {
+      ComplexVector c = other.copy();
+      if (c is! DenseComplexVector) {
         // should not happen
         super.copyFrom(source);
         return;
       }
-      other = c as ComplexVector;
+      other = c as DenseComplexVector;
     }
 
     Float64List elemsOther = other._elements;
@@ -203,8 +203,8 @@ class ComplexVector extends AbstractComplexVector {
   }
 
   void assign(
-      AbstractComplexVector y, final cfunc.ComplexComplexComplexFunction fn) {
-    if (y is! ComplexVector) {
+      ComplexVector y, final cfunc.ComplexComplexComplexFunction fn) {
+    if (y is! DenseComplexVector) {
       super.assign(y, fn);
       return;
     }
@@ -320,8 +320,8 @@ class ComplexVector extends AbstractComplexVector {
     }
   }
 
-  void setImaginary(final AbstractDoubleVector other) {
-    if (other is! DoubleVector) {
+  void setImaginary(final DoubleVector other) {
+    if (other is! DenseDoubleVector) {
       super.setImaginary(other);
       return;
     }
@@ -338,8 +338,8 @@ class ComplexVector extends AbstractComplexVector {
     }
   }
 
-  void setReal(final AbstractDoubleVector other) {
-    if (other is! DoubleVector) {
+  void setReal(final DoubleVector other) {
+    if (other is! DenseDoubleVector) {
       super.setReal(other);
       return;
     }
@@ -358,8 +358,8 @@ class ComplexVector extends AbstractComplexVector {
 
   Object get elements => _elements;
 
-  AbstractDoubleVector imaginary() {
-    var Im = new DoubleVector(size);
+  DoubleVector imaginary() {
+    var Im = new DenseDoubleVector(size);
     Float64List elemsOther = Im.elements;
     int zeroOther = Im.index(0);
     int strideOther = Im.stride;
@@ -403,8 +403,8 @@ class ComplexVector extends AbstractComplexVector {
     return new Complex(_elements[idx], _elements[idx + 1]);
   }
 
-  AbstractDoubleVector real() {
-    var R = new DoubleVector(size);
+  DoubleVector real() {
+    var R = new DenseDoubleVector(size);
     Float64List elemsOther = R.elements;
     int zeroOther = R.index(0);
     int strideOther = R.stride;
@@ -418,17 +418,17 @@ class ComplexVector extends AbstractComplexVector {
     return R;
   }
 
-  AbstractComplexVector like1D(int size) => new ComplexVector(size);
+  ComplexVector like1D(int size) => new DenseComplexVector(size);
 
-  AbstractComplexMatrix like2D(int rows, int columns) {
-    return new ComplexMatrix(rows, columns);
+  ComplexMatrix like2D(int rows, int columns) {
+    return new DenseComplexMatrix(rows, columns);
   }
 
-  AbstractComplexMatrix reshape(final int rows, final int columns) {
+  ComplexMatrix reshape(final int rows, final int columns) {
     if (rows * columns != size) {
       throw new ArgumentError("rows*columns != size");
     }
-    var M = new ComplexMatrix(rows, columns);
+    var M = new DenseComplexMatrix(rows, columns);
     Float64List elemsOther = M.elements as Float64List;
     int zeroOther = M.index(0, 0);
     int rowStrideOther = M.rowStride;
@@ -469,7 +469,7 @@ class ComplexVector extends AbstractComplexVector {
     }
   }
 
-  Complex dot(final AbstractComplexVector y,
+  Complex dot(final ComplexVector y,
       [final int from = 0, int length = null]) {
     if (length == null) {
       length = this.size;
@@ -524,10 +524,10 @@ class ComplexVector extends AbstractComplexVector {
     return sum;
   }
 
-  bool _haveSharedCellsRaw(AbstractComplexVector other) {
+  bool _haveSharedCellsRaw(ComplexVector other) {
     if (other is SelectedDenseComplexVector) {
       return _elements == other._elements;
-    } else if (other is ComplexVector) {
+    } else if (other is DenseComplexVector) {
       return _elements == other._elements;
     }
     return false;
@@ -535,12 +535,12 @@ class ComplexVector extends AbstractComplexVector {
 
   int index(int rank) => zero + rank * stride;
 
-  AbstractComplexVector _viewSelectionLike(Int32List offsets) {
+  ComplexVector _viewSelectionLike(Int32List offsets) {
     return new SelectedDenseComplexVector(_elements, offsets);
   }
 
   Object clone() {
-    return new ComplexVector._internal(size, _elements, zero, stride, !isView);
+    return new DenseComplexVector._internal(size, _elements, zero, stride, !isView);
   }
 }
 
@@ -553,7 +553,7 @@ class ComplexVector extends AbstractComplexVector {
 /// same signatures and semantics as its abstract superclass(es) while
 /// introducing no additional functionality. Thus, this class need not be visible
 /// to users.
-class SelectedDenseComplexVector extends AbstractComplexVector {
+class SelectedDenseComplexVector extends ComplexVector {
   Float64List _elements;
 
   /// The offsets of visible indexes of this matrix.
@@ -582,8 +582,8 @@ class SelectedDenseComplexVector extends AbstractComplexVector {
         _elements[__offset + _offsets[idx] + 1]);
   }
 
-  AbstractDoubleVector real() {
-    var R = new DoubleVector(size);
+  DoubleVector real() {
+    var R = new DenseDoubleVector(size);
     for (int i = 0; i < size; i++) {
       var tmp = get(i);
       R.set(i, tmp.real);
@@ -591,8 +591,8 @@ class SelectedDenseComplexVector extends AbstractComplexVector {
     return R;
   }
 
-  AbstractDoubleVector imaginary() {
-    var Im = new DoubleVector(size);
+  DoubleVector imaginary() {
+    var Im = new DenseDoubleVector(size);
     for (int i = 0; i < size; i++) {
       var tmp = get(i);
       Im.set(i, tmp.imaginary);
@@ -605,10 +605,10 @@ class SelectedDenseComplexVector extends AbstractComplexVector {
     throw new UnsupportedError("This method is not supported.");
   }
 
-  bool _haveSharedCellsRaw(AbstractComplexVector other) {
+  bool _haveSharedCellsRaw(ComplexVector other) {
     if (other is SelectedDenseComplexVector) {
       return _elements == other._elements;
-    } else if (other is ComplexVector) {
+    } else if (other is DenseComplexVector) {
       return _elements == other._elements;
     }
     return false;
@@ -616,14 +616,14 @@ class SelectedDenseComplexVector extends AbstractComplexVector {
 
   int index(int rank) => __offset + _offsets[zero + rank * stride];
 
-  AbstractComplexVector like1D(int size) => new ComplexVector(size);
+  ComplexVector like1D(int size) => new DenseComplexVector(size);
 
-  AbstractComplexMatrix like2D(int rows, int columns) {
-    return new ComplexMatrix(rows, columns);
+  ComplexMatrix like2D(int rows, int columns) {
+    return new DenseComplexMatrix(rows, columns);
   }
 
   /// This method is not supported.
-  AbstractComplexMatrix reshape(int rows, int columns) {
+  ComplexMatrix reshape(int rows, int columns) {
     throw new UnsupportedError("This method is not supported.");
   }
 
@@ -639,7 +639,7 @@ class SelectedDenseComplexVector extends AbstractComplexVector {
     _elements[__offset + _offsets[idx] + 1] = im;
   }
 
-  AbstractComplexVector _viewSelectionLike(Int32List offsets) {
+  ComplexVector _viewSelectionLike(Int32List offsets) {
     return new SelectedDenseComplexVector(_elements, offsets);
   }
 

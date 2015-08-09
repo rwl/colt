@@ -16,35 +16,35 @@ part 'diagonal_complex_matrix_test.dart';
 final math.Random random = new math.Random(0);
 
 complexVectorTests() {
-  testAbstractComplexVector('dense', ComplexVector.create);
-  testAbstractComplexVector('dense view', _flip(ComplexVector.create));
+  testComplexVector('dense', DenseComplexVector.create);
+  testComplexVector('dense view', _flip(DenseComplexVector.create));
 
-  testAbstractComplexVector('sparse', SparseComplexVector.create);
-  testAbstractComplexVector('sparse view', _flip(SparseComplexVector.create));
+  testComplexVector('sparse', SparseComplexVector.create);
+  testComplexVector('sparse view', _flip(SparseComplexVector.create));
 }
 
 complexMatrixTests() {
-  testAbstractComplexMatrix('dense', ComplexMatrix.create);
-  testAbstractComplexMatrix('dense view', _dice(ComplexMatrix.create));
+  testComplexMatrix('dense', DenseComplexMatrix.create);
+  testComplexMatrix('dense view', _dice(DenseComplexMatrix.create));
 
   testDiagonalComplexMatrix(false);
   testDiagonalComplexMatrix(true);
 
-  testAbstractComplexMatrix('sparse', SparseComplexMatrix.create);
-  testAbstractComplexMatrix('sparse view', _dice(SparseComplexMatrix.create));
+  testComplexMatrix('sparse', SparseComplexMatrix.create);
+  testComplexMatrix('sparse view', _dice(SparseComplexMatrix.create));
 
-  testAbstractComplexMatrix('sparse cc', SparseCCComplexMatrix.create);
-  testAbstractComplexMatrix('sparse cc view', _dice(SparseCCComplexMatrix.create));
+  testComplexMatrix('sparse cc', SparseCCComplexMatrix.create);
+  testComplexMatrix('sparse cc view', _dice(SparseCCComplexMatrix.create));
 
-  testAbstractComplexMatrix('sparse rc ', SparseRCComplexMatrix.create);
-  testAbstractComplexMatrix('sparse rc view', _dice(SparseRCComplexMatrix.create));
+  testComplexMatrix('sparse rc ', SparseRCComplexMatrix.create);
+  testComplexMatrix('sparse rc view', _dice(SparseRCComplexMatrix.create));
 }
 
 _flip(make) => (sz) => make(sz).flip();
 
 _dice(make) => (r, c) => make(r, c).dice();
 
-List<Float64List> toList(AbstractComplexMatrix m) {
+List<Float64List> toList(ComplexMatrix m) {
   var values = new List.generate(m.rows, (_) => new Float64List(2 * m.columns));
   for (int r = 0; r < m.rows; r++) {
     for (int c = 0; c < m.columns; c++) {

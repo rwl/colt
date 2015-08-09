@@ -12,9 +12,9 @@ part of cern.colt.matrix.complex;
 
 /// Abstract base class for 1-d matrices (aka vectors) holding `complex`
 /// elements.
-abstract class AbstractComplexVector extends AbstractVector {
+abstract class ComplexVector extends AbstractVector {
   //with ListMixin<double> {
-  AbstractComplexVector(int size,
+  ComplexVector(int size,
       [int zero = 0, int stride = 1, bool isNoView = true])
       : super(size, zero, stride, isNoView);
 
@@ -51,12 +51,12 @@ abstract class AbstractComplexVector extends AbstractVector {
   /// the same cells (as is the case if they are views derived from the same
   /// matrix) and intersect in an ambiguous way, then replaces as if using
   /// an intermediate auxiliary deep copy of [other].
-  void copyFrom(AbstractComplexVector other) {
+  void copyFrom(ComplexVector other) {
     if (other == this) {
       return;
     }
     checkSize(this, other);
-    AbstractComplexVector otherLoc;
+    ComplexVector otherLoc;
     if (_haveSharedCells(other)) {
       otherLoc = other.copy();
     } else {
@@ -68,7 +68,7 @@ abstract class AbstractComplexVector extends AbstractVector {
   }
 
   /// Assigns the result of a function to each cell.
-  void assign(final AbstractComplexVector y,
+  void assign(final ComplexVector y,
       final cfunc.ComplexComplexComplexFunction f) {
     checkSize(this, y);
     for (int i = 0; i < size; i++) {
@@ -100,7 +100,7 @@ abstract class AbstractComplexVector extends AbstractVector {
   /// Replaces imaginary part of the receiver with the values of another
   /// real matrix. The real part remains unchanged. Both matrices must
   /// have the same size.
-  void setImaginary(final AbstractDoubleVector other) {
+  void setImaginary(final DoubleVector other) {
     checkSize(this, other);
     for (int i = 0; i < size; i++) {
       double re = get(i).real;
@@ -112,7 +112,7 @@ abstract class AbstractComplexVector extends AbstractVector {
   /// Replaces real part of the receiver with the values of another real
   /// matrix. The imaginary part remains unchanged. Both matrices must
   /// have the same size.
-  void setReal(final AbstractDoubleVector other) {
+  void setReal(final DoubleVector other) {
     checkSize(this, other);
     for (int i = 0; i < size; i++) {
       double re = other.get(i);
@@ -134,15 +134,15 @@ abstract class AbstractComplexVector extends AbstractVector {
   }
 
   /// Constructs and returns a deep copy of the receiver.
-  AbstractComplexVector copy() {
+  ComplexVector copy() {
     return like()..copyFrom(this);
   }
 
   /// Compares this object against the specified object. The result is
   /// `true` if and only if the argument is not `null` and is at least
-  /// a [AbstractComplexVector] object that has the same sizes as the
+  /// a [ComplexVector] object that has the same sizes as the
   /// receiver and has exactly the same values at the same indexes.
-  bool equals(AbstractComplexVector obj) {
+  bool equals(ComplexVector obj) {
     if (identical(this, obj)) {
       return true;
     }
@@ -163,7 +163,7 @@ abstract class AbstractComplexVector extends AbstractVector {
   Object get elements;
 
   /// Returns the imaginary part of this matrix
-  AbstractDoubleVector imaginary();
+  DoubleVector imaginary();
 
   /// Fills the coordinates and values of cells having non-zero values into the
   /// specified lists. Fills into the lists, starting at index 0. After this
@@ -203,25 +203,25 @@ abstract class AbstractComplexVector extends AbstractVector {
   Complex get(int index);
 
   /// Returns the real part of this matrix
-  AbstractDoubleVector real();
+  DoubleVector real();
 
   /// Construct and returns a new empty matrix of the same dynamic type
   /// as the receiver, having the same size.
-  AbstractComplexVector like() {
+  ComplexVector like() {
     return like1D(size);
   }
 
   /// Construct and returns a new empty matrix of the same dynamic type
   /// as the receiver, having the specified size.
-  AbstractComplexVector like1D(int size);
+  ComplexVector like1D(int size);
 
   /// Construct and returns a new 2-d matrix of the corresponding dynamic
   /// type, entirely independent of the receiver.
-  AbstractComplexMatrix like2D(int rows, int columns);
+  ComplexMatrix like2D(int rows, int columns);
 
   /// Returns new matrix of size rows x columns whose elements are
   /// taken column-wise from this matrix.
-  AbstractComplexMatrix reshape(int rows, int columns);
+  ComplexMatrix reshape(int rows, int columns);
 
   /// Sets the matrix cell at coordinate [index] to the specified value.
   void put(int index, double re, double im) {
@@ -289,7 +289,7 @@ abstract class AbstractComplexVector extends AbstractVector {
 
   /// Constructs and returns a new *flip view*. What used to be index
   /// `0` is now index `size()-1`.
-  AbstractComplexVector flip() {
+  ComplexVector flip() {
     var v = _view();
     vFlip(v);
     return v;
@@ -297,7 +297,7 @@ abstract class AbstractComplexVector extends AbstractVector {
 
   /// Constructs and returns a new *sub-range view* that is a [width]
   /// sub matrix starting at [index].
-  AbstractComplexVector part(int index, int width) {
+  ComplexVector part(int index, int width) {
     var v = _view();
     vPart(v, index, width);
     return v;
@@ -306,7 +306,7 @@ abstract class AbstractComplexVector extends AbstractVector {
   /// Constructs and returns a new *selection view* that is a matrix
   /// holding the indicated cells. Indexes can occur multiple times
   /// and can be in arbitrary order.
-  AbstractComplexVector select(Int32List indexes) {
+  ComplexVector select(Int32List indexes) {
     // check for "all"
     if (indexes == null) {
       indexes = new Int32List(size);
@@ -325,7 +325,7 @@ abstract class AbstractComplexVector extends AbstractVector {
 
   /// Constructs and returns a new *stride view* which is a sub matrix
   /// consisting of every i-th cell.
-  AbstractComplexVector strides(int stride) {
+  ComplexVector strides(int stride) {
     var v = _view();
     vStride(v, stride);
     return v;
@@ -333,7 +333,7 @@ abstract class AbstractComplexVector extends AbstractVector {
 
   /// Returns the dot product of two vectors x and y. Operates on cells at
   /// indexes `from .. Min(size(),y.size(),from+length)-1`.
-  Complex dot(final AbstractComplexVector y,
+  Complex dot(final ComplexVector y,
       [final int from = 0, int length = null]) {
     if (length == null) {
       length = this.size;
@@ -371,10 +371,10 @@ abstract class AbstractComplexVector extends AbstractVector {
 
   /// Returns the content of this matrix if it is a wrapper; or `this`
   /// otherwise. Override this method in wrappers.
-  AbstractComplexVector _getContent() => this;
+  ComplexVector _getContent() => this;
 
   /// Returns `true` if both matrices share at least one identical cell.
-  bool _haveSharedCells(AbstractComplexVector other) {
+  bool _haveSharedCells(ComplexVector other) {
     if (other == null) {
       return false;
     }
@@ -385,39 +385,39 @@ abstract class AbstractComplexVector extends AbstractVector {
   }
 
   /// Always returns false
-  bool _haveSharedCellsRaw(AbstractComplexVector other) => false;
+  bool _haveSharedCellsRaw(ComplexVector other) => false;
 
   /// Constructs and returns a new view equal to the receiver.
-  AbstractComplexVector _view() {
-    return clone() as AbstractComplexVector;
+  ComplexVector _view() {
+    return clone() as ComplexVector;
   }
 
   /// Construct and returns a new selection view.
-  AbstractComplexVector _viewSelectionLike(Int32List offsets);
+  ComplexVector _viewSelectionLike(Int32List offsets);
 
   Object clone();
 
-  AbstractComplexVector operator *(AbstractComplexVector y) {
+  ComplexVector operator *(ComplexVector y) {
     return copy()..assign(y, cfunc.mult);
   }
 
-  AbstractComplexVector operator /(AbstractComplexVector y) {
+  ComplexVector operator /(ComplexVector y) {
     return copy()..assign(y, cfunc.div);
   }
 
-  AbstractComplexVector operator +(AbstractComplexVector y) {
+  ComplexVector operator +(ComplexVector y) {
     return copy()..assign(y, cfunc.plus);
   }
 
-  AbstractComplexVector operator -(AbstractComplexVector y) {
+  ComplexVector operator -(ComplexVector y) {
     return copy()..assign(y, cfunc.minus);
   }
 
-  AbstractComplexVector operator -() => copy()..apply(cfunc.neg);
+  ComplexVector operator -() => copy()..apply(cfunc.neg);
 
-  AbstractComplexVector conj() => copy()..apply(cfunc.conj);
+  ComplexVector conj() => copy()..apply(cfunc.conj);
 
-  AbstractComplexVector abs() => copy()..applyReal(cfunc.abs);
+  ComplexVector abs() => copy()..applyReal(cfunc.abs);
 
-  AbstractComplexVector arg() => copy()..applyReal(cfunc.arg);
+  ComplexVector arg() => copy()..applyReal(cfunc.arg);
 }

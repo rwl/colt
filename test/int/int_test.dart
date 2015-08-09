@@ -15,34 +15,34 @@ part 'dense_int_matrix_test.dart';
 final math.Random random = new math.Random(0);
 
 intVectorTests() {
-  testAbstractIntVector('dense', IntVector.create);
-  testAbstractIntVector('dense view', _flip(IntVector.create));
+  testIntVector('dense', DenseIntVector.create);
+  testIntVector('dense view', _flip(DenseIntVector.create));
 
-  testAbstractIntVector('sparse', SparseIntVector.create);
-  testAbstractIntVector('sparse view', _flip(SparseIntVector.create));
+  testIntVector('sparse', SparseIntVector.create);
+  testIntVector('sparse view', _flip(SparseIntVector.create));
 }
 
 intMatrixTests() {
-  testAbstractIntMatrix('dense', IntMatrix.create);
-  testAbstractIntMatrix('dense view', _dice(IntMatrix.create));
-  testIntMatrix('raw', IntMatrix.create);
-  testIntMatrix('view', _dice(IntMatrix.create));
+  testIntMatrix('dense', DenseIntMatrix.create);
+  testIntMatrix('dense view', _dice(DenseIntMatrix.create));
+  testIntMatrix('raw', DenseIntMatrix.create);
+  testIntMatrix('view', _dice(DenseIntMatrix.create));
 
-  testAbstractIntMatrix('sparse', SparseIntMatrix.create);
-  testAbstractIntMatrix('sparse view', _dice(SparseIntMatrix.create));
+  testIntMatrix('sparse', SparseIntMatrix.create);
+  testIntMatrix('sparse view', _dice(SparseIntMatrix.create));
 
-  testAbstractIntMatrix('sparse rc', SparseRCIntMatrix.create);
-  testAbstractIntMatrix('sparse rc view', _dice(SparseRCIntMatrix.create));
+  testIntMatrix('sparse rc', SparseRCIntMatrix.create);
+  testIntMatrix('sparse rc view', _dice(SparseRCIntMatrix.create));
 
-  testAbstractIntMatrix('sparse cc', SparseCCIntMatrix.create);
-  testAbstractIntMatrix('sparse cc view', _dice(SparseCCIntMatrix.create));
+  testIntMatrix('sparse cc', SparseCCIntMatrix.create);
+  testIntMatrix('sparse cc view', _dice(SparseCCIntMatrix.create));
 }
 
 _flip(make) => (sz) => make(sz).flip();
 
 _dice(make) => (r, c) => make(r, c).dice();
 
-List<Int32List> toList(AbstractIntMatrix m) {
+List<Int32List> toList(IntMatrix m) {
   var values = new List.generate(m.rows, (_) => new Int32List(m.columns));
   for (int r = 0; r < m.rows; r++) {
     Int32List currentRow = values[r];

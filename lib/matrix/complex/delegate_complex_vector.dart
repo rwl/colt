@@ -12,13 +12,13 @@ part of cern.colt.matrix.complex;
 
 /// 1-d matrix holding `complex` elements; either a view wrapping another
 /// 2-d matrix and therefore delegating calls to it.
-class DelegateComplexVector extends AbstractComplexVector {
-  AbstractComplexMatrix _content;
+class DelegateComplexVector extends ComplexVector {
+  ComplexMatrix _content;
 
   /// The row this view is bound to.
   int _row;
 
-  DelegateComplexVector(AbstractComplexMatrix newContent, int row)
+  DelegateComplexVector(ComplexMatrix newContent, int row)
       : super(newContent.columns) {
     if (row < 0 || row >= newContent.rows) {
       throw new ArgumentError();
@@ -29,9 +29,9 @@ class DelegateComplexVector extends AbstractComplexVector {
 
   Complex get(int index) => _content.get(_row, index);
 
-  AbstractComplexVector like1D(int size) => _content.like1D(size);
+  ComplexVector like1D(int size) => _content.like1D(size);
 
-  AbstractComplexMatrix like2D(int rows, int columns) {
+  ComplexMatrix like2D(int rows, int columns) {
     return _content.like2D(rows, columns);
   }
 
@@ -46,18 +46,18 @@ class DelegateComplexVector extends AbstractComplexVector {
   Object get elements => _content.elements;
 
   // This method is not supported.
-  AbstractComplexMatrix reshape(int rows, int columns) {
+  ComplexMatrix reshape(int rows, int columns) {
     throw new ArgumentError("This method is not supported.");
   }
 
   // This method is not supported.
-  AbstractComplexVector _viewSelectionLike(Int32List offsets) {
+  ComplexVector _viewSelectionLike(Int32List offsets) {
     throw new ArgumentError("This method is not supported.");
   }
 
-  AbstractDoubleVector imaginary() => _content.row(_row).imaginary();
+  DoubleVector imaginary() => _content.row(_row).imaginary();
 
-  AbstractDoubleVector real() => _content.row(_row).real();
+  DoubleVector real() => _content.row(_row).real();
 
   Object clone() => new DelegateComplexVector(_content, _row);
 }

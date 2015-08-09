@@ -35,13 +35,13 @@ class LargeDoubleMatrix extends WrapperDoubleMatrix {
 
   List<Float64List> get elements => _elements;
 
-  AbstractDoubleMatrix _getContent() => this;
+  DoubleMatrix _getContent() => this;
 
-  AbstractDoubleMatrix like2D(int rows, int columns) {
+  DoubleMatrix like2D(int rows, int columns) {
     return new LargeDoubleMatrix(rows, columns);
   }
 
-  AbstractDoubleVector like1D(int size) => new DoubleVector(size);
+  DoubleVector like1D(int size) => new DenseDoubleVector(size);
 
   Object clone() {
     return new LargeDoubleMatrix._internal(rows, columns, _elements);

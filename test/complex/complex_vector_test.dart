@@ -4,9 +4,9 @@ const SIZE = 2 * 17 * 5;
 
 const TOL = 1e-10;
 
-testAbstractComplexVector(String kind, AbstractComplexVector make(int size)) {
-  group("AbstractComplexVector ($kind)", () {
-    AbstractComplexVector A, B;
+testComplexVector(String kind, ComplexVector make(int size)) {
+  group("ComplexVector ($kind)", () {
+    ComplexVector A, B;
     setUp(() {
       A = make(SIZE);
       B = make(SIZE);
@@ -25,7 +25,7 @@ testAbstractComplexVector(String kind, AbstractComplexVector make(int size)) {
     });
 
     test('apply', () {
-      AbstractComplexVector Acopy = A.copy();
+      ComplexVector Acopy = A.copy();
       A.apply(acos);
       for (int i = 0; i < A.size; i++) {
         var expected = Acopy.get(i).acos();
@@ -42,7 +42,7 @@ testAbstractComplexVector(String kind, AbstractComplexVector make(int size)) {
     });
 
     test('assign', () {
-      AbstractComplexVector Acopy = A.copy();
+      ComplexVector Acopy = A.copy();
       A.assign(B, div);
       for (int i = 0; i < A.size; i++) {
         assertEquals(Acopy.get(i) / B.get(i), A.get(i), TOL);
@@ -50,7 +50,7 @@ testAbstractComplexVector(String kind, AbstractComplexVector make(int size)) {
     });
 
     test('applyReal', () {
-      AbstractComplexVector Acopy = A.copy();
+      ComplexVector Acopy = A.copy();
       A.applyReal(abs);
       for (int i = 0; i < A.size; i++) {
         var elem = A.get(i);
@@ -84,8 +84,8 @@ testAbstractComplexVector(String kind, AbstractComplexVector make(int size)) {
     });
 
     test('setImaginary', () {
-      AbstractComplexVector Acopy = A.copy();
-      AbstractDoubleVector Im = new DoubleVector.random(A.size);
+      ComplexVector Acopy = A.copy();
+      DoubleVector Im = new DenseDoubleVector.random(A.size);
       A.setImaginary(Im);
       for (int i = 0; i < A.size; i++) {
         var elem = A.get(i);
@@ -95,8 +95,8 @@ testAbstractComplexVector(String kind, AbstractComplexVector make(int size)) {
     });
 
     test('setReal', () {
-      AbstractComplexVector Acopy = A.copy();
-      AbstractDoubleVector Re = new DoubleVector.random(A.size);
+      ComplexVector Acopy = A.copy();
+      DoubleVector Re = new DenseDoubleVector.random(A.size);
       A.setReal(Re);
       for (int i = 0; i < A.size; i++) {
         var elem = A.get(i);
@@ -116,14 +116,14 @@ testAbstractComplexVector(String kind, AbstractComplexVector make(int size)) {
     });
 
     test('imaginary', () {
-      AbstractDoubleVector Im = A.imaginary();
+      DoubleVector Im = A.imaginary();
       for (int i = 0; i < A.size; i++) {
         expect(A.get(i).imaginary, closeTo(Im.get(i), TOL));
       }
     });
 
     test('real', () {
-      AbstractDoubleVector Re = A.real();
+      DoubleVector Re = A.real();
       for (int i = 0; i < A.size; i++) {
         expect(A.get(i).real, closeTo(Re.get(i), TOL));
       }
@@ -144,7 +144,7 @@ testAbstractComplexVector(String kind, AbstractComplexVector make(int size)) {
     test('reshape', () {
       int rows = 10;
       int columns = 17;
-      AbstractComplexMatrix B = A.reshape(rows, columns);
+      ComplexMatrix B = A.reshape(rows, columns);
       int idx = 0;
       for (int c = 0; c < columns; c++) {
         for (int r = 0; r < rows; r++) {
@@ -173,14 +173,14 @@ testAbstractComplexVector(String kind, AbstractComplexVector make(int size)) {
     });
 
     test('flip', () {
-      AbstractComplexVector B = A.flip();
+      ComplexVector B = A.flip();
       for (int i = 0; i < A.size; i++) {
         assertEquals(A.get(A.size - 1 - i), B.get(i), TOL);
       }
     });
 
     test('part', () {
-      AbstractComplexVector B = A.part(A.size ~/ 2, A.size ~/ 3);
+      ComplexVector B = A.part(A.size ~/ 2, A.size ~/ 3);
       for (int i = 0; i < A.size / 3; i++) {
         assertEquals(A.get(A.size ~/ 2 + i), B.get(i), TOL);
       }
@@ -189,7 +189,7 @@ testAbstractComplexVector(String kind, AbstractComplexVector make(int size)) {
     test('select', () {
       var indexes = new Int32List.fromList(
           [A.size ~/ 6, A.size ~/ 5, A.size ~/ 4, A.size ~/ 3, A.size ~/ 2]);
-      AbstractComplexVector B = A.select(indexes);
+      ComplexVector B = A.select(indexes);
       for (int i = 0; i < indexes.length; i++) {
         assertEquals(A.get(indexes[i]), B.get(i), TOL);
       }
@@ -197,7 +197,7 @@ testAbstractComplexVector(String kind, AbstractComplexVector make(int size)) {
 
     test('strides', () {
       int stride = 3;
-      AbstractComplexVector B = A.strides(stride);
+      ComplexVector B = A.strides(stride);
       for (int i = 0; i < B.size; i++) {
         assertEquals(A.get(i * stride), B.get(i), TOL);
       }

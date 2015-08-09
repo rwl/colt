@@ -1,6 +1,6 @@
 part of cern.colt.matrix.int.test;
 
-testIntMatrix(String kind, IntMatrix make(int rows, int columns)) {
+testDenseIntMatrix(String kind, IntMatrix make(int rows, int columns)) {
   group('IntMatrix ($kind)', () {
     IntMatrix A;
     setUp(() {

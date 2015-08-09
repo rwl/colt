@@ -12,7 +12,7 @@ part of cern.colt.matrix.complex;
 
 /// Sparse hashed 1-d matrix (aka vector) holding `complex` elements in
 /// a [Map].
-class SparseComplexVector extends AbstractComplexVector {
+class SparseComplexVector extends ComplexVector {
   Map<int, Complex> _elements;
 
   /// Constructs a matrix with a copy of the given [values]. The [values] are
@@ -64,7 +64,7 @@ class SparseComplexVector extends AbstractComplexVector {
 
   Object get elements => _elements;
 
-  bool _haveSharedCellsRaw(AbstractComplexVector other) {
+  bool _haveSharedCellsRaw(ComplexVector other) {
     if (other is SelectedSparseComplexVector) {
       return _elements == other._elements;
     } else if (other is SparseComplexVector) {
@@ -75,13 +75,13 @@ class SparseComplexVector extends AbstractComplexVector {
 
   int index(int rank) => zero + rank * stride;
 
-  AbstractComplexVector like1D(int size) => new SparseComplexVector(size);
+  ComplexVector like1D(int size) => new SparseComplexVector(size);
 
-  AbstractComplexMatrix like2D(int rows, int columns) {
+  ComplexMatrix like2D(int rows, int columns) {
     return new SparseComplexMatrix(rows, columns);
   }
 
-  AbstractComplexMatrix reshape(final int rows, final int columns) {
+  ComplexMatrix reshape(final int rows, final int columns) {
     if (rows * columns != size) {
       throw new ArgumentError("rows*columns != size");
     }
@@ -116,11 +116,11 @@ class SparseComplexVector extends AbstractComplexVector {
     }
   }
 
-  AbstractComplexVector _viewSelectionLike(Int32List offsets) {
+  ComplexVector _viewSelectionLike(Int32List offsets) {
     return new SelectedSparseComplexVector.withOffsets(_elements, offsets);
   }
 
-  AbstractDoubleVector imaginary() {
+  DoubleVector imaginary() {
     var Im = new SparseDoubleVector(size);
     for (int i = 0; i < size; i++) {
       Im.set(i, get(i).imaginary);
@@ -128,7 +128,7 @@ class SparseComplexVector extends AbstractComplexVector {
     return Im;
   }
 
-  AbstractDoubleVector real() {
+  DoubleVector real() {
     var Re = new SparseDoubleVector(size);
     for (int i = 0; i < size; i++) {
       Re.set(i, get(i).real);
@@ -144,7 +144,7 @@ class SparseComplexVector extends AbstractComplexVector {
 
 /// Selection view on sparse 1-d matrices holding `complex` elements. This
 /// implementation uses [Map].
-class SelectedSparseComplexVector extends AbstractComplexVector {
+class SelectedSparseComplexVector extends ComplexVector {
   Map<int, Complex> _elements;
 
   /// The offsets of visible indexes of this matrix.
@@ -177,7 +177,7 @@ class SelectedSparseComplexVector extends AbstractComplexVector {
     throw new UnsupportedError("This method is not supported.");
   }
 
-  bool _haveSharedCellsRaw(AbstractComplexVector other) {
+  bool _haveSharedCellsRaw(ComplexVector other) {
     if (other is SelectedSparseComplexVector) {
       return _elements == other._elements;
     } else if (other is SparseComplexVector) {
@@ -188,14 +188,14 @@ class SelectedSparseComplexVector extends AbstractComplexVector {
 
   int index(int rank) => __offset + _offsets[zero + rank * stride];
 
-  AbstractComplexVector like1D(int size) => new SparseComplexVector(size);
+  ComplexVector like1D(int size) => new SparseComplexVector(size);
 
-  AbstractComplexMatrix like2D(int rows, int columns) {
+  ComplexMatrix like2D(int rows, int columns) {
     return new SparseComplexMatrix(rows, columns);
   }
 
   /// This method is not supported.
-  AbstractComplexMatrix reshape(int rows, int columns) {
+  ComplexMatrix reshape(int rows, int columns) {
     throw new UnsupportedError("This method is not supported.");
   }
 
@@ -217,17 +217,17 @@ class SelectedSparseComplexVector extends AbstractComplexVector {
     }
   }
 
-  AbstractComplexVector _viewSelectionLike(Int32List offsets) {
+  ComplexVector _viewSelectionLike(Int32List offsets) {
     return new SelectedSparseComplexVector.withOffsets(this._elements, offsets);
   }
 
   /// This method is not supported.
-  AbstractDoubleVector imaginary() {
+  DoubleVector imaginary() {
     throw new UnsupportedError("This method is not supported.");
   }
 
   /// This method is not supported.
-  AbstractDoubleVector real() {
+  DoubleVector real() {
     throw new UnsupportedError("This method is not supported.");
   }
 

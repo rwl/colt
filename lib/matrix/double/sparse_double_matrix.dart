@@ -22,12 +22,12 @@ part of cern.colt.matrix.double;
 /// This class offers *expected* time complexity `O(1)` (i.e. constant time)
 /// for the basic operations `get`, `set` and `size`. As such this sparse
 /// class is expected to have no worse time complexity than its dense
-/// counterpart [DoubleMatrix]. However, constant factors are considerably
+/// counterpart [DenseDoubleMatrix]. However, constant factors are considerably
 /// larger.
 ///
 /// Cells are internally addressed in row-major order. Performance sensitive
 /// applications can exploit this fact.
-class SparseDoubleMatrix extends AbstractDoubleMatrix {
+class SparseDoubleMatrix extends DoubleMatrix {
   Map<int, double> _elements;
 
   /// Constructs a matrix with a given number of rows and columns.
@@ -62,7 +62,7 @@ class SparseDoubleMatrix extends AbstractDoubleMatrix {
     return new SparseDoubleMatrix(rows, columns);
   }
 
-  factory SparseDoubleMatrix.compose(List<List<AbstractDoubleMatrix>> parts) {
+  factory SparseDoubleMatrix.compose(List<List<DoubleMatrix>> parts) {
     return dfactory.compose(
         parts, (rows, columns) => new SparseDoubleMatrix(rows, columns));
   }
@@ -75,7 +75,7 @@ class SparseDoubleMatrix extends AbstractDoubleMatrix {
     }
   }
 
-  void copyFrom(AbstractDoubleMatrix source) {
+  void copyFrom(DoubleMatrix source) {
     if (!(source is SparseDoubleMatrix)) {
       super.copyFrom(source);
       return;
@@ -88,7 +88,7 @@ class SparseDoubleMatrix extends AbstractDoubleMatrix {
     super.copyFrom(source);
   }
 
-  void assign(final AbstractDoubleMatrix y, func.DoubleDoubleFunction fn) {
+  void assign(final DoubleMatrix y, func.DoubleDoubleFunction fn) {
     if (isView) {
       super.assign(y, fn);
       return;
@@ -205,11 +205,11 @@ class SparseDoubleMatrix extends AbstractDoubleMatrix {
     return rowZero + row * rowStride + columnZero + column * columnStride;
   }
 
-  AbstractDoubleMatrix like2D(int rows, int columns) {
+  DoubleMatrix like2D(int rows, int columns) {
     return new SparseDoubleMatrix(rows, columns);
   }
 
-  AbstractDoubleVector like1D(int size) => new SparseDoubleVector(size);
+  DoubleVector like1D(int size) => new SparseDoubleVector(size);
 
   void set(int row, int column, double value) {
     int index = rowZero + row * rowStride + columnZero + column * columnStride;
@@ -234,8 +234,8 @@ class SparseDoubleMatrix extends AbstractDoubleMatrix {
     return buf.toString();
   }
 
-  AbstractDoubleVector mult(AbstractDoubleVector y,
-      [AbstractDoubleVector z = null, final double alpha = 1.0,
+  DoubleVector mult(DoubleVector y,
+      [DoubleVector z = null, final double alpha = 1.0,
       double beta = 0.0, final bool transposeA = false]) {
     int rowsA = rows;
     int columnsA = columns;
@@ -246,10 +246,10 @@ class SparseDoubleMatrix extends AbstractDoubleMatrix {
 
     bool ignore = (z == null);
     if (z == null) {
-      z = new DoubleVector(rowsA);
+      z = new DenseDoubleVector(rowsA);
     }
 
-    if (!(!isView && y is DoubleVector && z is DoubleVector)) {
+    if (!(!isView && y is DenseDoubleVector && z is DenseDoubleVector)) {
       return super.mult(y, z, alpha, beta, transposeA);
     }
 
@@ -266,12 +266,12 @@ class SparseDoubleMatrix extends AbstractDoubleMatrix {
       z.apply(func.multiply(beta));
     }
 
-    DoubleVector zz = z as DoubleVector;
+    DenseDoubleVector zz = z as DenseDoubleVector;
     Float64List elementsZ = zz._elements;
     int strideZ = zz.stride;
     int zeroZ = z.index(0);
 
-    DoubleVector yy = y as DoubleVector;
+    DenseDoubleVector yy = y as DenseDoubleVector;
     Float64List elementsY = yy._elements;
     int strideY = yy.stride;
     int zeroY = y.index(0);
@@ -296,8 +296,8 @@ class SparseDoubleMatrix extends AbstractDoubleMatrix {
     return z;
   }
 
-  AbstractDoubleMatrix multiply(AbstractDoubleMatrix B,
-      [AbstractDoubleMatrix C = null, final double alpha = 1.0,
+  DoubleMatrix multiply(DoubleMatrix B,
+      [DoubleMatrix C = null, final double alpha = 1.0,
       double beta = 0.0, final bool transposeA = false,
       bool transposeB = false]) {
     if (isView) {
@@ -315,7 +315,7 @@ class SparseDoubleMatrix extends AbstractDoubleMatrix {
     int p = B.columns;
     bool ignore = (C == null);
     if (C == null) {
-      C = new DoubleMatrix(rowsA, p);
+      C = new DenseDoubleMatrix(rowsA, p);
     }
 
     if (B.rows != columnsA) {
@@ -341,11 +341,11 @@ class SparseDoubleMatrix extends AbstractDoubleMatrix {
     }
 
     // cache views
-    var Brows = new List<AbstractDoubleVector>(columnsA);
+    var Brows = new List<DoubleVector>(columnsA);
     for (int i = columnsA; --i >= 0;) {
       Brows[i] = B.row(i);
     }
-    var Crows = new List<AbstractDoubleVector>(rowsA);
+    var Crows = new List<DoubleVector>(rowsA);
     for (int i = rowsA; --i >= 0;) {
       Crows[i] = C.row(i);
     }
@@ -421,7 +421,7 @@ class SparseDoubleMatrix extends AbstractDoubleMatrix {
     }
   }
 
-  bool _haveSharedCellsRaw(AbstractDoubleMatrix other) {
+  bool _haveSharedCellsRaw(DoubleMatrix other) {
     if (other is SelectedSparseDoubleMatrix) {
       return _elements == other._elements;
     } else if (other is SparseDoubleMatrix) {
@@ -430,12 +430,12 @@ class SparseDoubleMatrix extends AbstractDoubleMatrix {
     return false;
   }
 
-  AbstractDoubleVector _like1D(int size, int offset, int stride) {
+  DoubleVector _like1D(int size, int offset, int stride) {
     return new SparseDoubleVector._internal(
         size, _elements, offset, stride, false);
   }
 
-  AbstractDoubleMatrix _viewSelectionLike(
+  DoubleMatrix _viewSelectionLike(
       Int32List rowOffsets, Int32List columnOffsets) {
     return new SelectedSparseDoubleMatrix(
         _elements, rowOffsets, columnOffsets, 0);
@@ -456,7 +456,7 @@ class SparseDoubleMatrix extends AbstractDoubleMatrix {
 /// same signatures and semantics as its abstract superclass(es) while
 /// introducing no additional functionality. Thus, this class need not be visible
 /// to users.
-class SelectedSparseDoubleMatrix extends AbstractDoubleMatrix {
+class SelectedSparseDoubleMatrix extends DoubleMatrix {
   Map<int, double> _elements;
 
   /// The offsets of the visible cells of this matrix.
@@ -499,11 +499,11 @@ class SelectedSparseDoubleMatrix extends AbstractDoubleMatrix {
         _columnOffsets[columnZero + column * columnStride];
   }
 
-  AbstractDoubleMatrix like2D(int rows, int columns) {
+  DoubleMatrix like2D(int rows, int columns) {
     return new SparseDoubleMatrix(rows, columns);
   }
 
-  AbstractDoubleVector like1D(int size) => new SparseDoubleVector(size);
+  DoubleVector like1D(int size) => new SparseDoubleVector(size);
 
   void set(int row, int column, double value) {
     int index = _offset +
@@ -517,7 +517,7 @@ class SelectedSparseDoubleMatrix extends AbstractDoubleMatrix {
     }
   }
 
-  AbstractDoubleVector column(int column) {
+  DoubleVector column(int column) {
     checkColumn(this, column);
     int viewSize = rows;
     int viewZero = rowZero;
@@ -528,7 +528,7 @@ class SelectedSparseDoubleMatrix extends AbstractDoubleMatrix {
         viewSize, _elements, viewZero, viewStride, viewOffsets, viewOffset);
   }
 
-  AbstractDoubleVector row(int row) {
+  DoubleVector row(int row) {
     checkRow(this, row);
     int viewSize = columns;
     int viewZero = columnZero;
@@ -543,7 +543,7 @@ class SelectedSparseDoubleMatrix extends AbstractDoubleMatrix {
 
   int _rowOffset(int absRank) => _rowOffsets[absRank];
 
-  bool _haveSharedCellsRaw(AbstractDoubleMatrix other) {
+  bool _haveSharedCellsRaw(DoubleMatrix other) {
     if (other is SelectedSparseDoubleMatrix) {
       return _elements == other._elements;
     } else if (other is SparseDoubleMatrix) {
@@ -552,12 +552,12 @@ class SelectedSparseDoubleMatrix extends AbstractDoubleMatrix {
     return false;
   }
 
-  AbstractDoubleVector _like1D(int size, int zero, int stride) {
+  DoubleVector _like1D(int size, int zero, int stride) {
     // this method is never called since [row] and [column] are overridden
     throw new Error();
   }
 
-  AbstractDoubleMatrix dice() {
+  DoubleMatrix dice() {
     var v = _view();
     vDice(v);
     Int32List tmp = _rowOffsets;
@@ -567,7 +567,7 @@ class SelectedSparseDoubleMatrix extends AbstractDoubleMatrix {
     return v;
   }
 
-  AbstractDoubleMatrix _viewSelectionLike(
+  DoubleMatrix _viewSelectionLike(
       Int32List rowOffsets, Int32List columnOffsets) {
     return new SelectedSparseDoubleMatrix(
         _elements, rowOffsets, columnOffsets, this._offset);

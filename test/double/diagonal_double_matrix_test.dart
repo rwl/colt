@@ -68,7 +68,7 @@ testDiagonalDoubleMatrix(bool view) {
     });
 
     test('apply', () {
-      AbstractDoubleMatrix Acopy = A.copy();
+      DoubleMatrix Acopy = A.copy();
       A.apply(acos);
       if (DINDEX >= 0) {
         for (int r = 0; r < dlength; r++) {
@@ -84,7 +84,7 @@ testDiagonalDoubleMatrix(bool view) {
     });
 
     test('assign', () {
-      AbstractDoubleMatrix Acopy = A.copy();
+      DoubleMatrix Acopy = A.copy();
       A.assign(B, div);
       if (DINDEX >= 0) {
         for (int r = 0; r < dlength; r++) {
@@ -254,7 +254,7 @@ testDiagonalDoubleMatrix(bool view) {
     });
 
     test('column', () {
-      AbstractDoubleVector col = A.column(NCOLUMNS ~/ 2);
+      DoubleVector col = A.column(NCOLUMNS ~/ 2);
       expect(NROWS, equals(col.size));
       for (int r = 0; r < NROWS; r++) {
         expect(A.get(r, NCOLUMNS ~/ 2), closeTo(col.get(r), TOL));
@@ -262,7 +262,7 @@ testDiagonalDoubleMatrix(bool view) {
     });
 
     test('columnFlip', () {
-      AbstractDoubleMatrix B = A.columnFlip();
+      DoubleMatrix B = A.columnFlip();
       expect(A.size, equals(B.size));
       for (int r = 0; r < NROWS; r++) {
         for (int c = 0; c < NCOLUMNS; c++) {
@@ -272,7 +272,7 @@ testDiagonalDoubleMatrix(bool view) {
     });
 
     test('dice', () {
-      AbstractDoubleMatrix B = A.dice();
+      DoubleMatrix B = A.dice();
       expect(NROWS, equals(B.columns));
       expect(NCOLUMNS, equals(B.rows));
       for (int r = 0; r < NROWS; r++) {
@@ -283,7 +283,7 @@ testDiagonalDoubleMatrix(bool view) {
     });
 
     test('part', () {
-      AbstractDoubleMatrix B =
+      DoubleMatrix B =
           A.part(NROWS ~/ 2, NCOLUMNS ~/ 2, NROWS ~/ 3, NCOLUMNS ~/ 3);
       expect(NROWS ~/ 3, equals(B.rows));
       expect(NCOLUMNS ~/ 3, equals(B.columns));
@@ -296,7 +296,7 @@ testDiagonalDoubleMatrix(bool view) {
     });
 
     test('row', () {
-      AbstractDoubleVector B = A.row(NROWS ~/ 2);
+      DoubleVector B = A.row(NROWS ~/ 2);
       expect(NCOLUMNS, equals(B.size));
       for (int r = 0; r < NCOLUMNS; r++) {
         expect(A.get(NROWS ~/ 2, r), closeTo(B.get(r), TOL));
@@ -304,7 +304,7 @@ testDiagonalDoubleMatrix(bool view) {
     });
 
     test('rowFlip', () {
-      AbstractDoubleMatrix B = A.rowFlip();
+      DoubleMatrix B = A.rowFlip();
       expect(A.size, equals(B.size));
       for (int r = 0; r < NROWS; r++) {
         for (int c = 0; c < NCOLUMNS; c++) {
@@ -324,7 +324,7 @@ testDiagonalDoubleMatrix(bool view) {
         NROWS ~/ 2,
         NROWS - 1
       ]);
-      AbstractDoubleMatrix B = A.select(rowIndexes, colIndexes);
+      DoubleMatrix B = A.select(rowIndexes, colIndexes);
       expect(rowIndexes.length, equals(B.rows));
       expect(colIndexes.length, equals(B.columns));
       for (int r = 0; r < rowIndexes.length; r++) {
@@ -338,7 +338,7 @@ testDiagonalDoubleMatrix(bool view) {
     test('strides', () {
       int rowStride = 3;
       int colStride = 5;
-      AbstractDoubleMatrix B = A.strides(rowStride, colStride);
+      DoubleMatrix B = A.strides(rowStride, colStride);
       for (int r = 0; r < B.rows; r++) {
         for (int c = 0; c < B.columns; c++) {
           expect(
@@ -350,7 +350,7 @@ testDiagonalDoubleMatrix(bool view) {
     test('multiply', () {
       double alpha = 3.0;
       double beta = 5.0;
-      AbstractDoubleMatrix C = new DiagonalDoubleMatrix(NROWS, NROWS, 0);
+      DoubleMatrix C = new DiagonalDoubleMatrix(NROWS, NROWS, 0);
       for (int i = 0; i < dlength; i++) {
         C.set(i, i, _r.nextDouble());
       }

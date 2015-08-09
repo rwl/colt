@@ -17,39 +17,39 @@ part 'sparse_double_matrix_test.dart';
 final math.Random _r = new math.Random(0);
 
 doubleVectorTests() {
-  testAbstractDoubleVector('dense', DoubleVector.create);
-  testAbstractDoubleVector('dense view', _flip(DoubleVector.create));
+  testDoubleVector('dense', DenseDoubleVector.create);
+  testDoubleVector('dense view', _flip(DenseDoubleVector.create));
 
-  testAbstractDoubleVector('sparse', SparseDoubleVector.create);
-  testAbstractDoubleVector('sparse view', _flip(SparseDoubleVector.create));
+  testDoubleVector('sparse', SparseDoubleVector.create);
+  testDoubleVector('sparse view', _flip(SparseDoubleVector.create));
 }
 
 doubleMatrixTests() {
-  testAbstractDoubleMatrix('dense', DoubleMatrix.create);
-  testAbstractDoubleMatrix('dense view', _dice(DoubleMatrix.create));
-  testDenseDoubleMatrix('raw', DoubleMatrix.create);
-  testDenseDoubleMatrix('view', _dice(DoubleMatrix.create));
+  testDoubleMatrix('dense', DenseDoubleMatrix.create);
+  testDoubleMatrix('dense view', _dice(DenseDoubleMatrix.create));
+  testDenseDoubleMatrix('raw', DenseDoubleMatrix.create);
+  testDenseDoubleMatrix('view', _dice(DenseDoubleMatrix.create));
 
 //  testDiagonalDoubleMatrix(true);
 //  testDiagonalDoubleMatrix(false);
 
-  testAbstractDoubleMatrix('sparse', SparseDoubleMatrix.create);
-  testAbstractDoubleMatrix('sparse view', _dice(SparseDoubleMatrix.create));
+  testDoubleMatrix('sparse', SparseDoubleMatrix.create);
+  testDoubleMatrix('sparse view', _dice(SparseDoubleMatrix.create));
 //  testSparseDoubleMatrix();
 //  testSparseDoubleMatrix();
 
-  testAbstractDoubleMatrix('sparse rc', SparseRCDoubleMatrix.create);
-  testAbstractDoubleMatrix('sparse rc view', _dice(SparseRCDoubleMatrix.create));
+  testDoubleMatrix('sparse rc', SparseRCDoubleMatrix.create);
+  testDoubleMatrix('sparse rc view', _dice(SparseRCDoubleMatrix.create));
 
-//  testAbstractDoubleMatrix('sparse cc', SparseCCDoubleMatrix.create);
-//  testAbstractDoubleMatrix('sparse cc view', _view(SparseCCDoubleMatrix.create));
+//  testDoubleMatrix('sparse cc', SparseCCDoubleMatrix.create);
+//  testDoubleMatrix('sparse cc view', _view(SparseCCDoubleMatrix.create));
 }
 
 _flip(make) => (sz) => make(sz).flip();
 
 _dice(make) => (r, c) => make(r, c).dice();
 
-List<Float64List> toList(AbstractDoubleMatrix m) {
+List<Float64List> toList(DoubleMatrix m) {
   var values = new List.generate(m.rows, (_) => new Float64List(m.columns));
   for (int r = 0; r < m.rows; r++) {
     Float64List currentRow = values[r];

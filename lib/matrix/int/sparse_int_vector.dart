@@ -20,9 +20,9 @@ part of cern.colt.matrix.int;
 /// This class offers expected time complexity `O(1)` (i.e. constant time)
 /// for the basic operations `get`, `set`, and `size`. As such this sparse
 /// class is expected to have no worse time complexity than its dense
-/// counterpart [IntVector]. However, constant factors are considerably
+/// counterpart [DenseIntVector]. However, constant factors are considerably
 /// larger.
-class SparseIntVector extends AbstractIntVector {
+class SparseIntVector extends IntVector {
   Map<int, int> _elements;
 
   /// Constructs a matrix with a copy of the given values.
@@ -76,13 +76,13 @@ class SparseIntVector extends AbstractIntVector {
 
   int index(int rank) => zero + rank * stride;
 
-  AbstractIntVector like1D(int size) => new SparseIntVector(size);
+  IntVector like1D(int size) => new SparseIntVector(size);
 
-  AbstractIntMatrix like2D(int rows, int columns) {
+  IntMatrix like2D(int rows, int columns) {
     return new SparseIntMatrix(rows, columns);
   }
 
-  AbstractIntMatrix reshape(int rows, int columns) {
+  IntMatrix reshape(int rows, int columns) {
     if (rows * columns != size) {
       throw new ArgumentError("rows*columns != size");
     }
@@ -120,7 +120,7 @@ class SparseIntVector extends AbstractIntVector {
     return buf.toString();
   }
 
-  bool _haveSharedCellsRaw(AbstractIntVector other) {
+  bool _haveSharedCellsRaw(IntVector other) {
     if (other is SelectedSparseIntVector) {
       return _elements == other._elements;
     } else if (other is SparseIntVector) {
@@ -129,7 +129,7 @@ class SparseIntVector extends AbstractIntVector {
     return false;
   }
 
-  AbstractIntVector _viewSelectionLike(Int32List offsets) {
+  IntVector _viewSelectionLike(Int32List offsets) {
     return new SelectedSparseIntVector(_elements, offsets);
   }
 
@@ -147,7 +147,7 @@ class SparseIntVector extends AbstractIntVector {
 /// same signatures and semantics as its abstract superclass(es) while
 /// introducing no additional functionality. Thus, this class need not be visible
 /// to users.
-class SelectedSparseIntVector extends AbstractIntVector {
+class SelectedSparseIntVector extends IntVector {
   Map<int, int> _elements;
 
   /// The offsets of visible indexes of this matrix.
@@ -177,14 +177,14 @@ class SelectedSparseIntVector extends AbstractIntVector {
 
   int index(int rank) => __offset + _offsets[zero + rank * stride];
 
-  AbstractIntVector like1D(int size) => new SparseIntVector(size);
+  IntVector like1D(int size) => new SparseIntVector(size);
 
-  AbstractIntMatrix like2D(int rows, int columns) {
+  IntMatrix like2D(int rows, int columns) {
     return new SparseIntMatrix(rows, columns);
   }
 
   // This method is not supported.
-  AbstractIntMatrix reshape(int rows, int columns) {
+  IntMatrix reshape(int rows, int columns) {
     throw new ArgumentError("This method is not supported.");
   }
 
@@ -199,7 +199,7 @@ class SelectedSparseIntVector extends AbstractIntVector {
 
   int _offset(int absRank) => _offsets[absRank];
 
-  bool _haveSharedCellsRaw(AbstractIntVector other) {
+  bool _haveSharedCellsRaw(IntVector other) {
     if (other is SelectedSparseIntVector) {
       return _elements == other._elements;
     } else if (other is SparseIntVector) {
@@ -208,7 +208,7 @@ class SelectedSparseIntVector extends AbstractIntVector {
     return false;
   }
 
-  AbstractIntVector _viewSelectionLike(Int32List offsets) {
+  IntVector _viewSelectionLike(Int32List offsets) {
     return new SelectedSparseIntVector(_elements, offsets);
   }
 

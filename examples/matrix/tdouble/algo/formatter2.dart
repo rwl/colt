@@ -17,7 +17,7 @@ main() {
 //
 //  // now the processing
 //  int size = formats.length;
-//  AbstractDoubleVector matrix = new DoubleVector.DenseDoubleVector(values);
+//  DoubleVector matrix = new DenseDoubleVector(values);
 //
 //  List<String> strings = new List<String>(size);
 //  // List<String> javaStrings = new String[size];

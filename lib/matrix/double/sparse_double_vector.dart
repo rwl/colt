@@ -21,9 +21,9 @@ part of cern.colt.matrix.double;
 /// This class offers *expected* time complexity `O(1)` (i.e. constant
 /// time) for the basic operations `get`, `set`, and `size`. As such
 /// this sparse class is expected to have no worse time complexity than
-/// its dense counterpart [DoubleVector]. However, constant factors are
+/// its dense counterpart [DenseDoubleVector]. However, constant factors are
 /// considerably larger.
-class SparseDoubleVector extends AbstractDoubleVector {
+class SparseDoubleVector extends DoubleVector {
   Map<int, double> _elements;
 
   /// Constructs a matrix with a copy of the given values.
@@ -47,7 +47,7 @@ class SparseDoubleVector extends AbstractDoubleVector {
   static SparseDoubleVector create(int sz) => new SparseDoubleVector(sz);
 
   factory SparseDoubleVector.append(
-      AbstractDoubleVector A, AbstractDoubleVector B) {
+      DoubleVector A, DoubleVector B) {
     return dfactory.append(A, B, (n) => new SparseDoubleVector(n));
   }
 
@@ -81,17 +81,17 @@ class SparseDoubleVector extends AbstractDoubleVector {
 
   int index(int rank) => zero + rank * stride;
 
-  AbstractDoubleVector like1D(int size) => new SparseDoubleVector(size);
+  DoubleVector like1D(int size) => new SparseDoubleVector(size);
 
-  AbstractDoubleMatrix like2D(int rows, int columns) {
+  DoubleMatrix like2D(int rows, int columns) {
     return new SparseDoubleMatrix(rows, columns);
   }
 
-  AbstractDoubleMatrix reshape(int rows, int columns) {
+  DoubleMatrix reshape(int rows, int columns) {
     if (rows * columns != size) {
       throw new ArgumentError("rows*columns != size");
     }
-    AbstractDoubleMatrix M = new SparseDoubleMatrix(rows, columns);
+    DoubleMatrix M = new SparseDoubleMatrix(rows, columns);
     int idx = 0;
     for (int c = 0; c < columns; c++) {
       for (int r = 0; r < rows; r++) {
@@ -131,7 +131,7 @@ class SparseDoubleVector extends AbstractDoubleVector {
     return buf.toString();
   }
 
-  bool _haveSharedCellsRaw(AbstractDoubleVector other) {
+  bool _haveSharedCellsRaw(DoubleVector other) {
     if (other is SelectedSparseDoubleVector) {
       return this._elements == other._elements;
     } else if (other is SparseDoubleVector) {
@@ -140,7 +140,7 @@ class SparseDoubleVector extends AbstractDoubleVector {
     return false;
   }
 
-  AbstractDoubleVector _viewSelectionLike(Int32List offsets) {
+  DoubleVector _viewSelectionLike(Int32List offsets) {
     return new SelectedSparseDoubleVector(_elements, offsets);
   }
 
@@ -159,7 +159,7 @@ class SparseDoubleVector extends AbstractDoubleVector {
 /// the same signatures and semantics as its abstract superclass(es) while
 /// introducing no additional functionality. Thus, this class need not be
 /// visible to users.
-class SelectedSparseDoubleVector extends AbstractDoubleVector {
+class SelectedSparseDoubleVector extends DoubleVector {
   Map<int, double> _elements;
 
   /// The offsets of visible indexes of this matrix.
@@ -193,17 +193,17 @@ class SelectedSparseDoubleVector extends AbstractDoubleVector {
 
   int index(int rank) => __offset + _offsets[zero + rank * stride];
 
-  AbstractDoubleVector like1D(int size) => new SparseDoubleVector(size);
+  DoubleVector like1D(int size) => new SparseDoubleVector(size);
 
-  AbstractDoubleMatrix like2D(int rows, int columns) {
+  DoubleMatrix like2D(int rows, int columns) {
     return new SparseDoubleMatrix(rows, columns);
   }
 
-  AbstractDoubleMatrix reshape(int rows, int columns) {
+  DoubleMatrix reshape(int rows, int columns) {
     if (rows * columns != size) {
       throw new ArgumentError("rows*columns != size");
     }
-    AbstractDoubleMatrix M = new SparseDoubleMatrix(rows, columns);
+    DoubleMatrix M = new SparseDoubleMatrix(rows, columns);
     int idx = 0;
     for (int c = 0; c < columns; c++) {
       for (int r = 0; r < rows; r++) {
@@ -224,7 +224,7 @@ class SelectedSparseDoubleVector extends AbstractDoubleVector {
 
   int offset(int absRank) => _offsets[absRank];
 
-  bool _haveSharedCellsRaw(AbstractDoubleVector other) {
+  bool _haveSharedCellsRaw(DoubleVector other) {
     if (other is SelectedSparseDoubleVector) {
       return _elements == other._elements;
     } else if (other is SparseDoubleVector) {
@@ -233,7 +233,7 @@ class SelectedSparseDoubleVector extends AbstractDoubleVector {
     return false;
   }
 
-  AbstractDoubleVector _viewSelectionLike(Int32List offsets) {
+  DoubleVector _viewSelectionLike(Int32List offsets) {
     return new SelectedSparseDoubleVector(_elements, offsets);
   }
 

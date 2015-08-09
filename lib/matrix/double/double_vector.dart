@@ -13,22 +13,22 @@ part of cern.colt.matrix.double;
 /// Dense 1-d matrix (aka vector) holding [double] elements.
 ///
 /// Internally holds one single contigous one-dimensional array.
-class DoubleVector extends AbstractDoubleVector {
+class DenseDoubleVector extends DoubleVector {
   Float64List _elements;
 
   /// Constructs a matrix with a copy of the given values.
-  factory DoubleVector.fromList(Float64List values) {
-    return new DoubleVector(values.length)..setAll(values);
+  factory DenseDoubleVector.fromList(Float64List values) {
+    return new DenseDoubleVector(values.length)..setAll(values);
   }
 
   /// Constructs a matrix with a given number of cells. All entries are
   /// initially `0`.
-  factory DoubleVector(int size) {
+  factory DenseDoubleVector(int size) {
     final elements = new Float64List(size);
-    return new DoubleVector._internal(size, elements, 0, 1, false);
+    return new DenseDoubleVector._internal(size, elements, 0, 1, false);
   }
 
-  DoubleVector._internal(
+  DenseDoubleVector._internal(
       int size, Float64List elements, int zero, int stride, bool isView)
       : super(size, zero, stride, !isView) {
     if (elements == null) {
@@ -37,11 +37,11 @@ class DoubleVector extends AbstractDoubleVector {
     _elements = elements;
   }
 
-  static DoubleVector create(int size) => new DoubleVector(size);
+  static DenseDoubleVector create(int size) => new DenseDoubleVector(size);
 
-  factory DoubleVector.random(int size) => dfactory.random(size, create);
+  factory DenseDoubleVector.random(int size) => dfactory.random(size, create);
 
-  factory DoubleVector.append(AbstractDoubleVector A, AbstractDoubleVector B) {
+  factory DenseDoubleVector.append(DoubleVector A, DoubleVector B) {
     return dfactory.append(A, B, create);
   }
 
@@ -107,14 +107,14 @@ class DoubleVector extends AbstractDoubleVector {
     }
   }
 
-  void copyFrom(AbstractDoubleVector source) {
+  void copyFrom(DoubleVector source) {
     // overriden for performance only
-    if (source is! DoubleVector) {
+    if (source is! DenseDoubleVector) {
       super.copyFrom(source);
       return;
     }
 
-    DoubleVector other = source as DoubleVector;
+    DenseDoubleVector other = source as DenseDoubleVector;
     if (other == this) {
       return;
     }
@@ -127,13 +127,13 @@ class DoubleVector extends AbstractDoubleVector {
     }
 
     if (_haveSharedCells(other)) {
-      AbstractDoubleVector c = other.copy();
-      if (c is! DoubleVector) {
+      DoubleVector c = other.copy();
+      if (c is! DenseDoubleVector) {
         // should not happen
         super.copyFrom(source);
         return;
       }
-      other = c as DoubleVector;
+      other = c as DenseDoubleVector;
     }
 
     if (_elements == null || other._elements == null) {
@@ -150,9 +150,9 @@ class DoubleVector extends AbstractDoubleVector {
     }
   }
 
-  void assign(final AbstractDoubleVector y, final DoubleDoubleFunction fn) {
+  void assign(final DoubleVector y, final DoubleDoubleFunction fn) {
     // overriden for performance only
-    if (y is! DoubleVector) {
+    if (y is! DenseDoubleVector) {
       super.assign(y, fn);
       return;
     }
@@ -404,17 +404,17 @@ class DoubleVector extends AbstractDoubleVector {
 
   double get(int index) => _elements[zero + index * stride];
 
-  AbstractDoubleVector like1D(int size) => new DoubleVector(size);
+  DoubleVector like1D(int size) => new DenseDoubleVector(size);
 
-  AbstractDoubleMatrix like2D(int rows, int columns) {
-    return new DoubleMatrix(rows, columns);
+  DoubleMatrix like2D(int rows, int columns) {
+    return new DenseDoubleMatrix(rows, columns);
   }
 
-  AbstractDoubleMatrix reshape(final int rows, final int columns) {
+  DoubleMatrix reshape(final int rows, final int columns) {
     if (rows * columns != size) {
       throw new ArgumentError("rows*columns != size");
     }
-    var m = new DoubleMatrix(rows, columns);
+    var m = new DenseDoubleMatrix(rows, columns);
     final Float64List elementsOther = m.elements as Float64List;
     final int zeroOther = m.index(0, 0);
     final int rowStrideOther = m.rowStride;
@@ -446,14 +446,14 @@ class DoubleVector extends AbstractDoubleVector {
     }
   }
 
-  double dot(AbstractDoubleVector y, [final int from = 0, int length = null]) {
+  double dot(DoubleVector y, [final int from = 0, int length = null]) {
     if (length == null) {
       length = size;
     }
-    if (y is! DoubleVector) {
+    if (y is! DenseDoubleVector) {
       return super.dot(y, from, length);
     }
-    DoubleVector yy = y as DoubleVector;
+    DenseDoubleVector yy = y as DenseDoubleVector;
 
     int tail = from + length;
     if (from < 0 || length < 0) {
@@ -507,10 +507,10 @@ class DoubleVector extends AbstractDoubleVector {
     return sum;
   }
 
-  bool _haveSharedCellsRaw(AbstractDoubleVector other) {
+  bool _haveSharedCellsRaw(DoubleVector other) {
     if (other is SelectedDenseDoubleVector) {
       return _elements == other._elements;
-    } else if (other is DoubleVector) {
+    } else if (other is DenseDoubleVector) {
       return _elements == other._elements;
     }
     return false;
@@ -518,12 +518,12 @@ class DoubleVector extends AbstractDoubleVector {
 
   int index(int rank) => zero + rank * stride;
 
-  AbstractDoubleVector _viewSelectionLike(Int32List offsets) {
+  DoubleVector _viewSelectionLike(Int32List offsets) {
     return new SelectedDenseDoubleVector._(_elements, offsets);
   }
 
   Object clone() {
-    return new DoubleVector._internal(size, _elements, zero, stride, isView);
+    return new DenseDoubleVector._internal(size, _elements, zero, stride, isView);
   }
 }
 
@@ -538,7 +538,7 @@ class DoubleVector extends AbstractDoubleVector {
 ///
 /// This class uses no delegation. Its instances point directly to the data. Cell
 /// addressing overhead is 1 additional array index access per get/set.
-class SelectedDenseDoubleVector extends AbstractDoubleVector {
+class SelectedDenseDoubleVector extends DoubleVector {
   Float64List _elements;
 
   /// The offsets of visible indexes of this matrix.
@@ -565,17 +565,17 @@ class SelectedDenseDoubleVector extends AbstractDoubleVector {
 
   int index(int rank) => __offset + _offsets[zero + rank * stride];
 
-  AbstractDoubleVector like1D(int size) => new DoubleVector(size);
+  DoubleVector like1D(int size) => new DenseDoubleVector(size);
 
-  AbstractDoubleMatrix like2D(int rows, int columns) {
-    return new DoubleMatrix(rows, columns);
+  DoubleMatrix like2D(int rows, int columns) {
+    return new DenseDoubleMatrix(rows, columns);
   }
 
-  AbstractDoubleMatrix reshape(int rows, int columns) {
+  DoubleMatrix reshape(int rows, int columns) {
     if (rows * columns != size) {
       throw new ArgumentError("rows*columns != size");
     }
-    var m = new DoubleMatrix(rows, columns);
+    var m = new DenseDoubleMatrix(rows, columns);
     final Float64List elementsOther = m.elements as Float64List;
     final int zeroOther = m.index(0, 0);
     final int rowStrideOther = m.rowStride;
@@ -598,16 +598,16 @@ class SelectedDenseDoubleVector extends AbstractDoubleVector {
 
   int offset(int absRank) => _offsets[absRank];
 
-  bool _haveSharedCellsRaw(AbstractDoubleVector other) {
+  bool _haveSharedCellsRaw(DoubleVector other) {
     if (other is SelectedDenseDoubleVector) {
       return _elements == other._elements;
-    } else if (other is DoubleVector) {
+    } else if (other is DenseDoubleVector) {
       return _elements == other._elements;
     }
     return false;
   }
 
-  AbstractDoubleVector _viewSelectionLike(Int32List offsets) {
+  DoubleVector _viewSelectionLike(Int32List offsets) {
     return new SelectedDenseDoubleVector._(_elements, offsets);
   }
 

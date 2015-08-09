@@ -4,7 +4,7 @@ const DINDEX = 3;
 
 testDiagonalComplexMatrix(bool view) {
   group('DiagonalComplexMatrix', () {
-    AbstractComplexMatrix A, B, Bt;
+    ComplexMatrix A, B, Bt;
     int DLENGTH;
     setUp(() {
       if (!view) {
@@ -36,9 +36,8 @@ testDiagonalComplexMatrix(bool view) {
     });
 
     test('fill', () {
-      Float64List value =
-          new Float64List.fromList([random.nextDouble(), random.nextDouble()]);
-      A.fill(value[0], value[1]);
+      var value = new Complex(random.nextDouble(), random.nextDouble());
+      A.fill(value.real, value.imaginary);
       if (DINDEX >= 0) {
         for (int r = 0; r < DLENGTH; r++) {
           assertEquals(value, A.get(r, r + DINDEX), TOL);
@@ -70,8 +69,8 @@ testDiagonalComplexMatrix(bool view) {
     });
 
     test('setImaginary', () {
-      AbstractDoubleMatrix Im = new DoubleMatrix.random(A.rows, A.columns);
-      AbstractComplexMatrix Acopy = A.copy();
+      DoubleMatrix Im = new DenseDoubleMatrix.random(A.rows, A.columns);
+      ComplexMatrix Acopy = A.copy();
       A.setImaginary(Im);
       if (DINDEX >= 0) {
         for (int r = 0; r < DLENGTH; r++) {
@@ -89,8 +88,8 @@ testDiagonalComplexMatrix(bool view) {
     });
 
     test('setReal', () {
-      AbstractDoubleMatrix Re = new DoubleMatrix.random(A.rows, A.columns);
-      AbstractComplexMatrix Acopy = A.copy();
+      DoubleMatrix Re = new DenseDoubleMatrix.random(A.rows, A.columns);
+      ComplexMatrix Acopy = A.copy();
       A.setReal(Re);
       if (DINDEX >= 0) {
         for (int r = 0; r < DLENGTH; r++) {
@@ -108,7 +107,7 @@ testDiagonalComplexMatrix(bool view) {
     });
 
     test('apply', () {
-      AbstractComplexMatrix Acopy = A.copy();
+      ComplexMatrix Acopy = A.copy();
       A.apply(acos);
       if (DINDEX >= 0) {
         for (int r = 0; r < DLENGTH; r++) {
@@ -126,7 +125,7 @@ testDiagonalComplexMatrix(bool view) {
     });
 
     test('assign', () {
-      AbstractComplexMatrix Acopy = A.copy();
+      ComplexMatrix Acopy = A.copy();
       A.assign(B, div);
       if (DINDEX >= 0) {
         for (int r = 0; r < DLENGTH; r++) {
@@ -190,7 +189,7 @@ testDiagonalComplexMatrix(bool view) {
     });
 
     test('column', () {
-      AbstractComplexVector col = A.column(NCOLUMNS ~/ 2);
+      ComplexVector col = A.column(NCOLUMNS ~/ 2);
       expect(NROWS, equals(col.size));
       for (int r = 0; r < NROWS; r++) {
         assertEquals(A.get(r, NCOLUMNS ~/ 2), col.get(r), TOL);
@@ -198,7 +197,7 @@ testDiagonalComplexMatrix(bool view) {
     });
 
     test('columnFlip', () {
-      AbstractComplexMatrix B = A.columnFlip();
+      ComplexMatrix B = A.columnFlip();
       expect(A.size, equals(B.size));
       for (int r = 0; r < NROWS; r++) {
         for (int c = 0; c < NCOLUMNS; c++) {
@@ -208,7 +207,7 @@ testDiagonalComplexMatrix(bool view) {
     });
 
     test('dice', () {
-      AbstractComplexMatrix B = A.dice();
+      ComplexMatrix B = A.dice();
       expect(NROWS, equals(B.columns));
       expect(NCOLUMNS, equals(B.rows));
       for (int r = 0; r < NROWS; r++) {
@@ -219,7 +218,7 @@ testDiagonalComplexMatrix(bool view) {
     });
 
     test('part', () {
-      AbstractComplexMatrix B =
+      ComplexMatrix B =
           A.part(NROWS ~/ 2, NCOLUMNS ~/ 2, NROWS ~/ 3, NCOLUMNS ~/ 3);
       expect(NROWS ~/ 3, equals(B.rows));
       expect(NCOLUMNS ~/ 3, equals(B.columns));
@@ -232,7 +231,7 @@ testDiagonalComplexMatrix(bool view) {
     });
 
     test('row', () {
-      AbstractComplexVector B = A.row(NROWS ~/ 2);
+      ComplexVector B = A.row(NROWS ~/ 2);
       expect(NCOLUMNS, equals(B.size));
       for (int r = 0; r < NCOLUMNS; r++) {
         assertEquals(A.get(NROWS ~/ 2, r), B.get(r), TOL);
@@ -240,7 +239,7 @@ testDiagonalComplexMatrix(bool view) {
     });
 
     test('rowFlip', () {
-      AbstractComplexMatrix B = A.rowFlip();
+      ComplexMatrix B = A.rowFlip();
       expect(A.size, equals(B.size));
       for (int r = 0; r < NROWS; r++) {
         for (int c = 0; c < NCOLUMNS; c++) {
@@ -260,7 +259,7 @@ testDiagonalComplexMatrix(bool view) {
         NROWS ~/ 2,
         NROWS - 1
       ]);
-      AbstractComplexMatrix B = A.select(rowIndexes, colIndexes);
+      ComplexMatrix B = A.select(rowIndexes, colIndexes);
       expect(rowIndexes.length, equals(B.rows));
       expect(colIndexes.length, equals(B.columns));
       for (int r = 0; r < rowIndexes.length; r++) {
@@ -273,7 +272,7 @@ testDiagonalComplexMatrix(bool view) {
     test('strides', () {
       int rowStride = 3;
       int colStride = 5;
-      AbstractComplexMatrix B = A.strides(rowStride, colStride);
+      ComplexMatrix B = A.strides(rowStride, colStride);
       for (int r = 0; r < B.rows; r++) {
         for (int c = 0; c < B.columns; c++) {
           assertEquals(A.get(r * rowStride, c * colStride), B.get(r, c), TOL);
@@ -284,7 +283,7 @@ testDiagonalComplexMatrix(bool view) {
     test('multiply', () {
       var alpha = new Complex(3.0, 4.0);
       var beta = new Complex(5.0, 6.0);
-      AbstractComplexMatrix C = new DiagonalComplexMatrix(NROWS, NROWS, 0);
+      ComplexMatrix C = new DiagonalComplexMatrix(NROWS, NROWS, 0);
       for (int i = 0; i < DLENGTH; i++) {
         C.setParts(i, i, random.nextDouble(), random.nextDouble());
       }

@@ -13,7 +13,7 @@ part of cern.colt.matrix.complex;
 /// Sparse hashed 2-d matrix holding `complex` elements.
 ///
 /// This implementation uses [Map].
-class SparseComplexMatrix extends AbstractComplexMatrix {
+class SparseComplexMatrix extends ComplexMatrix {
   Map<int, Complex> _elements;
 
   factory SparseComplexMatrix(int rows, int columns) {
@@ -42,7 +42,7 @@ class SparseComplexMatrix extends AbstractComplexMatrix {
     }
   }
 
-  void copyFrom(AbstractComplexMatrix source) {
+  void copyFrom(ComplexMatrix source) {
     // overriden for performance only
     if (!(source is SparseComplexMatrix)) {
       super.copyFrom(source);
@@ -64,7 +64,7 @@ class SparseComplexMatrix extends AbstractComplexMatrix {
   }
 
   void assign(
-      final AbstractComplexMatrix y, cfunc.ComplexComplexComplexFunction fn) {
+      final ComplexMatrix y, cfunc.ComplexComplexComplexFunction fn) {
     if (isView) {
       super.assign(y, fn);
       return;
@@ -107,7 +107,7 @@ class SparseComplexMatrix extends AbstractComplexMatrix {
 
   dynamic get elements => _elements;
 
-  bool _haveSharedCellsRaw(AbstractComplexMatrix other) {
+  bool _haveSharedCellsRaw(ComplexMatrix other) {
     if (other is SelectedSparseComplexMatrix) {
       return _elements == other._elements;
     } else if (other is SparseComplexMatrix) {
@@ -120,13 +120,13 @@ class SparseComplexMatrix extends AbstractComplexMatrix {
     return rowZero + row * rowStride + columnZero + column * columnStride;
   }
 
-  AbstractComplexMatrix like2D(int rows, int columns) {
+  ComplexMatrix like2D(int rows, int columns) {
     return new SparseComplexMatrix(rows, columns);
   }
 
-  AbstractComplexVector like1D(int size) => new SparseComplexVector(size);
+  ComplexVector like1D(int size) => new SparseComplexVector(size);
 
-  AbstractComplexVector _like1D(int size, int offset, int stride) {
+  ComplexVector _like1D(int size, int offset, int stride) {
     return new SparseComplexVector._internal(
         size, this._elements, offset, stride, true);
   }
@@ -149,14 +149,14 @@ class SparseComplexMatrix extends AbstractComplexMatrix {
     }
   }
 
-  AbstractComplexMatrix _viewSelectionLike(
+  ComplexMatrix _viewSelectionLike(
       Int32List rowOffsets, Int32List columnOffsets) {
     return new SelectedSparseComplexMatrix(
         this._elements, rowOffsets, columnOffsets, 0);
   }
 
-  AbstractDoubleMatrix imaginary() {
-    AbstractDoubleMatrix Im = new SparseDoubleMatrix(rows, columns);
+  DoubleMatrix imaginary() {
+    DoubleMatrix Im = new SparseDoubleMatrix(rows, columns);
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < columns; c++) {
         Im.set(r, c, get(r, c).imaginary);
@@ -165,8 +165,8 @@ class SparseComplexMatrix extends AbstractComplexMatrix {
     return Im;
   }
 
-  AbstractDoubleMatrix real() {
-    final AbstractDoubleMatrix Re = new SparseDoubleMatrix(rows, columns);
+  DoubleMatrix real() {
+    final DoubleMatrix Re = new SparseDoubleMatrix(rows, columns);
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < columns; c++) {
         Re.set(r, c, get(r, c).real);
@@ -183,7 +183,7 @@ class SparseComplexMatrix extends AbstractComplexMatrix {
 
 /// Selection view on sparse 2-d matrices holding `complex` elements. This
 /// implementation uses [Map].
-class SelectedSparseComplexMatrix extends AbstractComplexMatrix {
+class SelectedSparseComplexMatrix extends ComplexMatrix {
   Map<int, Complex> _elements;
 
   /// The offsets of the visible cells of this matrix.
@@ -225,7 +225,7 @@ class SelectedSparseComplexMatrix extends AbstractComplexMatrix {
     throw new UnsupportedError("This method is not supported.");
   }
 
-  bool _haveSharedCellsRaw(AbstractComplexMatrix other) {
+  bool _haveSharedCellsRaw(ComplexMatrix other) {
     if (other is SelectedSparseComplexMatrix) {
       return _elements == other._elements;
     } else if (other is SparseComplexMatrix) {
@@ -240,13 +240,13 @@ class SelectedSparseComplexMatrix extends AbstractComplexMatrix {
         _columnOffsets[columnZero + column * columnStride];
   }
 
-  AbstractComplexMatrix like2D(int rows, int columns) {
+  ComplexMatrix like2D(int rows, int columns) {
     return new SparseComplexMatrix(rows, columns);
   }
 
-  AbstractComplexVector like1D(int size) => new SparseComplexVector(size);
+  ComplexVector like1D(int size) => new SparseComplexVector(size);
 
-  AbstractComplexVector _like1D(int size, int zero, int stride) {
+  ComplexVector _like1D(int size, int zero, int stride) {
     throw new Error(); // never called since row() and column() are overridden
   }
 
@@ -274,7 +274,7 @@ class SelectedSparseComplexMatrix extends AbstractComplexMatrix {
     }
   }
 
-  AbstractComplexMatrix dice() {
+  ComplexMatrix dice() {
     var v = _view();
     vDice(v);
     // swap
@@ -288,7 +288,7 @@ class SelectedSparseComplexMatrix extends AbstractComplexMatrix {
     return v;
   }
 
-  AbstractComplexVector column(int column) {
+  ComplexVector column(int column) {
     checkColumn(this, column);
     int viewSize = rows;
     int viewZero = rowZero;
@@ -299,7 +299,7 @@ class SelectedSparseComplexMatrix extends AbstractComplexMatrix {
         viewSize, _elements, viewZero, viewStride, viewOffsets, viewOffset);
   }
 
-  AbstractComplexVector row(int row) {
+  ComplexVector row(int row) {
     checkRow(this, row);
     int viewSize = columns;
     int viewZero = columnZero;
@@ -310,19 +310,19 @@ class SelectedSparseComplexMatrix extends AbstractComplexMatrix {
         viewSize, _elements, viewZero, viewStride, viewOffsets, viewOffset);
   }
 
-  AbstractComplexMatrix _viewSelectionLike(
+  ComplexMatrix _viewSelectionLike(
       Int32List rowOffsets, Int32List columnOffsets) {
     return new SelectedSparseComplexMatrix(
         _elements, rowOffsets, columnOffsets, _offset);
   }
 
   /// This method is not supported.
-  AbstractDoubleMatrix imaginary() {
+  DoubleMatrix imaginary() {
     throw new UnsupportedError("This method is not supported.");
   }
 
   /// This method is not supported.
-  AbstractDoubleMatrix real() {
+  DoubleMatrix real() {
     throw new UnsupportedError("This method is not supported.");
   }
 

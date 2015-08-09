@@ -29,11 +29,11 @@ class LargeIntMatrix extends WrapperIntMatrix {
 
   Object get elements => _elements;
 
-  AbstractIntMatrix _getContent() => this;
+  IntMatrix _getContent() => this;
 
-  AbstractIntMatrix like2D(int rows, int columns) {
+  IntMatrix like2D(int rows, int columns) {
     return new LargeIntMatrix(rows, columns);
   }
 
-  AbstractIntVector like1D(int size) => new IntVector(size);
+  IntVector like1D(int size) => new DenseIntVector(size);
 }

@@ -36,10 +36,10 @@ import '../../function/double.dart' as func;
 
 import '../double/matrix.dart'
     show
-        AbstractDoubleVector,
-        AbstractDoubleMatrix,
         DoubleVector,
         DoubleMatrix,
+        DenseDoubleVector,
+        DenseDoubleMatrix,
         LargeDoubleMatrix,
         SparseDoubleVector,
         SparseDoubleMatrix,

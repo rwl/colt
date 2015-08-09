@@ -183,7 +183,7 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
     }
   }
 
-  void copyFrom(AbstractComplexMatrix source) {
+  void copyFrom(ComplexMatrix source) {
     if (source == this) {
       return; // nothing to do
     }
@@ -214,7 +214,7 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
   }
 
   void assign(
-      final AbstractComplexMatrix y, cfunc.ComplexComplexComplexFunction fn) {
+      final ComplexMatrix y, cfunc.ComplexComplexComplexFunction fn) {
     checkShape(this, y);
     if ((y is SparseRCComplexMatrix) &&
         (fn == cfunc.plus || fn == cfunc.minus)) {
@@ -433,8 +433,8 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
 
   /// Returns a new matrix that has the same elements as this matrix, but is in
   /// a dense form.
-  ComplexMatrix dense() {
-    var dense = new ComplexMatrix(rows, columns);
+  DenseComplexMatrix dense() {
+    var dense = new DenseComplexMatrix(rows, columns);
     forEachNonZero((int i, int j, Complex value) {
       dense.set(i, j, get(i, j));
       return value;
@@ -513,11 +513,11 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
 
   Float64List get values => _values;
 
-  AbstractComplexMatrix like2D(int rows, int columns) {
+  ComplexMatrix like2D(int rows, int columns) {
     return new SparseRCComplexMatrix(rows, columns); //, _columnIndexes.length);
   }
 
-  AbstractComplexVector like1D(int size) => new SparseComplexVector(size);
+  ComplexVector like1D(int size) => new SparseComplexVector(size);
 
   /// Removes (sums) duplicate entries (if any).
   void removeDuplicates() {
@@ -655,8 +655,8 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
 
   void trimToSize() => _realloc(0);
 
-  AbstractComplexVector mult(AbstractComplexVector y,
-      [AbstractComplexVector z = null, Complex alpha = null,
+  ComplexVector mult(ComplexVector y,
+      [ComplexVector z = null, Complex alpha = null,
       Complex beta = null, bool transposeA = false]) {
     if (alpha == null) {
       alpha = Complex.ONE;
@@ -669,10 +669,10 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
 
     bool ignore = (z == null || !transposeA);
     if (z == null) {
-      z = new ComplexVector(rowsA);
+      z = new DenseComplexVector(rowsA);
     }
 
-    if (!(y is ComplexVector && z is ComplexVector)) {
+    if (!(y is DenseComplexVector && z is DenseComplexVector)) {
       return super.mult(y, z, alpha, beta, transposeA);
     }
 
@@ -685,12 +685,12 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
           z.toStringShort());
     }
 
-    ComplexVector zz = z as ComplexVector;
+    DenseComplexVector zz = z as DenseComplexVector;
     Float64List elementsZ = zz._elements;
     int strideZ = zz.stride;
     int zeroZ = z.index(0);
 
-    ComplexVector yy = y as ComplexVector;
+    DenseComplexVector yy = y as DenseComplexVector;
     Float64List elementsY = yy._elements;
     int strideY = yy.stride;
     int zeroY = y.index(0);
@@ -756,8 +756,8 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
     return z;
   }
 
-  AbstractComplexMatrix multiply(AbstractComplexMatrix B,
-      [AbstractComplexMatrix C = null, Complex alpha = null,
+  ComplexMatrix multiply(ComplexMatrix B,
+      [ComplexMatrix C = null, Complex alpha = null,
       Complex beta = null, bool transposeA = false, bool transposeB = false]) {
     if (alpha == null) {
       alpha = Complex.ONE;
@@ -783,7 +783,7 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
       if (B is SparseRCComplexMatrix) {
         C = new SparseRCComplexMatrix(rowsA, p, rowsA * p);
       } else {
-        C = new ComplexMatrix(rowsA, p);
+        C = new DenseComplexMatrix(rowsA, p);
       }
     }
 
@@ -809,21 +809,21 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
       C.apply(cfunc.multiply(beta));
     }
 
-    if ((B is ComplexMatrix) && (C is ComplexMatrix)) {
+    if ((B is DenseComplexMatrix) && (C is DenseComplexMatrix)) {
       SparseRCComplexMatrix AA;
       if (transposeA) {
         AA = conjugateTranspose();
       } else {
         AA = this;
       }
-      ComplexMatrix BB;
+      DenseComplexMatrix BB;
       if (transposeB) {
-        BB = B.conjugateTranspose as ComplexMatrix;
+        BB = B.conjugateTranspose as DenseComplexMatrix;
       } else {
         BB = B;
       }
 
-      ComplexMatrix CC = C;
+      DenseComplexMatrix CC = C;
       Int32List rowPointersA = AA._rowPointers;
       Int32List columnIndexesA = AA._columnIndexes;
       Float64List valuesA = AA._values;
@@ -920,13 +920,13 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
         B = B.conjugateTranspose();
       }
       // cache views
-      final List<AbstractComplexVector> Brows =
-          new List<AbstractComplexVector>(columnsA);
+      final List<ComplexVector> Brows =
+          new List<ComplexVector>(columnsA);
       for (int i = columnsA; --i >= 0;) {
         Brows[i] = B.row(i);
       }
-      final List<AbstractComplexVector> Crows =
-          new List<AbstractComplexVector>(rowsA);
+      final List<ComplexVector> Crows =
+          new List<ComplexVector>(rowsA);
       for (int i = rowsA; --i >= 0;) {
         Crows[i] = C.row(i);
       }
@@ -977,7 +977,7 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
     _values = valuesNew;
   }
 
-  AbstractComplexMatrix _getContent() => this;
+  ComplexMatrix _getContent() => this;
 
   void _insert(int row, int column, int index, Complex value) {
     var columnIndexesList = new List.from(_columnIndexes);
@@ -1042,7 +1042,7 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
     return norm;
   }
 
-  AbstractDoubleMatrix real() {
+  DoubleMatrix real() {
     var vals = new Float64List(size);
     for (var i = 0; i < size; i++) {
       vals[i] = _values[2 * i];
@@ -1052,7 +1052,7 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
     return makeSparseRCDoubleMatrix(rows, columns, rowptr, colidx, vals);
   }
 
-  AbstractDoubleMatrix imaginary() {
+  DoubleMatrix imaginary() {
     var vals = new Float64List(size);
     for (var i = 0; i < size; i++) {
       vals[i] = _values[2 * i + 1];

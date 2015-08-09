@@ -39,18 +39,18 @@ class DoubleFormatter extends AbstractFormatter {
 
   /// Converts a given cell to a String; no alignment considered.
   String _formDoubleVector(
-      AbstractDoubleVector matrix, int index, Former formatter) {
+      DoubleVector matrix, int index, Former formatter) {
     return formatter.formDouble(matrix.get(index));
   }
 
   /// Converts a given cell to a String; no alignment considered.
   String _form(AbstractVector matrix, int index, Former formatter) {
     return this._formDoubleVector(
-        matrix as AbstractDoubleVector, index, formatter);
+        matrix as DoubleVector, index, formatter);
   }
 
   /// Returns a string representations of all cells; no alignment considered.
-  List<List<String>> formatMatrix(AbstractDoubleMatrix matrix) {
+  List<List<String>> formatMatrix(DoubleMatrix matrix) {
     List<List<String>> strings =
         new List<List<String>>(matrix.rows); //[matrix.columns()];
     for (int row = matrix.rows; --row >= 0;) {
@@ -61,7 +61,7 @@ class DoubleFormatter extends AbstractFormatter {
 
   /// Returns a string representations of all cells; no alignment considered.
   List<List<String>> _formatMatrix(AbstractMatrix matrix) {
-    return formatMatrix(matrix as AbstractDoubleMatrix);
+    return formatMatrix(matrix as DoubleMatrix);
   }
 
   /// Returns the index of the decimal point.
@@ -80,20 +80,20 @@ class DoubleFormatter extends AbstractFormatter {
   }
 
   /// Returns a string representation of the given matrix.
-  String toStringDoubleVector(AbstractDoubleVector matrix) {
-    AbstractDoubleMatrix easy = matrix.like2D(1, matrix.size);
+  String toStringDoubleVector(DoubleVector matrix) {
+    DoubleMatrix easy = matrix.like2D(1, matrix.size);
     easy.row(0).copyFrom(matrix);
     return toString2D(easy);
   }
 
   /// Returns a string representation of the given matrix.
-  String toStringDoubleMatrix(AbstractDoubleMatrix matrix) {
+  String toStringDoubleMatrix(DoubleMatrix matrix) {
     return super.toStringMatrix(matrix);
   }
 
   /// Returns a string representation of the given matrix.
   String toString2D(AbstractMatrix matrix) {
-    return toStringDoubleMatrix(matrix as AbstractDoubleMatrix);
+    return toStringDoubleMatrix(matrix as DoubleMatrix);
   }
 
   /*Object clone() {

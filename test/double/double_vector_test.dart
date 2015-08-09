@@ -4,9 +4,9 @@ const double TOL = 1e-10;
 
 const int SIZE = 2 * 17 * 5;
 
-testAbstractDoubleVector(String kind, AbstractDoubleVector make(int size)) {
-  group("AbstractDoubleVector ($kind)", () {
-    AbstractDoubleVector A, B;
+testDoubleVector(String kind, DoubleVector make(int size)) {
+  group("DoubleVector ($kind)", () {
+    DoubleVector A, B;
 
     setUp(() {
       A = make(SIZE);
@@ -47,7 +47,7 @@ testAbstractDoubleVector(String kind, AbstractDoubleVector make(int size)) {
     });
 
     test('apply', () {
-      AbstractDoubleVector Acopy = A.copy();
+      DoubleVector Acopy = A.copy();
       A.apply(acos);
       for (int i = 0; i < A.size; i++) {
         double expected = math.acos(Acopy.get(i));
@@ -64,7 +64,7 @@ testAbstractDoubleVector(String kind, AbstractDoubleVector make(int size)) {
     });
 
     test('assign', () {
-      AbstractDoubleVector Acopy = A.copy();
+      DoubleVector Acopy = A.copy();
       A.assign(B, div);
       for (int i = 0; i < A.size; i++) {
         expect(Acopy.get(i) / B.get(i), closeTo(A.get(i), TOL));
@@ -163,7 +163,7 @@ testAbstractDoubleVector(String kind, AbstractDoubleVector make(int size)) {
     test('reshape', () {
       int rows = 10;
       int columns = 17;
-      AbstractDoubleMatrix B = A.reshape(rows, columns);
+      DoubleMatrix B = A.reshape(rows, columns);
       int idx = 0;
       for (int c = 0; c < columns; c++) {
         for (int r = 0; r < rows; r++) {
@@ -173,7 +173,7 @@ testAbstractDoubleVector(String kind, AbstractDoubleVector make(int size)) {
     });
 
     test('flip', () {
-      AbstractDoubleVector b = A.flip();
+      DoubleVector b = A.flip();
       expect(A.size, equals(b.size));
       for (int i = 0; i < A.size; i++) {
         expect(A.get(i), closeTo(b.get(A.size - 1 - i), TOL));
@@ -181,7 +181,7 @@ testAbstractDoubleVector(String kind, AbstractDoubleVector make(int size)) {
     });
 
     test('part', () {
-      AbstractDoubleVector b = A.part(15, 11);
+      DoubleVector b = A.part(15, 11);
       for (int i = 0; i < 11; i++) {
         expect(A.get(15 + i), closeTo(b.get(i), TOL));
       }
@@ -189,7 +189,7 @@ testAbstractDoubleVector(String kind, AbstractDoubleVector make(int size)) {
 
     test('select', () {
       var indexes = new Int32List.fromList([5, 11, 22, 37, 101]);
-      AbstractDoubleVector b = A.select(indexes);
+      DoubleVector b = A.select(indexes);
       for (int i = 0; i < indexes.length; i++) {
         expect(A.get(indexes[i]), closeTo(b.get(i), TOL));
       }
@@ -197,7 +197,7 @@ testAbstractDoubleVector(String kind, AbstractDoubleVector make(int size)) {
 
     test('strides', () {
       int stride = 3;
-      AbstractDoubleVector b = A.strides(stride);
+      DoubleVector b = A.strides(stride);
       for (int i = 0; i < b.size; i++) {
         expect(A.get(i * stride), closeTo(b.get(i), TOL));
       }

@@ -12,12 +12,12 @@ part of cern.colt.matrix.double;
 
 /// 1-d matrix holding [double] elements; a view wrapping another 2-d
 /// matrix and therefore delegating calls to it.
-class DelegateDoubleVector extends AbstractDoubleVector {
-  AbstractDoubleMatrix _content;
+class DelegateDoubleVector extends DoubleVector {
+  DoubleMatrix _content;
 
   int _row;
 
-  DelegateDoubleVector(AbstractDoubleMatrix newContent, int row)
+  DelegateDoubleVector(DoubleMatrix newContent, int row)
       : super(newContent.columns) {
     if (row < 0 || row >= newContent.rows) {
       throw new ArgumentError();
@@ -28,9 +28,9 @@ class DelegateDoubleVector extends AbstractDoubleVector {
 
   double get(int index) => _content.get(_row, index);
 
-  AbstractDoubleVector like1D(int size) => _content.like1D(size);
+  DoubleVector like1D(int size) => _content.like1D(size);
 
-  AbstractDoubleMatrix like2D(int rows, int columns) {
+  DoubleMatrix like2D(int rows, int columns) {
     return _content.like2D(rows, columns);
   }
 
@@ -38,11 +38,11 @@ class DelegateDoubleVector extends AbstractDoubleVector {
 
   dynamic get elements => _content.elements;
 
-  AbstractDoubleMatrix reshape(int rows, int columns) {
+  DoubleMatrix reshape(int rows, int columns) {
     throw new ArgumentError("This method is not supported.");
   }
 
-  AbstractDoubleVector _viewSelectionLike(Int32List offsets) {
+  DoubleVector _viewSelectionLike(Int32List offsets) {
     throw new Error(); // should never get called
   }
 

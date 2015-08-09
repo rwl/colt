@@ -5,7 +5,7 @@ main(int size, double value) {
 //  Timer timer = new Timer();
 //  String s;
 //  StringBuffer buf;
-//  AbstractDoubleMatrix matrix = DoubleFactory2D.dense.make(size, size, value);
+//  DoubleMatrix matrix = DoubleFactory2D.dense.make(size, size, value);
 //
 //  timer.reset().start();
 //  buf = new StringBuffer();

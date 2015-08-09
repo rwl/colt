@@ -4,9 +4,9 @@ const int NROWS = 13;
 
 const int NCOLUMNS = 17;
 
-testAbstractIntMatrix(String kind, AbstractIntMatrix make(int rows, int columns)) {
-  group("AbstractIntMatrix ($kind)", () {
-    AbstractIntMatrix A, B, Bt;
+testIntMatrix(String kind, IntMatrix make(int rows, int columns)) {
+  group("IntMatrix ($kind)", () {
+    IntMatrix A, B, Bt;
     setUp(() {
       A = new IntMatrix(NROWS, NCOLUMNS);
       B = new IntMatrix(NROWS, NCOLUMNS);
@@ -45,7 +45,7 @@ testAbstractIntMatrix(String kind, AbstractIntMatrix make(int rows, int columns)
     });
 
     test('apply', () {
-      AbstractIntMatrix Acopy = A.copy();
+      IntMatrix Acopy = A.copy();
       A.apply(ifunc.neg);
       for (int r = 0; r < A.rows; r++) {
         for (int c = 0; c < A.columns; c++) {
@@ -65,7 +65,7 @@ testAbstractIntMatrix(String kind, AbstractIntMatrix make(int rows, int columns)
     });
 
     test('assign', () {
-      AbstractIntMatrix Acopy = A.copy();
+      IntMatrix Acopy = A.copy();
       A.assign(B, ifunc.plus);
       for (int r = 0; r < A.rows; r++) {
         for (int c = 0; c < A.columns; c++) {
@@ -91,7 +91,7 @@ testAbstractIntMatrix(String kind, AbstractIntMatrix make(int rows, int columns)
     });
 
     test('forEachNonZero', () {
-      AbstractIntMatrix Acopy = A.copy();
+      IntMatrix Acopy = A.copy();
       int fn(int first, int second, int third) {
         return -third;
       }
@@ -181,7 +181,7 @@ testAbstractIntMatrix(String kind, AbstractIntMatrix make(int rows, int columns)
     });
 
     test('column', () {
-      AbstractIntVector col = A.column(A.columns ~/ 2);
+      IntVector col = A.column(A.columns ~/ 2);
       expect(A.rows, col.size);
       for (int r = 0; r < A.rows; r++) {
         expect(A.get(r, A.columns ~/ 2), equals(col.get(r)));
@@ -189,7 +189,7 @@ testAbstractIntMatrix(String kind, AbstractIntMatrix make(int rows, int columns)
     });
 
     test('columnFlip', () {
-      AbstractIntMatrix B = A.columnFlip();
+      IntMatrix B = A.columnFlip();
       expect(A.size, equals(B.size));
       for (int r = 0; r < A.rows; r++) {
         for (int c = 0; c < A.columns; c++) {
@@ -199,7 +199,7 @@ testAbstractIntMatrix(String kind, AbstractIntMatrix make(int rows, int columns)
     });
 
     test('dice', () {
-      AbstractIntMatrix B = A.dice();
+      IntMatrix B = A.dice();
       expect(A.rows, equals(B.columns));
       expect(A.columns, equals(B.rows));
       for (int r = 0; r < A.rows; r++) {
@@ -210,7 +210,7 @@ testAbstractIntMatrix(String kind, AbstractIntMatrix make(int rows, int columns)
     });
 
     test('part', () {
-      AbstractIntMatrix B =
+      IntMatrix B =
       A.part(A.rows ~/ 2, A.columns ~/ 2, A.rows ~/ 3, A.columns ~/ 3);
       expect(A.rows ~/ 3, equals(B.rows));
       expect(A.columns ~/ 3, equals(B.columns));
@@ -222,7 +222,7 @@ testAbstractIntMatrix(String kind, AbstractIntMatrix make(int rows, int columns)
     });
 
     test('row', () {
-      AbstractIntVector B = A.row(A.rows ~/ 2);
+      IntVector B = A.row(A.rows ~/ 2);
       expect(A.columns, equals(B.size));
       for (int r = 0; r < A.columns; r++) {
         expect(A.get(A.rows ~/ 2, r), equals(B.get(r)));
@@ -230,7 +230,7 @@ testAbstractIntMatrix(String kind, AbstractIntMatrix make(int rows, int columns)
     });
 
     test('rowFlip', () {
-      AbstractIntMatrix B = A.rowFlip();
+      IntMatrix B = A.rowFlip();
       expect(A.size, equals(B.size));
       for (int r = 0; r < A.rows; r++) {
         for (int c = 0; c < A.columns; c++) {
@@ -255,7 +255,7 @@ testAbstractIntMatrix(String kind, AbstractIntMatrix make(int rows, int columns)
         A.columns ~/ 2,
         A.columns - 1
       ];
-      AbstractIntMatrix B = A.select(
+      IntMatrix B = A.select(
           new Int32List.fromList(rowIndexes), new Int32List.fromList(colIndexes));
       expect(rowIndexes.length, equals(B.rows));
       expect(colIndexes.length, equals(B.columns));
@@ -269,7 +269,7 @@ testAbstractIntMatrix(String kind, AbstractIntMatrix make(int rows, int columns)
     test('strides', () {
       int rowStride = 3;
       int colStride = 5;
-      AbstractIntMatrix B = A.strides(rowStride, colStride);
+      IntMatrix B = A.strides(rowStride, colStride);
       for (int r = 0; r < B.rows; r++) {
         for (int c = 0; c < B.columns; c++) {
           expect(A.get(r * rowStride, c * colStride), equals(B.get(r, c)));
@@ -278,13 +278,13 @@ testAbstractIntMatrix(String kind, AbstractIntMatrix make(int rows, int columns)
     });
 
     test('mult', () {
-      AbstractIntVector y = new IntVector(A.columns);
+      IntVector y = new IntVector(A.columns);
       for (int i = 0; i < y.size; i++) {
         y.set(i, random.nextInt(MAX_INT) % A.rows);
       }
       int alpha = 3;
       int beta = 5;
-      AbstractIntVector z = new IntVector.random(A.rows);
+      IntVector z = new IntVector.random(A.rows);
       z.apply(ifunc.modulus(A.rows));
       Int32List expected = z.toList();
       z = A.mult(y, z, alpha, beta, false);
@@ -352,7 +352,7 @@ testAbstractIntMatrix(String kind, AbstractIntMatrix make(int rows, int columns)
     test('multiply', () {
       int alpha = 3;
       int beta = 5;
-      AbstractIntMatrix C = new IntMatrix.random(A.rows, A.rows);
+      IntMatrix C = new IntMatrix.random(A.rows, A.rows);
       C.apply(ifunc.modulus(A.rows));
       List<Int32List> expected = toList(C);
       C = A.multiply(Bt, C, alpha, beta, false, false);

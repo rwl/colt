@@ -4,7 +4,7 @@ import 'matrix.dart';
 
 /// Infinity norm of vector `x`, which is:
 ///     max(abs(x[i]))
-double normInfinity(AbstractComplexVector x) {
+double normInfinity(ComplexVector x) {
   if (x.size == 0) {
     return 0.0;
   }
