@@ -118,7 +118,7 @@ class DelegateIntVector extends IntVector {
 
   /// Constructs a matrix view with a given content and row.
   DelegateIntVector(IntMatrix newContent, int row)
-      : super(newContent.columns) {
+      : super._(newContent.columns) {
     if (row < 0 || row >= newContent.rows) {
       throw new ArgumentError();
     }

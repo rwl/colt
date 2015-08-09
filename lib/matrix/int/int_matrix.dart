@@ -29,7 +29,7 @@ class DenseIntMatrix extends IntMatrix {
 
   DenseIntMatrix._internal(int rows, int columns, Int32List elements, int rowZero,
       int columnZero, int rowStride, int columnStride, bool isView)
-      : super(rows, columns, rowZero, columnZero, rowStride, columnStride,
+      : super._(rows, columns, rowZero, columnZero, rowStride, columnStride,
           !isView) {
     _elements = elements;
   }
@@ -679,7 +679,7 @@ class SelectedDenseIntMatrix extends IntMatrix {
   SelectedDenseIntMatrix(int rows, int columns, Int32List elements, int rowZero,
       int columnZero, int rowStride, int columnStride, Int32List rowOffsets,
       Int32List columnOffsets, int offset)
-      : super(
+      : super._(
           rows, columns, rowZero, columnZero, rowStride, columnStride, false) {
     _elements = elements;
     _rowOffsets = rowOffsets;

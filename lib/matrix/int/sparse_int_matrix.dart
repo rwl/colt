@@ -66,7 +66,7 @@ class SparseIntMatrix extends IntMatrix {
    *             or flip's are illegal.
    */
   SparseIntMatrix._internal(int rows, int columns, Map<int, int> elements, int rowZero, int columnZero, int rowStride, int columnStride)
-      : super(rows, columns, rowZero, columnZero, rowStride, columnStride, false) {
+      : super._(rows, columns, rowZero, columnZero, rowStride, columnStride, false) {
     _elements = elements;
   }
 
@@ -477,7 +477,7 @@ class SelectedSparseIntMatrix extends IntMatrix {
   }
 
   SelectedSparseIntMatrix._internal(int rows, int columns, Map<int, int> elements, int rowZero, int columnZero, int rowStride, int columnStride, Int32List rowOffsets, Int32List columnOffsets, int offset)
-      : super(rows, columns, rowZero, columnZero, rowStride, columnStride, false) {
+      : super._(rows, columns, rowZero, columnZero, rowStride, columnStride, false) {
     _elements = elements;
     _rowOffsets = rowOffsets;
     _columnOffsets = columnOffsets;

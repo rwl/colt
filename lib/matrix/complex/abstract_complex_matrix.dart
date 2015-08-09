@@ -12,11 +12,15 @@ part of cern.colt.matrix.complex;
 
 /// Abstract base class for 2-d matrices holding `complex` elements.
 abstract class ComplexMatrix extends AbstractMatrix {
-  ComplexMatrix(int rows, int columns, [int rowZero = 0,
+  ComplexMatrix._(int rows, int columns, [int rowZero = 0,
       int columnZero = 0, int rowStride = null, int columnStride = 1,
       bool isNoView = true])
       : super(rows, columns, rowZero, columnZero, rowStride, columnStride,
           isNoView);
+
+  factory ComplexMatrix(int rows, int columns) = DenseComplexMatrix;
+
+  factory ComplexMatrix.sparse(int rows, int columns) = SparseComplexMatrix;
 
   /// Applies a function to each cell and aggregates the results.
   Complex aggregate(final cfunc.ComplexComplexComplexFunction aggr,

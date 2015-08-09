@@ -15,10 +15,10 @@ part of cern.colt.matrix.complex;
 class WrapperComplexMatrix extends ComplexMatrix {
   ComplexMatrix _content;
 
-  WrapperComplexMatrix._(int rows, int columns) : super(rows, columns);
+  WrapperComplexMatrix._(int rows, int columns) : super._(rows, columns);
 
   WrapperComplexMatrix._wrap(ComplexMatrix newContent)
-      : super(newContent.rows, newContent.columns) {
+      : super._(newContent.rows, newContent.columns) {
     _content = newContent;
   }
 

@@ -18,11 +18,15 @@ part of cern.colt.matrix.double;
 /// from `[0,0]` to `[rows-1,columns-1]`. Any attempt to access
 /// an element at a coordinate outside this rangewill throw a [RangeError].
 abstract class DoubleMatrix extends AbstractMatrix {
-  DoubleMatrix(int rows, int columns, [int rowZero = 0,
+  DoubleMatrix._(int rows, int columns, [int rowZero = 0,
       int columnZero = 0, int rowStride = null, int columnStride = 1,
       bool isNoView = true])
       : super(rows, columns, rowZero, columnZero, rowStride, columnStride,
           isNoView);
+
+  factory DoubleMatrix(int rows, int columns) = DenseDoubleMatrix;
+
+  factory DoubleMatrix.sparse(int rows, int columns) = SparseDoubleMatrix;
 
   /// Applies a function to each cell and aggregates the results. Returns a
   /// value `v` such that `v==a(size)` where

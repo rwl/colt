@@ -30,7 +30,7 @@ class DenseDoubleVector extends DoubleVector {
 
   DenseDoubleVector._internal(
       int size, Float64List elements, int zero, int stride, bool isView)
-      : super(size, zero, stride, !isView) {
+      : super._(size, zero, stride, !isView) {
     if (elements == null) {
       elements = new Float64List(size);
     }
@@ -553,7 +553,7 @@ class SelectedDenseDoubleVector extends DoubleVector {
 
   SelectedDenseDoubleVector._internal(int size, Float64List elements, int zero,
       int stride, Int32List offsets, int offset)
-      : super(size, zero, stride, false) {
+      : super._(size, zero, stride, false) {
     _elements = elements;
     _offsets = offsets;
     __offset = offset;

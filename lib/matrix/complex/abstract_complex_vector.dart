@@ -14,9 +14,13 @@ part of cern.colt.matrix.complex;
 /// elements.
 abstract class ComplexVector extends AbstractVector {
   //with ListMixin<double> {
-  ComplexVector(int size,
+  ComplexVector._(int size,
       [int zero = 0, int stride = 1, bool isNoView = true])
       : super(size, zero, stride, isNoView);
+
+  factory ComplexVector(int size) = DenseComplexVector;
+
+  factory ComplexVector.sparse(int size) = SparseComplexVector;
 
   /// Applies a function to each cell and aggregates the results.
   Complex aggregate(final cfunc.ComplexComplexComplexFunction aggr,

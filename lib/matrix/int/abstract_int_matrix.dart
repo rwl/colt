@@ -12,10 +12,14 @@ part of cern.colt.matrix.int;
 
 /// Abstract base class for 2-d matrices holding [int] elements.
 abstract class IntMatrix extends AbstractMatrix {
-  IntMatrix(int rows, int columns, [int rowZero = 0, int columnZero = 0,
+  IntMatrix._(int rows, int columns, [int rowZero = 0, int columnZero = 0,
       int rowStride = null, int columnStride = 1, bool isNoView = true])
       : super(rows, columns, rowZero, columnZero, rowStride, columnStride,
           isNoView);
+
+  factory IntMatrix(int rows, int columns) = DenseIntMatrix;
+
+  factory IntMatrix.sparse(int rows, int columns) = SparseIntMatrix;
 
   /// Applies a function to each cell and aggregates the results. Returns a
   /// value `v` such that `v==a(size())` where

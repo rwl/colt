@@ -14,9 +14,13 @@ part of cern.colt.matrix.int;
 /// elements.
 abstract class IntVector
     extends AbstractVector /*with ListMixin<int>*/ {
-  IntVector(int size,
+  IntVector._(int size,
       [int zero = 0, int stride = 1, bool isNoView = true])
       : super(size, zero, stride, isNoView);
+
+  factory IntVector(int size) = DenseIntVector;
+
+  factory IntVector.sparse(int size) = SparseIntVector;
 
   /// Applies a function to each cell and aggregates the results. Returns a
   /// value `v` such that `v==a(size())` where

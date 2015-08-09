@@ -28,7 +28,7 @@ class DenseDoubleMatrix extends DoubleMatrix {
   /// Constructs a matrix with the given parameters.
   DenseDoubleMatrix._internal(int rows, int columns, Float64List elements,
       int rowZero, int columnZero, int rowStride, int columnStride, bool isView)
-      : super(rows, columns, rowZero, columnZero, rowStride, columnStride,
+      : super._(rows, columns, rowZero, columnZero, rowStride, columnStride,
           !isView) {
     this._elements = elements;
   }
@@ -681,7 +681,7 @@ class SelectedDenseDoubleMatrix extends DoubleMatrix {
       Float64List elements, int rowZero, int columnZero, int rowStride,
       int columnStride, Int32List rowOffsets, Int32List columnOffsets,
       int offset, bool isView)
-      : super(rows, columns, rowZero, columnZero, rowStride, columnStride,
+      : super._(rows, columns, rowZero, columnZero, rowStride, columnStride,
           !isView) {
     _elements = elements;
     _rowOffsets = rowOffsets;

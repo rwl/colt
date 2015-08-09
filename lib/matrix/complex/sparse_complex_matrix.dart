@@ -24,7 +24,7 @@ class SparseComplexMatrix extends ComplexMatrix {
   SparseComplexMatrix._internal(int rows, int columns,
       Map<int, Complex> elements, int rowZero, int columnZero, int rowStride,
       int columnStride, bool isNoView)
-      : super(rows, columns, rowZero, columnZero, rowStride, columnStride,
+      : super._(rows, columns, rowZero, columnZero, rowStride, columnStride,
           isNoView) {
     _elements = elements;
   }
@@ -195,7 +195,7 @@ class SelectedSparseComplexMatrix extends ComplexMatrix {
       Map<int, Complex> elements, int rowZero, int columnZero, int rowStride,
       int columnStride, Int32List rowOffsets, Int32List columnOffsets,
       int offset)
-      : super(
+      : super._(
           rows, columns, rowZero, columnZero, rowStride, columnStride, false) {
     _elements = elements;
     _rowOffsets = rowOffsets;

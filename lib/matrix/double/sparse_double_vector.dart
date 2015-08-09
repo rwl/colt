@@ -40,7 +40,7 @@ class SparseDoubleVector extends DoubleVector {
 
   SparseDoubleVector._internal(
       int size, Map<int, double> elements, int offset, int stride, bool isView)
-      : super(size, offset, stride, !isView) {
+      : super._(size, offset, stride, !isView) {
     _elements = elements;
   }
 
@@ -175,7 +175,7 @@ class SelectedSparseDoubleVector extends DoubleVector {
 
   SelectedSparseDoubleVector._internal(int size, Map<int, double> elements,
       int zero, int stride, Int32List offsets, int offset)
-      : super(size, zero, stride, false) {
+      : super._(size, zero, stride, false) {
     _elements = elements;
     _offsets = new Int32List.fromList(offsets);
     __offset = offset;

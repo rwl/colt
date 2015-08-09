@@ -39,7 +39,7 @@ class SparseIntVector extends IntVector {
   /// Constructs a matrix view with a given number of parameters.
   SparseIntVector._internal(
       int size, Map<int, int> elements, int offset, int stride)
-      : super(size, offset, stride, false) {
+      : super._(size, offset, stride, false) {
     _elements = elements;
   }
 
@@ -162,7 +162,7 @@ class SelectedSparseIntVector extends IntVector {
 
   SelectedSparseIntVector._internal(int size, Map<int, int> elements, int zero,
       int stride, Int32List offsets, int offset)
-      : super(size, zero, stride, false) {
+      : super._(size, zero, stride, false) {
     _elements = elements;
     _offsets = offsets;
     __offset = offset;

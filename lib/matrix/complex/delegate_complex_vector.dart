@@ -19,7 +19,7 @@ class DelegateComplexVector extends ComplexVector {
   int _row;
 
   DelegateComplexVector(ComplexMatrix newContent, int row)
-      : super(newContent.columns) {
+      : super._(newContent.columns) {
     if (row < 0 || row >= newContent.rows) {
       throw new ArgumentError();
     }

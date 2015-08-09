@@ -28,7 +28,7 @@ class SparseComplexVector extends ComplexVector {
 
   SparseComplexVector._internal(int size, Map<int, Complex> elements,
       int offset, int stride, bool isNoView)
-      : super(size, offset, stride, isNoView) {
+      : super._(size, offset, stride, isNoView) {
     _elements = elements;
   }
 
@@ -154,7 +154,7 @@ class SelectedSparseComplexVector extends ComplexVector {
 
   SelectedSparseComplexVector(int size, Map<int, Complex> elements,
       int zero, int stride, Int32List offsets, int offset)
-      : super(size, zero, stride, false) {
+      : super._(size, zero, stride, false) {
     _elements = elements;
     _offsets = offsets;
     __offset = offset;

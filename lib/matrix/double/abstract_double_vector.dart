@@ -13,8 +13,12 @@ part of cern.colt.matrix.double;
 /// Abstract base class for 1-d matrices (aka vectors) holding
 /// [double] elements.
 abstract class DoubleVector extends AbstractVector {
-  DoubleVector(int size, [int zero = 0, int stride = 1, bool isNoView = true])
+  DoubleVector._(int size, [int zero = 0, int stride = 1, bool isNoView = true])
       : super(size, zero, stride, isNoView);
+
+  factory DoubleVector(int size) = DenseDoubleVector;
+
+  factory DoubleVector.sparse(int size) = SparseDoubleVector;
 
   /// Applies a function to each cell and aggregates the results. Returns a
   /// value `v` such that `v == a(size())` where

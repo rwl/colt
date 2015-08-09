@@ -13,12 +13,12 @@ part of cern.colt.matrix.int;
 /// 2-d matrix holding [int] elements; either a view wrapping another
 /// matrix or a matrix whose views are wrappers.
 class WrapperIntMatrix extends IntMatrix {
-  WrapperIntMatrix._(int rows, int columns) : super(rows, columns);
+  WrapperIntMatrix._(int rows, int columns) : super._(rows, columns);
 
   IntMatrix _content;
 
   WrapperIntMatrix._wrap(IntMatrix newContent)
-      : super(newContent.rows, newContent.columns) {
+      : super._(newContent.rows, newContent.columns) {
     _content = newContent;
   }
 

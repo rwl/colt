@@ -30,7 +30,7 @@ class DenseIntVector extends IntVector {
 
   DenseIntVector._internal(
       int size, Int32List elements, int zero, int stride, bool isView)
-      : super(size, zero, stride, !isView) {
+      : super._(size, zero, stride, !isView) {
     if (elements == null) {
       elements = new Int32List(size);
     }
@@ -516,7 +516,7 @@ class SelectedDenseIntVector extends IntVector {
 
   SelectedDenseIntVector._internal(int size, Int32List elements, int zero,
       int stride, Int32List offsets, int offset)
-      : super(size, zero, stride, false) {
+      : super._(size, zero, stride, false) {
     _elements = elements;
     _offsets = offsets;
     __offset = offset;

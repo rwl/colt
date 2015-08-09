@@ -8,9 +8,9 @@ testIntMatrix(String kind, IntMatrix make(int rows, int columns)) {
   group("IntMatrix ($kind)", () {
     IntMatrix A, B, Bt;
     setUp(() {
-      A = new IntMatrix(NROWS, NCOLUMNS);
-      B = new IntMatrix(NROWS, NCOLUMNS);
-      Bt = new IntMatrix(NCOLUMNS, NROWS);
+      A = make(NROWS, NCOLUMNS);
+      B = make(NROWS, NCOLUMNS);
+      Bt = make(NCOLUMNS, NROWS);
       for (int r = 0; r < A.rows; r++) {
         for (int c = 0; c < A.columns; c++) {
           A.set(r, c, math.max(1, random.nextInt(MAX_INT) % A.rows));
@@ -278,13 +278,13 @@ testIntMatrix(String kind, IntMatrix make(int rows, int columns)) {
     });
 
     test('mult', () {
-      IntVector y = new IntVector(A.columns);
+      IntVector y = new DenseIntVector(A.columns);
       for (int i = 0; i < y.size; i++) {
         y.set(i, random.nextInt(MAX_INT) % A.rows);
       }
       int alpha = 3;
       int beta = 5;
-      IntVector z = new IntVector.random(A.rows);
+      IntVector z = new DenseIntVector.random(A.rows);
       z.apply(ifunc.modulus(A.rows));
       Int32List expected = z.toList();
       z = A.mult(y, z, alpha, beta, false);
@@ -315,11 +315,11 @@ testIntMatrix(String kind, IntMatrix make(int rows, int columns)) {
       }
 
       //transpose
-      y = new IntVector(A.rows);
+      y = new DenseIntVector(A.rows);
       for (int i = 0; i < y.size; i++) {
         y.set(i, random.nextInt(MAX_INT) % A.rows);
       }
-      z = new IntVector.random(A.columns);
+      z = new DenseIntVector.random(A.columns);
       z.apply(ifunc.modulus(A.rows));
       expected = z.toList();
       z = A.mult(y, z, alpha, beta, true);

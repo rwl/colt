@@ -38,7 +38,7 @@ class DenseComplexMatrix extends ComplexMatrix {
   DenseComplexMatrix._internal(int rows, int columns, Float64List elements,
       int rowZero, int columnZero, int rowStride, int columnStride,
       bool isNoView)
-      : super(rows, columns, rowZero, columnZero, rowStride, columnStride,
+      : super._(rows, columns, rowZero, columnZero, rowStride, columnStride,
           isNoView) {
     _elements = elements;
   }
@@ -767,7 +767,7 @@ class SelectedDenseComplexMatrix extends ComplexMatrix {
       Float64List elements, int rowZero, int columnZero, int rowStride,
       int columnStride, Int32List rowOffsets, Int32List columnOffsets,
       int offset)
-      : super(
+      : super._(
           rows, columns, rowZero, columnZero, rowStride, columnStride, false) {
     _elements = elements;
     _rowOffsets = rowOffsets;

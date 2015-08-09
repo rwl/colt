@@ -57,7 +57,7 @@ class DenseComplexVector extends ComplexVector {
 
   DenseComplexVector._internal(
       int size, Float64List elements, int zero, int stride, bool isNoView)
-      : super(size, zero, stride, isNoView) {
+      : super._(size, zero, stride, isNoView) {
     _elements = elements;
   }
 
@@ -568,7 +568,7 @@ class SelectedDenseComplexVector extends ComplexVector {
 
   SelectedDenseComplexVector._internal(int size, Float64List elements, int zero,
       int stride, Int32List offsets, int offset)
-      : super(size, zero, stride, false) {
+      : super._(size, zero, stride, false) {
     _elements = elements;
     _offsets = offsets;
     __offset = offset;

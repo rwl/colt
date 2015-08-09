@@ -22,10 +22,10 @@ part of cern.colt.matrix.double;
 class WrapperDoubleMatrix extends DoubleMatrix {
   DoubleMatrix _content;
 
-  WrapperDoubleMatrix._(int rows, int columns) : super(rows, columns);
+  WrapperDoubleMatrix._(int rows, int columns) : super._(rows, columns);
 
   WrapperDoubleMatrix._wrap(DoubleMatrix newContent)
-      : super(newContent.rows, newContent.columns) {
+      : super._(newContent.rows, newContent.columns) {
     _content = newContent;
   }
 
