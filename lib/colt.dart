@@ -1,6 +1,6 @@
 library cern.colt;
 
-export 'matrix/matrix.dart';
-export 'matrix/double/matrix.dart';
-export 'matrix/int/matrix.dart';
-export 'matrix/complex/matrix.dart';
+export 'src/matrix/double/matrix.dart';
+export 'src/matrix/int/matrix.dart';
+export 'src/matrix/complex/matrix.dart';
+
