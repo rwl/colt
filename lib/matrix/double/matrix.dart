@@ -48,8 +48,8 @@ import 'algorithm.dart' as dalgo;
 
 import '../formatter.dart';
 
-part 'double_vector.dart';
-part 'double_matrix.dart';
+part 'dense_double_vector.dart';
+part 'dense_double_matrix.dart';
 part 'large_double_matrix.dart';
 part 'sparse_double_vector.dart';
 part 'sparse_double_matrix.dart';

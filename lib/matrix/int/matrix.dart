@@ -43,8 +43,8 @@ import '../double/matrix.dart' show DenseDoubleVector;
 
 part 'abstract_int_vector.dart';
 part 'abstract_int_matrix.dart';
-part 'int_vector.dart';
-part 'int_matrix.dart';
+part 'dense_int_vector.dart';
+part 'dense_int_matrix.dart';
 part 'sparse_int_vector.dart';
 part 'sparse_int_matrix.dart';
 part 'wrapper_int_matrix.dart';
