@@ -11,7 +11,6 @@
 library cern.colt.matrix.tdouble.property;
 
 import 'matrix.dart';
-//import '../formatter.dart';
 import '../../math.dart';
 
 /// Returns a String with [length] blanks.

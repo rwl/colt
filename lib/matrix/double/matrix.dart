@@ -41,7 +41,7 @@ import '../../function/double.dart' as func;
 
 import 'factory.dart' as dfactory;
 
-import '../../math.dart' show EPSILON;
+import '../../math.dart' show EPSILON, MAX_INT;
 
 import 'property.dart' as dprop;
 import 'algorithm.dart' as dalgo;

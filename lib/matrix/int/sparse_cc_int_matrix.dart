@@ -208,10 +208,10 @@ class SparseCCIntMatrix extends WrapperIntMatrix {
     }
   }
 
-  void assign(final AbstractIntMatrix y, ifunc.IntIntFunction function) {
+  void assign(final AbstractIntMatrix y, ifunc.IntIntFunction fn) {
     checkShape(this, y);
 
-    if ((y is SparseCCIntMatrix) && (function == ifunc.plus)) {
+    if ((y is SparseCCIntMatrix) && (fn == ifunc.plus)) {
       // x[i] = x[i] + y[i]
       SparseCCIntMatrix yy = y;
       var nz = 0;
@@ -244,9 +244,9 @@ class SparseCCIntMatrix extends WrapperIntMatrix {
       _values = Cx;
     }
 
-    if (function is ifunc.IntPlusMultSecond) {
+    if (fn is ifunc.IntPlusMultSecond) {
       // x[i] = x[i] + alpha*y[i]
-      int alpha = function.multiplicator;
+      int alpha = fn.multiplicator;
       if (alpha == 0) {
         return; // nothing to do
       }
@@ -257,9 +257,9 @@ class SparseCCIntMatrix extends WrapperIntMatrix {
       return;
     }
 
-    if (function is ifunc.IntPlusMultFirst) {
+    if (fn is ifunc.IntPlusMultFirst) {
       // x[i] = alpha*x[i] + y[i]
-      int alpha = function.multiplicator;
+      int alpha = fn.multiplicator;
       if (alpha == 0) {
         copyFrom(y);
         return;
@@ -271,7 +271,7 @@ class SparseCCIntMatrix extends WrapperIntMatrix {
       return;
     }
 
-    if (function == ifunc.mult) {
+    if (fn == ifunc.mult) {
       // x[i] = x[i] * y[i]
       Int32List rowIndexesA = _rowIndexes;
       Int32List columnPointersA = _columnPointers;
@@ -281,15 +281,13 @@ class SparseCCIntMatrix extends WrapperIntMatrix {
         for (int k = columnPointersA[j + 1]; --k >= low;) {
           int i = rowIndexesA[k];
           valuesA[k] *= y.get(i, j);
-          if (valuesA[k] == 0) {
-            _remove(i, j);
-          }
+          //if (valuesA[k] == 0) _remove(i, j);
         }
       }
       return;
     }
 
-    if (function == ifunc.div) {
+    if (fn == ifunc.div) {
       // x[i] = x[i] / y[i]
       Int32List rowIndexesA = _rowIndexes;
       Int32List columnPointersA = _columnPointers;
@@ -300,17 +298,17 @@ class SparseCCIntMatrix extends WrapperIntMatrix {
         for (int k = columnPointersA[j + 1]; --k >= low;) {
           int i = rowIndexesA[k];
           valuesA[k] ~/= y.get(i, j);
-          if (valuesA[k] == 0) _remove(i, j);
+          //if (valuesA[k] == 0) _remove(i, j);
         }
       }
       return;
     }
-    super.assign(y, function);
+    super.assign(y, fn);
   }
 
   int get cardinality => _columnPointers[columns];
 
-  void forEachNonZero(final ifunc.IntIntIntFunction function) {
+  void forEachNonZero(final ifunc.IntIntIntFunction fn) {
     Int32List rowIndexesA = _rowIndexes;
     Int32List columnPointersA = _columnPointers;
     Int32List valuesA = _values;
@@ -320,7 +318,7 @@ class SparseCCIntMatrix extends WrapperIntMatrix {
       for (int k = columnPointersA[j + 1]; --k >= low;) {
         int i = rowIndexesA[k];
         int value = valuesA[k];
-        int r = function(i, j, value);
+        int r = fn(i, j, value);
         valuesA[k] = r;
       }
     }
@@ -408,11 +406,11 @@ class SparseCCIntMatrix extends WrapperIntMatrix {
 
     if (k >= 0) {
       // found
-      if (value == 0) {
+      /*if (value == 0) {
         _remove(column, k);
-      } else {
-        _values[k] = value;
-      }
+      } else {*/
+      _values[k] = value;
+      //}
       return;
     }
 
@@ -772,7 +770,7 @@ class SparseCCIntMatrix extends WrapperIntMatrix {
     _values = new Int32List.fromList(valuesList);
   }
 
-  void _remove(int column, int index) {
+  /*void _remove(int column, int index) {
     var rowIndexesList = new List.from(_rowIndexes);
     var valuesList = new List.from(_values);
     rowIndexesList.remove(index);
@@ -782,7 +780,7 @@ class SparseCCIntMatrix extends WrapperIntMatrix {
     }
     _rowIndexes = new Int32List.fromList(rowIndexesList);
     _values = new Int32List.fromList(valuesList);
-  }
+  }*/
 
   static int _searchFromTo(Int32List list, int key, int from, int to) {
     while (from <= to) {

@@ -11,7 +11,6 @@
 library cern.jet.math;
 
 import 'dart:math' as Math;
-import 'dart:typed_data';
 import 'package:complex/complex.dart';
 
 const MAX_INT = 2147483647; // 2^31-1

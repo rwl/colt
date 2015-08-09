@@ -50,7 +50,7 @@ class DoubleFormatter extends AbstractFormatter {
   }
 
   /// Returns a string representations of all cells; no alignment considered.
-  List<List<String>> format(AbstractDoubleMatrix matrix) {
+  List<List<String>> formatMatrix(AbstractDoubleMatrix matrix) {
     List<List<String>> strings =
         new List<List<String>>(matrix.rows); //[matrix.columns()];
     for (int row = matrix.rows; --row >= 0;) {
@@ -61,7 +61,7 @@ class DoubleFormatter extends AbstractFormatter {
 
   /// Returns a string representations of all cells; no alignment considered.
   List<List<String>> _formatMatrix(AbstractMatrix matrix) {
-    return format(matrix as AbstractDoubleMatrix);
+    return formatMatrix(matrix as AbstractDoubleMatrix);
   }
 
   /// Returns the index of the decimal point.

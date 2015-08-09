@@ -46,29 +46,15 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
     var values = new Float64List(nzmax);
     var columnPointers = new Int32List(rows + 1);
     return new SparseCCDoubleMatrix._internal(
-        rows, columns, rowPointers, columnIndexes, values);
-//    _dcs = cs.spalloc(rows, columns, nzmax, true, false);
+        rows, columns, rowIndexes, columnPointers, values);
   }
 
-  factory SparseCCDoubleMatrix._internal(int rows, int columns,
-      Int32List rowIndexes, Int32List columnPointers, Float64List values) {
-    /*try {
-      _setUp(rows, columns);
-    } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
-      if (!"matrix too large".equals(exc.getMessage())) throw exc;
-    }
-    if (columnPointers.length != columns + 1) {
-      throw new ArgumentError("columnsPointers.length != columns + 1");
-    }*/
-    cs.Matrix dcs = new cs.Matrix();
-    dcs.m = rows;
-    dcs.n = columns;
-    dcs.i = rowIndexes;
-    dcs.p = columnPointers;
-    dcs.x = values;
-    dcs.nz = -1; // column-compressed
-    dcs.nzmax = values.length;
-    return new SparseCCDoubleMatrix._internal(dcs);
+  SparseCCDoubleMatrix._internal(int rows, int columns, Int32List rowIndexes,
+      Int32List columnPointers, Float64List values)
+      : super._(rows, columns) {
+    _rowIndexes = rowIndexes;
+    _values = values;
+    _columnPointers = columnPointers;
   }
 
   /// Constructs a matrix with indexes given in the coordinate format and a
@@ -89,40 +75,28 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
     }
 
     int nz = Math.max(rowIndexes.length, 1);
-    cs.Matrix dcs = cs.spalloc(rows, columns, nz, true, false);
-    Int32List w = new Int32List(columns);
-    Int32List Cp = dcs.p;
-    Int32List Ci = dcs.i;
-    Float64List Cx = dcs.x;
+    var _rowIndexes = new Int32List(nz);
+    var _values = new Float64List(nz);
+    var _columnPointers = new Int32List(columns + 1);
+    var w = new Int32List(columns);
+    int r;
     for (int k = 0; k < nz; k++) {
       w[columnIndexes[k]]++;
     }
-    cs.cumsum(Cp, w, columns);
-    int p;
+    _cumsum(_columnPointers, w, columns);
     for (int k = 0; k < nz; k++) {
-      Ci[p = w[columnIndexes[k]]++] = rowIndexes[k];
-      if (Cx != null) {
-        Cx[p] = value;
-      }
+      _rowIndexes[r = w[columnIndexes[k]]++] = rowIndexes[k];
+      _values[r] = value;
     }
+    final m = new SparseCCDoubleMatrix._internal(
+        rows, columns, _rowIndexes, _columnPointers, _values);
     if (removeDuplicates) {
-      if (!cs.dupl(dcs)) {
-        //remove duplicates
-        throw new ArgumentError("Exception occured in cs_dupl()!");
-      }
+      m.removeDuplicates();
     }
-    bool rowIndexesSorted = false;
     if (sortRowIndexes) {
-      //sort row indexes
-      dcs = cs.transpose(dcs, true);
-      dcs = cs.transpose(dcs, true);
-      if (dcs == null) {
-        throw new ArgumentError("Exception occured in cs_transpose()!");
-      }
-      rowIndexesSorted = true;
+      m.sortRowIndexes();
     }
-    return new SparseCCDoubleMatrix._internal(dcs)
-      .._rowIndexesSorted = rowIndexesSorted;
+    return m;
   }
 
   /// Constructs a matrix with indexes and values given in the coordinate
@@ -131,51 +105,33 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
       Int32List rowIndexes, Int32List columnIndexes, Float64List values,
       [bool removeDuplicates = false, bool removeZeroes = false,
       bool sortRowIndexes = false]) {
-    /*try {
-      _setUp(rows, columns);
-    } on ArgumentError catch (exc) { // we can hold rows*columns>Integer.MAX_VALUE cells !
-      if (!"matrix too large".equals(exc.getMessage())) throw exc;
-    }
     if (rowIndexes.length != columnIndexes.length) {
       throw new ArgumentError("rowIndexes.length != columnIndexes.length");
     } else if (rowIndexes.length != values.length) {
       throw new ArgumentError("rowIndexes.length != values.length");
-    }*/
+    }
     int nz = Math.max(rowIndexes.length, 1);
-    cs.Matrix dcs = cs.spalloc(rows, columns, nz, true, false);
-    Int32List w = new Int32List(columns);
-    Int32List Cp = dcs.p;
-    Int32List Ci = dcs.i;
-    Float64List Cx = dcs.x;
-    for (int k = 0; k < nz; k++) w[columnIndexes[k]]++;
-    cs.cumsum(Cp, w, columns);
-    int p;
+    var _rowIndexes = new Int32List(nz);
+    var _values = new Float64List(nz);
+    var _columnPointers = new Int32List(columns + 1);
+    var w = new Int32List(columns);
+    int r;
     for (int k = 0; k < nz; k++) {
-      Ci[p = w[columnIndexes[k]]++] = rowIndexes[k];
-      if (Cx != null) {
-        Cx[p] = values[k];
-      }
+      w[columnIndexes[k]]++;
     }
-    if (removeZeroes) {
-      cs.dropzeros(dcs); //remove zeroes
+    _cumsum(_columnPointers, w, columns);
+    for (int k = 0; k < nz; k++) {
+      _rowIndexes[r = w[columnIndexes[k]]++] = rowIndexes[k];
+      _values[r] = values[k];
     }
+    final m = new SparseCCDoubleMatrix._internal(
+        rows, columns, _rowIndexes, _columnPointers, _values);
     if (removeDuplicates) {
-      if (!cs.dupl(dcs)) {
-        //remove duplicates
-        throw new ArgumentError("Exception occured in cs_dupl()!");
-      }
+      m.removeDuplicates();
     }
-    bool rowIndexesSorted = false;
     if (sortRowIndexes) {
-      dcs = cs.transpose(dcs, true);
-      dcs = cs.transpose(dcs, true);
-      if (dcs == null) {
-        throw new ArgumentError("Exception occured in cs_transpose()!");
-      }
-      rowIndexesSorted = true;
+      m.sortRowIndexes();
     }
-    return new SparseCCDoubleMatrix._internal(dcs)
-      .._rowIndexesSorted = rowIndexesSorted;
   }
 
   static SparseCCDoubleMatrix create(int rows, int columns) {
@@ -232,24 +188,20 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
 
     if (source is SparseCCDoubleMatrix) {
       SparseCCDoubleMatrix other = source;
-      this._columnPointers.setAll(0, other.columnPointers);
-      //System.arraycopy(other.getColumnPointers(), 0, this._columnPointers, 0, _columns + 1);
+      _columnPointers.setAll(0, other.columnPointers);
       int nzmax = other.rowIndexes.length;
-      if (_dcs.nzmax < nzmax) {
+      if (_rowIndexes.length < nzmax) {
         _rowIndexes = new Int32List(nzmax);
         _values = new Float64List(nzmax);
       }
-      this._rowIndexes.setAll(0, other.rowIndexes);
-      //System.arraycopy(other.getRowIndexes(), 0, this._rowIndexes, 0, nzmax);
-      this._values.setAll(0, other.values);
-      //System.arraycopy(other.getValues(), 0, this._values, 0, nzmax);
+      _rowIndexes.setAll(0, other.rowIndexes);
+      _values.setAll(0, other.values);
       _rowIndexesSorted = other._rowIndexesSorted;
     } else if (source is SparseRCDoubleMatrix) {
       SparseRCDoubleMatrix other = source.transpose();
-      this._columnPointers = other.rowPointers;
-      this._rowIndexes = other.columnIndexes;
-      this._values = other.values;
-      this._dcs.nzmax = this._values.length;
+      _columnPointers = other.rowPointers;
+      _rowIndexes = other.columnIndexes;
+      _values = other.values;
       _rowIndexesSorted = true;
     } else {
       fill(0.0);
@@ -266,7 +218,34 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
     if ((y is SparseCCDoubleMatrix) && (fn == func.plus)) {
       // x[i] = x[i] + y[i]
       SparseCCDoubleMatrix yy = y;
-      _dcs = cs.add(_dcs, yy._dcs, 1.0, 1.0);
+      var nz = 0;
+      var m = rows;
+      var anz = _columnPointers[columns];
+      var n = yy.columns;
+      var Bp = yy._columnPointers;
+      var bnz = Bp[n];
+      var w = new Int32List(m);
+      var x = new Float64List(m);
+      var C = new SparseCCDoubleMatrix(m, n, anz + bnz);
+      var Cp = C._columnPointers;
+      var Ci = C._rowIndexes;
+      var Cx = C._values;
+      for (var j = 0; j < n; j++) {
+        // column j of C starts here
+        Cp[j] = nz;
+        // alpha*A(:,j)
+        nz = _scatter(this, j, 1.0, w, x, j + 1, C, nz);
+        // beta*B(:,j)
+        nz = _scatter(yy, j, 1.0, w, x, j + 1, C, nz);
+        for (var p = Cp[j]; p < nz; p++) {
+          Cx[p] = x[Ci[p]];
+        }
+      }
+      // finalize the last column of C
+      Cp[n] = nz;
+      _rowIndexes = Ci;
+      _columnPointers = Cp;
+      _values = Cx;
       return;
     }
 
@@ -285,7 +264,7 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
 
     if (fn is DoublePlusMultFirst) {
       // x[i] = alpha*x[i] + y[i]
-      final double alpha = (fn as DoublePlusMultFirst).multiplicator;
+      final double alpha = fn.multiplicator;
       if (alpha == 0) {
         copyFrom(y);
         return;
@@ -307,7 +286,7 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
         for (int k = columnPointersA[j + 1]; --k >= low;) {
           int i = rowIndexesA[k];
           valuesA[k] *= y.get(i, j);
-          if (valuesA[k] == 0) _remove(i, j);
+          //if (valuesA[k] == 0) _remove(i, j);
         }
       }
       return;
@@ -324,7 +303,7 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
         for (int k = columnPointersA[j + 1]; --k >= low;) {
           int i = rowIndexesA[k];
           valuesA[k] /= y.get(i, j);
-          if (valuesA[k] == 0) _remove(i, j);
+          //if (valuesA[k] == 0) _remove(i, j);
         }
       }
       return;
@@ -367,7 +346,8 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
 
   double get(int row, int column) {
     //int k = Sorting.binarySearchFromTo(dcs.i, row, dcs.p[column], dcs.p[column + 1] - 1);
-    int k = _searchFromTo(_rowIndexes, row, _columnPointers[column], _columnPointers[column + 1] - 1);
+    int k = _searchFromTo(_rowIndexes, row, _columnPointers[column],
+        _columnPointers[column + 1] - 1);
     double v = 0.0;
     if (k >= 0) {
       v = _values[k];
@@ -378,11 +358,11 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
   /// Returns a new matrix that has the same elements as this matrix, but is
   /// in a row-compressed form.
   SparseRCDoubleMatrix rowCompressed() {
-    cs.Matrix dcst = cs.transpose(_dcs, true);
+    SparseCCDoubleMatrix tr = transpose();
     SparseRCDoubleMatrix rc = new SparseRCDoubleMatrix(rows, columns);
-    rc._columnIndexes = dcst.i;
-    rc._rowPointers = dcst.p;
-    rc._values = dcst.x;
+    rc._columnIndexes = tr._rowIndexes;
+    rc._rowPointers = tr._columnPointers;
+    rc._values = tr._values;
     rc._columnIndexesSorted = true;
     return rc;
   }
@@ -391,10 +371,29 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
 
   /// Returns a new matrix that is the transpose of this matrix.
   SparseCCDoubleMatrix transpose() {
-    cs.Matrix dcst = cs.transpose(_dcs, true);
-    SparseCCDoubleMatrix tr = new SparseCCDoubleMatrix(columns, rows);
-    tr._dcs = dcst;
-    return tr;
+    var q;
+    var m = rows;
+    var n = columns;
+    var Ap = _columnPointers;
+    var Ai = _rowIndexes;
+    var Ax = _values;
+    var C = new SparseCCDoubleMatrix(columns, rows, Ai.length);
+    var w = new Int32List(m);
+    var Cp = C._columnPointers;
+    var Ci = C._rowIndexes;
+    var Cx = C._values;
+    for (var p = 0; p < Ap[n]; p++) {
+      w[Ai[p]]++;
+    }
+    _cumsum(Cp, w, m);
+    for (var j = 0; j < n; j++) {
+      for (var p = Ap[j]; p < Ap[j + 1]; p++) {
+        // place A(i,j) as entry C(j,i)
+        Ci[q = w[Ai[p]]++] = j;
+        Cx[q] = Ax[p];
+      }
+    }
+    return C;
   }
 
   Float64List get values => _values;
@@ -409,15 +408,16 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
 
   void set(int row, int column, double value) {
     //int k = Sorting.binarySearchFromTo(dcs.i, row, dcs.p[column], dcs.p[column + 1] - 1);
-    int k = _searchFromTo(_rowIndexes, row, _columnPointers[column], _columnPointers[column + 1] - 1);
+    int k = _searchFromTo(_rowIndexes, row, _columnPointers[column],
+        _columnPointers[column + 1] - 1);
 
     if (k >= 0) {
       // found
-      if (value == 0) {
+      /*if (value == 0) {
         _remove(column, k);
-      } else {
+      } else {*/
         _values[k] = value;
-      }
+      //}
       return;
     }
 
@@ -428,34 +428,68 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
   }
 
   void sortRowIndexes() {
-    _dcs = cs.transpose(_dcs, true);
-    _dcs = cs.transpose(_dcs, true);
-    if (_dcs == null) {
-      throw new ArgumentError("Exception occured in cs_transpose()!");
-    }
+    SparseCCDoubleMatrix tr = transpose();
+    tr = tr.transpose();
+    _columnPointers = tr._columnPointers;
+    _rowIndexes = tr._rowIndexes;
+    _values = tr._values;
     _rowIndexesSorted = true;
   }
 
   /// Removes (sums) duplicate entries (if any).
   void removeDuplicates() {
-    if (!cs.dupl(_dcs)) {
-      //remove duplicates
-      throw new ArgumentError("Exception occured in cs_dupl()!");
+    int nz = 0;
+    var m = rows;
+    var n = columns;
+    var Ap = _columnPointers;
+    var Ai = _rowIndexes;
+    var Ax = _values;
+    var w = new Int32List(m);
+    for (var i = 0; i < m; i++) {
+      w[i] = -1;
     }
+    for (var j = 0; j < n; j++) {
+      var q = nz;
+      for (var p = Ap[j]; p < Ap[j + 1]; p++) {
+        var i = Ai[p];
+        if (w[i] >= q) {
+          Ax[w[i]] += Ax[p];
+        } else {
+          w[i] = nz;
+          Ai[nz] = i;
+          Ax[nz++] = Ax[p];
+        }
+      }
+      Ap[j] = q;
+    }
+    Ap[n] = nz;
   }
 
   /// Removes zero entries (if any)
   void removeZeroes() {
-    cs.dropzeros(_dcs); //remove zeroes
+    int nz = 0;
+    var n = columns;
+    var Ap = _columnPointers;
+    var Ai = _rowIndexes;
+    var Ax = _values;
+    for (var j = 0; j < n; j++) {
+      var p = Ap[j];
+      Ap[j] = nz;
+      for (; p < Ap[j + 1]; p++) {
+        if (Ax[p] != 0) {
+          Ax[nz] = Ax[p];
+          Ai[nz++] = Ai[p];
+        }
+      }
+    }
+    Ap[n] = nz;
   }
 
-  void trimToSize() {
-    cs.sprealloc(_dcs, 0);
-  }
+  void trimToSize() => _realloc(0);
 
   String toString() {
     var buf = new StringBuffer();
-    buf..write("$rows x $columns sparse matrix, nnz = $cardinality\n");
+    buf.write("$rows x $columns sparse matrix, nnz = $cardinality\n");
     for (int i = 0; i < columns; i++) {
       int high = _columnPointers[i + 1];
       for (int j = _columnPointers[i]; j < high; j++) {
@@ -512,7 +546,6 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
     Float64List valuesA = _values;
 
     int zidx = zeroZ;
-    //int nthreads = ConcurrencyUtils.getNumberOfThreads();
     if (!transposeA) {
       if ((!ignore) && (beta / alpha != 1.0)) {
         z.apply(func.multiply(beta / alpha));
@@ -537,7 +570,8 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
         int high = _columnPointers[i + 1];
         for (; k + 10 < high; k += 10) {
           int ind = k + 9;
-          sum += valuesA[ind] * elementsY[zeroY + strideY * _rowIndexes[ind--]] +
+          sum += valuesA[ind] *
+                  elementsY[zeroY + strideY * _rowIndexes[ind--]] +
               valuesA[ind] * elementsY[zeroY + strideY * _rowIndexes[ind--]] +
               valuesA[ind] * elementsY[zeroY + strideY * _rowIndexes[ind--]] +
               valuesA[ind] * elementsY[zeroY + strideY * _rowIndexes[ind--]] +
@@ -661,10 +695,35 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
         BB = BB.transpose();
       }
       SparseCCDoubleMatrix CC = C;
-      CC._dcs = cs.multiply(AA._dcs, BB._dcs);
-      if (CC._dcs == null) {
-        throw new ArgumentError("Exception occured in cs_multiply()");
+      int nz = 0;
+      var m = rowsA;
+      var n = columnsB;
+      var Bp = BB._columnPointers;
+      var Bi = BB._rowIndexes;
+      var Bx = BB._values;
+      var w = new Int32List(m);
+      var x = new Float64List(m);
+      var Cp = CC._columnPointers;
+      var Ci = CC._rowIndexes;
+      var Cx = CC._values;
+      for (var j = 0; j < n; j++) {
+        int nzmaxC = CC._rowIndexes.length;
+        if (nz + m > nzmaxC) {
+          nzmaxC = 2 * nzmaxC + m;
+          Int32List rowIndexesNew = new Int32List(nzmaxC);
+          rowIndexesNew.setAll(0, Ci);
+          Ci = rowIndexesNew;
+          var valuesNew = new Float64List(nzmaxC);
+          valuesNew.setAll(0, Cx);
+          Cx = valuesNew;
+        }
+        Cp[j] = nz;
+        for (p = Bp[j]; p < Bp[j + 1]; p++) {
+          nz = _scatter(AA, Bi[p], Bx[p], w, x, j + 1, CC, nz);
+        }
+        for (p = Cp[j]; p < nz; p++) Cx[p] = x[Ci[p]];
       }
+      Cp[n] = nz;
       if (alpha != 1.0) {
         CC.apply(func.multiply(alpha));
       }
@@ -673,12 +732,14 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
         B = B.dice();
       }
       // cache views
-      final List<AbstractDoubleVector> Brows =
-          new List<AbstractDoubleVector>(columnsA);
-      for (int i = columnsA; --i >= 0;) Brows[i] = B.row(i);
-      final List<AbstractDoubleVector> Crows =
-          new List<AbstractDoubleVector>(rowsA);
-      for (int i = rowsA; --i >= 0;) Crows[i] = C.row(i);
+      var Brows = new List<AbstractDoubleVector>(columnsA);
+      for (int i = columnsA; --i >= 0;) {
+        Brows[i] = B.row(i);
+      }
+      var Crows = new List<AbstractDoubleVector>(rowsA);
+      for (int i = rowsA; --i >= 0;) {
+        Crows[i] = C.row(i);
+      }
 
       var fn = new DoublePlusMultSecond.plusMult(0.0);
 
@@ -715,10 +776,9 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
     }
     _rowIndexes = new Int32List.fromList(rowIndexes);
     _values = new Float64List.fromList(values);
-    _dcs.nzmax = rowIndexes.length;
   }
 
-  void _remove(int column, int index) {
+  /*void _remove(int column, int index) {
     List rowIndexes = new List.from(_rowIndexes);
     List values = new List.from(_values);
     rowIndexes.removeAt(index);
@@ -729,7 +789,7 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
     _rowIndexes = new Int32List.fromList(rowIndexes);
     _values = new Float64List.fromList(values);
     _dcs.nzmax = rowIndexes.length;
-  }
+  }*/
 
   static int _searchFromTo(Int32List list, int key, int from, int to) {
     while (from <= to) {
@@ -743,7 +803,54 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
     return -(from + 1); // key not found.
   }
 
+  static int _cumsum(Int32List p, Int32List c, int n) {
+    int nz = 0;
+    int nz2 = 0;
+    for (int k = 0; k < n; k++) {
+      p[k] = nz;
+      nz += c[k];
+      nz2 += c[k];
+      c[k] = p[k];
+    }
+    p[n] = nz;
+    return (nz2);
+  }
+
+  void _realloc(int nzmax) {
+    if (nzmax <= 0) {
+      nzmax = _columnPointers[columns];
+    }
+    var rowIndexesNew = new Int32List(nzmax);
+    rowIndexesNew.setAll(0, _rowIndexes);
+    _rowIndexes = rowIndexesNew;
+    var valuesNew = new Float64List(nzmax);
+    valuesNew.setAll(0, _values);
+    _values = valuesNew;
+  }
+
+  int _scatter(SparseCCDoubleMatrix A, int j, double beta, Int32List w, Float64List x,
+               int mark, SparseCCDoubleMatrix C, int nz) {
+    var Ap = A._columnPointers;
+    var Ai = A._rowIndexes;
+    var Ax = A._values;
+    var Ci = C._rowIndexes;
+    for (var p = Ap[j]; p < Ap[j + 1]; p++) {
+      var i = Ai[p];
+      if (w[i] < mark) {
+        w[i] = mark;
+        Ci[nz++] = i;
+        if (x != null) {
+          x[i] = beta * Ax[p];
+        }
+      } else if (x != null) {
+        x[i] += beta * Ax[p];
+      }
+    }
+    return nz;
+  }
+
   Object clone() {
-    return new SparseCCDoubleMatrix._internal(_dcs);
+    return new SparseCCDoubleMatrix._internal(
+        rows, columns, _rowIndexes, _columnPointers, _values);
   }
 }
