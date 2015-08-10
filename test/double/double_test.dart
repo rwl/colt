@@ -6,7 +6,7 @@ import 'dart:typed_data';
 import 'package:test/test.dart';
 import 'package:colt/colt.dart';
 import 'package:colt/function/double.dart' hide equals;
-import 'package:colt/math.dart' show MAX_INT;
+import 'package:colt/src/math.dart' show MAX_INT;
 
 part 'double_vector_test.dart';
 part 'double_matrix_test.dart';

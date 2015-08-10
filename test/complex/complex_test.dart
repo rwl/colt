@@ -6,7 +6,7 @@ import 'dart:typed_data';
 import 'package:test/test.dart';
 import 'package:complex/complex.dart';
 import 'package:colt/colt.dart';
-import 'package:colt/math.dart' as cmath;
+import 'package:colt/src/math.dart' as cmath;
 import 'package:colt/function/complex.dart' hide equals;
 
 part 'complex_vector_test.dart';

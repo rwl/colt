@@ -127,13 +127,13 @@ testIntMatrix(String kind, IntMatrix make(int rows, int columns)) {
       A.fill(0);
       A.set(A.rows ~/ 3, A.columns ~/ 3, -7);
       A.set(A.rows ~/ 2, A.columns ~/ 2, -1);
-      List<int> rowList = new List<int>();
-      List<int> columnList = new List<int>();
-      List<int> valueList = new List<int>();
+      var rowList = <int>[];
+      var columnList = <int>[];
+      var valueList = <int>[];
       A.negative(rowList, columnList, valueList);
-      expect(2, equals(rowList.length));
-      expect(2, equals(columnList.length));
-      expect(2, equals(valueList.length));
+      expect(rowList.length, equals(2));
+      expect(columnList.length, equals(2));
+      expect(valueList.length, equals(2));
       expect(rowList.contains(A.rows ~/ 3), isTrue);
       expect(rowList.contains(A.rows ~/ 2), isTrue);
       expect(columnList.contains(A.columns ~/ 3), isTrue);
@@ -146,13 +146,13 @@ testIntMatrix(String kind, IntMatrix make(int rows, int columns)) {
       A.fill(0);
       A.set(A.rows ~/ 3, A.columns ~/ 3, 7);
       A.set(A.rows ~/ 2, A.columns ~/ 2, 1);
-      List<int> rowList = new List<int>();
-      List<int> columnList = new List<int>();
-      List<int> valueList = new List<int>();
+      var rowList = <int>[];
+      var columnList = <int>[];
+      var valueList = <int>[];
       A.nonzero(rowList, columnList, valueList);
-      expect(2, equals(rowList.length));
-      expect(2, equals(columnList.length));
-      expect(2, equals(valueList.length));
+      expect(rowList.length, equals(2));
+      expect(columnList.length, equals(2));
+      expect(valueList.length, equals(2));
       expect(rowList.contains(A.rows ~/ 3), isTrue);
       expect(rowList.contains(A.rows ~/ 2), isTrue);
       expect(columnList.contains(A.columns ~/ 3), isTrue);
@@ -165,13 +165,13 @@ testIntMatrix(String kind, IntMatrix make(int rows, int columns)) {
       A.fill(0);
       A.set(A.rows ~/ 3, A.columns ~/ 3, 7);
       A.set(A.rows ~/ 2, A.columns ~/ 2, 1);
-      List<int> rowList = new List<int>();
-      List<int> columnList = new List<int>();
-      List<int> valueList = new List<int>();
+      var rowList = <int>[];
+      var columnList = <int>[];
+      var valueList = <int>[];
       A.positive(rowList, columnList, valueList);
-      expect(2, equals(rowList.length));
-      expect(2, equals(columnList.length));
-      expect(2, equals(valueList.length));
+      expect(rowList.length, equals(2));
+      expect(columnList.length, equals(2));
+      expect(valueList.length, equals(2));
       expect(rowList.contains(A.rows ~/ 3), isTrue);
       expect(rowList.contains(A.rows ~/ 2), isTrue);
       expect(columnList.contains(A.columns ~/ 3), isTrue);
@@ -352,7 +352,7 @@ testIntMatrix(String kind, IntMatrix make(int rows, int columns)) {
     test('multiply', () {
       int alpha = 3;
       int beta = 5;
-      IntMatrix C = new IntMatrix.random(A.rows, A.rows);
+      IntMatrix C = new DenseIntMatrix.random(A.rows, A.rows);
       C.apply(ifunc.modulus(A.rows));
       List<Int32List> expected = toList(C);
       C = A.multiply(Bt, C, alpha, beta, false, false);
@@ -392,7 +392,7 @@ testIntMatrix(String kind, IntMatrix make(int rows, int columns)) {
       }
 
       //transposeA
-      C = new IntMatrix.random(A.columns, A.columns);
+      C = new DenseIntMatrix.random(A.columns, A.columns);
       C.apply(ifunc.modulus(A.rows));
       expected = toList(C);
       C = A.multiply(B, C, alpha, beta, true, false);
@@ -431,7 +431,7 @@ testIntMatrix(String kind, IntMatrix make(int rows, int columns)) {
       }
 
       //transposeB
-      C = new IntMatrix.random(A.rows, A.rows);
+      C = new DenseIntMatrix.random(A.rows, A.rows);
       C.apply(ifunc.modulus(A.rows));
       expected = toList(C);
       C = A.multiply(B, C, alpha, beta, false, true);
@@ -469,7 +469,7 @@ testIntMatrix(String kind, IntMatrix make(int rows, int columns)) {
         }
       }
       //transposeA and transposeB
-      C = new IntMatrix.random(A.columns, A.columns);
+      C = new DenseIntMatrix.random(A.columns, A.columns);
       C.apply(ifunc.modulus(A.rows));
       expected = toList(C);
       C = A.multiply(Bt, C, alpha, beta, true, true);

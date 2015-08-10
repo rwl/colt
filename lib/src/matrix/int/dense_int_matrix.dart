@@ -139,7 +139,7 @@ class DenseIntMatrix extends IntMatrix {
       return; // nothing to do
     }
     checkShape(this, other_final);
-    if (!isView && other_final.isView) {
+    if (!isView && !other_final.isView) {
       // quickest
       _elements.setAll(0, other_final._elements);
       return;

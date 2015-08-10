@@ -212,8 +212,7 @@ abstract class IntMatrix extends AbstractMatrix {
   /// the specified lists. Fills into the lists, starting at index 0. After
   /// this call returns the specified lists all have a new size, the number
   /// of negative values.
-  void negative(final Int32List rowList, final Int32List columnList,
-      final Int32List valueList) {
+  void negative(List<int> rowList, List<int> columnList, List<int> valueList) {
     rowList.clear();
     columnList.clear();
     valueList.clear();
@@ -246,8 +245,7 @@ abstract class IntMatrix extends AbstractMatrix {
   ///     valueList  = (8,7)
   ///
   /// In other words, `get(0,2) == 8, get(1,1) == 7`.
-  void nonzero(final Int32List rowList, final Int32List columnList,
-      final Int32List valueList) {
+  void nonzero(List<int> rowList, List<int> columnList, List<int> valueList) {
     rowList.clear();
     columnList.clear();
     valueList.clear();
@@ -267,8 +265,7 @@ abstract class IntMatrix extends AbstractMatrix {
   /// the specified lists. Fills into the lists, starting at index 0. After
   /// this call returns the specified lists all have a new size, the number
   /// of positive values.
-  void positive(final Int32List rowList, final Int32List columnList,
-      final Int32List valueList) {
+  void positive(List<int> rowList, List<int> columnList, List<int> valueList) {
     rowList.clear();
     columnList.clear();
     valueList.clear();

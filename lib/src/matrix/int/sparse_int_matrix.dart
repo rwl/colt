@@ -167,7 +167,7 @@ class SparseIntMatrix extends IntMatrix {
       rowIndexes[k] = key ~/ columns;
       columnIndexes[k] = key % columns;
     }
-    return new SparseCCIntMatrix.withValues(rows, columns, rowIndexes, columnIndexes, values, false, false, sortRowIndexes);
+    return new SparseCCIntMatrix.withValues(rows, columns, rowIndexes, columnIndexes, values, removeDuplicates: false, removeZeroes: false, sortRowIndexes: sortRowIndexes);
   }
 
   /// Returns a new matrix that has the same elements as this matrix, but is
@@ -183,7 +183,7 @@ class SparseIntMatrix extends IntMatrix {
       rowIndexes[k] = key ~/ columns;
       columnIndexes[k] = key % columns;
     }
-    return new SparseRCIntMatrix.withValues(rows, columns, rowIndexes, columnIndexes, values, false, false, sortColumnIndexes);
+    return new SparseRCIntMatrix.withValues(rows, columns, rowIndexes, columnIndexes, values, removeDuplicates: false, removeZeroes: false, sortColumnIndexes: sortColumnIndexes);
   }
 
   Object get elements => _elements;
@@ -205,7 +205,12 @@ class SparseIntMatrix extends IntMatrix {
   }
 
   int get(int row, int column) {
-    return _elements[rowZero + row * rowStride + columnZero + column * columnStride];
+    var i = rowZero + row * rowStride + columnZero + column * columnStride;
+    if (_elements.containsKey(i)) {
+      return _elements[i];
+    } else {
+      return 0;
+    }
   }
 
   int index(int row, int column) {
