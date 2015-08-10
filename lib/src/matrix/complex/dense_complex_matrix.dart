@@ -10,7 +10,7 @@
 // any purpose. It is provided "as is" without expressed or implied warranty.
 part of cern.colt.matrix.complex;
 
-/// Dense 2-d matrix holding `complex` elements.
+/// Dense 2-d matrix holding [Complex] elements.
 ///
 /// Internally holds one single contigous one-dimensional array, addressed in
 /// row major order. Complex data is represented by 2 double values in sequence,
@@ -739,7 +739,7 @@ class DenseComplexMatrix extends ComplexMatrix {
   }
 }
 
-/// Selection view on dense 2-d matrices holding `complex` elements.
+/// Selection view on dense 2-d matrices holding [Complex] elements.
 ///
 /// Objects of this class are typically constructed via `select` methods on
 /// some source matrix. The interface introduced in abstract super classes

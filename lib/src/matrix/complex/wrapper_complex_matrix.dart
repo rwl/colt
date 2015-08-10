@@ -10,7 +10,7 @@
 // any purpose. It is provided "as is" without expressed or implied warranty.
 part of cern.colt.matrix.complex;
 
-/// 2-d matrix holding `complex` elements; either a view wrapping another
+/// 2-d matrix holding [Complex] elements; either a view wrapping another
 /// matrix or a matrix whose views are wrappers.
 class WrapperComplexMatrix extends ComplexMatrix {
   ComplexMatrix _content;

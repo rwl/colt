@@ -10,7 +10,7 @@
 // any purpose. It is provided "as is" without expressed or implied warranty.
 part of cern.colt.matrix.complex;
 
-/// Sparse hashed 2-d matrix holding `complex` elements.
+/// Sparse hashed 2-d matrix holding [Complex] elements.
 ///
 /// This implementation uses [Map].
 class SparseComplexMatrix extends ComplexMatrix {
@@ -96,10 +96,9 @@ class SparseComplexMatrix extends ComplexMatrix {
   }
 
   Complex get(int row, int column) {
-    Complex elem = _elements[
-        rowZero + row * rowStride + columnZero + column * columnStride];
-    if (elem != null) {
-      return elem;
+    var i = rowZero + row * rowStride + columnZero + column * columnStride;
+    if (_elements.containsKey(i)) {
+      return _elements[i];
     } else {
       return Complex.ZERO;
     }
@@ -181,7 +180,7 @@ class SparseComplexMatrix extends ComplexMatrix {
   }
 }
 
-/// Selection view on sparse 2-d matrices holding `complex` elements. This
+/// Selection view on sparse 2-d matrices holding [Complex] elements. This
 /// implementation uses [Map].
 class SelectedSparseComplexMatrix extends ComplexMatrix {
   Map<int, Complex> _elements;

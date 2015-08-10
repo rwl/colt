@@ -10,7 +10,7 @@
 // any purpose. It is provided "as is" without expressed or implied warranty.
 part of cern.colt.matrix.complex;
 
-/// 1-d matrix holding `complex` elements; either a view wrapping another
+/// 1-d matrix holding [Complex] elements; either a view wrapping another
 /// 2-d matrix and therefore delegating calls to it.
 class DelegateComplexVector extends ComplexVector {
   ComplexMatrix _content;

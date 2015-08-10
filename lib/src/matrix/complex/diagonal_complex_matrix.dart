@@ -10,7 +10,7 @@
 // any purpose. It is provided "as is" without expressed or implied warranty.
 part of cern.colt.matrix.complex;
 
-/// Diagonal 2-d matrix holding `complex` elements.
+/// Diagonal 2-d matrix holding [Complex] elements.
 class DiagonalComplexMatrix extends WrapperComplexMatrix {
   /// The non zero elements of the matrix.
   Float64List _elements;

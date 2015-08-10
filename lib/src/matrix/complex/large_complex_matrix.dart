@@ -10,7 +10,7 @@
 // any purpose. It is provided "as is" without expressed or implied warranty.
 part of cern.colt.matrix.complex;
 
-/// Dense 2-d matrix holding `complex` elements.
+/// Dense 2-d matrix holding [Complex] elements.
 ///
 /// Internally holds one two-dimensional array, `elements[rows][2*columns]`.
 /// Complex data is represented by 2 double values in sequence.

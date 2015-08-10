@@ -10,7 +10,7 @@
 // any purpose. It is provided "as is" without expressed or implied warranty.
 part of cern.colt.matrix.complex;
 
-/// Sparse hashed 1-d matrix (aka vector) holding `complex` elements in
+/// Sparse hashed 1-d matrix (aka vector) holding [Complex] elements in
 /// a [Map].
 class SparseComplexVector extends ComplexVector {
   Map<int, Complex> _elements;
@@ -142,7 +142,7 @@ class SparseComplexVector extends ComplexVector {
   }
 }
 
-/// Selection view on sparse 1-d matrices holding `complex` elements. This
+/// Selection view on sparse 1-d matrices holding [Complex] elements. This
 /// implementation uses [Map].
 class SelectedSparseComplexVector extends ComplexVector {
   Map<int, Complex> _elements;

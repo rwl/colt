@@ -10,7 +10,7 @@
 // any purpose. It is provided "as is" without expressed or implied warranty.
 part of cern.colt.matrix.complex;
 
-/// Dense 1-d matrix (aka vector) holding `complex` elements.
+/// Dense 1-d matrix (aka vector) holding [Complex] elements.
 ///
 /// Internally holds one single contiguous one-dimensional array. Complex
 /// data is represented by 2 double values in sequence, i.e.
@@ -544,7 +544,7 @@ class DenseComplexVector extends ComplexVector {
   }
 }
 
-/// Selection view on dense 1-d matrices holding `complex` elements.
+/// Selection view on dense 1-d matrices holding [Complex] elements.
 ///
 /// Objects of this class are typically constructed via `select` methods on
 /// some source matrix. The interface introduced in abstract super classes

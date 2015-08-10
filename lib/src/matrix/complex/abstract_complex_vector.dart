@@ -10,7 +10,7 @@
 // any purpose. It is provided "as is" without expressed or implied warranty.
 part of cern.colt.matrix.complex;
 
-/// Abstract base class for 1-d matrices (aka vectors) holding `complex`
+/// Abstract base class for 1-d matrices (aka vectors) holding [Complex]
 /// elements.
 abstract class ComplexVector extends AbstractVector {
   //with ListMixin<double> {

@@ -10,7 +10,7 @@
 // any purpose. It is provided "as is" without expressed or implied warranty.
 part of cern.colt.matrix.complex;
 
-/// Abstract base class for 2-d matrices holding `complex` elements.
+/// Abstract base class for 2-d matrices holding [Complex] elements.
 abstract class ComplexMatrix extends AbstractMatrix {
   ComplexMatrix._(int rows, int columns, [int rowZero = 0,
       int columnZero = 0, int rowStride = null, int columnStride = 1,
