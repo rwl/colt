@@ -46,7 +46,8 @@ import '../double/matrix.dart'
         SparseRCDoubleMatrix,
         makeSparseRCDoubleMatrix;
 
-import '../../math.dart' show EPSILON, DEG_RAD, MAX_INT, isEqual;
+import '../../math.dart'
+    show EPSILON, DEG_RAD, MAX_INT, isEqual, cumsum, searchRange, EPS;
 
 import 'property.dart' as cprop;
 

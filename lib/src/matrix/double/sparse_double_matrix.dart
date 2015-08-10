@@ -154,7 +154,7 @@ class SparseDoubleMatrix extends DoubleMatrix {
       columnIndexes[k] = key % columns;
     }
     return new SparseCCDoubleMatrix.withValues(rows, columns, rowIndexes,
-        columnIndexes, values, false, false, sortRowIndexes);
+        columnIndexes, values, removeDuplicates: false, removeZeroes: false, sortRowIndexes: sortRowIndexes);
   }
 
   /// Returns a new matrix that has the same elements as this matrix, but is

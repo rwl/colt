@@ -10,7 +10,7 @@
 // any purpose. It is provided "as is" without expressed or implied warranty.
 part of cern.colt.matrix.complex;
 
-/// Sparse column-compressed 2-d matrix holding `complex` elements.
+/// Sparse column-compressed 2-d matrix holding [Complex] elements.
 ///
 /// Internally uses the standard sparse column-compressed format.
 ///
@@ -32,9 +32,9 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
     if (nzmax == null) {
       nzmax = Math.min(10 * rows, MAX_INT);
     }
-    final rowIndexes = new Int32List(nzmax);
-    final values = new Float64List(2 * nzmax);
-    final columnPointers = new Int32List(columns + 1);
+    var rowIndexes = new Int32List(nzmax);
+    var values = new Float64List(2 * nzmax);
+    var columnPointers = new Int32List(columns + 1);
     return new SparseCCComplexMatrix._internal(
         rows, columns, rowIndexes, columnPointers, values);
   }
@@ -57,7 +57,7 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
   /// single value.
   factory SparseCCComplexMatrix.withValue(int rows, int columns,
       Int32List rowIndexes, Int32List columnIndexes, double re, double im,
-      bool removeDuplicates) {
+      {bool removeDuplicates: false, bool sortRowIndexes: false}) {
     if (rowIndexes.length != columnIndexes.length) {
       throw new ArgumentError("rowIndexes.length != columnIndexes.length");
     }
@@ -66,24 +66,27 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
     }
 
     int nz = Math.max(rowIndexes.length, 1);
-    final _rowIndexes = new Int32List(nz);
-    final _values = new Float64List(2 * nz);
-    final _columnPointers = new Int32List(columns + 1);
-    var w = new Int32List(columns);
-    int r;
+    var _rowIndexes = new Int32List(nz);
+    var _values = new Float64List(2 * nz);
+    var _columnPointers = new Int32List(columns + 1);
+    var columnCounts = new Int32List(columns);
     for (int k = 0; k < nz; k++) {
-      w[columnIndexes[k]]++;
+      columnCounts[columnIndexes[k]]++;
     }
-    _cumsum(_columnPointers, w, columns);
+    cumsum(_columnPointers, columnCounts);
     for (int k = 0; k < nz; k++) {
-      _rowIndexes[r = w[columnIndexes[k]]++] = rowIndexes[k];
+      var r = columnCounts[columnIndexes[k]]++;
+      _rowIndexes[r] = rowIndexes[k];
       _values[2 * r] = re;
       _values[2 * r + 1] = im;
     }
-    final m = new SparseCCComplexMatrix._internal(
+    var m = new SparseCCComplexMatrix._internal(
         rows, columns, _rowIndexes, _columnPointers, _values);
     if (removeDuplicates) {
       m.removeDuplicates();
+    }
+    if (sortRowIndexes) {
+      m.sortRowIndexes();
     }
     return m;
   }
@@ -92,24 +95,25 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
   /// format.
   factory SparseCCComplexMatrix.withValues(int rows, int columns,
       Int32List rowIndexes, Int32List columnIndexes, Float64List values,
-      {bool removeDuplicates: false, bool removeZeroes: false}) {
+      {bool removeDuplicates: false, bool removeZeroes: false,
+      bool sortRowIndexes: false}) {
     if (rowIndexes.length != columnIndexes.length) {
       throw new ArgumentError("rowIndexes.length != columnIndexes.length");
     } else if (2 * rowIndexes.length != values.length) {
       throw new ArgumentError("2 * rowIndexes.length != values.length");
     }
     int nz = Math.max(rowIndexes.length, 1);
-    final _rowIndexes = new Int32List(nz);
-    final _values = new Float64List(2 * nz);
-    final _columnPointers = new Int32List(columns + 1);
-    Int32List w = new Int32List(columns);
-    int r;
+    var _rowIndexes = new Int32List(nz);
+    var _values = new Float64List(2 * nz);
+    var _columnPointers = new Int32List(columns + 1);
+    var columnCounts = new Int32List(columns);
     for (int k = 0; k < nz; k++) {
-      w[columnIndexes[k]]++;
+      columnCounts[columnIndexes[k]]++;
     }
-    _cumsum(_columnPointers, w, columns);
+    cumsum(_columnPointers, columnCounts);
     for (int k = 0; k < nz; k++) {
-      _rowIndexes[r = w[columnIndexes[k]]++] = rowIndexes[k];
+      var r = columnCounts[columnIndexes[k]]++;
+      _rowIndexes[r] = rowIndexes[k];
       _values[2 * r] = values[2 * k];
       _values[2 * r + 1] = values[2 * k + 1];
     }
@@ -117,6 +121,12 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
         rows, columns, _rowIndexes, _columnPointers, _values);
     if (removeDuplicates) {
       m.removeDuplicates();
+    }
+    if (removeZeroes) {
+      m.removeZeroes();
+    }
+    if (sortRowIndexes) {
+      m.sortRowIndexes();
     }
     return m;
   }
@@ -137,17 +147,16 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
         return;
       }
       if (alpha.real != alpha.real || alpha.imaginary != alpha.imaginary) {
-        fill(alpha.real, alpha.imaginary); // isNaN(). This should not happen.
+        fill(alpha.real, alpha.imaginary); // isNaN. This should not happen.
         return;
       }
 
-      final Float64List valuesE = _values;
       int nz = cardinality;
       for (int j = 0; j < nz; j++) {
-        var valE = new Complex(valuesE[2 * j], valuesE[2 * j + 1]);
-        valE = valE * alpha;
-        valuesE[2 * j] = valE.real;
-        valuesE[2 * j + 1] = valE.imaginary;
+        var value = new Complex(_values[2 * j], _values[2 * j + 1]);
+        value = value * alpha;
+        _values[2 * j] = value.real;
+        _values[2 * j + 1] = value.imaginary;
       }
     } else {
       forEachNonZero((int i, int j, Complex value) {
@@ -177,20 +186,19 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
     checkShape(this, source);
 
     if (source is SparseCCComplexMatrix) {
-      SparseCCComplexMatrix other = source;
-      _columnPointers.setAll(0, other.columnPointers);
-      int nzmax = other.rowIndexes.length;
+      _columnPointers.setAll(0, source.columnPointers);
+      int nzmax = source.rowIndexes.length;
       if (_rowIndexes.length < nzmax) {
         _rowIndexes = new Int32List(nzmax);
         _values = new Float64List(2 * nzmax);
       }
-      _rowIndexes.setAll(0, other.rowIndexes);
-      _values.setAll(0, other.values);
+      _rowIndexes.setAll(0, source.rowIndexes);
+      _values.setAll(0, source.values);
     } else if (source is SparseRCComplexMatrix) {
-      SparseRCComplexMatrix other = source.conjugateTranspose();
-      _columnPointers = other.rowPointers;
-      _rowIndexes = other.columnIndexes;
-      _values = other.values;
+      SparseRCComplexMatrix tr = source.conjugateTranspose();
+      _columnPointers = tr.rowPointers;
+      _rowIndexes = tr.columnIndexes;
+      _values = tr.values;
     } else {
       fill(0.0, 0.0);
       source.forEachNonZero((int i, int j, Complex value) {
@@ -200,38 +208,35 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
     }
   }
 
-  void assign(
-      final ComplexMatrix y, cfunc.ComplexComplexComplexFunction fn) {
+  void assign(ComplexMatrix y, cfunc.ComplexComplexComplexFunction fn) {
     checkShape(this, y);
 
-    if ((y is SparseCCComplexMatrix) && (fn == cfunc.plus)) {
+    if (y is SparseCCComplexMatrix && fn == cfunc.plus) {
       // x[i] = x[i] + y[i]
       SparseCCComplexMatrix yy = y;
       int nz = 0;
-      var m = rows;
-      var anz = _columnPointers[columns];
+      var nnz = _columnPointers[columns];
       var n = yy.columns;
-      var Bp = yy._columnPointers;
-      var bnz = Bp[n];
-      var w = new Int32List(m);
-      var x = new Float64List(2 * m);
-      var C = new SparseCCComplexMatrix(m, n, anz + bnz);
-      var Cp = C._columnPointers;
-      var Ci = C._rowIndexes;
-      var Cx = C._values;
+      var bnz = yy._columnPointers[n];
+      var w = new Int32List(rows);
+      var x = new Float64List(2 * rows);
+      var C = new SparseCCComplexMatrix(rows, n, nnz + bnz);
+      var columnPointersC = C._columnPointers;
+      var rowIndexesC = C._rowIndexes;
+      var valuesC = C._values;
       for (var j = 0; j < n; j++) {
-        Cp[j] = nz;
-        nz = _scatter(this, j, Complex.ONE, w, x, j + 1, C, nz);
-        nz = _scatter(yy, j, Complex.ONE, w, x, j + 1, C, nz);
-        for (var p = Cp[j]; p < nz; p++) {
-          Cx[2 * p] = x[2 * Ci[p]];
-          Cx[2 * p + 1] = x[2 * Ci[p] + 1];
+        columnPointersC[j] = nz;
+        nz = _toDense(this, j, Complex.ONE, w, x, j + 1, C, nz);
+        nz = _toDense(yy, j, Complex.ONE, w, x, j + 1, C, nz);
+        for (var p = columnPointersC[j]; p < nz; p++) {
+          valuesC[2 * p] = x[2 * rowIndexesC[p]];
+          valuesC[2 * p + 1] = x[2 * rowIndexesC[p] + 1];
         }
       }
-      Cp[n] = nz;
-      _rowIndexes = Ci;
-      _columnPointers = Cp;
-      _values = Cx;
+      columnPointersC[n] = nz;
+      _rowIndexes = rowIndexesC;
+      _columnPointers = columnPointersC;
+      _values = valuesC;
       return;
     }
 
@@ -264,17 +269,14 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
 
     if (fn == cfunc.mult) {
       // x[i] = x[i] * y[i]
-      Int32List rowIndexesA = _rowIndexes;
-      Int32List columnPointersA = _columnPointers;
-      Float64List valuesA = _values;
       for (int j = columns; --j >= 0;) {
-        int low = columnPointersA[j];
-        for (int k = columnPointersA[j + 1]; --k >= low;) {
-          int i = rowIndexesA[k];
-          var valA = new Complex(valuesA[2 * k], valuesA[2 * k + 1]);
+        int low = _columnPointers[j];
+        for (int k = _columnPointers[j + 1]; --k >= low;) {
+          int i = _rowIndexes[k];
+          var valA = new Complex(_values[2 * k], _values[2 * k + 1]);
           valA = valA * y.get(i, j);
-          valuesA[2 * k] = valA.real;
-          valuesA[2 * k + 1] = valA.imaginary;
+          _values[2 * k] = valA.real;
+          _values[2 * k + 1] = valA.imaginary;
           //if (valuesA[2 * k] == 0 && valuesA[2 * k + 1] == 0) _remove(i, j);
         }
       }
@@ -283,18 +285,14 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
 
     if (fn == cfunc.div) {
       // x[i] = x[i] / y[i]
-      Int32List rowIndexesA = _rowIndexes;
-      Int32List columnPointersA = _columnPointers;
-      Float64List valuesA = _values;
-
       for (int j = columns; --j >= 0;) {
-        int low = columnPointersA[j];
-        for (int k = columnPointersA[j + 1]; --k >= low;) {
-          int i = rowIndexesA[k];
-          var valA = new Complex(valuesA[2 * k], valuesA[2 * k + 1]);
+        int low = _columnPointers[j];
+        for (int k = _columnPointers[j + 1]; --k >= low;) {
+          int i = _rowIndexes[k];
+          var valA = new Complex(_values[2 * k], _values[2 * k + 1]);
           valA = valA / y.get(i, j);
-          valuesA[2 * k] = valA.real;
-          valuesA[2 * k + 1] = valA.imaginary;
+          _values[2 * k] = valA.real;
+          _values[2 * k + 1] = valA.imaginary;
           //if (valuesA[2 * k] == 0 && valuesA[2 * k + 1] == 0) _remove(i, j);
         }
       }
@@ -306,25 +304,23 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
   int get cardinality => _columnPointers[columns];
 
   void forEachNonZero(final cfunc.IntIntComplexFunction fn) {
-    Int32List rowIndexesA = _rowIndexes;
-    Int32List columnPointersA = _columnPointers;
-    Float64List valuesA = _values;
     for (int j = columns; --j >= 0;) {
-      int low = columnPointersA[j];
-      for (int k = columnPointersA[j + 1]; --k >= low;) {
-        int i = rowIndexesA[k];
-        var valA = new Complex(valuesA[2 * k], valuesA[2 * k + 1]);
+      int low = _columnPointers[j];
+      for (int k = _columnPointers[j + 1]; --k >= low;) {
+        int i = _rowIndexes[k];
+        var valA = new Complex(_values[2 * k], _values[2 * k + 1]);
         valA = fn(i, j, valA);
-        valuesA[2 * k] = valA.real;
-        valuesA[2 * k + 1] = valA.imaginary;
+        _values[2 * k] = valA.real;
+        _values[2 * k + 1] = valA.imaginary;
       }
     }
   }
 
+  /// Column pointers (size [columns]+1).
   Int32List get columnPointers => _columnPointers;
 
-  /// Returns a new matrix that has the same elements as this matrix, but is in
-  /// a dense form.
+  /// Returns a new matrix that has the same elements as this matrix, but is
+  /// in a dense form.
   DenseComplexMatrix dense() {
     var dense = new DenseComplexMatrix(rows, columns);
     forEachNonZero((int i, int j, Complex value) {
@@ -335,8 +331,7 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
   }
 
   Complex get(int row, int column) {
-    //int k = Sorting.binarySearchFromTo(dcs.i, row, dcs.p[column], dcs.p[column + 1] - 1);
-    int k = _searchFromTo(_rowIndexes, row, _columnPointers[column],
+    int k = searchRange(_rowIndexes, row, _columnPointers[column],
         _columnPointers[column + 1] - 1);
     if (k >= 0) {
       return new Complex(_values[2 * k], _values[2 * k + 1]);
@@ -355,74 +350,48 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
     return rc;
   }
 
+  /// Row indices (size `nzmax`).
   Int32List get rowIndexes => _rowIndexes;
 
-  dynamic get elements {
-    /*DZcs cs = new DZcs();
-    cs.m = _rows;
-    cs.n = _columns;
-    cs.i = _rowIndexes;
-    cs.p = _columnPointers;
-    cs.x = _values;
-    cs.nz = -1;
-    cs.nzmax = _values.length ~/ 2;
-    return cs;*/
-    return _values;
-  }
+  dynamic get elements => _values;
 
   /// Returns a new matrix that is the transpose of this matrix.
   SparseCCComplexMatrix transpose() {
-    var q;
-    var m = rows;
-    var n = columns;
-    var Ap = _columnPointers;
-    var Ai = _rowIndexes;
-    var Ax = _values;
-    var C = new SparseCCComplexMatrix(columns, rows, Ai.length);
-    var w = new Int32List(m);
-    var Cp = C._columnPointers;
-    var Ci = C._rowIndexes;
-    var Cx = C._values;
-    for (var p = 0; p < Ap[n]; p++) {
-      w[Ai[p]]++;
+    var C = new SparseCCComplexMatrix(columns, rows, _rowIndexes.length);
+    var rowCounts = new Int32List(rows);
+    for (var p = 0; p < _columnPointers[columns]; p++) {
+      rowCounts[_rowIndexes[p]]++;
     }
-    _cumsum(Cp, w, m);
-    for (var j = 0; j < n; j++) {
-      for (var p = Ap[j]; p < Ap[j + 1]; p++) {
-        // place A(i,j) as entry C(j,i)
-        Ci[q = w[Ai[p]]++] = j;
-        Cx[q] = Ax[p];
+    cumsum(C._columnPointers, rowCounts);
+    for (var j = 0; j < columns; j++) {
+      for (var p = _columnPointers[j]; p < _columnPointers[j + 1]; p++) {
+        var q = rowCounts[_rowIndexes[p]]++;
+        C._rowIndexes[q] = j;
+        C._values[q] = _values[p];
       }
     }
     return C;
   }
 
   SparseCCComplexMatrix conjugateTranspose() {
-    var m = rows;
-    var n = columns;
-    var Ap = _columnPointers;
-    var Ai = _rowIndexes;
-    var Ax = _values;
-    var C = new SparseCCComplexMatrix(columns, rows, Ai.length);
-    var w = new Int32List(m);
-    var Cp = C._columnPointers;
-    var Ci = C._rowIndexes;
-    var Cx = C._values;
-    for (var p = 0; p < Ap[n]; p++) {
-      w[Ai[p]]++;
+    var C = new SparseCCComplexMatrix(columns, rows, _rowIndexes.length);
+    var rowCounts = new Int32List(rows);
+    for (var p = 0; p < _columnPointers[columns]; p++) {
+      rowCounts[_rowIndexes[p]]++;
     }
-    _cumsum(Cp, w, m);
-    var q;
-    for (var j = 0; j < n; j++) {
-      for (var p = Ap[j]; p < Ap[j + 1]; p++) {
-        Ci[q = w[Ai[p]]++] = j;
-        Cx[2 * q] = Ax[2 * p];
-        Cx[2 * q + 1] = -Ax[2 * p + 1];
+    cumsum(C._columnPointers, rowCounts);
+    for (var j = 0; j < columns; j++) {
+      for (var p = _columnPointers[j]; p < _columnPointers[j + 1]; p++) {
+        var q = rowCounts[_rowIndexes[p]]++;
+        C._rowIndexes[q] = j;
+        C._values[2 * q] = _values[2 * p];
+        C._values[2 * q + 1] = -_values[2 * p + 1];
       }
     }
     return C;
   }
 
+  /// Numerical values (size `nzmax`).
   Float64List get values => _values;
 
   ComplexMatrix like2D(int rows, int columns) {
@@ -432,18 +401,13 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
   ComplexVector like1D(int size) => new SparseComplexVector(size);
 
   void set(int row, int column, Complex value) {
-    //int k = Sorting.binarySearchFromTo(dcs.i, row, dcs.p[column], dcs.p[column + 1] - 1);
-    int k = _searchFromTo(_rowIndexes, row, _columnPointers[column],
+    int k = searchRange(_rowIndexes, row, _columnPointers[column],
         _columnPointers[column + 1] - 1);
 
     if (k >= 0) {
-      // found
-      //if (value[0] == 0 && value[1] == 0) {
-      //  _remove(column, k);
-      //} else {
-        _values[2 * k] = value.real;
-        _values[2 * k + 1] = value.imaginary;
-      //}
+      //if (value[0] == 0 && value[1] == 0) _remove(column, k); else
+      _values[2 * k] = value.real;
+      _values[2 * k + 1] = value.imaginary;
       return;
     }
 
@@ -454,18 +418,13 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
   }
 
   void setParts(int row, int column, double re, double im) {
-    //int k = Sorting.binarySearchFromTo(dcs.i, row, dcs.p[column], dcs.p[column + 1] - 1);
-    int k = _searchFromTo(_rowIndexes, row, _columnPointers[column],
+    int k = searchRange(_rowIndexes, row, _columnPointers[column],
         _columnPointers[column + 1] - 1);
 
     if (k >= 0) {
-      // found
-      //if (re == 0 && im == 0) {
-      //  _remove(column, k);
-      //} else {
-        _values[2 * k] = re;
-        _values[2 * k + 1] = im;
-      //}
+      //if (re == 0 && im == 0) _remove(column, k); else
+      _values[2 * k] = re;
+      _values[2 * k + 1] = im;
       return;
     }
 
@@ -486,57 +445,56 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
   /// Removes (sums) duplicate entries (if any).
   void removeDuplicates() {
     int nz = 0;
-    var m = rows;
-    var n = columns;
-    var Ap = _columnPointers;
-    var Ai = _rowIndexes;
-    var Ax = _values;
-    var w = new Int32List(m);
-    for (var i = 0; i < m; i++) {
-      w[i] = -1;
+    var r = new Int32List(rows);
+    for (var i = 0; i < rows; i++) {
+      r[i] = -1;
     }
-    for (var j = 0; j < n; j++) {
+    for (var j = 0; j < columns; j++) {
       var q = nz;
-      for (var p = Ap[j]; p < Ap[j + 1]; p++) {
-        var i = Ai[p];
-        if (w[i] >= q) {
-          Ax[w[i]] += Ax[p];
+      for (var p = _columnPointers[j]; p < _columnPointers[j + 1]; p++) {
+        var i = _rowIndexes[p];
+        if (r[i] >= q) {
+          _values[r[i]] += _values[p];
         } else {
-          w[i] = nz;
-          Ai[nz] = i;
-          Ax[2 * nz] = Ax[2 * p];
-          Ax[2 * nz + 1] = Ax[2 * p + 1];
+          r[i] = nz;
+          _rowIndexes[nz] = i;
+          _values[2 * nz] = _values[2 * p];
+          _values[2 * nz + 1] = _values[2 * p + 1];
           nz++;
         }
       }
-      Ap[j] = q;
+      _columnPointers[j] = q;
     }
-    Ap[n] = nz;
+    _columnPointers[columns] = nz;
   }
 
   /// Removes zero entries (if any).
   void removeZeroes() {
     int nz = 0;
-    var n = columns;
-    var Ap = _columnPointers;
-    var Ai = _rowIndexes;
-    var Ax = _values;
-    for (var j = 0; j < n; j++) {
-      var p = Ap[j];
-      Ap[j] = nz;
-      for (; p < Ap[j + 1]; p++) {
-        if (Ax[p] != 0) {
-          Ai[nz] = Ai[p];
-          Ax[2 * nz] = Ax[2 * p];
-          Ax[2 * nz + 1] = Ax[2 * p + 1];
+    for (var j = 0; j < columns; j++) {
+      var p = _columnPointers[j];
+      _columnPointers[j] = nz;
+      for (; p < _columnPointers[j + 1]; p++) {
+        if (_values[2 * p] != 0 || _values[2 * p + 1] != 0) {
+          _rowIndexes[nz] = _rowIndexes[p];
+          _values[2 * nz] = _values[2 * p];
+          _values[2 * nz + 1] = _values[2 * p + 1];
           nz++;
         }
       }
     }
-    Ap[n] = nz;
+    _columnPointers[columns] = nz;
   }
 
-  void trimToSize() => _realloc(0);
+  void trimToSize() {
+    var nzmax = _columnPointers[columns];
+    var rowIndexesNew = new Int32List(nzmax);
+    rowIndexesNew.setAll(0, _rowIndexes);
+    _rowIndexes = rowIndexesNew;
+    var valuesNew = new Float64List(2 * nzmax);
+    valuesNew.setAll(0, _values);
+    _values = valuesNew;
+  }
 
   String toString() {
     var buf = new StringBuffer();
@@ -544,49 +502,21 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
     for (int i = 0; i < columns; i++) {
       int high = _columnPointers[i + 1];
       for (int j = _columnPointers[i]; j < high; j++) {
+        buf.write('(${_rowIndexes[j]},$i)    ${_values[2 * j]}');
         if (_values[2 * j + 1] > 0) {
-          buf
-            ..write('(')
-            ..write(_rowIndexes[j])
-            ..write(',')
-            ..write(i)
-            ..write(')')
-            ..write('\t')
-            ..write(_values[2 * j])
-            ..write('+')
-            ..write(_values[2 * j + 1])
-            ..write('i')
-            ..write('\n');
+          buf.write('+${_values[2 * j + 1]}i\n');
         } else if (_values[2 * j + 1] == 0) {
-          buf
-            ..write('(')
-            ..write(_rowIndexes[j])
-            ..write(',')
-            ..write(i)
-            ..write(')')
-            ..write('\t')
-            ..write(_values[2 * j])
-            ..write('\n');
+          buf.write('\n');
         } else {
-          buf
-            ..write('(')
-            ..write(_rowIndexes[j])
-            ..write(',')
-            ..write(i)
-            ..write(')')
-            ..write('\t')
-            ..write(_values[2 * j]) /*..write('-')*/ ..write(_values[2 * j + 1])
-            ..write('i')
-            ..write('\n');
+          buf.write('${_values[2 * j + 1]}i\n');
         }
       }
     }
     return buf.toString();
   }
 
-  ComplexVector mult(ComplexVector y,
-      [ComplexVector z = null, Complex alpha = null,
-      Complex beta = null, bool transposeA = false]) {
+  ComplexVector mult(ComplexVector y, [ComplexVector z = null,
+      Complex alpha = null, Complex beta = null, bool transposeA = false]) {
     if (alpha == null) {
       alpha = Complex.ONE;
     }
@@ -601,7 +531,7 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
       z = new DenseComplexVector(rowsA);
     }
 
-    if (!(y is DenseComplexVector && z is DenseComplexVector)) {
+    if (y is! DenseComplexVector || z is! DenseComplexVector) {
       return super.mult(y, z, alpha, beta, transposeA);
     }
 
@@ -636,7 +566,8 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
 
       for (int i = 0; i < columns; i++) {
         int high = columnPointersA[i + 1];
-        var yElem = new Complex(elementsY[zeroY + strideY * i], elementsY[zeroY + strideY * i + 1]);
+        var yElem = new Complex(
+            elementsY[zeroY + strideY * i], elementsY[zeroY + strideY * i + 1]);
         for (int k = columnPointersA[i]; k < high; k++) {
           int j = rowIndexesA[k];
           var valA = new Complex(valuesA[2 * k], valuesA[2 * k + 1]);
@@ -653,7 +584,7 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
         for (int k = _columnPointers[i]; k < high; k++) {
           var valA = new Complex(valuesA[2 * k], -valuesA[2 * k + 1]);
           var valY = new Complex(elementsY[zeroY + strideY * _rowIndexes[k]],
-          elementsY[zeroY + strideY * _rowIndexes[k] + 1]);
+              elementsY[zeroY + strideY * _rowIndexes[k] + 1]);
           sum += valA * valY;
         }
         sum = alpha * sum;
@@ -667,9 +598,8 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
     return z;
   }
 
-  ComplexMatrix multiply(ComplexMatrix B,
-      [ComplexMatrix C = null, Complex alpha = null,
-      Complex beta = null, bool transposeA = false,
+  ComplexMatrix multiply(ComplexMatrix B, [ComplexMatrix C = null,
+      Complex alpha = null, Complex beta = null, bool transposeA = false,
       bool transposeB = false]) {
     if (alpha == null) {
       alpha = Complex.ONE;
@@ -721,7 +651,7 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
       C.apply(cfunc.multiply(beta));
     }
 
-    if ((B is DenseComplexMatrix) && (C is DenseComplexMatrix)) {
+    if (B is DenseComplexMatrix && C is DenseComplexMatrix) {
       SparseCCComplexMatrix AA;
       if (transposeA) {
         AA = conjugateTranspose();
@@ -751,21 +681,23 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
       for (int jj = 0; jj < columnsB; jj++) {
         for (int kk = 0; kk < columnsA; kk++) {
           int high = columnPointersA[kk + 1];
-          var valB = new Complex(elementsB[zeroB + kk * rowStrideB + jj * columnStrideB],
-            elementsB[zeroB + kk * rowStrideB + jj * columnStrideB + 1]);
+          var valB = new Complex(
+              elementsB[zeroB + kk * rowStrideB + jj * columnStrideB],
+              elementsB[zeroB + kk * rowStrideB + jj * columnStrideB + 1]);
           for (int ii = columnPointersA[kk]; ii < high; ii++) {
             int j = rowIndexesA[ii];
             var valA = new Complex(valuesA[2 * ii], valuesA[2 * ii + 1]);
             valA = valA * valB;
             elementsC[zeroC + j * rowStrideC + jj * columnStrideC] += valA.real;
-            elementsC[zeroC + j * rowStrideC + jj * columnStrideC + 1] += valA.imaginary;
+            elementsC[zeroC + j * rowStrideC + jj * columnStrideC + 1] +=
+                valA.imaginary;
           }
         }
       }
       if (!(alpha.real == 1.0 && alpha.imaginary == 0)) {
         C.apply(cfunc.multiply(alpha));
       }
-    } else if ((B is SparseCCComplexMatrix) && (C is SparseCCComplexMatrix)) {
+    } else if (B is SparseCCComplexMatrix && C is SparseCCComplexMatrix) {
       SparseCCComplexMatrix AA;
       if (transposeA) {
         AA = conjugateTranspose();
@@ -778,38 +710,36 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
       }
       SparseCCComplexMatrix CC = C;
       int nz = 0;
-      var m = rowsA;
-      var n = columnsB;
-      var Bp = BB._columnPointers;
-      var Bi = BB._rowIndexes;
-      var Bx = BB._values;
-      var w = new Int32List(m);
-      var x = new Float64List(2 * m);
-      var Cp = CC._columnPointers;
-      var Ci = CC._rowIndexes;
-      var Cx = CC._values;
-      for (var j = 0; j < n; j++) {
+      var columnPointersB = BB._columnPointers;
+      var rowIndexesB = BB._rowIndexes;
+      var valuesB = BB._values;
+      var w = new Int32List(rowsA);
+      var x = new Float64List(2 * rowsA);
+      var columnPointersC = CC._columnPointers;
+      var rowIndexesC = CC._rowIndexes;
+      var valuesC = CC._values;
+      for (var j = 0; j < columnsB; j++) {
         int nzmaxC = CC._rowIndexes.length;
-        if (nz + m > nzmaxC) {
-          nzmaxC = 2 * nzmaxC + m;
+        if (nz + rowsA > nzmaxC) {
+          nzmaxC = 2 * nzmaxC + rowsA;
           var rowIndexesNew = new Int32List(nzmaxC);
-          rowIndexesNew.setAll(0, Ci);
-          Ci = rowIndexesNew;
+          rowIndexesNew.setAll(0, rowIndexesC);
+          rowIndexesC = rowIndexesNew;
           var valuesNew = new Float64List(2 * nzmaxC);
-          valuesNew.setAll(0, Cx);
-          Cx = valuesNew;
+          valuesNew.setAll(0, valuesC);
+          valuesC = valuesNew;
         }
-        Cp[j] = nz;
-        for (p = Bp[j]; p < Bp[j + 1]; p++) {
-          var elemB = new Complex(Bx[2 * p], Bx[2 * p + 1]);
-          nz = _scatter(AA, Bi[p], elemB, w, x, j + 1, CC, nz);
+        columnPointersC[j] = nz;
+        for (p = columnPointersB[j]; p < columnPointersB[j + 1]; p++) {
+          var elemB = new Complex(valuesB[2 * p], valuesB[2 * p + 1]);
+          nz = _toDense(AA, rowIndexesB[p], elemB, w, x, j + 1, CC, nz);
         }
-        for (p = Cp[j]; p < nz; p++) {
-          Cx[2 * p] = x[2 * Ci[p]];
-          Cx[2 * p + 1] = x[2 * Ci[p] + 1];
+        for (p = columnPointersC[j]; p < nz; p++) {
+          valuesC[2 * p] = x[2 * rowIndexesC[p]];
+          valuesC[2 * p + 1] = x[2 * rowIndexesC[p] + 1];
         }
       }
-      Cp[n] = nz;
+      columnPointersC[columnsB] = nz;
       if (!(alpha.real == 1.0 && alpha.imaginary == 0)) {
         CC.apply(cfunc.multiply(alpha));
       }
@@ -829,14 +759,11 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
 
       var fn = cfunc.ComplexPlusMultSecond.plusMult(Complex.ZERO);
 
-      Int32List rowIndexesA = _rowIndexes;
-      Int32List columnPointersA = _columnPointers;
-      Float64List valuesA = _values;
       for (int i = columns; --i >= 0;) {
-        int low = columnPointersA[i];
-        for (int k = columnPointersA[i + 1]; --k >= low;) {
-          int j = rowIndexesA[k];
-          var valA = new Complex(valuesA[2 * k], valuesA[2 * k + 1]);
+        int low = _columnPointers[i];
+        for (int k = _columnPointers[i + 1]; --k >= low;) {
+          int j = _rowIndexes[k];
+          var valA = new Complex(_values[2 * k], _values[2 * k + 1]);
           fn.multiplicator = valA * alpha;
           if (!transposeA) {
             Crows[j].assign(Brows[i], fn);
@@ -894,62 +821,21 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
     _values = new Float64List.fromList(valuesList);
   }*/
 
-  static int _searchFromTo(Int32List list, int key, int from, int to) {
-    while (from <= to) {
-      if (list[from] == key) {
-        return from;
-      } else {
-        from++;
-        continue;
-      }
-    }
-    return -(from + 1); // key not found.
-  }
-
-  static int _cumsum(Int32List p, Int32List c, int n) {
-    int nz = 0;
-    int nz2 = 0;
-    for (int k = 0; k < n; k++) {
-      p[k] = nz;
-      nz += c[k];
-      nz2 += c[k];
-      c[k] = p[k];
-    }
-    p[n] = nz;
-    return nz2;
-  }
-
-  void _realloc(int nzmax) {
-    if (nzmax <= 0) {
-      nzmax = _columnPointers[columns];
-    }
-    var rowIndexesNew = new Int32List(nzmax);
-    rowIndexesNew.setAll(0, _rowIndexes);
-    _rowIndexes = rowIndexesNew;
-    var valuesNew = new Float64List(2 * nzmax);
-    valuesNew.setAll(0, _values);
-    _values = valuesNew;
-  }
-
-  int _scatter(SparseCCComplexMatrix A, int j, Complex beta, Int32List w,
+  static int _toDense(SparseCCComplexMatrix A, int j, Complex beta, Int32List w,
       Float64List x, int mark, SparseCCComplexMatrix C, int nz) {
-    var Ap = A._columnPointers;
-    var Ai = A._rowIndexes;
-    var Ax = A._values;
-    var Ci = C._rowIndexes;
-    for (var p = Ap[j]; p < Ap[j + 1]; p++) {
-      var i = Ai[p];
+    for (var p = A._columnPointers[j]; p < A._columnPointers[j + 1]; p++) {
+      var i = A._rowIndexes[p];
       if (w[i] < mark) {
         w[i] = mark;
-        Ci[nz++] = i;
+        C._rowIndexes[nz++] = i;
         if (x != null) {
-          var valA = new Complex(Ax[2 * p], Ax[2 * p + 1]);
+          var valA = new Complex(A._values[2 * p], A._values[2 * p + 1]);
           valA = beta * valA;
           x[2 * i] = valA.real;
           x[2 * i + 1] = valA.imaginary;
         }
       } else if (x != null) {
-        var valA = new Complex(Ax[2 * p], Ax[2 * p + 1]);
+        var valA = new Complex(A._values[2 * p], A._values[2 * p + 1]);
         valA = beta * valA;
         x[2 * i] += valA.real;
         x[2 * i + 1] += valA.imaginary;

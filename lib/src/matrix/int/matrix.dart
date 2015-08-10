@@ -33,7 +33,7 @@ import '../../function/int.dart' as ifunc;
 
 import 'factory.dart' as ifactory;
 
-import '../../math.dart' show MAX_INT;
+import '../../math.dart' show MAX_INT, cumsum, toDense, searchRange;
 
 import 'property.dart' as iprop;
 
