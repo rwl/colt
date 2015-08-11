@@ -2,13 +2,14 @@
 
 A [Dart][] library for vector and matrix algebra.
 
-[![Build Status](https://travis-ci.org/rwl/colt.svg)](https://travis-ci.org/rwl/colt)
-
 Includes fixed sized (non-resizable) dense and sparse matrices for `int`,
 `double` and `Complex` types.
 
 A Dart translation of [ParallelColt][] which in turn is based on the
 original [Colt][] project from CERN.
+
+[![Build Status](https://travis-ci.org/rwl/colt.svg)](https://travis-ci.org/rwl/colt)
+[![Coverage Status](https://coveralls.io/repos/rwl/colt/badge.svg?branch=master&service=github)](https://coveralls.io/github/rwl/colt?branch=master)
 
 ### Example
 
