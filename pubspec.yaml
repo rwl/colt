@@ -1,11 +1,13 @@
 name: colt
 version: 0.1.0
+author: Richard Lincoln <r.w.lincoln@gmail.com>
 description: Vector and matrix algebra package
+homepage: https://github.com/rwl/colt
 dependencies:
-  intl: any
-  complex: any
-  quiver: any
+  complex: '>=0.1.1 <0.2.0'
+  intl: '>=0.12.3 <0.13.0'
+  quiver: '>=0.21.4 <0.22.0'
 dev_dependencies:
-  test: any
-  benchmark_harness: ">=1.0.0 <2.0.0"
-  browser: any
+  benchmark_harness: '>=1.0.0 <2.0.0'
+  browser: '>=0.10.0+2 < 0.11.0'
+  test: '>=0.12.0 <0.13.0'
