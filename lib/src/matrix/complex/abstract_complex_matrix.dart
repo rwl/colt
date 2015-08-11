@@ -449,10 +449,9 @@ abstract class ComplexMatrix extends AbstractMatrix {
           ", " +
           zz.toStringShort());
     }
-    var s = Complex.ZERO;
+
     for (int r = 0; r < rows; r++) {
-      s[0] = 0.0;
-      s[1] = 0.0;
+      var s = Complex.ZERO;
       for (int c = 0; c < columns; c++) {
         s += get(r, c) * y.get(c);
       }

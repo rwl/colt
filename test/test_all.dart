@@ -9,6 +9,6 @@ main() {
   doubleVectorTests();
   doubleMatrixTests();
 
-//  complexVectorTests();
-//  complexMatrixTests();
+  complexVectorTests();
+  complexMatrixTests();
 }

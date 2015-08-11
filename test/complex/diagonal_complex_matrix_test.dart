@@ -460,7 +460,7 @@ testDiagonalComplexMatrix(bool view) {
       for (int r = 0; r < NCOLUMNS; r++) {
         for (int c = 0; c < NCOLUMNS; c++) {
           expect(expected[r][2 * c], closeTo(C.at(r, c).real, TOL));
-          expect(expected[r][2 * c + 1], closeTo(C.at(r, c).real, TOL));
+          expect(expected[r][2 * c + 1], closeTo(C.at(r, c).imaginary, TOL));
         }
       }
       //---

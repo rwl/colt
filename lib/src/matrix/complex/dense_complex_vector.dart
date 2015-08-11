@@ -514,8 +514,7 @@ class DenseComplexVector extends ComplexVector {
     }
     int idx = zero;
     for (int k = 0; k < size; k++) {
-      sum[0] += _elements[idx];
-      sum[1] += _elements[idx + 1];
+      sum += new Complex(_elements[idx], _elements[idx + 1]);
       idx += stride;
     }
     return sum;
