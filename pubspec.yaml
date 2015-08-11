@@ -1,5 +1,5 @@
 name: colt
-version: 0.0.1
+version: 0.1.0
 description: Vector and matrix algebra package
 dependencies:
   intl: any
