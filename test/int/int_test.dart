@@ -23,13 +23,13 @@ intVectorTests() {
 }
 
 intMatrixTests() {
-//  testIntMatrix('dense', DenseIntMatrix.create);
-//  testIntMatrix('dense view', _dice(DenseIntMatrix.create));
-//  testDenseIntMatrix('raw', DenseIntMatrix.create);
-//  testDenseIntMatrix('view', _dice(DenseIntMatrix.create));
-//
-//  testIntMatrix('sparse', SparseIntMatrix.create);
-//  testIntMatrix('sparse view', _dice(SparseIntMatrix.create));
+  testIntMatrix('dense', DenseIntMatrix.create);
+  testIntMatrix('dense view', _dice(DenseIntMatrix.create));
+  testDenseIntMatrix('raw', DenseIntMatrix.create);
+  testDenseIntMatrix('view', _dice(DenseIntMatrix.create));
+
+  testIntMatrix('sparse', SparseIntMatrix.create);
+  testIntMatrix('sparse view', _dice(SparseIntMatrix.create));
 
   testIntMatrix('sparse rc', SparseRCIntMatrix.create);
   testIntMatrix('sparse rc view', _dice(SparseRCIntMatrix.create));

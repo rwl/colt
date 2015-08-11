@@ -502,7 +502,7 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
     for (int i = 0; i < columns; i++) {
       int high = _columnPointers[i + 1];
       for (int j = _columnPointers[i]; j < high; j++) {
-        buf.write('(${_rowIndexes[j]},$i)    ${_values[2 * j]}');
+        buf.write('(${_rowIndexes[j]},$i)\t${_values[2 * j]}');
         if (_values[2 * j + 1] > 0) {
           buf.write('+${_values[2 * j + 1]}i\n');
         } else if (_values[2 * j + 1] == 0) {

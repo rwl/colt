@@ -457,7 +457,7 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
     for (int i = 0; i < columns; i++) {
       int high = _columnPointers[i + 1];
       for (int j = _columnPointers[i]; j < high; j++) {
-        buf.write('(${_rowIndexes[j]},$i)    ${_values[j]}\n');
+        buf.write('(${_rowIndexes[j]},$i)\t${_values[j]}\n');
       }
     }
     return buf.toString();

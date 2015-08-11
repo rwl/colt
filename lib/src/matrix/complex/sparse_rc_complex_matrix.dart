@@ -611,13 +611,13 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
     for (int i = 0; i < rows; i++) {
       int high = _rowPointers[i + 1];
       for (int j = _rowPointers[i]; j < high; j++) {
-        buf.write('($i,${_columnIndexes[j]})    ');
+        buf.write('($i,${_columnIndexes[j]})\t${_values[2 * j]}');
         if (_values[2 * j + 1] > 0) {
-          buf.write('${_values[2 * j]}+${_values[2 * j + 1]}i\n');
+          buf.write('+${_values[2 * j + 1]}i\n');
         } else if (_values[2 * j + 1] == 0) {
-          buf.write('${_values[2 * j]}\n');
+          buf.write('\n');
         } else {
-          buf.write('${_values[2 * j]}${_values[2 * j + 1]}i\n');
+          buf.write('${_values[2 * j + 1]}i\n');
         }
       }
     }

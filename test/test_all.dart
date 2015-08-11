@@ -3,7 +3,7 @@ import 'int/int_test.dart';
 import 'complex/complex_test.dart';
 
 main() {
-//  intVectorTests();
+  intVectorTests();
   intMatrixTests();
 
 //  doubleVectorTests();

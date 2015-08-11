@@ -70,7 +70,7 @@ int cumsum(Int32List p, Int32List c) {
 }
 
 int toDense(Int32List columnPointersA, Int32List rowIndexesA, List<num> valuesA,
-    int j, num beta, Int32List w, Float64List x, int mark,
+    int j, num beta, Int32List w, List<num> x, int mark,
     Int32List rowIndexesC, int nz) {
   for (var p = columnPointersA[j]; p < columnPointersA[j + 1]; p++) {
     var i = rowIndexesA[p];

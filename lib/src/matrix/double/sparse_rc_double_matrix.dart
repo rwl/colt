@@ -497,7 +497,7 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
     for (int i = 0; i < rows; i++) {
       int high = _rowPointers[i + 1];
       for (int j = _rowPointers[i]; j < high; j++) {
-        buf.write('($i,${_columnIndexes[j]})    ${_values[j]}\n');
+        buf.write('($i,${_columnIndexes[j]})\t${_values[j]}\n');
       }
     }
     return buf.toString();
