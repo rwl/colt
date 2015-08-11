@@ -1,9 +1,10 @@
 name: colt
 version: 0.0.1
-description: A pub package
+description: Vector and matrix algebra package
 dependencies:
   intl: any
   complex: any
+  quiver: any
 dev_dependencies:
   test: any
   benchmark_harness: ">=1.0.0 <2.0.0"
