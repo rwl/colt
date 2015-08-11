@@ -1,5 +1,5 @@
 name: colt
-version: 0.1.0
+version: 0.1.1
 author: Richard Lincoln <r.w.lincoln@gmail.com>
 description: Vector and matrix algebra package
 homepage: https://github.com/rwl/colt
