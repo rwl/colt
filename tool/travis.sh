@@ -6,8 +6,8 @@ set -e
 $(dirname -- "$0")/ensure_dartfmt.sh
 
 # Run the tests.
-#dart -c test/test_all.dart
-pub run test
+dart -c test/test_all.dart
+#pub run test
 
 # Install dart_coveralls; gather and send coverage data.
 if [ "$COVERALLS_TOKEN" ] && [ "$TRAVIS_DART_VERSION" = "stable" ]; then
