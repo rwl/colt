@@ -3,4 +3,10 @@ sudo: false
 dart:
   - stable
 #  - dev
+before_install:
+ - chmod +x tool/travis.sh
+ - chmod +x tool/ensure_dartfmt.sh
 script: ./tool/travis.sh
+notifications:
+  email:
+    on_failure: change
