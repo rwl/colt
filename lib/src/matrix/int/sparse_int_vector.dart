@@ -66,7 +66,7 @@ class SparseIntVector extends IntVector {
   Object get elements => _elements;
 
   int get(int index) {
-    final i = zero + index * stride;
+    var i = zero + index * stride;
     if (_elements.containsKey(i)) {
       return _elements[i];
     } else {
@@ -86,7 +86,7 @@ class SparseIntVector extends IntVector {
     if (rows * columns != size) {
       throw new ArgumentError("rows*columns != size");
     }
-    final M = new SparseIntMatrix(rows, columns);
+    var M = new SparseIntMatrix(rows, columns);
     int idx = 0;
     for (int c = 0; c < columns; c++) {
       for (int r = 0; r < rows; r++) {

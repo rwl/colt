@@ -7,7 +7,7 @@ testDenseIntMatrix(String kind, IntMatrix make(int rows, int columns)) {
       A = make(NROWS, NCOLUMNS);
     });
     test('setAll', () {
-      final expected = new Int32List(A.size);
+      var expected = new Int32List(A.size);
       for (int i = 0; i < A.size; i++) {
         expected[i] = random.nextInt(MAX_INT);
       }

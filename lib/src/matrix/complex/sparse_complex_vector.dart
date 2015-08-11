@@ -81,7 +81,7 @@ class SparseComplexVector extends ComplexVector {
     return new SparseComplexMatrix(rows, columns);
   }
 
-  ComplexMatrix reshape(final int rows, final int columns) {
+  ComplexMatrix reshape(int rows, int columns) {
     if (rows * columns != size) {
       throw new ArgumentError("rows*columns != size");
     }

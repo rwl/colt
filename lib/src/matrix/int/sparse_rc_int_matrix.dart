@@ -68,7 +68,7 @@ class SparseRCIntMatrix extends WrapperIntMatrix {
       _columnIndexes[r] = columnIndexes[k];
       values[r] = value;
     }
-    final m = new SparseRCIntMatrix._internal(
+    var m = new SparseRCIntMatrix._internal(
         rows, columns, rowPointers, _columnIndexes, values);
     if (removeDuplicates) {
       m.removeDuplicates();
@@ -104,7 +104,7 @@ class SparseRCIntMatrix extends WrapperIntMatrix {
       _columnIndexes[r] = columnIndexes[k];
       _values[r] = values[k];
     }
-    final m = new SparseRCIntMatrix._internal(
+    var m = new SparseRCIntMatrix._internal(
         rows, columns, rowPointers, _columnIndexes, _values);
     if (removeZeroes) {
       m.removeZeroes();
@@ -133,7 +133,7 @@ class SparseRCIntMatrix extends WrapperIntMatrix {
     return new SparseRCIntMatrix(rows, columns);
   }
 
-  void apply(final ifunc.IntFunction fn) {
+  void apply(ifunc.IntFunction fn) {
     if (fn is ifunc.IntMult) {
       // x[i] = mult*x[i]
       int alpha = fn.multiplicator;
@@ -205,7 +205,7 @@ class SparseRCIntMatrix extends WrapperIntMatrix {
     }
   }
 
-  void assign(final IntMatrix y, ifunc.IntIntFunction fn) {
+  void assign(IntMatrix y, ifunc.IntIntFunction fn) {
     checkShape(this, y);
     if (y is SparseRCIntMatrix && fn == ifunc.plus) {
       // x[i] = x[i] + y[i]
@@ -329,7 +329,7 @@ class SparseRCIntMatrix extends WrapperIntMatrix {
 
   int get cardinality => _rowPointers[rows];
 
-  void forEachNonZero(final ifunc.IntIntIntFunction fn) {
+  void forEachNonZero(ifunc.IntIntIntFunction fn) {
     for (int i = rows; --i >= 0;) {
       int low = _rowPointers[i];
       for (int k = _rowPointers[i + 1]; --k >= low;) {
@@ -509,8 +509,8 @@ class SparseRCIntMatrix extends WrapperIntMatrix {
     _values = valuesNew;
   }
 
-  IntVector mult(IntVector y, [IntVector z = null, final int alpha = 1,
-      int beta = null, final bool transposeA = false]) {
+  IntVector mult(IntVector y, [IntVector z = null, int alpha = 1,
+      int beta = null, bool transposeA = false]) {
     if (beta == null) {
       beta = z == null ? 1 : 0;
     }
@@ -632,9 +632,9 @@ class SparseRCIntMatrix extends WrapperIntMatrix {
     return z;
   }
 
-  IntMatrix multiply(IntMatrix B, [IntMatrix C = null, final int alpha = 1,
-      int beta = null, final bool transposeA = false,
-      final bool transposeB = false]) {
+  IntMatrix multiply(IntMatrix B, [IntMatrix C = null, int alpha = 1,
+      int beta = null, bool transposeA = false,
+      bool transposeB = false]) {
     if (beta == null) {
       beta = C == null ? 1 : 0;
     }
@@ -786,11 +786,11 @@ class SparseRCIntMatrix extends WrapperIntMatrix {
         B = B.dice();
       }
       // cache views
-      final List<IntVector> Brows = new List<IntVector>(columnsA);
+      List<IntVector> Brows = new List<IntVector>(columnsA);
       for (int i = columnsA; --i >= 0;) {
         Brows[i] = B.row(i);
       }
-      final List<IntVector> Crows = new List<IntVector>(rowsA);
+      List<IntVector> Crows = new List<IntVector>(rowsA);
       for (int i = rowsA; --i >= 0;) {
         Crows[i] = C.row(i);
       }

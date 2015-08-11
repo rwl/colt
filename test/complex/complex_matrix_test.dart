@@ -257,9 +257,9 @@ testComplexMatrix(
     });
 
     test('select', () {
-      final rowIndexes = new Int32List.fromList(
+      var rowIndexes = new Int32List.fromList(
           [A.rows ~/ 6, A.rows ~/ 5, A.rows ~/ 4, A.rows ~/ 3, A.rows ~/ 2]);
-      final colIndexes = new Int32List.fromList([
+      var colIndexes = new Int32List.fromList([
         A.columns ~/ 6,
         A.columns ~/ 5,
         A.columns ~/ 4,
@@ -293,8 +293,8 @@ testComplexMatrix(
       for (int i = 0; i < y.size; i++) {
         y.set(i, new Complex(random.nextDouble(), random.nextDouble()));
       }
-      final alpha = new Complex(3.0, 2.0);
-      final beta = new Complex(5.0, 4.0);
+      var alpha = new Complex(3.0, 2.0);
+      var beta = new Complex(5.0, 4.0);
       ComplexVector z = null;
       z = A.mult(y, z, alpha, beta, false);
       var expected = new Float64List(2 * A.rows);

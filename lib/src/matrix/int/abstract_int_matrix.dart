@@ -35,7 +35,7 @@ abstract class IntMatrix extends AbstractMatrix {
   ///     // Sum( x[row,col]*x[row,col] )
   ///     matrix.aggregate(F.plus, F.square);
   ///     --> 14
-  int aggregate(final ifunc.IntIntFunction aggr, final ifunc.IntFunction fn) {
+  int aggregate(ifunc.IntIntFunction aggr, ifunc.IntFunction fn) {
     if (size == 0) {
       throw new ArgumentError("size == 0");
     }
@@ -65,7 +65,7 @@ abstract class IntMatrix extends AbstractMatrix {
   ///     2 x 2 matrix
   ///     0.479426  0.997495
   ///     0.598472 -0.350783
-  void apply(final ifunc.IntFunction fn) {
+  void apply(ifunc.IntFunction fn) {
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < columns; c++) {
         set(r, c, fn(get(r, c)));
@@ -74,7 +74,7 @@ abstract class IntMatrix extends AbstractMatrix {
   }
 
   /// Sets all cells to the state specified by [value].
-  void fill(final int value) {
+  void fill(int value) {
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < columns; c++) {
         set(r, c, value);
@@ -85,7 +85,7 @@ abstract class IntMatrix extends AbstractMatrix {
   /// Sets all cells to the state specified by [values]. [values]
   /// is required to have the form `values[row*column]` and elements
   /// have to be stored in a row-wise order.
-  void setAll(final Int32List values) {
+  void setAll(Int32List values) {
     if (values.length != rows * columns) {
       throw new ArgumentError("Must have same length: length=${values.length} "
           "rows()*columns()=${rows * columns}");
@@ -140,7 +140,7 @@ abstract class IntMatrix extends AbstractMatrix {
   ///     m1 == 2 x 2 matrix
   ///     1   1
   ///     16 729
-  void assign(final IntMatrix y, final ifunc.IntIntFunction fn) {
+  void assign(IntMatrix y, ifunc.IntIntFunction fn) {
     checkShape(this, y);
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < columns; c++) {
@@ -184,7 +184,7 @@ abstract class IntMatrix extends AbstractMatrix {
   /// Assigns the result of a function to each non-zero cell;
   /// `x[row,col] = function(x[row,col])`. Use this method for fast
   /// special-purpose iteration.
-  void forEachNonZero(final ifunc.IntIntIntFunction fn) {
+  void forEachNonZero(ifunc.IntIntIntFunction fn) {
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < columns; c++) {
         int value = get(r, c);
@@ -552,8 +552,8 @@ abstract class IntMatrix extends AbstractMatrix {
   /// `z = alpha * A * y + beta*z`.
   /// `z[i] = alpha*Sum(A[i,j] * y[j]) + beta*z[i], i=0..A.rows()-1, j=0..y.length-1`.
   /// Where `A == this`.
-  IntVector mult(final IntVector y, [IntVector z = null,
-      final int alpha = 1, int beta = null, final bool transposeA = false]) {
+  IntVector mult(IntVector y, [IntVector z = null,
+      int alpha = 1, int beta = null, bool transposeA = false]) {
     if (beta == null) {
       beta = z == null ? 1 : 0;
     }
@@ -589,9 +589,9 @@ abstract class IntMatrix extends AbstractMatrix {
   /// `C = alpha * A x B + beta*C`.
   /// `C[i,j] = alpha*Sum(A[i,k] * B[k,j]) + beta*C[i,j], k=0..n-1`.
   /// Matrix shapes: `A(m x n), B(n x p), C(m x p)`.
-  IntMatrix multiply(final IntMatrix B,
-      [IntMatrix C = null, final int alpha = 1, int beta = null,
-      final bool transposeA = false, final bool transposeB = false]) {
+  IntMatrix multiply(IntMatrix B,
+      [IntMatrix C = null, int alpha = 1, int beta = null,
+      bool transposeA = false, bool transposeB = false]) {
     if (beta == null) {
       beta = C == null ? 1 : 0;
     }

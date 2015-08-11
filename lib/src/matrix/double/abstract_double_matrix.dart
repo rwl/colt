@@ -71,7 +71,7 @@ abstract class DoubleMatrix extends AbstractMatrix {
   ///     2 x 2 matrix
   ///     0.479426  0.997495
   ///     0.598472 -0.350783
-  void apply(final DoubleFunction fn) {
+  void apply(DoubleFunction fn) {
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < columns; c++) {
         set(r, c, fn(get(r, c)));
@@ -80,7 +80,7 @@ abstract class DoubleMatrix extends AbstractMatrix {
   }
 
   /// Sets all cells to the state specified by `value`.
-  void fill(final double value) {
+  void fill(double value) {
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < columns; c++) {
         set(r, c, value.toDouble());
@@ -146,7 +146,7 @@ abstract class DoubleMatrix extends AbstractMatrix {
   ///      m1 == 2 x 2 matrix
   ///      1   1
   ///      16 729
-  void assign(final DoubleMatrix y, final DoubleDoubleFunction fn) {
+  void assign(DoubleMatrix y, DoubleDoubleFunction fn) {
     checkShape(this, y);
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < columns; c++) {
@@ -188,7 +188,7 @@ abstract class DoubleMatrix extends AbstractMatrix {
   }
 
   /// Applies a function to each `non-zero` cell;
-  void forEachNonZero(final func.IntIntDoubleFunction fn) {
+  void forEachNonZero(func.IntIntDoubleFunction fn) {
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < columns; c++) {
         double value = get(r, c);
@@ -256,8 +256,8 @@ abstract class DoubleMatrix extends AbstractMatrix {
   /// specified lists. Fills into the lists, starting at index 0. After this
   /// call returns the specified lists all have a new size, the number of
   /// negative values.
-  void negative(final List<int> rowList, final List<int> columnList,
-      final List<double> valueList) {
+  void negative(List<int> rowList, List<int> columnList,
+      List<double> valueList) {
     rowList.clear();
     columnList.clear();
     valueList.clear();
@@ -289,8 +289,8 @@ abstract class DoubleMatrix extends AbstractMatrix {
   ///     valueList  = (8,7)
   ///
   /// In other words, `get(0,2) == 8, get(1,1) == 7`.
-  void nonzero(final List<int> rowList, final List<int> columnList,
-      final List<double> valueList) {
+  void nonzero(List<int> rowList, List<int> columnList,
+      List<double> valueList) {
     rowList.clear();
     columnList.clear();
     valueList.clear();
@@ -310,8 +310,8 @@ abstract class DoubleMatrix extends AbstractMatrix {
   /// specified lists. Fills into the lists, starting at index 0. After this
   /// call returns the specified lists all have a new size, the number of
   /// positive values.
-  void positive(final List<int> rowList, final List<int> columnList,
-      final List<double> valueList) {
+  void positive(List<int> rowList, List<int> columnList,
+      List<double> valueList) {
     rowList.clear();
     columnList.clear();
     valueList.clear();
@@ -503,7 +503,7 @@ abstract class DoubleMatrix extends AbstractMatrix {
   /// Linear algebraic matrix-vector multiplication;
   /// `z = alpha * A * y + beta*z`.
   /// `z[i] = alpha*Sum(A[i,j] * y[j]) + beta*z[i], i=0..A.rows-1, j=0..y.size-1`.
-  DoubleVector mult(final DoubleVector y,
+  DoubleVector mult(DoubleVector y,
       [DoubleVector z = null, double alpha = 1.0, double beta = 0.0,
       bool transposeA = false]) {
     if (transposeA) {
@@ -539,7 +539,7 @@ abstract class DoubleMatrix extends AbstractMatrix {
   /// `C[i,j] = alpha*Sum(A[i,k] * B[k,j]) + beta*C[i,j], k=0..n-1`.
   ///
   /// Matrix shapes: `A(m x n), B(n x p), C(m x p)`.
-  DoubleMatrix multiply(final DoubleMatrix B,
+  DoubleMatrix multiply(DoubleMatrix B,
       [DoubleMatrix C = null, double alpha = 1.0, double beta = 0.0,
       bool transposeA = false, bool transposeB = false]) {
     if (transposeA) {

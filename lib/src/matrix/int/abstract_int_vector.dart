@@ -33,7 +33,7 @@ abstract class IntVector
   ///     // Sum( x[i]*x[i] )
   ///     matrix.aggregate(F.plus,F.square);
   ///     --> 14
-  int aggregate(final ifunc.IntIntFunction aggr, final ifunc.IntFunction fn) {
+  int aggregate(ifunc.IntIntFunction aggr, ifunc.IntFunction fn) {
     if (size == 0) {
       throw new ArgumentError("size == 0");
     }
@@ -53,14 +53,14 @@ abstract class IntVector
   ///     matrix.apply(F.sin);
   ///     -->
   ///     matrix ==  0.479426 0.997495 0.598472 -0.350783
-  void apply(final ifunc.IntFunction fn) {
+  void apply(ifunc.IntFunction fn) {
     for (int i = 0; i < size; i++) {
       set(i, fn(get(i)));
     }
   }
 
   /// Sets all cells to the state specified by [value].
-  void fill(final int value) {
+  void fill(int value) {
     for (int i = 0; i < size; i++) {
       set(i, value);
     }
@@ -68,7 +68,7 @@ abstract class IntVector
 
   /// Sets all cells to the state specified by [values]. [values]
   /// is required to have the same number of cells as the receiver.
-  void setAll(final Int32List values) {
+  void setAll(Int32List values) {
     if (values.length != size) {
       throw new ArgumentError(
           "Must have same number of cells: length=${values.length} size()=$size");
@@ -109,7 +109,7 @@ abstract class IntVector
   ///     m1.assign(m2, F.pow);
   ///     -->
   ///     m1 == 1 1 16 729
-  void assign(final IntVector y, final ifunc.IntIntFunction fn) {
+  void assign(IntVector y, ifunc.IntIntFunction fn) {
     checkSize(this, y);
     for (int i = 0; i < size; i++) {
       set(i, fn(get(i), y.get(i)));
@@ -405,7 +405,7 @@ abstract class IntVector
   }
 
   /// Fills the cell values into the specified 1-dimensional array.
-  void fillList(final Int32List values) {
+  void fillList(Int32List values) {
     if (values.length < size) {
       throw new ArgumentError("values too small");
     }
@@ -482,7 +482,7 @@ abstract class IntVector
   /// Returns the dot product of two vectors x and y, which is
   /// `Sum(x[i]*y[i])`. Where `x == this`. Operates on cells at
   /// indexes `from .. Min(size(),y.size(),from+length)-1`.
-  int dot(final IntVector y, [final int from = 0, int length = null]) {
+  int dot(IntVector y, [int from = 0, int length = null]) {
     if (length == null) {
       length = size;
     }

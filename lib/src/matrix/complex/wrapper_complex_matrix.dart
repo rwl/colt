@@ -22,7 +22,7 @@ class WrapperComplexMatrix extends ComplexMatrix {
     _content = newContent;
   }
 
-  void setAll(final Float64List values) {
+  void setAll(Float64List values) {
     if (_content is DiagonalComplexMatrix) {
       int dlength = (_content as DiagonalComplexMatrix)._dlength;
       Float64List elems = (_content as DiagonalComplexMatrix)._elements;
@@ -120,7 +120,7 @@ class WrapperComplexMatrix extends ComplexMatrix {
   }
 
   ComplexMatrix part(
-      final int row, final int column, int height, int width) {
+      int row, int column, int height, int width) {
     checkBox(this, row, column, height, width);
     var view = new PartWrapperComplexMatrix(this, row, column);
     setRows(view, height);
@@ -160,8 +160,8 @@ class WrapperComplexMatrix extends ComplexMatrix {
 
     checkRowIndexes(this, rowIndexes);
     checkColumnIndexes(this, columnIndexes);
-    final rix = new Int32List.fromList(rowIndexes);
-    final cix = new Int32List.fromList(columnIndexes);
+    var rix = new Int32List.fromList(rowIndexes);
+    var cix = new Int32List.fromList(columnIndexes);
 
     var view = new SelectionWrapperComplexMatrix(this, cix, rix);
     setRows(view, rowIndexes.length);
@@ -170,7 +170,7 @@ class WrapperComplexMatrix extends ComplexMatrix {
     return view;
   }
 
-  ComplexMatrix strides(final int rowStride, final int columnStride) {
+  ComplexMatrix strides(int rowStride, int columnStride) {
     if (rowStride <= 0 || columnStride <= 0) {
       throw new RangeError("illegal stride");
     }

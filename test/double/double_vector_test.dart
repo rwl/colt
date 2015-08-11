@@ -85,7 +85,7 @@ testDoubleVector(String kind, DoubleVector make(int size)) {
       A.fill(0.0);
       A.set(A.size ~/ 3, 0.7);
       A.set(A.size ~/ 2, 0.1);
-      final maxAndLoc = A.max();
+      var maxAndLoc = A.max();
       expect(0.7, closeTo(maxAndLoc.value, TOL));
       expect(A.size ~/ 3, equals(maxAndLoc.location));
     });
@@ -94,7 +94,7 @@ testDoubleVector(String kind, DoubleVector make(int size)) {
       A.fill(0.0);
       A.set(A.size ~/ 3, -0.7);
       A.set(A.size ~/ 2, -0.1);
-      final minAndLoc = A.min();
+      var minAndLoc = A.min();
       expect(-0.7, closeTo(minAndLoc.value, TOL));
       expect(A.size ~/ 3, equals(minAndLoc.location));
     });

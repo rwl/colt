@@ -32,7 +32,7 @@ class SparseDoubleMatrix extends DoubleMatrix {
 
   /// Constructs a matrix with a given number of rows and columns.
   factory SparseDoubleMatrix(int rows, int columns) {
-    final elements = new Map<int, double>();
+    var elements = new Map<int, double>();
     return new SparseDoubleMatrix._internal(
         rows, columns, elements, 0, 0, columns, 1, false);
   }
@@ -88,7 +88,7 @@ class SparseDoubleMatrix extends DoubleMatrix {
     super.copyFrom(source);
   }
 
-  void assign(final DoubleMatrix y, func.DoubleDoubleFunction fn) {
+  void assign(DoubleMatrix y, func.DoubleDoubleFunction fn) {
     if (isView) {
       super.assign(y, fn);
       return;
@@ -98,7 +98,7 @@ class SparseDoubleMatrix extends DoubleMatrix {
 
     if (fn is func.DoublePlusMultSecond) {
       // x[i] = x[i] + alpha*y[i]
-      final double alpha = fn.multiplicator;
+      double alpha = fn.multiplicator;
       if (alpha == 0) {
         return; // nothing to do
       }
@@ -149,7 +149,7 @@ class SparseDoubleMatrix extends DoubleMatrix {
     var columnIndexes = new Int32List(nnz);
 
     for (int k = 0; k < nnz; k++) {
-      final key = keys[k];
+      var key = keys[k];
       rowIndexes[k] = key ~/ columns;
       columnIndexes[k] = key % columns;
     }
@@ -179,7 +179,7 @@ class SparseDoubleMatrix extends DoubleMatrix {
 
   Object get elements => _elements;
 
-  void forEachNonZero(final func.IntIntDoubleFunction fn) {
+  void forEachNonZero(func.IntIntDoubleFunction fn) {
     if (!isView) {
       _elements.forEach((int key, double value) {
         int i = key ~/ columns;
@@ -194,7 +194,7 @@ class SparseDoubleMatrix extends DoubleMatrix {
   }
 
   double get(int row, int column) {
-    final i = rowZero + row * rowStride + columnZero + column * columnStride;
+    var i = rowZero + row * rowStride + columnZero + column * columnStride;
     if (_elements.containsKey(i)) {
       return _elements[i];
     }
@@ -235,8 +235,8 @@ class SparseDoubleMatrix extends DoubleMatrix {
   }
 
   DoubleVector mult(DoubleVector y,
-      [DoubleVector z = null, final double alpha = 1.0,
-      double beta = 0.0, final bool transposeA = false]) {
+      [DoubleVector z = null, double alpha = 1.0,
+      double beta = 0.0, bool transposeA = false]) {
     int rowsA = rows;
     int columnsA = columns;
     if (transposeA) {
@@ -297,8 +297,8 @@ class SparseDoubleMatrix extends DoubleMatrix {
   }
 
   DoubleMatrix multiply(DoubleMatrix B,
-      [DoubleMatrix C = null, final double alpha = 1.0,
-      double beta = 0.0, final bool transposeA = false,
+      [DoubleMatrix C = null, double alpha = 1.0,
+      double beta = 0.0, bool transposeA = false,
       bool transposeB = false]) {
     if (isView) {
       return super.multiply(B, C, alpha, beta, transposeA, transposeB);

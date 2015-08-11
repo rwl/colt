@@ -59,7 +59,7 @@ class DiagonalIntMatrix extends WrapperIntMatrix {
     _elements = new Int32List(_dlength);
   }
 
-  void apply(final ifunc.IntFunction fn) {
+  void apply(ifunc.IntFunction fn) {
     if (fn is ifunc.IntMult) {
       // x[i] = mult*x[i]
       int alpha = fn.multiplicator;
@@ -93,7 +93,7 @@ class DiagonalIntMatrix extends WrapperIntMatrix {
     return;
   }
 
-  void setAll(final Int32List values) {
+  void setAll(Int32List values) {
     if (values.length != _dlength) {
       throw new ArgumentError(
           "Must have same length: length=${values.length} dlength=$_dlength");
@@ -125,7 +125,7 @@ class DiagonalIntMatrix extends WrapperIntMatrix {
     }
   }
 
-  void assign(final IntMatrix y, final ifunc.IntIntFunction fn) {
+  void assign(IntMatrix y, ifunc.IntIntFunction fn) {
     checkShape(this, y);
     if (y is DiagonalIntMatrix) {
       DiagonalIntMatrix other = y;
@@ -135,7 +135,7 @@ class DiagonalIntMatrix extends WrapperIntMatrix {
       }
       if (fn is ifunc.IntPlusMultSecond) {
         // x[i] = x[i] + alpha*y[i]
-        final int alpha = fn.multiplicator;
+        int alpha = fn.multiplicator;
         if (alpha == 0) {
           return; // nothing to do
         }
@@ -143,7 +143,7 @@ class DiagonalIntMatrix extends WrapperIntMatrix {
       Int32List otherElements = other._elements;
       if (fn is ifunc.IntPlusMultSecond) {
         // x[i] = x[i] + alpha*y[i]
-        final int alpha = fn.multiplicator;
+        int alpha = fn.multiplicator;
         if (alpha == 1) {
           for (int j = _dlength; --j >= 0;) {
             _elements[j] += otherElements[j];
@@ -194,8 +194,8 @@ class DiagonalIntMatrix extends WrapperIntMatrix {
       if (!(this != null && obj != null)) {
         return false;
       }
-      final int rows = this.rows;
-      final int columns = this.columns;
+      int rows = this.rows;
+      int columns = this.columns;
       if (columns != other.columns || rows != other.rows) {
         return false;
       }
@@ -217,7 +217,7 @@ class DiagonalIntMatrix extends WrapperIntMatrix {
     }
   }
 
-  void forEachNonZero(final ifunc.IntIntIntFunction function) {
+  void forEachNonZero(ifunc.IntIntIntFunction function) {
     for (int j = _dlength; --j >= 0;) {
       int value = _elements[j];
       if (value != 0) {
@@ -336,7 +336,7 @@ class DiagonalIntMatrix extends WrapperIntMatrix {
   }
 
   IntVector mult(IntVector y, [IntVector z = null,
-      final int alpha = 1, int beta = null, final bool transposeA = false]) {
+      int alpha = 1, int beta = null, bool transposeA = false]) {
     if (beta == null) {
       beta = z == null ? 1 : 0;
     }

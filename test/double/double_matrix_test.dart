@@ -100,7 +100,7 @@ void testDoubleMatrix(
       A.fill(0.0);
       A.set(A.rows ~/ 3, A.columns ~/ 3, 0.7);
       A.set(A.rows ~/ 2, A.columns ~/ 2, 0.1);
-      final maxAndLoc = A.max();
+      var maxAndLoc = A.max();
       expect(0.7, closeTo(maxAndLoc.value, TOL));
       expect(A.rows ~/ 3, equals(maxAndLoc.row));
       expect(A.columns ~/ 3, equals(maxAndLoc.column));
@@ -110,7 +110,7 @@ void testDoubleMatrix(
       A.fill(0.0);
       A.set(A.rows ~/ 3, A.columns ~/ 3, -0.7);
       A.set(A.rows ~/ 2, A.columns ~/ 2, -0.1);
-      final minAndLoc = A.min();
+      var minAndLoc = A.min();
       expect(-0.7, closeTo(minAndLoc.value, TOL));
       expect(A.rows ~/ 3, equals(minAndLoc.row));
       expect(A.columns ~/ 3, equals(minAndLoc.column));

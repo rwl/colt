@@ -68,7 +68,7 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
       values[2 * r] = re;
       values[2 * r + 1] = im;
     }
-    final m = new SparseRCComplexMatrix._internal(
+    var m = new SparseRCComplexMatrix._internal(
         rows, columns, rowPointers, _columnIndexes, values);
     if (removeDuplicates) {
       m.removeDuplicates();
@@ -105,7 +105,7 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
       _values[2 * r] = values[2 * k];
       _values[2 * r + 1] = values[2 * k + 1];
     }
-    final m = new SparseRCComplexMatrix._internal(
+    var m = new SparseRCComplexMatrix._internal(
         rows, columns, rowPointers, _columnIndexes, _values);
     if (removeZeroes) {
       m.removeZeroes();
@@ -137,7 +137,7 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
     return new SparseRCComplexMatrix(rows, columns);
   }
 
-  void apply(final cfunc.ComplexComplexFunction fn) {
+  void apply(cfunc.ComplexComplexFunction fn) {
     if (fn is cfunc.ComplexMult) {
       // x[i] = mult*x[i]
       Complex alpha = fn.multiplicator;
@@ -397,7 +397,7 @@ class SparseRCComplexMatrix extends WrapperComplexMatrix {
 
   int get cardinality => _rowPointers[rows];
 
-  void forEachNonZero(final cfunc.IntIntComplexFunction fn) {
+  void forEachNonZero(cfunc.IntIntComplexFunction fn) {
     for (int i = 0; i < rows; i++) {
       int high = _rowPointers[i + 1];
       for (int k = _rowPointers[i]; k < high; k++) {

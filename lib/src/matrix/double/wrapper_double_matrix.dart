@@ -29,7 +29,7 @@ class WrapperDoubleMatrix extends DoubleMatrix {
     _content = newContent;
   }
 
-  void setAll(final Float64List values) {
+  void setAll(Float64List values) {
     if (_content is DiagonalDoubleMatrix) {
       int dlength = (_content as DiagonalDoubleMatrix)._dlength;
       Float64List elems = (_content as DiagonalDoubleMatrix)._elements;
@@ -48,7 +48,7 @@ class WrapperDoubleMatrix extends DoubleMatrix {
   }
 
   /*void assign(
-      final DoubleMatrix y, final func.DoubleDoubleFunction fn) {
+      DoubleMatrix y, func.DoubleDoubleFunction fn) {
     checkShape(this, y);
     if (y is WrapperDoubleMatrix) {
       var rowList = new List<int>();
@@ -133,7 +133,7 @@ class WrapperDoubleMatrix extends DoubleMatrix {
   }
 
   DoubleMatrix part(
-      final int row, final int column, int height, int width) {
+      int row, int column, int height, int width) {
     checkBox(this, row, column, height, width);
     var view = new PartWrapperDoubleMatrix(this, row, column);
     setRows(view, height);
@@ -184,7 +184,7 @@ class WrapperDoubleMatrix extends DoubleMatrix {
     return view;
   }
 
-  DoubleMatrix strides(final int _rowStride, final int _columnStride) {
+  DoubleMatrix strides(int _rowStride, int _columnStride) {
     if (_rowStride <= 0 || _columnStride <= 0) {
       throw new RangeError("illegal stride");
     }

@@ -117,7 +117,7 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
       _values[2 * r] = values[2 * k];
       _values[2 * r + 1] = values[2 * k + 1];
     }
-    final m = new SparseCCComplexMatrix._internal(
+    var m = new SparseCCComplexMatrix._internal(
         rows, columns, _rowIndexes, _columnPointers, _values);
     if (removeDuplicates) {
       m.removeDuplicates();
@@ -135,7 +135,7 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
     return new SparseCCComplexMatrix(rows, columns);
   }
 
-  void apply(final cfunc.ComplexComplexFunction fn) {
+  void apply(cfunc.ComplexComplexFunction fn) {
     if (fn is cfunc.ComplexMult) {
       // x[i] = mult*x[i]
       Complex alpha = fn.multiplicator;
@@ -303,7 +303,7 @@ class SparseCCComplexMatrix extends WrapperComplexMatrix {
 
   int get cardinality => _columnPointers[columns];
 
-  void forEachNonZero(final cfunc.IntIntComplexFunction fn) {
+  void forEachNonZero(cfunc.IntIntComplexFunction fn) {
     for (int j = columns; --j >= 0;) {
       int low = _columnPointers[j];
       for (int k = _columnPointers[j + 1]; --k >= low;) {

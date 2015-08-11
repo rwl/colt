@@ -102,7 +102,7 @@ class SparseIntMatrix extends IntMatrix {
     super.copyFrom(source);
   }
 
-  void assign(final IntMatrix y, ifunc.IntIntFunction fn) {
+  void assign(IntMatrix y, ifunc.IntIntFunction fn) {
     if (isView) {
       super.assign(y, fn);
       return;
@@ -111,7 +111,7 @@ class SparseIntMatrix extends IntMatrix {
     checkShape(this, y);
 
     if (fn is ifunc.IntPlusMultSecond) { // x[i] = x[i] + alpha*y[i]
-      final int alpha = fn.multiplicator;
+      int alpha = fn.multiplicator;
       if (alpha == 0) {
         return; // nothing to do
       }
@@ -188,7 +188,7 @@ class SparseIntMatrix extends IntMatrix {
 
   Object get elements => _elements;
 
-  void forEachNonZero(final ifunc.IntIntIntFunction fn) {
+  void forEachNonZero(ifunc.IntIntIntFunction fn) {
     if (!isView) {
       _elements.forEach((int key, int value) {
         int i = key ~/ columns;
@@ -266,7 +266,7 @@ class SparseIntMatrix extends IntMatrix {
     return v;
   }
 
-  IntVector mult(IntVector y, [IntVector z = null, final int alpha = 1, int beta = null, final bool transposeA = false]) {
+  IntVector mult(IntVector y, [IntVector z = null, int alpha = 1, int beta = null, bool transposeA = false]) {
     if (beta == null) {
       beta = z == null ? 1 : 0;
     }
@@ -323,7 +323,7 @@ class SparseIntMatrix extends IntMatrix {
     return z;
   }
 
-  IntMatrix multiply(IntMatrix B, [IntMatrix C = null, final int alpha = 1, int beta = null, final bool transposeA = false, final bool transposeB = false]) {
+  IntMatrix multiply(IntMatrix B, [IntMatrix C = null, int alpha = 1, int beta = null, bool transposeA = false, bool transposeB = false]) {
     if (beta == null) {
       beta = C == null ? 1 : 0;
     }

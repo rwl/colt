@@ -4,7 +4,7 @@ import 'dart:math' as math;
 import 'dart:typed_data';
 
 import 'package:test/test.dart';
-import 'package:colt/math.dart' show MAX_INT;
+import 'package:colt/src/math.dart' show MAX_INT;
 import 'package:colt/colt.dart';
 import 'package:colt/function/int.dart' as ifunc;
 
@@ -23,13 +23,13 @@ intVectorTests() {
 }
 
 intMatrixTests() {
-  testIntMatrix('dense', DenseIntMatrix.create);
-  testIntMatrix('dense view', _dice(DenseIntMatrix.create));
-  testIntMatrix('raw', DenseIntMatrix.create);
-  testIntMatrix('view', _dice(DenseIntMatrix.create));
-
-  testIntMatrix('sparse', SparseIntMatrix.create);
-  testIntMatrix('sparse view', _dice(SparseIntMatrix.create));
+//  testIntMatrix('dense', DenseIntMatrix.create);
+//  testIntMatrix('dense view', _dice(DenseIntMatrix.create));
+//  testDenseIntMatrix('raw', DenseIntMatrix.create);
+//  testDenseIntMatrix('view', _dice(DenseIntMatrix.create));
+//
+//  testIntMatrix('sparse', SparseIntMatrix.create);
+//  testIntMatrix('sparse view', _dice(SparseIntMatrix.create));
 
   testIntMatrix('sparse rc', SparseRCIntMatrix.create);
   testIntMatrix('sparse rc view', _dice(SparseRCIntMatrix.create));

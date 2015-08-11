@@ -109,14 +109,14 @@ testDiagonalDoubleMatrix(bool view) {
       if (DINDEX >= 0) {
         A.set(NROWS ~/ 3, NROWS ~/ 3 + DINDEX, 0.7);
         A.set(NROWS ~/ 2, NROWS ~/ 2 + DINDEX, 0.1);
-        final maxAndLoc = A.max();
+        var maxAndLoc = A.max();
         expect(0.7, closeTo(maxAndLoc.value, TOL));
         expect(NROWS ~/ 3, equals(maxAndLoc.row));
         expect(NROWS ~/ 3 + DINDEX, equals(maxAndLoc.column));
       } else {
         A.set(NROWS ~/ 3 - DINDEX, NROWS ~/ 3, 0.7);
         A.set(NROWS ~/ 2 - DINDEX, NROWS ~/ 2, 0.1);
-        final maxAndLoc = A.max();
+        var maxAndLoc = A.max();
         expect(0.7, closeTo(maxAndLoc.value, TOL));
         expect(NROWS ~/ 3 - DINDEX, equals(maxAndLoc.row));
         expect(NROWS ~/ 3, equals(maxAndLoc.column));
@@ -128,14 +128,14 @@ testDiagonalDoubleMatrix(bool view) {
       if (DINDEX >= 0) {
         A.set(NROWS ~/ 3, NROWS ~/ 3 + DINDEX, -0.7);
         A.set(NROWS ~/ 2, NROWS ~/ 2 + DINDEX, -0.1);
-        final minAndLoc = A.min();
+        var minAndLoc = A.min();
         expect(-0.7, closeTo(minAndLoc.value, TOL));
         expect(NROWS ~/ 3, equals(minAndLoc.row));
         expect(NROWS ~/ 3 + DINDEX, equals(minAndLoc.column));
       } else {
         A.set(NROWS ~/ 3 - DINDEX, NROWS ~/ 3, -0.7);
         A.set(NROWS ~/ 2 - DINDEX, NROWS ~/ 2, -0.1);
-        final minAndLoc = A.min();
+        var minAndLoc = A.min();
         expect(-0.7, closeTo(minAndLoc.value, TOL));
         expect(NROWS ~/ 3 - DINDEX, equals(minAndLoc.row));
         expect(NROWS ~/ 3, equals(minAndLoc.column));
@@ -314,9 +314,9 @@ testDiagonalDoubleMatrix(bool view) {
     });
 
     test('select', () {
-      final rowIndexes = new Int32List.fromList(
+      var rowIndexes = new Int32List.fromList(
           [NROWS ~/ 6, NROWS ~/ 5, NROWS ~/ 4, NROWS ~/ 3, NROWS ~/ 2]);
-      final colIndexes = new Int32List.fromList([
+      var colIndexes = new Int32List.fromList([
         NROWS ~/ 6,
         NROWS ~/ 5,
         NROWS ~/ 4,

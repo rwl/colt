@@ -35,7 +35,7 @@ abstract class DoubleVector extends AbstractVector {
   /// [aggr] an aggregation function taking as first argument the current
   /// aggregation and as second argument the transformed current cell value.
   /// [fn] a function transforming the current cell value.
-  double aggregate(final DoubleDoubleFunction aggr, DoubleFunction fn) {
+  double aggregate(DoubleDoubleFunction aggr, DoubleFunction fn) {
     if (size == 0) {
       return double.NAN;
     }
@@ -53,14 +53,14 @@ abstract class DoubleVector extends AbstractVector {
   ///     matrix.apply(F.sin);
   ///     -->
   ///     matrix ==  0.479426 0.997495 0.598472 -0.350783
-  void apply(final DoubleFunction fn) {
+  void apply(DoubleFunction fn) {
     for (int i = 0; i < size; i++) {
       set(i, fn(get(i)));
     }
   }
 
   /// Sets all cells to the state specified by [value].
-  void fill(final double value) {
+  void fill(double value) {
     for (int i = 0; i < size; i++) {
       set(i, value);
     }
@@ -455,8 +455,8 @@ abstract class DoubleVector extends AbstractVector {
   /// Returns the dot product of two vectors x and y, which is
   /// `Sum(x[i]*y[i])`. Operates on cells at indexes
   /// `from .. Min(size(), y.size(), from+length)-1`.
-  double dot(final DoubleVector y,
-      [final int from = 0, int length = null]) {
+  double dot(DoubleVector y,
+      [int from = 0, int length = null]) {
     if (length == null) {
       length = size;
     }

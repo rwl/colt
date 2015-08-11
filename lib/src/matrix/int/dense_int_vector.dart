@@ -24,7 +24,7 @@ class DenseIntVector extends IntVector {
   /// Constructs a matrix with a given number of cells. All entries are
   /// initially `0`.
   factory DenseIntVector(int size) {
-    final elements = new Int32List(size);
+    var elements = new Int32List(size);
     return new DenseIntVector._internal(size, elements, 0, 1, false);
   }
 
@@ -57,7 +57,7 @@ class DenseIntVector extends IntVector {
     return ifactory.append(a, b, create);
   }
 
-  int aggregate(final ifunc.IntIntFunction aggr, final ifunc.IntFunction fn) {
+  int aggregate(ifunc.IntIntFunction aggr, ifunc.IntFunction fn) {
     if (size == 0) {
       throw new ArgumentError("size == 0");
     }
@@ -70,7 +70,7 @@ class DenseIntVector extends IntVector {
     return a;
   }
 
-  void apply(final ifunc.IntFunction fn) {
+  void apply(ifunc.IntFunction fn) {
     int multiplicator;
     if (fn is ifunc.IntMult) {
       // x[i] = mult*x[i]
@@ -96,8 +96,8 @@ class DenseIntVector extends IntVector {
     }
   }
 
-  void fill(final int value) {
-    final Int32List elems = this._elements;
+  void fill(int value) {
+    Int32List elems = this._elements;
     int idx = zero;
     for (int i = 0; i < size; i++) {
       elems[idx] = value;
@@ -105,7 +105,7 @@ class DenseIntVector extends IntVector {
     }
   }
 
-  void setAll(final Int32List values) {
+  void setAll(Int32List values) {
     if (values.length != size) {
       throw new ArgumentError(
           "Must have same number of cells: length=${values.length} size()=$size");
@@ -162,7 +162,7 @@ class DenseIntVector extends IntVector {
     }
   }
 
-  void assign(final IntVector y, final ifunc.IntIntFunction fn) {
+  void assign(IntVector y, ifunc.IntIntFunction fn) {
     // overriden for performance only
     if (!(y is DenseIntVector)) {
       super.assign(y, fn);
@@ -240,7 +240,7 @@ class DenseIntVector extends IntVector {
 
   Object get elements => _elements;
 
-  void positive({List<int> indexList, final List<int> valueList}) {
+  void positive({List<int> indexList, List<int> valueList}) {
     bool fillIndexList = indexList != null;
     bool fillValueList = valueList != null;
     if (fillIndexList) {
@@ -287,7 +287,7 @@ class DenseIntVector extends IntVector {
     }
   }
 
-  void negative({List<int> indexList, final List<int> valueList}) {
+  void negative({List<int> indexList, List<int> valueList}) {
     bool fillIndexList = indexList != null;
     bool fillValueList = valueList != null;
     if (fillIndexList) {
@@ -370,7 +370,7 @@ class DenseIntVector extends IntVector {
     return new DenseIntMatrix(rows, columns);
   }
 
-  IntMatrix reshape(final int rows, final int columns) {
+  IntMatrix reshape(int rows, int columns) {
     if (rows * columns != size) {
       throw new ArgumentError("rows*columns != size");
     }
@@ -406,7 +406,7 @@ class DenseIntVector extends IntVector {
     }
   }
 
-  int dot(IntVector y, [final int from = 0, int length = null]) {
+  int dot(IntVector y, [int from = 0, int length = null]) {
     if (length == null) {
       length = size;
     }

@@ -107,7 +107,7 @@ testIntMatrix(String kind, IntMatrix make(int rows, int columns)) {
       A.fill(0);
       A.set(A.rows ~/ 3, A.columns ~/ 3, 7);
       A.set(A.rows ~/ 2, A.columns ~/ 2, 1);
-      final maxAndLoc = A.max();
+      var maxAndLoc = A.max();
       expect(7, equals(maxAndLoc.value));
       expect(A.rows ~/ 3, equals(maxAndLoc.row));
       expect(A.columns ~/ 3, equals(maxAndLoc.column));
@@ -117,7 +117,7 @@ testIntMatrix(String kind, IntMatrix make(int rows, int columns)) {
       A.fill(0);
       A.set(A.rows ~/ 3, A.columns ~/ 3, -7);
       A.set(A.rows ~/ 2, A.columns ~/ 2, -1);
-      final minAndLoc = A.min();
+      var minAndLoc = A.min();
       expect(-7, equals(minAndLoc.value));
       expect(A.rows ~/ 3, equals(minAndLoc.row));
       expect(A.columns ~/ 3, equals(minAndLoc.column));
@@ -240,14 +240,14 @@ testIntMatrix(String kind, IntMatrix make(int rows, int columns)) {
     });
 
     test('select', () {
-      final rowIndexes = [
+      var rowIndexes = [
         A.rows ~/ 6,
         A.rows ~/ 5,
         A.rows ~/ 4,
         A.rows ~/ 3,
         A.rows ~/ 2
       ];
-      final colIndexes = [
+      var colIndexes = [
         A.columns ~/ 6,
         A.columns ~/ 5,
         A.columns ~/ 4,

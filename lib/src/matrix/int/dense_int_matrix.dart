@@ -40,11 +40,11 @@ class DenseIntMatrix extends IntMatrix {
     return ifactory.randomMatrix(r, c, create);
   }
 
-  int aggregate(final ifunc.IntIntFunction aggr, final ifunc.IntFunction fn) {
+  int aggregate(ifunc.IntIntFunction aggr, ifunc.IntFunction fn) {
     if (size == 0) {
       throw new ArgumentError("size == 0");
     }
-    final int zero = index(0, 0);
+    int zero = index(0, 0);
     int a = fn(_elements[zero]);
     int d = 1; // first cell already done
     for (int r = 0; r < rows; r++) {
@@ -56,7 +56,7 @@ class DenseIntMatrix extends IntMatrix {
     return a;
   }
 
-  void apply(final ifunc.IntFunction fn) {
+  void apply(ifunc.IntFunction fn) {
     Int32List elems = _elements;
     if (elems == null) {
       throw new Error();
@@ -94,9 +94,9 @@ class DenseIntMatrix extends IntMatrix {
     }
   }
 
-  void fill(final int value) {
+  void fill(int value) {
     Int32List elems = _elements;
-    final int zero = index(0, 0);
+    int zero = index(0, 0);
     int idx = zero;
     for (int r = 0; r < rows; r++) {
       for (int i = idx, c = 0; c < columns; c++) {
@@ -107,7 +107,7 @@ class DenseIntMatrix extends IntMatrix {
     }
   }
 
-  void setAll(final Int32List values) {
+  void setAll(Int32List values) {
     if (values.length != size) {
       throw new ArgumentError("Must have same length: length=${values.length} "
           "rows()*columns()=${rows * columns}");
@@ -128,7 +128,7 @@ class DenseIntMatrix extends IntMatrix {
     }
   }
 
-  void copyFrom(final IntMatrix source) {
+  void copyFrom(IntMatrix source) {
     // overriden for performance only
     if (source is! DenseIntMatrix) {
       super.copyFrom(source);
@@ -176,7 +176,7 @@ class DenseIntMatrix extends IntMatrix {
     }
   }
 
-  void assign(final IntMatrix y, final ifunc.IntIntFunction fn) {
+  void assign(IntMatrix y, ifunc.IntIntFunction fn) {
     // overriden for performance only
     if (y is! DenseIntMatrix) {
       super.assign(y, fn);
@@ -297,8 +297,8 @@ class DenseIntMatrix extends IntMatrix {
 
   Object get elements => _elements;
 
-  void forEachNonZero(final ifunc.IntIntIntFunction function) {
-    final int zero = index(0, 0);
+  void forEachNonZero(ifunc.IntIntIntFunction function) {
+    int zero = index(0, 0);
     int idx = zero;
     for (int r = 0; r < rows; r++) {
       for (int i = idx, c = 0; c < columns; c++) {
@@ -312,8 +312,8 @@ class DenseIntMatrix extends IntMatrix {
     }
   }
 
-  void negative(final List<int> rowList, final List<int> columnList,
-      final List<int> valueList) {
+  void negative(List<int> rowList, List<int> columnList,
+      List<int> valueList) {
     rowList.clear();
     columnList.clear();
     valueList.clear();
@@ -332,8 +332,8 @@ class DenseIntMatrix extends IntMatrix {
     }
   }
 
-  void nonzero(final List<int> rowList, final List<int> columnList,
-      final List<int> valueList) {
+  void nonzero(List<int> rowList, List<int> columnList,
+      List<int> valueList) {
     rowList.clear();
     columnList.clear();
     valueList.clear();
@@ -352,8 +352,8 @@ class DenseIntMatrix extends IntMatrix {
     }
   }
 
-  void positive(final List<int> rowList, final List<int> columnList,
-      final List<int> valueList) {
+  void positive(List<int> rowList, List<int> columnList,
+      List<int> valueList) {
     rowList.clear();
     columnList.clear();
     valueList.clear();
@@ -411,7 +411,7 @@ class DenseIntMatrix extends IntMatrix {
   IntMatrixLocation min() {
     int rowLocation = 0;
     int columnLocation = 0;
-    final int zero = index(0, 0);
+    int zero = index(0, 0);
     int minValue = _elements[zero];
     int d = 1;
     int elem;
@@ -434,8 +434,8 @@ class DenseIntMatrix extends IntMatrix {
         value;
   }
 
-  IntVector mult(final IntVector y, [IntVector z = null,
-      final int alpha = 1, int beta = null, final bool transposeA = false]) {
+  IntVector mult(IntVector y, [IntVector z = null,
+      int alpha = 1, int beta = null, bool transposeA = false]) {
     if (beta == null) {
       beta = z == null ? 1 : 0;
     }
@@ -487,8 +487,8 @@ class DenseIntMatrix extends IntMatrix {
   }
 
   IntMatrix multiply(IntMatrix B, [IntMatrix C = null,
-      final int alpha = 1, int beta = null, final bool transposeA = false,
-      final bool transposeB = false]) {
+      int alpha = 1, int beta = null, bool transposeA = false,
+      bool transposeB = false]) {
     if (beta == null) {
       beta = C == null ? 1 : 0;
     }
@@ -539,9 +539,9 @@ class DenseIntMatrix extends IntMatrix {
 
     DenseIntMatrix BB = B as DenseIntMatrix;
     DenseIntMatrix CC = C as DenseIntMatrix;
-    final Int32List AElems = this._elements;
-    final Int32List BElems = BB._elements;
-    final Int32List CElems = CC._elements;
+    Int32List AElems = this._elements;
+    Int32List BElems = BB._elements;
+    Int32List CElems = CC._elements;
     if (AElems == null || BElems == null || CElems == null) {
       throw new Error();
     }
@@ -614,7 +614,7 @@ class DenseIntMatrix extends IntMatrix {
     if (_elements == null) {
       throw new Error();
     }
-    final int zero = index(0, 0);
+    int zero = index(0, 0);
     int idx = zero;
     for (int r = 0; r < rows; r++) {
       for (int i = idx, c = 0; c < columns; c++) {

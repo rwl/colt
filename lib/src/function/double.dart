@@ -392,7 +392,7 @@ DoubleFunction round(double precision) {
 /// Constructs a function that returns `fn(b,a)`, i.e.
 /// applies the function with the first operand as second operand and the
 /// second operand as first operand.
-DoubleDoubleFunction swapArgs(final DoubleDoubleFunction fn) {
+DoubleDoubleFunction swapArgs(DoubleDoubleFunction fn) {
   return (double a, double b) => fn(b, a);
 }
 
@@ -413,12 +413,12 @@ class DoubleMult {
     double call(double a) => a * multiplicator;
 
     /// `a / constant`.
-    factory DoubleMult.div(final double constant) {
+    factory DoubleMult.div(double constant) {
         return new DoubleMult.mult(1 / constant);
     }
 
     /// `a * constant`.
-    factory DoubleMult.mult(final double constant) {
+    factory DoubleMult.mult(double constant) {
         return new DoubleMult(constant);
     }
 }
@@ -442,22 +442,22 @@ class DoublePlusMultFirst {
     double call(double a, double b) => a * multiplicator + b;
 
     /// `a - b/constant`.
-    factory DoublePlusMultFirst.minusDiv(final double constant) {
+    factory DoublePlusMultFirst.minusDiv(double constant) {
         return new DoublePlusMultFirst(-1 / constant);
     }
 
     /// `a - b*constant`.
-    factory DoublePlusMultFirst.minusMult(final double constant) {
+    factory DoublePlusMultFirst.minusMult(double constant) {
         return new DoublePlusMultFirst(-constant);
     }
 
     /// `a + b/constant`.
-    factory DoublePlusMultFirst.plusDiv(final double constant) {
+    factory DoublePlusMultFirst.plusDiv(double constant) {
         return new DoublePlusMultFirst(1 / constant);
     }
 
     /// `a + b*constant`.
-    factory DoublePlusMultFirst.plusMult(final double constant) {
+    factory DoublePlusMultFirst.plusMult(double constant) {
         return new DoublePlusMultFirst(constant);
     }
 }
@@ -481,22 +481,22 @@ class DoublePlusMultSecond {
     double call(double a, double b) => a + b * multiplicator;
 
     /// `a - b/constant`.
-    factory DoublePlusMultSecond.minusDiv(final double constant) {
+    factory DoublePlusMultSecond.minusDiv(double constant) {
         return new DoublePlusMultSecond(-1 / constant);
     }
 
     /// `a - b*constant`.
-    factory DoublePlusMultSecond.minusMult(final double constant) {
+    factory DoublePlusMultSecond.minusMult(double constant) {
         return new DoublePlusMultSecond(-constant);
     }
 
     /// `a + b/constant`.
-    factory DoublePlusMultSecond.plusDiv(final double constant) {
+    factory DoublePlusMultSecond.plusDiv(double constant) {
         return new DoublePlusMultSecond(1 / constant);
     }
 
     /// `a + b*constant`.
-    factory DoublePlusMultSecond.plusMult(final double constant) {
+    factory DoublePlusMultSecond.plusMult(double constant) {
         return new DoublePlusMultSecond(constant);
     }
 }

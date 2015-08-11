@@ -85,7 +85,7 @@ testIntVector(String kind, IntVector make(int size)) {
       A.fill(0);
       A.set(A.size ~/ 3, 7);
       A.set(A.size ~/ 2, 1);
-      final maxAndLoc = A.max();
+      var maxAndLoc = A.max();
       expect(7, equals(maxAndLoc.value));
       expect(A.size ~/ 3, equals(maxAndLoc.location));
     });
@@ -94,7 +94,7 @@ testIntVector(String kind, IntVector make(int size)) {
       A.fill(0);
       A.set(A.size ~/ 3, -7);
       A.set(A.size ~/ 2, -1);
-      final minAndLoc = A.min();
+      var minAndLoc = A.min();
       expect(-7, equals(minAndLoc.value));
       expect(A.size ~/ 3, equals(minAndLoc.location));
     });
@@ -145,7 +145,7 @@ testIntVector(String kind, IntVector make(int size)) {
     });
 
     test('toList', () {
-      final array = A.toList();
+      var array = A.toList();
       expect(A.size == array.length, isTrue);
       for (int i = 0; i < A.size; i++) {
         expect(array[i], equals(A.get(i)));
@@ -153,7 +153,7 @@ testIntVector(String kind, IntVector make(int size)) {
     });
 
     test('fillList', () {
-      final array = new Int32List(A.size);
+      var array = new Int32List(A.size);
       A.fillList(array);
       for (int i = 0; i < A.size; i++) {
         expect(A.get(i), equals(array[i]));
@@ -188,7 +188,7 @@ testIntVector(String kind, IntVector make(int size)) {
     });
 
     test('select', () {
-      final indexes = new Int32List.fromList([5, 11, 22, 37, 101]);
+      var indexes = new Int32List.fromList([5, 11, 22, 37, 101]);
       IntVector b = A.select(indexes);
       for (int i = 0; i < indexes.length; i++) {
         expect(A.get(indexes[i]), equals(b.get(i)));

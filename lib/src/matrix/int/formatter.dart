@@ -45,7 +45,7 @@ class IntFormatter extends AbstractFormatter {
 
   /// Returns a string representations of all cells; no alignment considered.
   List<List<String>> formatMatrix(IntMatrix matrix) {
-    final strings = new List<List<String>>.generate(
+    var strings = new List<List<String>>.generate(
         matrix.rows, (_) => new List<String>(matrix.columns));
     for (int row = matrix.rows; --row >= 0;) {
       strings[row] = _formatRow(matrix.row(row));

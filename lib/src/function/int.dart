@@ -109,161 +109,161 @@ int xor(int a, int b) => a ^ b;
 
 /// Constructs a function that returns `a & b`. `a` is a
 /// variable, `b` is fixed.
-IntFunction ampersand(final int b) {
+IntFunction ampersand(int b) {
   return (int a) => a & b;
 }
 
 /// Constructs a function that returns `(from<=a && a<=to) ? 1 : 0`.
 /// `a` is a variable, `from` and `to` are fixed.
-IntFunction between(final int from, final int to) {
+IntFunction between(int from, int to) {
   return (int a) => (from <= a && a <= to) ? 1 : 0;
 }
 
 /// Constructs a unary function from a binary function with the first operand
 /// (argument) fixed to the given constant `c`. The second operand is
 /// variable (free).
-IntFunction bindArg1(final IntIntFunction function, final int c) {
+IntFunction bindArg1(IntIntFunction function, int c) {
   return (int v) => function(c, v);
 }
 
 /// Constructs a unary function from a binary function with the second
 /// operand (argument) fixed to the given constant `c`. The first
 /// operand is variable (free).
-IntFunction bindArg2(final IntIntFunction function, final int c) {
+IntFunction bindArg2(IntIntFunction function, int c) {
   return (int v) => function(v, c);
 }
 
 /// Constructs the function `g( h(a) )`.
-IntFunction chain2(final IntFunction g, final IntFunction h) {
+IntFunction chain2(IntFunction g, IntFunction h) {
   return (int a) => g(h(a));
 }
 
 /// Constructs the function `g( h(a,b) )`.
-IntIntFunction chain3(final IntFunction g, final IntIntFunction h) {
+IntIntFunction chain3(IntFunction g, IntIntFunction h) {
   return (int a, int b) => g(h(a, b));
 }
 
 /// Constructs the function `f( g(a), h(b) )`.
 IntIntFunction chain4(
-    final IntIntFunction f, final IntFunction g, final IntFunction h) {
+    IntIntFunction f, IntFunction g, IntFunction h) {
   return (int a, int b) => f(g(a), h(b));
 }
 
 /// Constructs a function that returns `a < b ? -1 : a > b ? 1 : 0`.
 /// `a` is a variable, `b` is fixed.
-IntFunction compareTo(final int b) {
+IntFunction compareTo(int b) {
   return (int a) => a < b ? -1 : a > b ? 1 : 0;
 }
 
 /// Constructs a function that returns the constant `c`.
-IntFunction constant(final int c) {
+IntFunction constant(int c) {
   return (int a) => c;
 }
 
 /// Constructs a function that returns `a / b`. `a` is a
 /// variable, `b` is fixed.
-IntFunction divide(final int b) {
+IntFunction divide(int b) {
   return (int a) => a ~/ b;
 }
 
 /// Constructs a function that returns `a == b ? 1 : 0`. `a` is
 /// a variable, `b` is fixed.
-IntFunction equalTo(final int b) {
+IntFunction equalTo(int b) {
   return (int a) => a == b ? 1 : 0;
 }
 
 /// Constructs a function that returns `from<=a && a<=to`. `a`
 /// is a variable, `from` and `to` are fixed.
-//IntProcedure isBetween(final int from, final int to) {
+//IntProcedure isBetween(int from, int to) {
 //  return (int a) => from <= a && a <= to;
 //}
 
 /// Constructs a function that returns `a == b`. `a` is a
 /// variable, `b` is fixed.
-//IntProcedure isEqualTo(final int b) {
+//IntProcedure isEqualTo(int b) {
 //  return (int a) => a == b;
 //}
 
 /// Constructs a function that returns `a > b`. `a` is a
 /// variable, `b` is fixed.
-//IntProcedure isGreaterThan(final int b) {
+//IntProcedure isGreaterThan(int b) {
 //  return (int a) => a > b;
 //}
 
 /// Constructs a function that returns `a < b`. `a` is a
 /// variable, `b` is fixed.
-//IntProcedure isLessThan(final int b) {
+//IntProcedure isLessThan(int b) {
 //  return (int a) => a < b;
 //}
 
 /// Constructs a function that returns `Math.max(a,b)`. `a` is
 /// a variable, `b` is fixed.
-IntFunction maximum(final int b) {
+IntFunction maximum(int b) {
   return (int a) => (a >= b) ? a : b;
 }
 
 /// Constructs a function that returns `Math.min(a,b)`. `a` is
 /// a variable, `b` is fixed.
-IntFunction minimum(final int b) {
+IntFunction minimum(int b) {
   return (int a) => (a <= b) ? a : b;
 }
 
 /// Constructs a function that returns `a - b`. `a` is a
 /// variable, `b` is fixed.
-IntFunction subtract(final int b) {
+IntFunction subtract(int b) {
   return (int a) => a - b;
 }
 
 /// Constructs a function that returns `a - b*constant`. `a`
 /// and `b` are variables, `constant` is fixed.
-IntIntFunction minusMult(final int constant) {
+IntIntFunction minusMult(int constant) {
   return plusMultSecond(-constant);
 }
 
 /// Constructs a function that returns `a % b`. `a` is a
 /// variable, `b` is fixed.
-IntFunction modulus(final int b) {
+IntFunction modulus(int b) {
   return (int a) => a % b;
 }
 
 /// Constructs a function that returns `a * b`. `a` is a
 /// variable, `b` is fixed.
-IntFunction multiply(final int b) {
+IntFunction multiply(int b) {
   return (int a) => a * b;
 }
 
 /// Constructs a function that returns `a | b`. `a` is a
 /// variable, `b` is fixed.
-IntFunction bar(final int b) {
+IntFunction bar(int b) {
   return (int a) => a | b;
 }
 
 /// Constructs a function that returns `a + b`. `a` is a
 /// variable, `b` is fixed.
-IntFunction add(final int b) {
+IntFunction add(int b) {
   return (int a) => a + b;
 }
 
 /// Constructs a function that returns `b*constant`.
-IntIntFunction multSecond(final int constant) {
+IntIntFunction multSecond(int constant) {
   return (int a, int b) => b * constant;
 }
 
 /// Constructs a function that returns `Math.pow(a,b)`.
 /// `a` is a variable, `b` is fixed.
-IntFunction power(final int b) {
+IntFunction power(int b) {
   return (int a) => math.pow(a, b);
 }
 
 /// Constructs a function that returns `a + b*constant`. `a`
 /// and `b` are variables, `constant` is fixed.
-IntIntFunction plusMultSecond(final int constant) {
+IntIntFunction plusMultSecond(int constant) {
   return new IntPlusMultSecond(constant);
 }
 
 /// Constructs a function that returns `a * constant + b`. `a`
 /// and `b` are variables, `constant` is fixed.
-IntIntFunction plusMultFirst(final int constant) {
+IntIntFunction plusMultFirst(int constant) {
   return new IntPlusMultFirst(constant);
 }
 
@@ -275,26 +275,26 @@ IntFunction random() {
 
 /// Constructs a function that returns `a << b`. `a` is a
 /// variable, `b` is fixed.
-IntFunction leftShift(final int b) {
+IntFunction leftShift(int b) {
   return (int a) => a << b;
 }
 
 /// Constructs a function that returns `a >> b`. `a` is a
 /// variable, `b` is fixed.
-IntFunction signedRightShift(final int b) {
+IntFunction signedRightShift(int b) {
   return (int a) => a >> b;
 }
 
 /// Constructs a function that returns `function(b,a)`, i.e.
 /// applies the function with the first operand as second operand and the
 /// second operand as first operand.
-IntIntFunction swapArgs(final IntIntFunction function) {
+IntIntFunction swapArgs(IntIntFunction function) {
   return (int a, int b) => function(b, a);
 }
 
 /// Constructs a function that returns `a | b`. `a` is a
 /// variable, `b` is fixed.
-IntFunction exclusiveOr(final int b) {
+IntFunction exclusiveOr(int b) {
   return (int a) => a ^ b;
 }
 
@@ -317,12 +317,12 @@ class IntMult {
   }
 
   /// `a / constant`.
-  factory IntMult.div(final int constant) {
+  factory IntMult.div(int constant) {
     return new IntMult.mult(1 ~/ constant);
   }
 
   /// `a * constant`.
-  factory IntMult.mult(final int constant) {
+  factory IntMult.mult(int constant) {
     return new IntMult(constant);
   }
 }
@@ -348,12 +348,12 @@ class IntPlusMultFirst {
   }
 
   /// `a - b*constant`.
-  factory IntPlusMultFirst.minusMult(final int constant) {
+  factory IntPlusMultFirst.minusMult(int constant) {
     return new IntPlusMultFirst(-constant);
   }
 
   /// `a + b*constant`.
-  factory IntPlusMultFirst.plusMult(final int constant) {
+  factory IntPlusMultFirst.plusMult(int constant) {
     return new IntPlusMultFirst(constant);
   }
 }
@@ -379,12 +379,12 @@ class IntPlusMultSecond {
   }
 
   /// `a - b*constant`.
-  factory IntPlusMultSecond.minusMult(final int constant) {
+  factory IntPlusMultSecond.minusMult(int constant) {
     return new IntPlusMultSecond(-constant);
   }
 
   /// `a + b*constant`.
-  factory IntPlusMultSecond.plusMult(final int constant) {
+  factory IntPlusMultSecond.plusMult(int constant) {
     return new IntPlusMultSecond(constant);
   }
 }

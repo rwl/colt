@@ -68,10 +68,10 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
     return new DiagonalDoubleMatrix(rows, columns);
   }
 
-  void apply(final func.DoubleFunction fn) {
+  void apply(func.DoubleFunction fn) {
     if (fn is DoubleMult) {
       // x[i] = mult*x[i]
-      final double alpha = fn.multiplicator;
+      double alpha = fn.multiplicator;
       if (alpha == 1) {
         return;
       }
@@ -100,7 +100,7 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
     }
   }
 
-  void setAll(final Float64List values) {
+  void setAll(Float64List values) {
     if (values.length != _dlength) {
       throw new ArgumentError(
           "Must have same length: length=${values.length} dlength=$_dlength");
@@ -132,7 +132,7 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
   }
 
   void assign(
-      final DoubleMatrix y, final func.DoubleDoubleFunction fn) {
+      DoubleMatrix y, func.DoubleDoubleFunction fn) {
     checkShape(this, y);
     if (y is DiagonalDoubleMatrix) {
       DiagonalDoubleMatrix other = y;
@@ -147,7 +147,7 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
           return; // nothing to do
         }
       }
-      final Float64List otherElements = other._elements;
+      Float64List otherElements = other._elements;
 
       if (fn is DoublePlusMultSecond) {
         // x[i] = x[i] + alpha*y[i]
@@ -219,8 +219,8 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
       if (!(this != null && obj != null)) {
         return false;
       }
-      final int rows = this.rows;
-      final int columns = this.columns;
+      int rows = this.rows;
+      int columns = this.columns;
       if (columns != other.columns || rows != other.rows) {
         return false;
       }
@@ -245,7 +245,7 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
     }
   }
 
-  void forEachNonZero(final func.IntIntDoubleFunction fn) {
+  void forEachNonZero(func.IntIntDoubleFunction fn) {
     for (int j = _dlength; --j >= 0;) {
       double value = _elements[j];
       if (value != 0) {
@@ -372,7 +372,7 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
 
   DoubleVector mult(DoubleVector y,
       [DoubleVector z = null, double alpha = 1.0, double beta = 0.0,
-      final bool transposeA = false]) {
+      bool transposeA = false]) {
     int rowsA = rows;
     int columnsA = columns;
     if (transposeA) {
@@ -403,14 +403,14 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
     }
 
     DenseDoubleVector zz = z as DenseDoubleVector;
-    final Float64List elementsZ = zz._elements;
-    final int strideZ = zz.stride;
-    final int zeroZ = z.index(0);
+    Float64List elementsZ = zz._elements;
+    int strideZ = zz.stride;
+    int zeroZ = z.index(0);
 
     DenseDoubleVector yy = y as DenseDoubleVector;
-    final Float64List elementsY = yy._elements;
-    final int strideY = yy.stride;
-    final int zeroY = y.index(0);
+    Float64List elementsY = yy._elements;
+    int strideY = yy.stride;
+    int zeroY = y.index(0);
 
     if (elementsY == null || elementsZ == null) {
       throw new Error();

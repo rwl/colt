@@ -83,7 +83,7 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
       _rowIndexes[r] = rowIndexes[k];
       _values[r] = value;
     }
-    final m = new SparseCCDoubleMatrix._internal(
+    var m = new SparseCCDoubleMatrix._internal(
         rows, columns, _rowIndexes, _columnPointers, _values);
     if (removeDuplicates) {
       m.removeDuplicates();
@@ -119,7 +119,7 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
       _rowIndexes[r] = rowIndexes[k];
       _values[r] = values[k];
     }
-    final m = new SparseCCDoubleMatrix._internal(
+    var m = new SparseCCDoubleMatrix._internal(
         rows, columns, _rowIndexes, _columnPointers, _values);
     if (removeDuplicates) {
       m.removeDuplicates();
@@ -136,7 +136,7 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
     return new SparseCCDoubleMatrix(rows, columns);
   }
 
-  void apply(final func.DoubleFunction fn) {
+  void apply(func.DoubleFunction fn) {
     if (fn is DoubleMult) {
       // x[i] = mult*x[i]
       double alpha = fn.multiplicator;
@@ -206,7 +206,7 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
     }
   }
 
-  void assign(final DoubleMatrix y, func.DoubleDoubleFunction fn) {
+  void assign(DoubleMatrix y, func.DoubleDoubleFunction fn) {
     checkShape(this, y);
 
     if ((y is SparseCCDoubleMatrix) && (fn == func.plus)) {
@@ -239,7 +239,7 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
 
     if (fn is DoublePlusMultSecond) {
       // x[i] = x[i] + alpha*y[i]
-      final double alpha = fn.multiplicator;
+      double alpha = fn.multiplicator;
       if (alpha == 0) {
         return; // nothing to do
       }
@@ -252,7 +252,7 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
 
     if (fn is DoublePlusMultFirst) {
       // x[i] = alpha*x[i] + y[i]
-      final double alpha = fn.multiplicator;
+      double alpha = fn.multiplicator;
       if (alpha == 0) {
         copyFrom(y);
         return;
@@ -296,7 +296,7 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
 
   Object get elements => _values;
 
-  void forEachNonZero(final func.IntIntDoubleFunction fn) {
+  void forEachNonZero(func.IntIntDoubleFunction fn) {
     for (int j = columns; --j >= 0;) {
       int low = _columnPointers[j];
       for (int k = _columnPointers[j + 1]; --k >= low;) {
@@ -464,8 +464,8 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
   }
 
   DoubleVector mult(DoubleVector y, [DoubleVector z = null,
-      final double alpha = 1.0, final double beta = 0.0,
-      final bool transposeA = false]) {
+      double alpha = 1.0, double beta = 0.0,
+      bool transposeA = false]) {
     int rowsA = transposeA ? columns : rows;
     int columnsA = transposeA ? rows : columns;
 
@@ -549,8 +549,8 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
   }
 
   DoubleMatrix multiply(DoubleMatrix B, [DoubleMatrix C = null,
-      final double alpha = 1.0, double beta = 0.0,
-      final bool transposeA = false, bool transposeB = false]) {
+      double alpha = 1.0, double beta = 0.0,
+      bool transposeA = false, bool transposeB = false]) {
     int rowsA = rows;
     int columnsA = columns;
     if (transposeA) {

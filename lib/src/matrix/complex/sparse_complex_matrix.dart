@@ -64,7 +64,7 @@ class SparseComplexMatrix extends ComplexMatrix {
   }
 
   void assign(
-      final ComplexMatrix y, cfunc.ComplexComplexComplexFunction fn) {
+      ComplexMatrix y, cfunc.ComplexComplexComplexFunction fn) {
     if (isView) {
       super.assign(y, fn);
       return;

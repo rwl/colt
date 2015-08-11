@@ -85,7 +85,7 @@ class SparseCCIntMatrix extends WrapperIntMatrix {
       _rowIndexes[r] = rowIndexes[k];
       values[r] = value;
     }
-    final m = new SparseCCIntMatrix._internal(
+    var m = new SparseCCIntMatrix._internal(
         rows, columns, _rowIndexes, columnPointers, values);
     if (removeDuplicates) {
       m.removeDuplicates();
@@ -121,7 +121,7 @@ class SparseCCIntMatrix extends WrapperIntMatrix {
       _rowIndexes[r] = rowIndexes[k];
       _values[r] = values[k];
     }
-    final m = new SparseCCIntMatrix._internal(
+    var m = new SparseCCIntMatrix._internal(
         rows, columns, _rowIndexes, columnPointers, _values);
     if (removeDuplicates) {
       m.removeDuplicates();
@@ -138,7 +138,7 @@ class SparseCCIntMatrix extends WrapperIntMatrix {
     return new SparseCCIntMatrix(rows, columns);
   }
 
-  void apply(final ifunc.IntFunction fn) {
+  void apply(ifunc.IntFunction fn) {
     if (fn is ifunc.IntMult) {
       // x[i] = mult*x[i]
       int alpha = fn.multiplicator;
@@ -208,7 +208,7 @@ class SparseCCIntMatrix extends WrapperIntMatrix {
     }
   }
 
-  void assign(final IntMatrix y, ifunc.IntIntFunction fn) {
+  void assign(IntMatrix y, ifunc.IntIntFunction fn) {
     checkShape(this, y);
 
     if (y is SparseCCIntMatrix && fn == ifunc.plus) {
@@ -297,7 +297,7 @@ class SparseCCIntMatrix extends WrapperIntMatrix {
 
   int get cardinality => _columnPointers[columns];
 
-  void forEachNonZero(final ifunc.IntIntIntFunction fn) {
+  void forEachNonZero(ifunc.IntIntIntFunction fn) {
     for (int j = columns; --j >= 0;) {
       int low = _columnPointers[j];
       for (int k = _columnPointers[j + 1]; --k >= low;) {
@@ -464,8 +464,8 @@ class SparseCCIntMatrix extends WrapperIntMatrix {
     return buf.toString();
   }
 
-  IntVector mult(IntVector y, [IntVector z = null, final int alpha = 1,
-      int beta = null, final bool transposeA = false]) {
+  IntVector mult(IntVector y, [IntVector z = null, int alpha = 1,
+      int beta = null, bool transposeA = false]) {
     if (beta == null) {
       beta = z == null ? 1 : 0;
     }
@@ -547,9 +547,9 @@ class SparseCCIntMatrix extends WrapperIntMatrix {
     return z;
   }
 
-  IntMatrix multiply(IntMatrix B, [IntMatrix C = null, final int alpha = 1,
-      int beta = null, final bool transposeA = false,
-      final bool transposeB = false]) {
+  IntMatrix multiply(IntMatrix B, [IntMatrix C = null, int alpha = 1,
+      int beta = null, bool transposeA = false,
+      bool transposeB = false]) {
     if (beta == null) {
       beta = C == null ? 1 : 0;
     }

@@ -34,7 +34,7 @@ class SparseDoubleVector extends DoubleVector {
   /// Constructs a matrix with a given number of parameters. All entries are
   /// initially `0`.
   factory SparseDoubleVector(int size) {
-    final elements = new Map<int, double>();
+    var elements = new Map<int, double>();
     return new SparseDoubleVector._internal(size, elements, 0, 1, false);
   }
 
@@ -72,7 +72,7 @@ class SparseDoubleVector extends DoubleVector {
   dynamic get elements => _elements;
 
   double get(int index) {
-    final i = zero + index * stride;
+    var i = zero + index * stride;
     if (_elements.containsKey(i)) {
       return _elements[i];
     }
@@ -184,7 +184,7 @@ class SelectedSparseDoubleVector extends DoubleVector {
   dynamic get elements => _elements;
 
   double get(int index) {
-    final i = __offset + _offsets[zero + index * stride];
+    var i = __offset + _offsets[zero + index * stride];
     if (_elements.containsKey(i)) {
       return _elements[i];
     }

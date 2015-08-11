@@ -22,7 +22,7 @@ class WrapperIntMatrix extends IntMatrix {
     _content = newContent;
   }
 
-  /*void assign(final IntMatrix y, final ifunc.IntIntFunction function) {
+  /*void assign(IntMatrix y, ifunc.IntIntFunction function) {
     checkShape(this, y);
     if (y is WrapperIntMatrix) {
       var rowList = new List();
@@ -36,7 +36,7 @@ class WrapperIntMatrix extends IntMatrix {
     return;
   }*/
 
-  void setAll(final Int32List values) {
+  void setAll(Int32List values) {
     if (_content is DiagonalIntMatrix) {
       int dlength = (_content as DiagonalIntMatrix)._dlength;
       Int32List elems = (_content as DiagonalIntMatrix)._elements;
@@ -121,7 +121,7 @@ class WrapperIntMatrix extends IntMatrix {
     return view;
   }
 
-  IntMatrix part(final int row, final int column, int height, int width) {
+  IntMatrix part(int row, int column, int height, int width) {
     checkBox(this, row, column, height, width);
     var view = new PartWrapperIntMatrix2D(this, column, row);
     setRows(view, height);
@@ -173,7 +173,7 @@ class WrapperIntMatrix extends IntMatrix {
     return view;
   }
 
-  IntMatrix strides(final int _rowStride, final int _columnStride) {
+  IntMatrix strides(int _rowStride, int _columnStride) {
     if (_rowStride <= 0 || _columnStride <= 0) {
       throw new RangeError("illegal stride");
     }

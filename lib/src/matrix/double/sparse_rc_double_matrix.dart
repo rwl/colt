@@ -77,7 +77,7 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
       _columnIndexes[r] = columnIndexes[k];
       values[r] = value;
     }
-    final m = new SparseRCDoubleMatrix._internal(
+    var m = new SparseRCDoubleMatrix._internal(
         rows, columns, rowPointers, _columnIndexes, values);
     if (removeDuplicates) {
       m.removeDuplicates();
@@ -113,7 +113,7 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
       _columnIndexes[r] = columnIndexes[k];
       _values[r] = values[k];
     }
-    final m = new SparseRCDoubleMatrix._internal(
+    var m = new SparseRCDoubleMatrix._internal(
         rows, columns, rowPointers, _columnIndexes, _values);
     if (removeZeroes) {
       m.removeZeroes();
@@ -142,7 +142,7 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
     return new SparseRCDoubleMatrix(rows, columns);
   }
 
-  void apply(final func.DoubleFunction fn) {
+  void apply(func.DoubleFunction fn) {
     if (fn is func.DoubleMult) {
       // x[i] = mult*x[i]
       double alpha = fn.multiplicator;
@@ -211,7 +211,7 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
     }
   }
 
-  void assign(final DoubleMatrix y, func.DoubleDoubleFunction fn) {
+  void assign(DoubleMatrix y, func.DoubleDoubleFunction fn) {
     checkShape(this, y);
     if (y is SparseRCDoubleMatrix && fn == func.plus) {
       // x[i] = x[i] + y[i]
@@ -335,7 +335,7 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
 
   int get cardinality => _rowPointers[rows];
 
-  void forEachNonZero(final func.IntIntDoubleFunction fn) {
+  void forEachNonZero(func.IntIntDoubleFunction fn) {
     for (int i = rows; --i >= 0;) {
       int low = _rowPointers[i];
       for (int k = _rowPointers[i + 1]; --k >= low;) {
@@ -514,8 +514,8 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
   }
 
   DoubleVector mult(DoubleVector y, [DoubleVector z = null,
-      final double alpha = 1.0, final double beta = 0.0,
-      final bool transposeA = false]) {
+      double alpha = 1.0, double beta = 0.0,
+      bool transposeA = false]) {
     int rowsA = transposeA ? columns : rows;
     int columnsA = transposeA ? rows : columns;
 
@@ -634,8 +634,8 @@ class SparseRCDoubleMatrix extends WrapperDoubleMatrix {
   }
 
   DoubleMatrix multiply(DoubleMatrix B, [DoubleMatrix C = null,
-      final double alpha = 1.0, double beta = 0.0,
-      final bool transposeA = false, bool transposeB = false]) {
+      double alpha = 1.0, double beta = 0.0,
+      bool transposeA = false, bool transposeB = false]) {
     int rowsA = rows;
     int columnsA = columns;
     if (transposeA) {

@@ -51,7 +51,7 @@ class DenseComplexVector extends ComplexVector {
 
   /// Constructs a matrix with the given size.
   factory DenseComplexVector(int size) {
-    final elements = new Float64List(2 * size);
+    var elements = new Float64List(2 * size);
     return new DenseComplexVector._internal(size, elements, 0, 2, true);
   }
 
@@ -66,8 +66,8 @@ class DenseComplexVector extends ComplexVector {
   factory DenseComplexVector.fromPolar(
       DoubleVector r, DoubleVector theta,
       [bool radians = true]) {
-    final real = theta.copy();
-    final imag = theta.copy();
+    var real = theta.copy();
+    var imag = theta.copy();
     if (!radians) {
       real.apply(func.multiply(DEG_RAD));
       imag.apply(func.multiply(DEG_RAD));
@@ -84,8 +84,8 @@ class DenseComplexVector extends ComplexVector {
     return new DenseComplexVector(size);
   }
 
-  Complex aggregate(final cfunc.ComplexComplexComplexFunction aggr,
-      final cfunc.ComplexComplexFunction fn) {
+  Complex aggregate(cfunc.ComplexComplexComplexFunction aggr,
+      cfunc.ComplexComplexFunction fn) {
     if (size == 0) {
       return Complex.NAN;
     }
@@ -98,7 +98,7 @@ class DenseComplexVector extends ComplexVector {
     return a;
   }
 
-  void apply(final cfunc.ComplexComplexFunction fn) {
+  void apply(cfunc.ComplexComplexFunction fn) {
     if (_elements == null) {
       throw new Error();
     }
@@ -129,7 +129,7 @@ class DenseComplexVector extends ComplexVector {
     }
   }
 
-  void applyReal(final cfunc.ComplexRealFunction fn) {
+  void applyReal(cfunc.ComplexRealFunction fn) {
     if (this._elements == null) {
       throw new Error();
     }
@@ -203,7 +203,7 @@ class DenseComplexVector extends ComplexVector {
   }
 
   void assign(
-      ComplexVector y, final cfunc.ComplexComplexComplexFunction fn) {
+      ComplexVector y, cfunc.ComplexComplexComplexFunction fn) {
     if (y is! DenseComplexVector) {
       super.assign(y, fn);
       return;
@@ -299,7 +299,7 @@ class DenseComplexVector extends ComplexVector {
     }
   }
 
-  void fill(final double re, final double im) {
+  void fill(double re, double im) {
     int idx = zero;
     for (int i = 0; i < size; i++) {
       _elements[idx] = re;
@@ -320,7 +320,7 @@ class DenseComplexVector extends ComplexVector {
     }
   }
 
-  void setImaginary(final DoubleVector other) {
+  void setImaginary(DoubleVector other) {
     if (other is! DenseDoubleVector) {
       super.setImaginary(other);
       return;
@@ -338,7 +338,7 @@ class DenseComplexVector extends ComplexVector {
     }
   }
 
-  void setReal(final DoubleVector other) {
+  void setReal(DoubleVector other) {
     if (other is! DenseDoubleVector) {
       super.setReal(other);
       return;
@@ -424,7 +424,7 @@ class DenseComplexVector extends ComplexVector {
     return new DenseComplexMatrix(rows, columns);
   }
 
-  ComplexMatrix reshape(final int rows, final int columns) {
+  ComplexMatrix reshape(int rows, int columns) {
     if (rows * columns != size) {
       throw new ArgumentError("rows*columns != size");
     }
@@ -469,8 +469,8 @@ class DenseComplexVector extends ComplexVector {
     }
   }
 
-  Complex dot(final ComplexVector y,
-      [final int from = 0, int length = null]) {
+  Complex dot(ComplexVector y,
+      [int from = 0, int length = null]) {
     if (length == null) {
       length = this.size;
     }

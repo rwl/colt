@@ -30,7 +30,7 @@ class DenseComplexMatrix extends ComplexMatrix {
   /// Constructs a matrix with a given number of rows and columns. All entries
   /// are initially `0`.
   factory DenseComplexMatrix(int rows, int columns) {
-    final elements = new Float64List(rows * 2 * columns);
+    var elements = new Float64List(rows * 2 * columns);
     return new DenseComplexMatrix._internal(
         rows, columns, elements, 0, 0, 2 * columns, 2, true);
   }
@@ -47,8 +47,8 @@ class DenseComplexMatrix extends ComplexMatrix {
     return new DenseComplexMatrix(rows, columns);
   }
 
-  Complex aggregate(final cfunc.ComplexComplexComplexFunction aggr,
-      final cfunc.ComplexComplexFunction fn) {
+  Complex aggregate(cfunc.ComplexComplexComplexFunction aggr,
+      cfunc.ComplexComplexFunction fn) {
     if (size == 0) {
       return Complex.NAN;
     }
@@ -66,8 +66,8 @@ class DenseComplexMatrix extends ComplexMatrix {
     return a;
   }
 
-  void apply(final cfunc.ComplexComplexFunction fn) {
-    final int zero = index(0, 0);
+  void apply(cfunc.ComplexComplexFunction fn) {
+    var zero = index(0, 0);
     int idx = zero;
     if (fn is cfunc.ComplexMult) {
       var multiplicator = fn.multiplicator;
@@ -96,8 +96,8 @@ class DenseComplexMatrix extends ComplexMatrix {
     }
   }
 
-  void applyReal(final cfunc.ComplexRealFunction fn) {
-    final int zero = index(0, 0);
+  void applyReal(cfunc.ComplexRealFunction fn) {
+    var zero = index(0, 0);
     int idx = zero;
     if (fn == cfunc.abs) {
       for (int r = 0; r < rows; r++) {
@@ -133,7 +133,7 @@ class DenseComplexMatrix extends ComplexMatrix {
     }
   }
 
-  void copyFrom(final ComplexMatrix source) {
+  void copyFrom(ComplexMatrix source) {
     // overriden for performance only
     if (source is! DenseComplexMatrix) {
       super.copyFrom(source);
@@ -181,8 +181,8 @@ class DenseComplexMatrix extends ComplexMatrix {
     }
   }
 
-  void assign(final ComplexMatrix y,
-      final cfunc.ComplexComplexComplexFunction fn) {
+  void assign(ComplexMatrix y,
+      cfunc.ComplexComplexComplexFunction fn) {
     // overriden for performance only
     if (y is! DenseComplexMatrix) {
       super.assign(y, fn);
@@ -261,8 +261,8 @@ class DenseComplexMatrix extends ComplexMatrix {
     }
   }
 
-  void fill(final double re, final double im) {
-    final int zero = index(0, 0);
+  void fill(double re, double im) {
+    var zero = index(0, 0);
     int idx = zero;
     for (int r = 0; r < rows; r++) {
       for (int i = idx, c = 0; c < columns; c++) {
@@ -274,7 +274,7 @@ class DenseComplexMatrix extends ComplexMatrix {
     }
   }
 
-  void setAll(final Float64List values) {
+  void setAll(Float64List values) {
     if (values.length != rows * 2 * columns) {
       throw new ArgumentError(
           "Must have same length: length=${values.length} rows()*2*columns()=${rows * 2 * columns}");
@@ -282,7 +282,7 @@ class DenseComplexMatrix extends ComplexMatrix {
     if (!isView) {
       _elements.setAll(0, values);
     } else {
-      final int zero = index(0, 0);
+      var zero = index(0, 0);
       int idxOther = 0;
       int idx = zero;
       for (int r = 0; r < rows; r++) {
@@ -296,7 +296,7 @@ class DenseComplexMatrix extends ComplexMatrix {
     }
   }
 
-  void setImaginary(final DoubleMatrix other) {
+  void setImaginary(DoubleMatrix other) {
     checkShape(this, other);
     int columnStrideOther = other.columnStride;
     int rowStrideOther = other.rowStride;
@@ -316,7 +316,7 @@ class DenseComplexMatrix extends ComplexMatrix {
     }
   }
 
-  void setReal(final DoubleMatrix other) {
+  void setReal(DoubleMatrix other) {
     checkShape(this, other);
     int columnStrideOther = other.columnStride;
     int rowStrideOther = other.rowStride;
@@ -338,7 +338,7 @@ class DenseComplexMatrix extends ComplexMatrix {
 
   int get cardinality {
     int cardinality = 0;
-    final int zero = index(0, 0);
+    var zero = index(0, 0);
     int idx = zero;
     for (int r = 0; r < rows; r++) {
       for (int i = idx, c = 0; c < columns; c++) {
@@ -352,8 +352,8 @@ class DenseComplexMatrix extends ComplexMatrix {
     return cardinality;
   }
 
-  void forEachNonZero(final cfunc.IntIntComplexFunction fn) {
-    final int zero = index(0, 0);
+  void forEachNonZero(cfunc.IntIntComplexFunction fn) {
+    var zero = index(0, 0);
     int idx = zero;
     for (int r = 0; r < rows; r++) {
       for (int i = idx, c = 0; c < columns; c++) {
@@ -410,8 +410,8 @@ class DenseComplexMatrix extends ComplexMatrix {
     return Im;
   }
 
-  void nonzero(final List<int> rowList, final List<int> columnList,
-      final List<Complex> valueList) {
+  void nonzero(List<int> rowList, List<int> columnList,
+      List<Complex> valueList) {
     rowList.clear();
     columnList.clear();
     valueList.clear();
@@ -474,7 +474,7 @@ class DenseComplexMatrix extends ComplexMatrix {
     _elements[idx + 1] = value.imaginary;
   }
 
-  ComplexVector mult(final ComplexVector y,
+  ComplexVector mult(ComplexVector y,
       [ComplexVector z = null, Complex alpha = null,
       Complex beta = null, bool transposeA = false]) {
     if (alpha == null) {
@@ -542,8 +542,8 @@ class DenseComplexMatrix extends ComplexMatrix {
 
   ComplexMatrix multiply(ComplexMatrix B,
       [ComplexMatrix C = null, Complex alpha = null,
-      Complex beta = null, final bool transposeA = false,
-      final bool transposeB = false]) {
+      Complex beta = null, bool transposeA = false,
+      bool transposeB = false]) {
     if (alpha == null) {
       alpha = Complex.ONE;
     }
@@ -880,7 +880,7 @@ class SelectedDenseComplexMatrix extends ComplexMatrix {
     var R = new DenseDoubleMatrix(rows, columns);
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < columns; c++) {
-        final tmp = get(r, c);
+        var tmp = get(r, c);
         R.set(r, c, tmp.real);
       }
     }
@@ -891,7 +891,7 @@ class SelectedDenseComplexMatrix extends ComplexMatrix {
     var Im = new DenseDoubleMatrix(rows, columns);
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < columns; c++) {
-        final tmp = get(r, c);
+        var tmp = get(r, c);
         Im.set(r, c, tmp.imaginary);
       }
     }

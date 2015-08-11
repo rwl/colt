@@ -23,8 +23,8 @@ abstract class ComplexMatrix extends AbstractMatrix {
   factory ComplexMatrix.sparse(int rows, int columns) = SparseComplexMatrix;
 
   /// Applies a function to each cell and aggregates the results.
-  Complex aggregate(final cfunc.ComplexComplexComplexFunction aggr,
-      final cfunc.ComplexComplexFunction fn) {
+  Complex aggregate(cfunc.ComplexComplexComplexFunction aggr,
+      cfunc.ComplexComplexFunction fn) {
     if (size == 0) {
       return Complex.NAN;
     }
@@ -40,7 +40,7 @@ abstract class ComplexMatrix extends AbstractMatrix {
   }
 
   /// Applies a function to each cell.
-  void apply(final cfunc.ComplexComplexFunction fn) {
+  void apply(cfunc.ComplexComplexFunction fn) {
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < columns; c++) {
         set(r, c, fn(get(r, c)));
@@ -50,7 +50,7 @@ abstract class ComplexMatrix extends AbstractMatrix {
 
   /// Assigns the result of a function to the real part of the receiver. The
   /// imaginary part of the receiver is reset to zero.
-  void applyReal(final cfunc.ComplexRealFunction fn) {
+  void applyReal(cfunc.ComplexRealFunction fn) {
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < columns; c++) {
         double re = fn(get(r, c));
@@ -83,8 +83,8 @@ abstract class ComplexMatrix extends AbstractMatrix {
   }
 
   /// Assigns the result of a function to each cell.
-  void assign(final ComplexMatrix y,
-      final cfunc.ComplexComplexComplexFunction f) {
+  void assign(ComplexMatrix y,
+      cfunc.ComplexComplexComplexFunction f) {
     checkShape(this, y);
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < columns; c++) {
@@ -94,7 +94,7 @@ abstract class ComplexMatrix extends AbstractMatrix {
   }
 
   /// Sets all cells to the state specified by [re] and [im].
-  void fill(final double re, final double im) {
+  void fill(double re, double im) {
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < columns; c++) {
         setParts(r, c, re, im);
@@ -107,7 +107,7 @@ abstract class ComplexMatrix extends AbstractMatrix {
   /// `re = values[row*rowStride+column*columnStride];`
   /// `im = values[row*rowStride+column*columnStride+1]`
   /// and have exactly the same number of rows and columns as the receiver.
-  void setAll(final Float64List values) {
+  void setAll(Float64List values) {
     if (values.length != rows * 2 * columns) {
       throw new ArgumentError(
           "Must have same length: length=${values.length} rows()*2*columns()=${rows * 2 * columns}");
@@ -124,7 +124,7 @@ abstract class ComplexMatrix extends AbstractMatrix {
   /// Replaces imaginary part of the receiver with the values of another real
   /// matrix. The real part of the receiver remains unchanged. Both matrices
   /// must have the same size.
-  void setImaginary(final DoubleMatrix other) {
+  void setImaginary(DoubleMatrix other) {
     checkShape(this, other);
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < columns; c++) {
@@ -138,7 +138,7 @@ abstract class ComplexMatrix extends AbstractMatrix {
   /// Replaces real part of the receiver with the values of another real
   /// matrix. The imaginary part of the receiver remains unchanged. Both
   /// matrices must have the same size.
-  void setReal(final DoubleMatrix other) {
+  void setReal(DoubleMatrix other) {
     checkShape(this, other);
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < columns; c++) {
@@ -184,7 +184,7 @@ abstract class ComplexMatrix extends AbstractMatrix {
 
   /// Assigns the result of a function to each non-zero cell. Use this
   /// method for fast special-purpose iteration.
-  void forEachNonZero(final cfunc.IntIntComplexFunction fn) {
+  void forEachNonZero(cfunc.IntIntComplexFunction fn) {
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < columns; c++) {
         var value = get(r, c);
@@ -230,8 +230,8 @@ abstract class ComplexMatrix extends AbstractMatrix {
   /// specified lists. Fills into the lists, starting at index 0. After this
   /// call returns the specified lists all have a new size, the number of
   /// non-zero values.
-  void nonzero(final List<int> rowList, final List<int> columnList,
-      final List<Complex> valueList) {
+  void nonzero(List<int> rowList, List<int> columnList,
+      List<Complex> valueList) {
     rowList.clear();
     columnList.clear();
     valueList.clear();
@@ -425,7 +425,7 @@ abstract class ComplexMatrix extends AbstractMatrix {
 
   /// Linear algebraic matrix-vector multiplication;
   /// `z = alpha * A * y + beta*z`. Where `A == this`.
-  ComplexVector mult(final ComplexVector y,
+  ComplexVector mult(ComplexVector y,
       [ComplexVector z = null, Complex alpha = null,
       Complex beta = null, bool transposeA = false]) {
     if (alpha == null) {
@@ -466,7 +466,7 @@ abstract class ComplexMatrix extends AbstractMatrix {
   /// Linear algebraic matrix-matrix multiplication;
   /// `C = alpha * A x B + beta*C`. Matrix shapes:
   /// `A(m x n), B(n x p), C(m x p)`.
-  ComplexMatrix multiply(final ComplexMatrix B,
+  ComplexMatrix multiply(ComplexMatrix B,
       [ComplexMatrix C = null, Complex alpha = null,
       Complex beta = null, bool transposeA = false, bool transposeB = false]) {
     if (alpha == null) {

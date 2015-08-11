@@ -20,7 +20,7 @@ class DenseDoubleMatrix extends DoubleMatrix {
   /// Constructs a matrix with a given number of rows and columns. All entries
   /// are initially `0`.
   factory DenseDoubleMatrix(int rows, int columns) {
-    final elements = new Float64List(rows * columns);
+    var elements = new Float64List(rows * columns);
     return new DenseDoubleMatrix._internal(
         rows, columns, elements, 0, 0, columns, 1, false);
   }
@@ -43,7 +43,7 @@ class DenseDoubleMatrix extends DoubleMatrix {
     if (size == 0) {
       return double.NAN;
     }
-    final int zero = index(0, 0);
+    int zero = index(0, 0);
     double a = 0.0;
     a = fn(_elements[
         zero + (rows - 1) * rowStride + (columns - 1) * columnStride]);
@@ -59,11 +59,11 @@ class DenseDoubleMatrix extends DoubleMatrix {
   }
 
   void apply(DoubleFunction fn) {
-    final Float64List elems = this._elements;
+    Float64List elems = this._elements;
     if (elems == null) {
       throw new Error();
     }
-    final int zero = index(0, 0);
+    int zero = index(0, 0);
     int idx = zero + (rows - 1) * rowStride + (columns - 1) * columnStride;
     // specialization for speed
     if (fn is func.DoubleMult) {
@@ -97,9 +97,9 @@ class DenseDoubleMatrix extends DoubleMatrix {
     }
   }
 
-  void fill(final double value) {
-    final Float64List elems = this._elements;
-    final int zero = index(0, 0);
+  void fill(double value) {
+    Float64List elems = this._elements;
+    int zero = index(0, 0);
     int idx = zero;
     for (int r = 0; r < rows; r++) {
       for (int i = idx, c = 0; c < columns; c++) {
@@ -110,7 +110,7 @@ class DenseDoubleMatrix extends DoubleMatrix {
     }
   }
 
-  void setAll(final Float64List values) {
+  void setAll(Float64List values) {
     if (values.length != size) {
       throw new ArgumentError(
           "Must have same length: length=${values.length} rows()*columns()=${rows * columns}");
@@ -118,7 +118,7 @@ class DenseDoubleMatrix extends DoubleMatrix {
     if (!isView) {
       _elements.setAll(0, values);
     } else {
-      final int zero = index(0, 0);
+      int zero = index(0, 0);
       int idxOther = 0;
       int idx = zero;
       for (int r = 0; r < rows; r++) {
@@ -131,7 +131,7 @@ class DenseDoubleMatrix extends DoubleMatrix {
     }
   }
 
-  void copyFrom(final DoubleMatrix source) {
+  void copyFrom(DoubleMatrix source) {
     // overriden for performance only
     if (source is! DenseDoubleMatrix) {
       super.copyFrom(source);
@@ -180,7 +180,7 @@ class DenseDoubleMatrix extends DoubleMatrix {
     }
   }
 
-  void assign(final DoubleMatrix y, DoubleDoubleFunction fn) {
+  void assign(DoubleMatrix y, DoubleDoubleFunction fn) {
     // overriden for performance only
     if (!(y is DenseDoubleMatrix)) {
       super.assign(y, fn);
@@ -360,8 +360,8 @@ class DenseDoubleMatrix extends DoubleMatrix {
     return new DoubleMatrixLocation._(minValue, rowLocation, columnLocation);
   }
 
-  void negative(final List<int> rowList, final List<int> columnList,
-      final List<double> valueList) {
+  void negative(List<int> rowList, List<int> columnList,
+      List<double> valueList) {
     rowList.clear();
     columnList.clear();
     valueList.clear();
@@ -380,8 +380,8 @@ class DenseDoubleMatrix extends DoubleMatrix {
     }
   }
 
-  void nonzero(final List<int> rowList, final List<int> columnList,
-      final List<double> valueList) {
+  void nonzero(List<int> rowList, List<int> columnList,
+      List<double> valueList) {
     rowList.clear();
     columnList.clear();
     valueList.clear();
@@ -400,8 +400,8 @@ class DenseDoubleMatrix extends DoubleMatrix {
     }
   }
 
-  void positive(final List<int> rowList, final List<int> columnList,
-      final List<double> valueList) {
+  void positive(List<int> rowList, List<int> columnList,
+      List<double> valueList) {
     rowList.clear();
     columnList.clear();
     valueList.clear();
@@ -440,9 +440,9 @@ class DenseDoubleMatrix extends DoubleMatrix {
         value;
   }
 
-  DoubleVector mult(final DoubleVector y,
-      [DoubleVector z = null, final double alpha = 1.0,
-      final double beta = 0.0, final bool transposeA = false]) {
+  DoubleVector mult(DoubleVector y,
+      [DoubleVector z = null, double alpha = 1.0,
+      double beta = 0.0, bool transposeA = false]) {
     if (transposeA) {
       return dice().mult(y, z, alpha, beta, false);
     }
@@ -492,8 +492,8 @@ class DenseDoubleMatrix extends DoubleMatrix {
   }
 
   DoubleMatrix multiply(DoubleMatrix B,
-      [DoubleMatrix C = null, final double alpha = 1.0,
-      final double beta = 0.0, final bool transposeA = false,
+      [DoubleMatrix C = null, double alpha = 1.0,
+      double beta = 0.0, bool transposeA = false,
       bool transposeB = false]) {
     if (transposeA) {
       return dice().multiply(B, C, alpha, beta, false, transposeB);

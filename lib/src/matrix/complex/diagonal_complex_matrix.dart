@@ -66,7 +66,7 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
     return new DiagonalComplexMatrix(rows, columns);
   }
 
-  void apply(final cfunc.ComplexComplexFunction fn) {
+  void apply(cfunc.ComplexComplexFunction fn) {
     if (fn is cfunc.ComplexMult) {
       // x[i] = mult*x[i]
       Complex alpha = fn.multiplicator;
@@ -104,7 +104,7 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
     }
   }
 
-  void setAll(final Float64List values) {
+  void setAll(Float64List values) {
     if (values.length != 2 * _dlength) {
       throw new ArgumentError(
           "Must have same length: length=${values.length} 2*dlength=${2 * _dlength}");
@@ -137,8 +137,8 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
     }
   }
 
-  void assign(final ComplexMatrix y,
-      final cfunc.ComplexComplexComplexFunction fn) {
+  void assign(ComplexMatrix y,
+      cfunc.ComplexComplexComplexFunction fn) {
     checkShape(this, y);
     if (y is DiagonalComplexMatrix) {
       DiagonalComplexMatrix other = y;
@@ -259,7 +259,7 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
     }
   }
 
-  void forEachNonZero(final cfunc.IntIntComplexFunction fn) {
+  void forEachNonZero(cfunc.IntIntComplexFunction fn) {
     for (int i = 0; i < _dlength; i++) {
       var value = new Complex(_elements[2 * i], _elements[2 * i + 1]);
       if (value.real != 0 || value.imaginary != 0) {

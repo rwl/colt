@@ -24,7 +24,7 @@ class DenseDoubleVector extends DoubleVector {
   /// Constructs a matrix with a given number of cells. All entries are
   /// initially `0`.
   factory DenseDoubleVector(int size) {
-    final elements = new Float64List(size);
+    var elements = new Float64List(size);
     return new DenseDoubleVector._internal(size, elements, 0, 1, false);
   }
 
@@ -45,7 +45,7 @@ class DenseDoubleVector extends DoubleVector {
     return dfactory.append(A, B, create);
   }
 
-  double aggregate(final DoubleDoubleFunction aggr, final DoubleFunction fn) {
+  double aggregate(DoubleDoubleFunction aggr, DoubleFunction fn) {
     if (size == 0) {
       return double.NAN;
     }
@@ -58,7 +58,7 @@ class DenseDoubleVector extends DoubleVector {
     return a;
   }
 
-  void apply(final DoubleFunction fn) {
+  void apply(DoubleFunction fn) {
     double multiplicator = 0.0;
     if (fn is func.DoubleMult) {
       // x[i] = mult*x[i]
@@ -83,7 +83,7 @@ class DenseDoubleVector extends DoubleVector {
     }
   }
 
-  void fill(final double value) {
+  void fill(double value) {
     int idx = zero;
     for (int i = 0; i < size; i++) {
       _elements[idx] = value;
@@ -91,7 +91,7 @@ class DenseDoubleVector extends DoubleVector {
     }
   }
 
-  void setAll(final Float64List values) {
+  void setAll(Float64List values) {
     if (values.length != size) {
       throw new ArgumentError(
           "Must have same number of cells: length=${values.length} size()=${size}");
@@ -139,8 +139,8 @@ class DenseDoubleVector extends DoubleVector {
     if (_elements == null || other._elements == null) {
       throw new Error();
     }
-    final int zeroOther = other.index(0);
-    final int strideOther = other.stride;
+    int zeroOther = other.index(0);
+    int strideOther = other.stride;
     int idx = zero;
     int idxOther = zeroOther;
     for (int k = 0; k < size; k++) {
@@ -150,7 +150,7 @@ class DenseDoubleVector extends DoubleVector {
     }
   }
 
-  void assign(final DoubleVector y, final DoubleDoubleFunction fn) {
+  void assign(DoubleVector y, DoubleDoubleFunction fn) {
     // overriden for performance only
     if (y is! DenseDoubleVector) {
       super.assign(y, fn);
@@ -159,9 +159,9 @@ class DenseDoubleVector extends DoubleVector {
 
     checkSize(this, y);
 
-    final int zeroOther = y.index(0);
-    final int strideOther = y.stride;
-    final Float64List elementsOther = y.elements as Float64List;
+    int zeroOther = y.index(0);
+    int strideOther = y.stride;
+    Float64List elementsOther = y.elements as Float64List;
     // specialized for speed
     int idx = zero;
     int idxOther = zeroOther;
@@ -410,15 +410,15 @@ class DenseDoubleVector extends DoubleVector {
     return new DenseDoubleMatrix(rows, columns);
   }
 
-  DoubleMatrix reshape(final int rows, final int columns) {
+  DoubleMatrix reshape(int rows, int columns) {
     if (rows * columns != size) {
       throw new ArgumentError("rows*columns != size");
     }
     var m = new DenseDoubleMatrix(rows, columns);
-    final Float64List elementsOther = m.elements as Float64List;
-    final int zeroOther = m.index(0, 0);
-    final int rowStrideOther = m.rowStride;
-    final int columnStrideOther = m.columnStride;
+    Float64List elementsOther = m.elements as Float64List;
+    int zeroOther = m.index(0, 0);
+    int rowStrideOther = m.rowStride;
+    int columnStrideOther = m.columnStride;
     int idx = zero;
     for (int c = 0; c < columns; c++) {
       int idxOther = zeroOther + c * columnStrideOther;
@@ -446,7 +446,7 @@ class DenseDoubleVector extends DoubleVector {
     }
   }
 
-  double dot(DoubleVector y, [final int from = 0, int length = null]) {
+  double dot(DoubleVector y, [int from = 0, int length = null]) {
     if (length == null) {
       length = size;
     }
@@ -465,7 +465,7 @@ class DenseDoubleVector extends DoubleVector {
     if (y.size < tail) {
       tail = y.size;
     }
-    final Float64List elementsOther = yy._elements;
+    Float64List elementsOther = yy._elements;
     int zeroThis = index(from);
     int zeroOther = yy.index(from);
     int strideOther = yy.stride;
@@ -495,7 +495,7 @@ class DenseDoubleVector extends DoubleVector {
 
   double sum() {
     double sum = 0.0;
-    final Float64List elems = this._elements;
+    Float64List elems = this._elements;
     if (elems == null) {
       throw new Error();
     }
@@ -576,10 +576,10 @@ class SelectedDenseDoubleVector extends DoubleVector {
       throw new ArgumentError("rows*columns != size");
     }
     var m = new DenseDoubleMatrix(rows, columns);
-    final Float64List elementsOther = m.elements as Float64List;
-    final int zeroOther = m.index(0, 0);
-    final int rowStrideOther = m.rowStride;
-    final int colStrideOther = m.columnStride;
+    Float64List elementsOther = m.elements as Float64List;
+    int zeroOther = m.index(0, 0);
+    int rowStrideOther = m.rowStride;
+    int colStrideOther = m.columnStride;
     int idxOther;
     int idx = 0;
     for (int c = 0; c < columns; c++) {

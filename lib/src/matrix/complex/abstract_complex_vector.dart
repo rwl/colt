@@ -23,8 +23,8 @@ abstract class ComplexVector extends AbstractVector {
   factory ComplexVector.sparse(int size) = SparseComplexVector;
 
   /// Applies a function to each cell and aggregates the results.
-  Complex aggregate(final cfunc.ComplexComplexComplexFunction aggr,
-      final cfunc.ComplexComplexFunction f) {
+  Complex aggregate(cfunc.ComplexComplexComplexFunction aggr,
+      cfunc.ComplexComplexFunction f) {
     if (size == 0) {
       return Complex.NAN;
     }
@@ -36,7 +36,7 @@ abstract class ComplexVector extends AbstractVector {
   }
 
   /// Applies a function to each cell.
-  void apply(final cfunc.ComplexComplexFunction f) {
+  void apply(cfunc.ComplexComplexFunction f) {
     for (int i = 0; i < size; i++) {
       set(i, f(get(i)));
     }
@@ -44,7 +44,7 @@ abstract class ComplexVector extends AbstractVector {
 
   /// Applies a function to the real part of the receiver. The
   /// imaginary part of the receiver is reset to zero.
-  void applyReal(final cfunc.ComplexRealFunction f) {
+  void applyReal(cfunc.ComplexRealFunction f) {
     for (int i = 0; i < size; i++) {
       setParts(i, f(get(i)), 0.0);
     }
@@ -72,8 +72,8 @@ abstract class ComplexVector extends AbstractVector {
   }
 
   /// Assigns the result of a function to each cell.
-  void assign(final ComplexVector y,
-      final cfunc.ComplexComplexComplexFunction f) {
+  void assign(ComplexVector y,
+      cfunc.ComplexComplexComplexFunction f) {
     checkSize(this, y);
     for (int i = 0; i < size; i++) {
       set(i, f(get(i), y.get(i)));
@@ -81,7 +81,7 @@ abstract class ComplexVector extends AbstractVector {
   }
 
   /// Sets all cells to the state specified by [re] and [im].
-  void fill(final double re, final double im) {
+  void fill(double re, double im) {
     for (int i = 0; i < size; i++) {
       setParts(i, re, im);
     }
@@ -91,7 +91,7 @@ abstract class ComplexVector extends AbstractVector {
   /// to have the same number of cells as the receiver. Complex data is
   /// represented by 2 double values in sequence: the real and imaginary
   /// parts, i.e. input array must be of size `2*size`.
-  void setAll(final Float64List values) {
+  void setAll(Float64List values) {
     if (values.length != 2 * size) {
       throw new ArgumentError(
           "The length of values[] must be equal to 2*size()=$size");
@@ -104,7 +104,7 @@ abstract class ComplexVector extends AbstractVector {
   /// Replaces imaginary part of the receiver with the values of another
   /// real matrix. The real part remains unchanged. Both matrices must
   /// have the same size.
-  void setImaginary(final DoubleVector other) {
+  void setImaginary(DoubleVector other) {
     checkSize(this, other);
     for (int i = 0; i < size; i++) {
       double re = get(i).real;
@@ -116,7 +116,7 @@ abstract class ComplexVector extends AbstractVector {
   /// Replaces real part of the receiver with the values of another real
   /// matrix. The imaginary part remains unchanged. Both matrices must
   /// have the same size.
-  void setReal(final DoubleVector other) {
+  void setReal(DoubleVector other) {
     checkSize(this, other);
     for (int i = 0; i < size; i++) {
       double re = other.get(i);
@@ -175,7 +175,7 @@ abstract class ComplexVector extends AbstractVector {
   /// non-zero values.
   ///
   /// In general, fill order is unspecified.
-  void nonzero({List<int> indexList, final List<Complex> valueList}) {
+  void nonzero({List<int> indexList, List<Complex> valueList}) {
     bool fillIndexList = indexList != null;
     bool fillValueList = valueList != null;
     if (fillIndexList) {
@@ -253,7 +253,7 @@ abstract class ComplexVector extends AbstractVector {
   }
 
   /// Fills the cell values into the specified 1-dimensional array.
-  void fillList(final Float64List values) {
+  void fillList(Float64List values) {
     if (values.length < 2 * size) {
       throw new ArgumentError("values too small");
     }
@@ -337,8 +337,8 @@ abstract class ComplexVector extends AbstractVector {
 
   /// Returns the dot product of two vectors x and y. Operates on cells at
   /// indexes `from .. Min(size(),y.size(),from+length)-1`.
-  Complex dot(final ComplexVector y,
-      [final int from = 0, int length = null]) {
+  Complex dot(ComplexVector y,
+      [int from = 0, int length = null]) {
     if (length == null) {
       length = this.size;
     }

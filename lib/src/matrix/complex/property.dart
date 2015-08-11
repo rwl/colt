@@ -40,7 +40,7 @@ import '../../math.dart' as cmath;
 
 /// Returns whether all cells of the given matrix [A] are equal to the
 /// given value.
-bool allVector(final ComplexVector A, final Complex value,
+bool allVector(ComplexVector A, Complex value,
     [double epsilon = EPSILON]) {
   if (A == null) {
     return false;
@@ -62,7 +62,7 @@ bool allVector(final ComplexVector A, final Complex value,
 }
 
 /// Returns whether both given matrices [A] and [B] are equal.
-bool equalsVector(final ComplexVector A, final ComplexVector B,
+bool equalsVector(ComplexVector A, ComplexVector B,
     [double epsilon = EPSILON]) {
   if (identical(A, B)) {
     return true;
@@ -94,7 +94,7 @@ bool equalsVector(final ComplexVector A, final ComplexVector B,
 
 /// Returns whether all cells of the given matrix [A] are equal to the
 /// given value.
-bool allMatrix(final ComplexMatrix A, final Complex value,
+bool allMatrix(ComplexMatrix A, Complex value,
     [double epsilon = EPSILON]) {
   if (A == null) {
     return false;
@@ -120,7 +120,7 @@ bool allMatrix(final ComplexMatrix A, final Complex value,
 }
 
 /// Returns whether both given matrices [A] and [B] are equal.
-bool equalsMatrix(final ComplexMatrix A, final ComplexMatrix B,
+bool equalsMatrix(ComplexMatrix A, ComplexMatrix B,
     [double epsilon = EPSILON]) {
   if (identical(A, B)) {
     return true;
