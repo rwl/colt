@@ -2,6 +2,8 @@
 
 A [Dart][] library for vector and matrix algebra.
 
+[![Build Status](https://travis-ci.org/rwl/colt.svg)](https://travis-ci.org/rwl/colt)
+
 Includes fixed sized (non-resizable) dense and sparse matrices for `int`,
 `double` and `Complex` types.
 
