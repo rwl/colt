@@ -58,12 +58,14 @@ testDiagonalComplexMatrix(bool view) {
       if (DINDEX >= 0) {
         for (int r = 0; r < DLENGTH; r++) {
           expect(expected[2 * r], closeTo(A.get(r, r + DINDEX).real, TOL));
-          expect(expected[2 * r + 1], closeTo(A.get(r, r + DINDEX).imaginary, TOL));
+          expect(expected[2 * r + 1],
+              closeTo(A.get(r, r + DINDEX).imaginary, TOL));
         }
       } else {
         for (int r = 0; r < DLENGTH; r++) {
           expect(expected[2 * r], closeTo(A.get(r - DINDEX, r).real, TOL));
-          expect(expected[2 * r + 1], closeTo(A.get(r - DINDEX, r).imaginary, TOL));
+          expect(expected[2 * r + 1],
+              closeTo(A.get(r - DINDEX, r).imaginary, TOL));
         }
       }
     });
@@ -76,13 +78,15 @@ testDiagonalComplexMatrix(bool view) {
         for (int r = 0; r < DLENGTH; r++) {
           expect(Acopy.get(r, r + DINDEX).real,
               closeTo(A.get(r, r + DINDEX).real, TOL));
-          expect(Im.get(r, r + DINDEX), closeTo(A.get(r, r + DINDEX).imaginary, TOL));
+          expect(Im.get(r, r + DINDEX),
+              closeTo(A.get(r, r + DINDEX).imaginary, TOL));
         }
       } else {
         for (int r = 0; r < DLENGTH; r++) {
           expect(Acopy.get(r - DINDEX, r).real,
               closeTo(A.get(r - DINDEX, r).real, TOL));
-          expect(Im.get(r - DINDEX, r), closeTo(A.get(r - DINDEX, r).imaginary, TOL));
+          expect(Im.get(r - DINDEX, r),
+              closeTo(A.get(r - DINDEX, r).imaginary, TOL));
         }
       }
     });
@@ -95,13 +99,15 @@ testDiagonalComplexMatrix(bool view) {
         for (int r = 0; r < DLENGTH; r++) {
           expect(Acopy.get(r, r + DINDEX).imaginary,
               closeTo(A.get(r, r + DINDEX).imaginary, TOL));
-          expect(Re.get(r, r + DINDEX), closeTo(A.get(r, r + DINDEX).real, TOL));
+          expect(
+              Re.get(r, r + DINDEX), closeTo(A.get(r, r + DINDEX).real, TOL));
         }
       } else {
         for (int r = 0; r < DLENGTH; r++) {
           expect(Acopy.get(r - DINDEX, r).imaginary,
               closeTo(A.get(r - DINDEX, r).imaginary, TOL));
-          expect(Re.get(r - DINDEX, r), closeTo(A.get(r - DINDEX, r).real, TOL));
+          expect(
+              Re.get(r - DINDEX, r), closeTo(A.get(r - DINDEX, r).real, TOL));
         }
       }
     });
@@ -113,13 +119,15 @@ testDiagonalComplexMatrix(bool view) {
         for (int r = 0; r < DLENGTH; r++) {
           var expected = Acopy.get(r, r + DINDEX).acos();
           expect(expected.real, closeTo(A.get(r, r + DINDEX).real, TOL));
-          expect(expected.imaginary, closeTo(A.get(r, r + DINDEX).imaginary, TOL));
+          expect(
+              expected.imaginary, closeTo(A.get(r, r + DINDEX).imaginary, TOL));
         }
       } else {
         for (int r = 0; r < DLENGTH; r++) {
           var expected = Acopy.get(r - DINDEX, r).acos();
           expect(expected.real, closeTo(A.get(r - DINDEX, r).real, TOL));
-          expect(expected.imaginary, closeTo(A.get(r - DINDEX, r).imaginary, TOL));
+          expect(
+              expected.imaginary, closeTo(A.get(r - DINDEX, r).imaginary, TOL));
         }
       }
     });

@@ -20,8 +20,7 @@ typedef IntMatrix MatrixFn(int r, int c);
 
 /// `C = A||B`; Constructs a new matrix which is the concatenation of two
 /// other matrices.
-IntVector append(
-    IntVector A, IntVector B, VectorFn make) {
+IntVector append(IntVector A, IntVector B, VectorFn make) {
   // concatenate
   IntVector matrix = make(A.size + B.size);
   matrix.part(0, A.size).copyFrom(A);
@@ -104,8 +103,7 @@ IntVector repeat(IntVector A, int repeat, VectorFn make) {
 ///     -->
 ///     0 1 2 6 7
 ///     3 4 5 8 9
-IntMatrix appendColumns(
-    IntMatrix A, IntMatrix B, MatrixFn make) {
+IntMatrix appendColumns(IntMatrix A, IntMatrix B, MatrixFn make) {
   // force both to have maximal shared number of rows.
   if (B.rows > A.rows) {
     B = B.part(0, 0, A.rows, B.columns);
@@ -123,8 +121,7 @@ IntMatrix appendColumns(
   return matrix;
 }
 
-IntMatrix appendColumn(
-    IntMatrix A, IntVector b, MatrixFn make) {
+IntMatrix appendColumn(IntMatrix A, IntVector b, MatrixFn make) {
   // force both to have maximal shared number of rows.
   if (b.size > A.rows) {
     b = b.part(0, A.rows);
@@ -157,8 +154,7 @@ IntMatrix appendColumn(
 ///     4 5
 ///     6 7
 ///     8 9
-IntMatrix appendRows(
-    IntMatrix A, IntMatrix B, MatrixFn make) {
+IntMatrix appendRows(IntMatrix A, IntMatrix B, MatrixFn make) {
   // force both to have maximal shared number of columns.
   if (B.columns > A.columns) B = B.part(0, 0, B.rows, A.columns);
   else if (B.columns < A.columns) A = A.part(0, 0, A.rows, B.columns);
@@ -173,8 +169,7 @@ IntMatrix appendRows(
   return matrix;
 }
 
-IntMatrix appendRow(
-    IntMatrix A, IntVector b, MatrixFn make) {
+IntMatrix appendRow(IntMatrix A, IntVector b, MatrixFn make) {
   // force both to have maximal shared number of columns.
   if (b.size > A.columns) {
     b = b.part(0, A.columns);
@@ -235,8 +230,7 @@ void _checkRectShape(List<List<IntMatrix>> array) {
   }
 }
 
-IntMatrix reshape(
-    IntVector a, int rows, int columns, MatrixFn make) {
+IntMatrix reshape(IntVector a, int rows, int columns, MatrixFn make) {
   if (a.size != rows * columns) {
     throw new ArgumentError("a.length != rows*columns");
   }
@@ -335,8 +329,7 @@ IntMatrix compose(List<List<IntMatrix>> parts, MatrixFn make) {
 ///
 ///     A 0
 ///     0 B
-IntMatrix composeDiagonal(
-    IntMatrix A, IntMatrix B, MatrixFn make) {
+IntMatrix composeDiagonal(IntMatrix A, IntMatrix B, MatrixFn make) {
   int ar = A.rows;
   int ac = A.columns;
   int br = B.rows;
@@ -353,8 +346,7 @@ IntMatrix composeDiagonal(
 ///     A 0 0
 ///     0 B 0
 ///     0 0 C
-IntMatrix composeDiag(IntMatrix A, IntMatrix B,
-    IntMatrix C, MatrixFn make) {
+IntMatrix composeDiag(IntMatrix A, IntMatrix B, IntMatrix C, MatrixFn make) {
   IntMatrix diag =
       make(A.rows + B.rows + C.rows, A.columns + B.columns + C.columns);
   diag.part(0, 0, A.rows, A.columns).copyFrom(A);
@@ -365,8 +357,7 @@ IntMatrix composeDiag(IntMatrix A, IntMatrix B,
   return diag;
 }
 
-IntMatrix composeBidiagonal(
-    IntMatrix A, IntMatrix B, MatrixFn make) {
+IntMatrix composeBidiagonal(IntMatrix A, IntMatrix B, MatrixFn make) {
   int ar = A.rows;
   int ac = A.columns;
   int br = B.rows;
@@ -533,8 +524,7 @@ IntMatrix columnMajor(Int32List values, int rows, MatrixFn make) {
 
 /// Constructs a matrix with the given shape, each cell initialized with the
 /// given value.
-IntMatrix fillMatrix(
-    int rows, int columns, int initialValue, MatrixFn make) {
+IntMatrix fillMatrix(int rows, int columns, int initialValue, MatrixFn make) {
   if (initialValue == 0) return make(rows, columns);
   return make(rows, columns)..fill(initialValue);
 }

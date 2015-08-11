@@ -13,7 +13,6 @@ part of cern.colt.matrix;
 /// Abstract base class for 2-d matrices holding objects or primitive data
 /// types such as [int], [double], etc.
 abstract class AbstractMatrix {
-
   bool _isNoView = true;
 
   /// The number of colums and rows this matrix (view) has.
@@ -30,8 +29,9 @@ abstract class AbstractMatrix {
   /// The index of the first element.
   int _rowZero, _columnZero;
 
-  AbstractMatrix(int rows, int columns, [int rowZero = 0, int columnZero = 0, int rowStride = null, int columnStride = 1, bool isNoView = true]) {
-  //void _setUp(int rows, int columns, int rowZero, int columnZero, int rowStride, int columnStride) {
+  AbstractMatrix(int rows, int columns, [int rowZero = 0, int columnZero = 0,
+      int rowStride = null, int columnStride = 1, bool isNoView = true]) {
+    //void _setUp(int rows, int columns, int rowZero, int columnZero, int rowStride, int columnStride) {
     if (rowStride == null) {
       rowStride = columns;
     }
@@ -104,21 +104,28 @@ abstract class AbstractMatrix {
 /// Checks whether the receiver contains the given box and throws an
 /// exception, if necessary.
 void checkBox(AbstractMatrix m, int row, int column, int height, int width) {
-  if (column < 0 || width < 0 || column + width > m._columns || row < 0 || height < 0 || row + height > m._rows) {
-    throw new RangeError(m.toStringShort() + ", column:$column, row:$row ,width:$width, height:$height");
+  if (column < 0 ||
+      width < 0 ||
+      column + width > m._columns ||
+      row < 0 ||
+      height < 0 ||
+      row + height > m._rows) {
+    throw new RangeError(m.toStringShort() +
+        ", column:$column, row:$row ,width:$width, height:$height");
   }
 }
 
 /// Sanity check for operations requiring a column index to be within bounds.
 void checkColumn(AbstractMatrix m, int column) {
   if (column < 0 || column >= m._columns) {
-    throw new RangeError("Attempted to access " + m.toStringShort() + " at column=$column");
+    throw new RangeError(
+        "Attempted to access " + m.toStringShort() + " at column=$column");
   }
 }
 
 /// Checks whether indexes are legal and throws an exception, if necessary.
 void checkColumnIndexes(AbstractMatrix m, List<int> indexes) {
-  for (int index in  indexes) {
+  for (int index in indexes) {
     checkColumn(m, index);
   }
 }
@@ -126,7 +133,8 @@ void checkColumnIndexes(AbstractMatrix m, List<int> indexes) {
 /// Sanity check for operations requiring a row index to be within bounds.
 void checkRow(AbstractMatrix m, int row) {
   if (row < 0 || row >= m._rows) {
-    throw new RangeError("Attempted to access " + m.toStringShort() + " at row=$row");
+    throw new RangeError(
+        "Attempted to access " + m.toStringShort() + " at row=$row");
   }
 }
 
@@ -142,11 +150,22 @@ void checkRowIndexes(AbstractMatrix m, List<int> indexes) {
 void checkShape(AbstractMatrix A, AbstractMatrix B, [AbstractMatrix C = null]) {
   if (C == null) {
     if (A._columns != B._columns || A._rows != B._rows) {
-      throw new ArgumentError("Incompatible dimensions: " + A.toStringShort() + " and " + B.toStringShort());
+      throw new ArgumentError("Incompatible dimensions: " +
+          A.toStringShort() +
+          " and " +
+          B.toStringShort());
     }
   } else {
-    if (A._columns != B._columns || A._rows != B._rows || A._columns != C._columns || A._rows != C._rows) {
-      throw new ArgumentError("Incompatible dimensions: " + A.toStringShort() + ", " + B.toStringShort() + ", " + C.toStringShort());
+    if (A._columns != B._columns ||
+        A._rows != B._rows ||
+        A._columns != C._columns ||
+        A._rows != C._rows) {
+      throw new ArgumentError("Incompatible dimensions: " +
+          A.toStringShort() +
+          ", " +
+          B.toStringShort() +
+          ", " +
+          C.toStringShort());
     }
   }
 }

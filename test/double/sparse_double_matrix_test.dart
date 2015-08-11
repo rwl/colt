@@ -17,7 +17,8 @@ void testRowCompressed() {
     columnindexes[i] = (_r.nextInt(MAX_INT) % NCOLUMNS).abs();
     values[i] = _r.nextDouble();
   }
-  var A = new SparseDoubleMatrix.withValues(NROWS, NCOLUMNS, rowindexes, columnindexes, values);
+  var A = new SparseDoubleMatrix.withValues(
+      NROWS, NCOLUMNS, rowindexes, columnindexes, values);
   SparseRCDoubleMatrix B = A.rowCompressed(false);
   for (int r = 0; r < A.rows; r++) {
     for (int c = 0; c < A.columns; c++) {
@@ -42,7 +43,8 @@ void testColumnCompressed() {
     columnindexes[i] = (_r.nextInt(MAX_INT) % NCOLUMNS).abs();
     values[i] = _r.nextDouble();
   }
-  var A = new SparseDoubleMatrix.withValues(NROWS, NCOLUMNS, rowindexes, columnindexes, values);
+  var A = new SparseDoubleMatrix.withValues(
+      NROWS, NCOLUMNS, rowindexes, columnindexes, values);
   SparseCCDoubleMatrix B = A.columnCompressed(false);
   for (int r = 0; r < A.rows; r++) {
     for (int c = 0; c < A.columns; c++) {

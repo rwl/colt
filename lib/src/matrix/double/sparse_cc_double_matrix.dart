@@ -463,9 +463,8 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
     return buf.toString();
   }
 
-  DoubleVector mult(DoubleVector y, [DoubleVector z = null,
-      double alpha = 1.0, double beta = 0.0,
-      bool transposeA = false]) {
+  DoubleVector mult(DoubleVector y, [DoubleVector z = null, double alpha = 1.0,
+      double beta = 0.0, bool transposeA = false]) {
     int rowsA = transposeA ? columns : rows;
     int columnsA = transposeA ? rows : columns;
 
@@ -549,8 +548,8 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
   }
 
   DoubleMatrix multiply(DoubleMatrix B, [DoubleMatrix C = null,
-      double alpha = 1.0, double beta = 0.0,
-      bool transposeA = false, bool transposeB = false]) {
+      double alpha = 1.0, double beta = 0.0, bool transposeA = false,
+      bool transposeB = false]) {
     int rowsA = rows;
     int columnsA = columns;
     if (transposeA) {

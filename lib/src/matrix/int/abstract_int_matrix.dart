@@ -537,8 +537,7 @@ abstract class IntMatrix extends AbstractMatrix {
   }
 
   /// Construct and returns a new selection view.
-  IntMatrix _viewSelectionLike(
-      Int32List rowOffsets, Int32List columnOffsets);
+  IntMatrix _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets);
 
   /// Constructs and returns a new *stride view* which is a sub matrix
   /// consisting of every i-th cell.
@@ -552,8 +551,8 @@ abstract class IntMatrix extends AbstractMatrix {
   /// `z = alpha * A * y + beta*z`.
   /// `z[i] = alpha*Sum(A[i,j] * y[j]) + beta*z[i], i=0..A.rows()-1, j=0..y.length-1`.
   /// Where `A == this`.
-  IntVector mult(IntVector y, [IntVector z = null,
-      int alpha = 1, int beta = null, bool transposeA = false]) {
+  IntVector mult(IntVector y, [IntVector z = null, int alpha = 1,
+      int beta = null, bool transposeA = false]) {
     if (beta == null) {
       beta = z == null ? 1 : 0;
     }
@@ -589,9 +588,8 @@ abstract class IntMatrix extends AbstractMatrix {
   /// `C = alpha * A x B + beta*C`.
   /// `C[i,j] = alpha*Sum(A[i,k] * B[k,j]) + beta*C[i,j], k=0..n-1`.
   /// Matrix shapes: `A(m x n), B(n x p), C(m x p)`.
-  IntMatrix multiply(IntMatrix B,
-      [IntMatrix C = null, int alpha = 1, int beta = null,
-      bool transposeA = false, bool transposeB = false]) {
+  IntMatrix multiply(IntMatrix B, [IntMatrix C = null, int alpha = 1,
+      int beta = null, bool transposeA = false, bool transposeB = false]) {
     if (beta == null) {
       beta = C == null ? 1 : 0;
     }

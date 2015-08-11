@@ -90,7 +90,7 @@ abstract class AbstractFormatter {
 
   String _alignment = LEFT;
 
-  String _format = null;//"%G";
+  String _format = null; //"%G";
 
   int _minColumnWidth = DEFAULT_MIN_COLUMN_WIDTH;
 
@@ -150,7 +150,6 @@ abstract class AbstractFormatter {
     for (int row = 0; row < rows; row++) {
       _alignRow(strings[row], maxColWidth, maxColLead);
     }
-
   }
 
   /// Converts a row into a string.
@@ -171,7 +170,8 @@ abstract class AbstractFormatter {
 
   /// Modifies the strings the string matrix to be aligned
   /// (left,centered,right,decimal).
-  void _alignRow(List<String> row, List<int> maxColWidth, List<int> maxColLead) {
+  void _alignRow(
+      List<String> row, List<int> maxColWidth, List<int> maxColLead) {
     var s = new StringBuffer();
 
     int columns = row.length;
@@ -189,7 +189,6 @@ abstract class AbstractFormatter {
         s.write(_blanks((maxColWidth[column] - c.length) ~/ 2));
         s.write(c);
         s.write(_blanks(maxColWidth[column] - s.length));
-
       } else if (_alignment == LEFT) {
         s.write(c);
         s.write(_blanks(maxColWidth[column] - s.length));

@@ -14,7 +14,6 @@ part of cern.colt.matrix.double;
 ///
 /// Internally holds one two-dimensional array, `elements[rows][columns]`.
 class LargeDoubleMatrix extends WrapperDoubleMatrix {
-
   List<Float64List> _elements;
 
   factory LargeDoubleMatrix(int rows, int columns) {
@@ -22,7 +21,8 @@ class LargeDoubleMatrix extends WrapperDoubleMatrix {
     return new LargeDoubleMatrix._internal(rows, columns, elements);
   }
 
-  LargeDoubleMatrix._internal(int rows, int columns, List<Float64List> elements) : super._(rows, columns) {
+  LargeDoubleMatrix._internal(int rows, int columns, List<Float64List> elements)
+      : super._(rows, columns) {
     _elements = elements;
     _content = this;
   }

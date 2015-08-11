@@ -40,16 +40,17 @@ import '../../math.dart' as cmath;
 
 /// Returns whether all cells of the given matrix [A] are equal to the
 /// given value.
-bool allVector(ComplexVector A, Complex value,
-    [double epsilon = EPSILON]) {
+bool allVector(ComplexVector A, Complex value, [double epsilon = EPSILON]) {
   if (A == null) {
     return false;
   }
   for (int i = 0; i < A.size; i++) {
     var x = A.get(i);
-    var diff = new Complex((value.real - x.real).abs(), (value.imaginary - x.imaginary).abs());
+    var diff = new Complex(
+        (value.real - x.real).abs(), (value.imaginary - x.imaginary).abs());
     if (((diff.real != diff.real) || (diff.imaginary != diff.imaginary)) &&
-            ((((value.real != value.real) || (value.imaginary != value.imaginary)) &&
+            ((((value.real != value.real) ||
+                    (value.imaginary != value.imaginary)) &&
                 ((x.real != x.real) || (x.imaginary != x.imaginary)))) ||
         (cmath.isEqual(value, x, epsilon))) {
       diff = Complex.ZERO;
@@ -78,9 +79,11 @@ bool equalsVector(ComplexVector A, ComplexVector B,
   for (int i = 0; i < size; i++) {
     var x = A.get(i);
     var value = B.get(i);
-    var diff = new Complex((value.real - x.real).abs(), (value.imaginary - x.imaginary).abs());
+    var diff = new Complex(
+        (value.real - x.real).abs(), (value.imaginary - x.imaginary).abs());
     if (((diff.real != diff.real) || (diff.imaginary != diff.imaginary)) &&
-            ((((value.real != value.real) || (value.imaginary != value.imaginary)) &&
+            ((((value.real != value.real) ||
+                    (value.imaginary != value.imaginary)) &&
                 ((x.real != x.real) || (x.imaginary != x.imaginary)))) ||
         (cmath.isEqual(value, x, epsilon))) {
       diff = Complex.ZERO;
@@ -94,8 +97,7 @@ bool equalsVector(ComplexVector A, ComplexVector B,
 
 /// Returns whether all cells of the given matrix [A] are equal to the
 /// given value.
-bool allMatrix(ComplexMatrix A, Complex value,
-    [double epsilon = EPSILON]) {
+bool allMatrix(ComplexMatrix A, Complex value, [double epsilon = EPSILON]) {
   if (A == null) {
     return false;
   }
@@ -104,9 +106,11 @@ bool allMatrix(ComplexMatrix A, Complex value,
   for (int r = 0; r < rows; r++) {
     for (int c = 0; c < columns; c++) {
       var x = A.get(r, c);
-      var diff = new Complex((value.real - x.real).abs(), (value.imaginary - x.imaginary).abs());
+      var diff = new Complex(
+          (value.real - x.real).abs(), (value.imaginary - x.imaginary).abs());
       if (((diff.real != diff.real) || (diff.imaginary != diff.imaginary)) &&
-              ((((value.real != value.real) || (value.imaginary != value.imaginary)) &&
+              ((((value.real != value.real) ||
+                      (value.imaginary != value.imaginary)) &&
                   ((x.real != x.real) || (x.imaginary != x.imaginary)))) ||
           (cmath.isEqual(value, x, epsilon))) {
         diff = Complex.ZERO;
@@ -137,9 +141,11 @@ bool equalsMatrix(ComplexMatrix A, ComplexMatrix B,
     for (int c = 0; c < columns; c++) {
       var x = A.get(r, c);
       var value = B.get(r, c);
-      var diff = new Complex((value.real - x.real).abs(), (value.imaginary - x.imaginary).abs());
+      var diff = new Complex(
+          (value.real - x.real).abs(), (value.imaginary - x.imaginary).abs());
       if (((diff.real != diff.real) || (diff.imaginary != diff.imaginary)) &&
-              ((((value.real != value.real) || (value.imaginary != value.imaginary)) &&
+              ((((value.real != value.real) ||
+                      (value.imaginary != value.imaginary)) &&
                   ((x.real != x.real) || (x.imaginary != x.imaginary)))) ||
           (cmath.isEqual(value, x, epsilon))) {
         diff = Complex.ZERO;

@@ -12,9 +12,8 @@ part of cern.colt.matrix.complex;
 
 /// Abstract base class for 2-d matrices holding [Complex] elements.
 abstract class ComplexMatrix extends AbstractMatrix {
-  ComplexMatrix._(int rows, int columns, [int rowZero = 0,
-      int columnZero = 0, int rowStride = null, int columnStride = 1,
-      bool isNoView = true])
+  ComplexMatrix._(int rows, int columns, [int rowZero = 0, int columnZero = 0,
+      int rowStride = null, int columnStride = 1, bool isNoView = true])
       : super(rows, columns, rowZero, columnZero, rowStride, columnStride,
           isNoView);
 
@@ -83,8 +82,7 @@ abstract class ComplexMatrix extends AbstractMatrix {
   }
 
   /// Assigns the result of a function to each cell.
-  void assign(ComplexMatrix y,
-      cfunc.ComplexComplexComplexFunction f) {
+  void assign(ComplexMatrix y, cfunc.ComplexComplexComplexFunction f) {
     checkShape(this, y);
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < columns; c++) {
@@ -230,8 +228,8 @@ abstract class ComplexMatrix extends AbstractMatrix {
   /// specified lists. Fills into the lists, starting at index 0. After this
   /// call returns the specified lists all have a new size, the number of
   /// non-zero values.
-  void nonzero(List<int> rowList, List<int> columnList,
-      List<Complex> valueList) {
+  void nonzero(
+      List<int> rowList, List<int> columnList, List<Complex> valueList) {
     rowList.clear();
     columnList.clear();
     valueList.clear();
@@ -316,7 +314,8 @@ abstract class ComplexMatrix extends AbstractMatrix {
           continue;
         }
         if (elem.imaginary < 0) {
-          s.write(f.format(elem.real) + " - " + f.format(-elem.imaginary) + "i\t");
+          s.write(
+              f.format(elem.real) + " - " + f.format(-elem.imaginary) + "i\t");
           continue;
         }
         s.write(f.format(elem.real) + " + " + f.format(elem.imaginary) + "i\t");
@@ -425,9 +424,8 @@ abstract class ComplexMatrix extends AbstractMatrix {
 
   /// Linear algebraic matrix-vector multiplication;
   /// `z = alpha * A * y + beta*z`. Where `A == this`.
-  ComplexVector mult(ComplexVector y,
-      [ComplexVector z = null, Complex alpha = null,
-      Complex beta = null, bool transposeA = false]) {
+  ComplexVector mult(ComplexVector y, [ComplexVector z = null,
+      Complex alpha = null, Complex beta = null, bool transposeA = false]) {
     if (alpha == null) {
       alpha = Complex.ONE;
     }
@@ -466,9 +464,9 @@ abstract class ComplexMatrix extends AbstractMatrix {
   /// Linear algebraic matrix-matrix multiplication;
   /// `C = alpha * A x B + beta*C`. Matrix shapes:
   /// `A(m x n), B(n x p), C(m x p)`.
-  ComplexMatrix multiply(ComplexMatrix B,
-      [ComplexMatrix C = null, Complex alpha = null,
-      Complex beta = null, bool transposeA = false, bool transposeB = false]) {
+  ComplexMatrix multiply(ComplexMatrix B, [ComplexMatrix C = null,
+      Complex alpha = null, Complex beta = null, bool transposeA = false,
+      bool transposeB = false]) {
     if (alpha == null) {
       alpha = Complex.ONE;
     }

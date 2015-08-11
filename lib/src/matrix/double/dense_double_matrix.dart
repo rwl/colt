@@ -360,8 +360,8 @@ class DenseDoubleMatrix extends DoubleMatrix {
     return new DoubleMatrixLocation._(minValue, rowLocation, columnLocation);
   }
 
-  void negative(List<int> rowList, List<int> columnList,
-      List<double> valueList) {
+  void negative(
+      List<int> rowList, List<int> columnList, List<double> valueList) {
     rowList.clear();
     columnList.clear();
     valueList.clear();
@@ -380,8 +380,8 @@ class DenseDoubleMatrix extends DoubleMatrix {
     }
   }
 
-  void nonzero(List<int> rowList, List<int> columnList,
-      List<double> valueList) {
+  void nonzero(
+      List<int> rowList, List<int> columnList, List<double> valueList) {
     rowList.clear();
     columnList.clear();
     valueList.clear();
@@ -400,8 +400,8 @@ class DenseDoubleMatrix extends DoubleMatrix {
     }
   }
 
-  void positive(List<int> rowList, List<int> columnList,
-      List<double> valueList) {
+  void positive(
+      List<int> rowList, List<int> columnList, List<double> valueList) {
     rowList.clear();
     columnList.clear();
     valueList.clear();
@@ -440,8 +440,7 @@ class DenseDoubleMatrix extends DoubleMatrix {
         value;
   }
 
-  DoubleVector mult(DoubleVector y,
-      [DoubleVector z = null, double alpha = 1.0,
+  DoubleVector mult(DoubleVector y, [DoubleVector z = null, double alpha = 1.0,
       double beta = 0.0, bool transposeA = false]) {
     if (transposeA) {
       return dice().mult(y, z, alpha, beta, false);
@@ -491,9 +490,8 @@ class DenseDoubleMatrix extends DoubleMatrix {
     return z;
   }
 
-  DoubleMatrix multiply(DoubleMatrix B,
-      [DoubleMatrix C = null, double alpha = 1.0,
-      double beta = 0.0, bool transposeA = false,
+  DoubleMatrix multiply(DoubleMatrix B, [DoubleMatrix C = null,
+      double alpha = 1.0, double beta = 0.0, bool transposeA = false,
       bool transposeB = false]) {
     if (transposeA) {
       return dice().multiply(B, C, alpha, beta, false, transposeB);

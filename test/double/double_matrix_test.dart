@@ -3,8 +3,7 @@ part of cern.colt.matrix.double.test;
 const int NROWS = 13;
 const int NCOLUMNS = 17;
 
-void testDoubleMatrix(
-    String kind, DoubleMatrix make(int rows, int columns)) {
+void testDoubleMatrix(String kind, DoubleMatrix make(int rows, int columns)) {
   group("DoubleMatrix ($kind)", () {
     DoubleMatrix A, B, Bt;
 

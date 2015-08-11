@@ -20,14 +20,15 @@ DoubleVector append(DoubleVector A, DoubleVector B, VectorFn make) {
 
 /// Constructs a matrix with cells having ascending values.
 DoubleVector ascending(int size, VectorFn make) {
-  return descending(size, make)..apply(func.chainGH(func.neg, func.subtract(size)));
+  return descending(size, make)
+    ..apply(func.chainGH(func.neg, func.subtract(size)));
 }
 
 /// Constructs a matrix with cells having descending values.
 DoubleVector descending(int size, VectorFn make) {
   DoubleVector matrix = make(size);
   double v = 0.0;
-  for (int i = size; --i >= 0; ) {
+  for (int i = size; --i >= 0;) {
     matrix.set(i, v);
     v += 1;
   }
@@ -77,7 +78,7 @@ DoubleVector random(int size, VectorFn make) {
 DoubleVector repeat(DoubleVector A, int repeat, VectorFn make) {
   int size = A.size;
   DoubleVector matrix = make(repeat * size);
-  for (int i = repeat; --i >= 0; ) {
+  for (int i = repeat; --i >= 0;) {
     matrix.part(size * i, size).copyFrom(A);
   }
   return matrix;
@@ -103,13 +104,14 @@ DoubleVector repeat(DoubleVector A, int repeat, VectorFn make) {
 /// have the same number of columns.
 void _checkRectangularShapeParts(List<List<DoubleMatrix>> array) {
   int columns = -1;
-  for (int row = array.length; --row >= 0; ) {
+  for (int row = array.length; --row >= 0;) {
     if (array[row] != null) {
       if (columns == -1) {
         columns = array[row].length;
       }
       if (array[row].length != columns) {
-        throw new ArgumentError("All rows of array must have same number of columns.");
+        throw new ArgumentError(
+            "All rows of array must have same number of columns.");
       }
     }
   }
@@ -244,7 +246,8 @@ DoubleMatrix appendRows(DoubleMatrix A, DoubleMatrix B, MatrixFn make) {
 ///     0 1 2
 ///     3 4 5
 DoubleMatrix ascendingMatrix(int rows, int columns, MatrixFn make) {
-  return descendingMatrix(rows, columns, make)..apply(func.chainGH(func.neg, func.subtract(columns * rows)));
+  return descendingMatrix(rows, columns, make)
+    ..apply(func.chainGH(func.neg, func.subtract(columns * rows)));
 }
 
 /// Constructs a block matrix made from the given parts. The inverse to
@@ -270,9 +273,9 @@ DoubleMatrix compose(List<List<DoubleMatrix>> parts, MatrixFn make) {
 
   // determine maximum column width of each column
   var maxWidths = new Int32List(columns);
-  for (int column = columns; --column >= 0; ) {
+  for (int column = columns; --column >= 0;) {
     int maxWidth = 0;
-    for (int row = rows; --row >= 0; ) {
+    for (int row = rows; --row >= 0;) {
       DoubleMatrix part = parts[row][column];
       if (part != null) {
         int width = part.columns;
@@ -287,9 +290,9 @@ DoubleMatrix compose(List<List<DoubleMatrix>> parts, MatrixFn make) {
 
   // determine row height of each row
   var maxHeights = new Int32List(rows);
-  for (int row = rows; --row >= 0; ) {
+  for (int row = rows; --row >= 0;) {
     int maxHeight = 0;
-    for (int column = columns; --column >= 0; ) {
+    for (int column = columns; --column >= 0;) {
       DoubleMatrix part = parts[row][column];
       if (part != null) {
         int height = part.rows;
@@ -304,11 +307,11 @@ DoubleMatrix compose(List<List<DoubleMatrix>> parts, MatrixFn make) {
 
   // shape of result
   int resultRows = 0;
-  for (int row = rows; --row >= 0; ) {
+  for (int row = rows; --row >= 0;) {
     resultRows += maxHeights[row];
   }
   int resultCols = 0;
-  for (int column = columns; --column >= 0; ) {
+  for (int column = columns; --column >= 0;) {
     resultCols += maxWidths[column];
   }
 
@@ -337,8 +340,8 @@ DoubleMatrix compose(List<List<DoubleMatrix>> parts, MatrixFn make) {
 DoubleMatrix descendingMatrix(int rows, int columns, MatrixFn make) {
   DoubleMatrix matrix = make(rows, columns);
   double v = 0.0;
-  for (int row = rows; --row >= 0; ) {
-    for (int column = columns; --column >= 0; ) {
+  for (int row = rows; --row >= 0;) {
+    for (int column = columns; --column >= 0;) {
       matrix.set(row, column, v);
       v += 1;
     }
@@ -374,7 +377,7 @@ DoubleMatrix diagonalMatrix(DoubleVector vector, MatrixFn make) {
 DoubleVector diagonal(DoubleMatrix A, MatrixFn make) {
   int min = Math.min(A.rows, A.columns);
   DoubleVector diag = make(0, 0).like1D(min);
-  for (int i = min; --i >= 0; ) {
+  for (int i = min; --i >= 0;) {
     diag.set(i, A.get(i, i));
   }
   return diag;
@@ -384,7 +387,7 @@ DoubleVector diagonal(DoubleMatrix A, MatrixFn make) {
 /// elsewhere).
 DoubleMatrix identity(int rowsAndColumns, MatrixFn make) {
   DoubleMatrix matrix = make(rowsAndColumns, rowsAndColumns);
-  for (int i = rowsAndColumns; --i >= 0; ) {
+  for (int i = rowsAndColumns; --i >= 0;) {
     matrix.set(i, i, 1.0);
   }
   return matrix;
@@ -411,7 +414,8 @@ DoubleMatrix makeColumn(Float64List values, int rows, MatrixFn make) {
 
 /// Constructs a matrix with the given shape, each cell initialized with the
 /// given value.
-DoubleMatrix fillMatrix(int rows, int columns, double initialValue, MatrixFn make) {
+DoubleMatrix fillMatrix(
+    int rows, int columns, double initialValue, MatrixFn make) {
   if (initialValue == 0) {
     return make(rows, columns);
   }
@@ -434,12 +438,13 @@ DoubleMatrix randomMatrix(int rows, int columns, MatrixFn make) {
 ///     2 3 2 3 2 3
 ///     0 1 0 1 0 1
 ///     2 3 2 3 2 3
-DoubleMatrix repeatMatrix(DoubleMatrix A, int rowRepeat, int columnRepeat, MatrixFn make) {
+DoubleMatrix repeatMatrix(
+    DoubleMatrix A, int rowRepeat, int columnRepeat, MatrixFn make) {
   int r = A.rows;
   int c = A.columns;
   DoubleMatrix matrix = make(r * rowRepeat, c * columnRepeat);
-  for (int i = rowRepeat; --i >= 0; ) {
-    for (int j = columnRepeat; --j >= 0; ) {
+  for (int i = rowRepeat; --i >= 0;) {
+    for (int j = columnRepeat; --j >= 0;) {
       matrix.part(r * i, c * j, r, c).copyFrom(A);
     }
   }

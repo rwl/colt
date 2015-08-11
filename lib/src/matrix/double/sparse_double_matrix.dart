@@ -153,8 +153,11 @@ class SparseDoubleMatrix extends DoubleMatrix {
       rowIndexes[k] = key ~/ columns;
       columnIndexes[k] = key % columns;
     }
-    return new SparseCCDoubleMatrix.withValues(rows, columns, rowIndexes,
-        columnIndexes, values, removeDuplicates: false, removeZeroes: false, sortRowIndexes: sortRowIndexes);
+    return new SparseCCDoubleMatrix.withValues(
+        rows, columns, rowIndexes, columnIndexes, values,
+        removeDuplicates: false,
+        removeZeroes: false,
+        sortRowIndexes: sortRowIndexes);
   }
 
   /// Returns a new matrix that has the same elements as this matrix, but is
@@ -234,8 +237,7 @@ class SparseDoubleMatrix extends DoubleMatrix {
     return buf.toString();
   }
 
-  DoubleVector mult(DoubleVector y,
-      [DoubleVector z = null, double alpha = 1.0,
+  DoubleVector mult(DoubleVector y, [DoubleVector z = null, double alpha = 1.0,
       double beta = 0.0, bool transposeA = false]) {
     int rowsA = rows;
     int columnsA = columns;
@@ -296,9 +298,8 @@ class SparseDoubleMatrix extends DoubleMatrix {
     return z;
   }
 
-  DoubleMatrix multiply(DoubleMatrix B,
-      [DoubleMatrix C = null, double alpha = 1.0,
-      double beta = 0.0, bool transposeA = false,
+  DoubleMatrix multiply(DoubleMatrix B, [DoubleMatrix C = null,
+      double alpha = 1.0, double beta = 0.0, bool transposeA = false,
       bool transposeB = false]) {
     if (isView) {
       return super.multiply(B, C, alpha, beta, transposeA, transposeB);

@@ -131,8 +131,7 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
     }
   }
 
-  void assign(
-      DoubleMatrix y, func.DoubleDoubleFunction fn) {
+  void assign(DoubleMatrix y, func.DoubleDoubleFunction fn) {
     checkShape(this, y);
     if (y is DiagonalDoubleMatrix) {
       DiagonalDoubleMatrix other = y;
@@ -370,9 +369,8 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
     }
   }
 
-  DoubleVector mult(DoubleVector y,
-      [DoubleVector z = null, double alpha = 1.0, double beta = 0.0,
-      bool transposeA = false]) {
+  DoubleVector mult(DoubleVector y, [DoubleVector z = null, double alpha = 1.0,
+      double beta = 0.0, bool transposeA = false]) {
     int rowsA = rows;
     int columnsA = columns;
     if (transposeA) {

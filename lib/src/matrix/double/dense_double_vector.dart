@@ -523,7 +523,8 @@ class DenseDoubleVector extends DoubleVector {
   }
 
   Object clone() {
-    return new DenseDoubleVector._internal(size, _elements, zero, stride, isView);
+    return new DenseDoubleVector._internal(
+        size, _elements, zero, stride, isView);
   }
 }
 

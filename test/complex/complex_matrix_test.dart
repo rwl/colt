@@ -4,8 +4,7 @@ const NROWS = 13;
 const NCOLUMNS = 17;
 //const TOL = 1e-10;
 
-testComplexMatrix(
-    String kind, ComplexMatrix make(int rows, int columns)) {
+testComplexMatrix(String kind, ComplexMatrix make(int rows, int columns)) {
   group("ComplexMatrix ($kind)", () {
     ComplexMatrix A, B, Bt;
     setUp(() {
@@ -58,8 +57,7 @@ testComplexMatrix(
       A.assign(B, div);
       for (int r = 0; r < A.rows; r++) {
         for (int c = 0; c < A.columns; c++) {
-          assertEquals(
-              Acopy.get(r, c) / B.get(r, c), A.get(r, c), TOL);
+          assertEquals(Acopy.get(r, c) / B.get(r, c), A.get(r, c), TOL);
         }
       }
     });
@@ -122,7 +120,8 @@ testComplexMatrix(
       A.setReal(Re);
       for (int r = 0; r < A.rows; r++) {
         for (int c = 0; c < A.columns; c++) {
-          expect(Acopy.get(r, c).imaginary, closeTo(A.get(r, c).imaginary, TOL));
+          expect(
+              Acopy.get(r, c).imaginary, closeTo(A.get(r, c).imaginary, TOL));
           expect(Re.get(r, c), closeTo(A.get(r, c).real, TOL));
         }
       }
@@ -158,7 +157,8 @@ testComplexMatrix(
       for (int r = 0; r < A.rows; r++) {
         for (int c = 0; c < A.columns; c++) {
           expect(A.get(r, c).real, closeTo(Aconj.get(c, r).real, TOL));
-          expect(-A.get(r, c).imaginary, closeTo(Aconj.get(c, r).imaginary, TOL));
+          expect(
+              -A.get(r, c).imaginary, closeTo(Aconj.get(c, r).imaginary, TOL));
         }
       }
     });
@@ -344,7 +344,8 @@ testComplexMatrix(
       var beta = new Complex(5.0, 4.0);
       ComplexMatrix C = null;
       C = A.multiply(Bt, C, alpha, beta, false, false);
-      var expected = new List.generate(A.rows, (_) => new Float64List(2 * A.rows));
+      var expected =
+          new List.generate(A.rows, (_) => new Float64List(2 * A.rows));
       for (int j = 0; j < A.rows; j++) {
         for (int i = 0; i < A.rows; i++) {
           var s = Complex.ZERO;
@@ -368,8 +369,8 @@ testComplexMatrix(
       //transposeA
       C = null;
       C = A.multiply(B, C, alpha, beta, true, false);
-      expected = new List.generate(
-          A.columns, (_) => new Float64List(2 * A.columns));
+      expected =
+          new List.generate(A.columns, (_) => new Float64List(2 * A.columns));
       for (int j = 0; j < A.columns; j++) {
         for (int i = 0; i < A.columns; i++) {
           var s = Complex.ZERO;
@@ -416,8 +417,8 @@ testComplexMatrix(
       //transposeA and transposeB
       C = null;
       C = A.multiply(Bt, C, alpha, beta, true, true);
-      expected = new List.generate(
-          A.columns, (_) => new Float64List(2 * A.columns));
+      expected =
+          new List.generate(A.columns, (_) => new Float64List(2 * A.columns));
       for (int j = 0; j < A.columns; j++) {
         for (int i = 0; i < A.columns; i++) {
           var s = Complex.ZERO;

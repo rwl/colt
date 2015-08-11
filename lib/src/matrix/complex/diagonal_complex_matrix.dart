@@ -137,8 +137,7 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
     }
   }
 
-  void assign(ComplexMatrix y,
-      cfunc.ComplexComplexComplexFunction fn) {
+  void assign(ComplexMatrix y, cfunc.ComplexComplexComplexFunction fn) {
     checkShape(this, y);
     if (y is DiagonalComplexMatrix) {
       DiagonalComplexMatrix other = y;
@@ -240,8 +239,8 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
       for (int i = 0; i < _dlength; i++) {
         var x = new Complex(_elements[2 * i], _elements[2 * i + 1]);
         var value = new Complex(otherElements[2 * i], otherElements[2 * i + 1]);
-        var diff =
-            new Complex((value.real - x.real).abs(), (value.imaginary - x.imaginary).abs());
+        var diff = new Complex(
+            (value.real - x.real).abs(), (value.imaginary - x.imaginary).abs());
         if (((diff.real != diff.real) || (diff.imaginary != diff.imaginary)) &&
                 ((((value.real != value.real) ||
                         (value.imaginary != value.imaginary)) &&
@@ -356,9 +355,8 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
     }
   }
 
-  ComplexVector mult(ComplexVector y,
-      [ComplexVector z = null, Complex alpha = null,
-      Complex beta = null, bool transposeA = false]) {
+  ComplexVector mult(ComplexVector y, [ComplexVector z = null,
+      Complex alpha = null, Complex beta = null, bool transposeA = false]) {
     if (alpha == null) {
       alpha = Complex.ONE;
     }

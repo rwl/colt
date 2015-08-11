@@ -335,8 +335,8 @@ class DiagonalIntMatrix extends WrapperIntMatrix {
     }
   }
 
-  IntVector mult(IntVector y, [IntVector z = null,
-      int alpha = 1, int beta = null, bool transposeA = false]) {
+  IntVector mult(IntVector y, [IntVector z = null, int alpha = 1,
+      int beta = null, bool transposeA = false]) {
     if (beta == null) {
       beta = z == null ? 1 : 0;
     }

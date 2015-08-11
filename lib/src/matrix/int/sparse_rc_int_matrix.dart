@@ -633,8 +633,7 @@ class SparseRCIntMatrix extends WrapperIntMatrix {
   }
 
   IntMatrix multiply(IntMatrix B, [IntMatrix C = null, int alpha = 1,
-      int beta = null, bool transposeA = false,
-      bool transposeB = false]) {
+      int beta = null, bool transposeA = false, bool transposeB = false]) {
     if (beta == null) {
       beta = C == null ? 1 : 0;
     }

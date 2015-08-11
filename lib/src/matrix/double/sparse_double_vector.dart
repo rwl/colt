@@ -46,8 +46,7 @@ class SparseDoubleVector extends DoubleVector {
 
   static SparseDoubleVector create(int sz) => new SparseDoubleVector(sz);
 
-  factory SparseDoubleVector.append(
-      DoubleVector A, DoubleVector B) {
+  factory SparseDoubleVector.append(DoubleVector A, DoubleVector B) {
     return dfactory.append(A, B, (n) => new SparseDoubleVector(n));
   }
 

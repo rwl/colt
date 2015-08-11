@@ -72,8 +72,7 @@ abstract class ComplexVector extends AbstractVector {
   }
 
   /// Assigns the result of a function to each cell.
-  void assign(ComplexVector y,
-      cfunc.ComplexComplexComplexFunction f) {
+  void assign(ComplexVector y, cfunc.ComplexComplexComplexFunction f) {
     checkSize(this, y);
     for (int i = 0; i < size; i++) {
       set(i, f(get(i), y.get(i)));
@@ -337,8 +336,7 @@ abstract class ComplexVector extends AbstractVector {
 
   /// Returns the dot product of two vectors x and y. Operates on cells at
   /// indexes `from .. Min(size(),y.size(),from+length)-1`.
-  Complex dot(ComplexVector y,
-      [int from = 0, int length = null]) {
+  Complex dot(ComplexVector y, [int from = 0, int length = null]) {
     if (length == null) {
       length = this.size;
     }

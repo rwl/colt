@@ -63,8 +63,7 @@ class SparseComplexMatrix extends ComplexMatrix {
     super.copyFrom(source);
   }
 
-  void assign(
-      ComplexMatrix y, cfunc.ComplexComplexComplexFunction fn) {
+  void assign(ComplexMatrix y, cfunc.ComplexComplexComplexFunction fn) {
     if (isView) {
       super.assign(y, fn);
       return;

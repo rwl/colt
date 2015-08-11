@@ -63,8 +63,7 @@ class DenseComplexVector extends ComplexVector {
 
   /// Constructs a matrix from the given polar representation. [r] is the
   /// polar radius. [theta] is the polar angle.
-  factory DenseComplexVector.fromPolar(
-      DoubleVector r, DoubleVector theta,
+  factory DenseComplexVector.fromPolar(DoubleVector r, DoubleVector theta,
       [bool radians = true]) {
     var real = theta.copy();
     var imag = theta.copy();
@@ -202,8 +201,7 @@ class DenseComplexVector extends ComplexVector {
     }
   }
 
-  void assign(
-      ComplexVector y, cfunc.ComplexComplexComplexFunction fn) {
+  void assign(ComplexVector y, cfunc.ComplexComplexComplexFunction fn) {
     if (y is! DenseComplexVector) {
       super.assign(y, fn);
       return;
@@ -469,8 +467,7 @@ class DenseComplexVector extends ComplexVector {
     }
   }
 
-  Complex dot(ComplexVector y,
-      [int from = 0, int length = null]) {
+  Complex dot(ComplexVector y, [int from = 0, int length = null]) {
     if (length == null) {
       length = this.size;
     }
@@ -540,7 +537,8 @@ class DenseComplexVector extends ComplexVector {
   }
 
   Object clone() {
-    return new DenseComplexVector._internal(size, _elements, zero, stride, !isView);
+    return new DenseComplexVector._internal(
+        size, _elements, zero, stride, !isView);
   }
 }
 

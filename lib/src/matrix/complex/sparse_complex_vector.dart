@@ -152,8 +152,8 @@ class SelectedSparseComplexVector extends ComplexVector {
 
   int __offset;
 
-  SelectedSparseComplexVector(int size, Map<int, Complex> elements,
-      int zero, int stride, Int32List offsets, int offset)
+  SelectedSparseComplexVector(int size, Map<int, Complex> elements, int zero,
+      int stride, Int32List offsets, int offset)
       : super._(size, zero, stride, false) {
     _elements = elements;
     _offsets = offsets;

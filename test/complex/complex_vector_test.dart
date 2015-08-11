@@ -234,6 +234,6 @@ testComplexVector(String kind, ComplexVector make(int size)) {
 
 void assertEquals(Complex expected, Complex actual, double tol) {
   //for (int i = 0; i < actual.length; i++) {
-    expect(cmath.isEqual(expected, actual, tol), isTrue);
+  expect(cmath.isEqual(expected, actual, tol), isTrue);
   //}
 }

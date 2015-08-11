@@ -211,12 +211,13 @@ testIntMatrix(String kind, IntMatrix make(int rows, int columns)) {
 
     test('part', () {
       IntMatrix B =
-      A.part(A.rows ~/ 2, A.columns ~/ 2, A.rows ~/ 3, A.columns ~/ 3);
+          A.part(A.rows ~/ 2, A.columns ~/ 2, A.rows ~/ 3, A.columns ~/ 3);
       expect(A.rows ~/ 3, equals(B.rows));
       expect(A.columns ~/ 3, equals(B.columns));
       for (int r = 0; r < A.rows / 3; r++) {
         for (int c = 0; c < A.columns / 3; c++) {
-          expect(A.get(A.rows ~/ 2 + r, A.columns ~/ 2 + c), equals(B.get(r, c)));
+          expect(
+              A.get(A.rows ~/ 2 + r, A.columns ~/ 2 + c), equals(B.get(r, c)));
         }
       }
     });
@@ -255,8 +256,8 @@ testIntMatrix(String kind, IntMatrix make(int rows, int columns)) {
         A.columns ~/ 2,
         A.columns - 1
       ];
-      IntMatrix B = A.select(
-          new Int32List.fromList(rowIndexes), new Int32List.fromList(colIndexes));
+      IntMatrix B = A.select(new Int32List.fromList(rowIndexes),
+          new Int32List.fromList(colIndexes));
       expect(rowIndexes.length, equals(B.rows));
       expect(colIndexes.length, equals(B.columns));
       for (int r = 0; r < rowIndexes.length; r++) {
@@ -375,7 +376,7 @@ testIntMatrix(String kind, IntMatrix make(int rows, int columns)) {
       C = null;
       C = A.multiply(Bt, C, alpha, beta, false, false);
       expected =
-      new List<Int32List>.generate(A.rows, (_) => new Int32List(A.rows));
+          new List<Int32List>.generate(A.rows, (_) => new Int32List(A.rows));
       for (int j = 0; j < A.rows; j++) {
         for (int i = 0; i < A.rows; i++) {
           int s = 0;
@@ -453,7 +454,7 @@ testIntMatrix(String kind, IntMatrix make(int rows, int columns)) {
       C = null;
       C = A.multiply(B, C, alpha, beta, false, true);
       expected =
-      new List<Int32List>.generate(A.rows, (_) => new Int32List(A.rows));
+          new List<Int32List>.generate(A.rows, (_) => new Int32List(A.rows));
       for (int j = 0; j < A.rows; j++) {
         for (int i = 0; i < A.rows; i++) {
           int s = 0;

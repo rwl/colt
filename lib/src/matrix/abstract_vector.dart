@@ -28,7 +28,6 @@ abstract class AbstractVector {
   /// Returns whether the receiver is a view or not.
   bool get isView => !_isNoView;
 
-
   /// Returns the position of the element with the given relative rank within
   /// the (virtual or non-virtual) internal 1-dimensional array. Override this
   /// method for performance.
@@ -44,7 +43,8 @@ abstract class AbstractVector {
 
   /// Sets up a matrix with the given parameters.
 //  void _setUp(int size, [int zero = 0, int stride = 1]) {
-  AbstractVector(int size, [int zero = 0, int stride = 1, bool isNoView = true]) {
+  AbstractVector(int size,
+      [int zero = 0, int stride = 1, bool isNoView = true]) {
     if (size < 0) {
       throw new ArgumentError("negative size");
     }
@@ -83,7 +83,8 @@ abstract class AbstractVector {
 /// Sanity check for operations requiring an index to be within bounds.
 void checkIndex(AbstractVector vector, int index) {
   if (index < 0 || index >= vector._size) {
-    throw new RangeError("Attempted to access " + vector.toStringShort() + " at index=$index");
+    throw new RangeError(
+        "Attempted to access " + vector.toStringShort() + " at index=$index");
   }
 }
 
@@ -106,7 +107,10 @@ void checkRange(AbstractVector vector, int index, int width) {
 /// Sanity check for operations requiring two matrices with the same size.
 void checkSize(AbstractVector A, AbstractVector B) {
   if (A._size != B._size) {
-    throw new ArgumentError("Incompatible sizes: " + A.toStringShort() + " and " + B.toStringShort());
+    throw new ArgumentError("Incompatible sizes: " +
+        A.toStringShort() +
+        " and " +
+        B.toStringShort());
   }
 }
 

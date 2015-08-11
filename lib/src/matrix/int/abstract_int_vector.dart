@@ -12,10 +12,8 @@ part of cern.colt.matrix.int;
 
 /// Abstract base class for 1-d matrices (aka vectors) holding [int]
 /// elements.
-abstract class IntVector
-    extends AbstractVector /*with ListMixin<int>*/ {
-  IntVector._(int size,
-      [int zero = 0, int stride = 1, bool isNoView = true])
+abstract class IntVector extends AbstractVector /*with ListMixin<int>*/ {
+  IntVector._(int size, [int zero = 0, int stride = 1, bool isNoView = true])
       : super(size, zero, stride, isNoView);
 
   factory IntVector(int size) = DenseIntVector;

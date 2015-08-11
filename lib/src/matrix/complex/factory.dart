@@ -193,7 +193,8 @@ void _checkRectangularShape2D(List<List<ComplexMatrix>> array) {
     if (array[r] != null) {
       if (columns == -1) columns = array[r].length;
       if (array[r].length != columns) {
-        throw new ArgumentError("All rows of array must have same number of columns.");
+        throw new ArgumentError(
+            "All rows of array must have same number of columns.");
       }
     }
   }
@@ -303,16 +304,21 @@ ComplexMatrix composeDiagonal(ComplexMatrix A, ComplexMatrix B, MatrixFn make) {
 ///     A 0 0
 ///     0 B 0
 ///     0 0 C
-ComplexMatrix composeDiagonal3(ComplexMatrix A, ComplexMatrix B, ComplexMatrix C, MatrixFn make) {
-  ComplexMatrix diag = make(A.rows + B.rows + C.rows, A.columns + B.columns + C.columns);
+ComplexMatrix composeDiagonal3(
+    ComplexMatrix A, ComplexMatrix B, ComplexMatrix C, MatrixFn make) {
+  ComplexMatrix diag =
+      make(A.rows + B.rows + C.rows, A.columns + B.columns + C.columns);
   diag.part(0, 0, A.rows, A.columns).copyFrom(A);
   diag.part(A.rows, A.columns, B.rows, B.columns).copyFrom(B);
-  diag.part(A.rows + B.rows, A.columns + B.columns, C.rows, C.columns).copyFrom(C);
+  diag
+      .part(A.rows + B.rows, A.columns + B.columns, C.rows, C.columns)
+      .copyFrom(C);
   return diag;
 }
 
 /// Constructs a bidiagonal block matrix from the given parts.
-ComplexMatrix composeBidiagonal(ComplexMatrix A, ComplexMatrix B, MatrixFn make) {
+ComplexMatrix composeBidiagonal(
+    ComplexMatrix A, ComplexMatrix B, MatrixFn make) {
   int ar = A.rows;
   int ac = A.columns;
   int br = B.rows;
@@ -430,7 +436,7 @@ ComplexVector diagonal(ComplexMatrix A, MatrixFn make) {
 /// elsewhere).
 ComplexMatrix identity(int rowsAndColumns, MatrixFn make) {
   ComplexMatrix matrix = make(rowsAndColumns, rowsAndColumns);
-  for (int i = rowsAndColumns; --i >= 0; ) {
+  for (int i = rowsAndColumns; --i >= 0;) {
     matrix.set(i, i, Complex.ONE);
   }
   return matrix;
@@ -438,7 +444,8 @@ ComplexMatrix identity(int rowsAndColumns, MatrixFn make) {
 
 /// Constructs a matrix with the given shape, each cell initialized with the
 /// given value.
-ComplexMatrix fillMatrix(int rows, int columns, Complex initialValue, MatrixFn make) {
+ComplexMatrix fillMatrix(
+    int rows, int columns, Complex initialValue, MatrixFn make) {
   if (initialValue.real == 0 && initialValue.imaginary == 0) {
     return make(rows, columns);
   }
@@ -453,7 +460,8 @@ ComplexMatrix randomMatrix(int rows, int columns, MatrixFn make) {
 
 /// `C = A||A||..||A`; Constructs a new matrix which is duplicated both along
 /// the row and column dimension.
-ComplexMatrix repeatMatrix(ComplexMatrix A, int rowRepeat, int columnRepeat, MatrixFn make) {
+ComplexMatrix repeatMatrix(
+    ComplexMatrix A, int rowRepeat, int columnRepeat, MatrixFn make) {
   int r = A.rows;
   int c = A.columns;
   ComplexMatrix matrix = make(r * rowRepeat, c * columnRepeat);

@@ -27,8 +27,8 @@ class DenseIntMatrix extends IntMatrix {
         rows, columns, elements, 0, 0, columns, 1, false);
   }
 
-  DenseIntMatrix._internal(int rows, int columns, Int32List elements, int rowZero,
-      int columnZero, int rowStride, int columnStride, bool isView)
+  DenseIntMatrix._internal(int rows, int columns, Int32List elements,
+      int rowZero, int columnZero, int rowStride, int columnStride, bool isView)
       : super._(rows, columns, rowZero, columnZero, rowStride, columnStride,
           !isView) {
     _elements = elements;
@@ -312,8 +312,7 @@ class DenseIntMatrix extends IntMatrix {
     }
   }
 
-  void negative(List<int> rowList, List<int> columnList,
-      List<int> valueList) {
+  void negative(List<int> rowList, List<int> columnList, List<int> valueList) {
     rowList.clear();
     columnList.clear();
     valueList.clear();
@@ -332,8 +331,7 @@ class DenseIntMatrix extends IntMatrix {
     }
   }
 
-  void nonzero(List<int> rowList, List<int> columnList,
-      List<int> valueList) {
+  void nonzero(List<int> rowList, List<int> columnList, List<int> valueList) {
     rowList.clear();
     columnList.clear();
     valueList.clear();
@@ -352,8 +350,7 @@ class DenseIntMatrix extends IntMatrix {
     }
   }
 
-  void positive(List<int> rowList, List<int> columnList,
-      List<int> valueList) {
+  void positive(List<int> rowList, List<int> columnList, List<int> valueList) {
     rowList.clear();
     columnList.clear();
     valueList.clear();
@@ -434,8 +431,8 @@ class DenseIntMatrix extends IntMatrix {
         value;
   }
 
-  IntVector mult(IntVector y, [IntVector z = null,
-      int alpha = 1, int beta = null, bool transposeA = false]) {
+  IntVector mult(IntVector y, [IntVector z = null, int alpha = 1,
+      int beta = null, bool transposeA = false]) {
     if (beta == null) {
       beta = z == null ? 1 : 0;
     }
@@ -486,9 +483,8 @@ class DenseIntMatrix extends IntMatrix {
     return z;
   }
 
-  IntMatrix multiply(IntMatrix B, [IntMatrix C = null,
-      int alpha = 1, int beta = null, bool transposeA = false,
-      bool transposeB = false]) {
+  IntMatrix multiply(IntMatrix B, [IntMatrix C = null, int alpha = 1,
+      int beta = null, bool transposeA = false, bool transposeB = false]) {
     if (beta == null) {
       beta = C == null ? 1 : 0;
     }
@@ -639,8 +635,7 @@ class DenseIntMatrix extends IntMatrix {
     return new DenseIntVector._internal(size, _elements, zero, stride, true);
   }
 
-  IntMatrix _viewSelectionLike(
-      Int32List rowOffsets, Int32List columnOffsets) {
+  IntMatrix _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets) {
     return new SelectedDenseIntMatrix.offset(
         _elements, rowOffsets, columnOffsets, 0);
   }
@@ -767,8 +762,7 @@ class SelectedDenseIntMatrix extends IntMatrix {
     return v;
   }
 
-  IntMatrix _viewSelectionLike(
-      Int32List rowOffsets, Int32List columnOffsets) {
+  IntMatrix _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets) {
     return new SelectedDenseIntMatrix.offset(
         this._elements, rowOffsets, columnOffsets, _offset);
   }

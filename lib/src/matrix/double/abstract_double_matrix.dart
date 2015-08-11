@@ -18,9 +18,8 @@ part of cern.colt.matrix.double;
 /// from `[0,0]` to `[rows-1,columns-1]`. Any attempt to access
 /// an element at a coordinate outside this rangewill throw a [RangeError].
 abstract class DoubleMatrix extends AbstractMatrix {
-  DoubleMatrix._(int rows, int columns, [int rowZero = 0,
-      int columnZero = 0, int rowStride = null, int columnStride = 1,
-      bool isNoView = true])
+  DoubleMatrix._(int rows, int columns, [int rowZero = 0, int columnZero = 0,
+      int rowStride = null, int columnStride = 1, bool isNoView = true])
       : super(rows, columns, rowZero, columnZero, rowStride, columnStride,
           isNoView);
 
@@ -256,8 +255,8 @@ abstract class DoubleMatrix extends AbstractMatrix {
   /// specified lists. Fills into the lists, starting at index 0. After this
   /// call returns the specified lists all have a new size, the number of
   /// negative values.
-  void negative(List<int> rowList, List<int> columnList,
-      List<double> valueList) {
+  void negative(
+      List<int> rowList, List<int> columnList, List<double> valueList) {
     rowList.clear();
     columnList.clear();
     valueList.clear();
@@ -289,8 +288,8 @@ abstract class DoubleMatrix extends AbstractMatrix {
   ///     valueList  = (8,7)
   ///
   /// In other words, `get(0,2) == 8, get(1,1) == 7`.
-  void nonzero(List<int> rowList, List<int> columnList,
-      List<double> valueList) {
+  void nonzero(
+      List<int> rowList, List<int> columnList, List<double> valueList) {
     rowList.clear();
     columnList.clear();
     valueList.clear();
@@ -310,8 +309,8 @@ abstract class DoubleMatrix extends AbstractMatrix {
   /// specified lists. Fills into the lists, starting at index 0. After this
   /// call returns the specified lists all have a new size, the number of
   /// positive values.
-  void positive(List<int> rowList, List<int> columnList,
-      List<double> valueList) {
+  void positive(
+      List<int> rowList, List<int> columnList, List<double> valueList) {
     rowList.clear();
     columnList.clear();
     valueList.clear();
@@ -503,9 +502,8 @@ abstract class DoubleMatrix extends AbstractMatrix {
   /// Linear algebraic matrix-vector multiplication;
   /// `z = alpha * A * y + beta*z`.
   /// `z[i] = alpha*Sum(A[i,j] * y[j]) + beta*z[i], i=0..A.rows-1, j=0..y.size-1`.
-  DoubleVector mult(DoubleVector y,
-      [DoubleVector z = null, double alpha = 1.0, double beta = 0.0,
-      bool transposeA = false]) {
+  DoubleVector mult(DoubleVector y, [DoubleVector z = null, double alpha = 1.0,
+      double beta = 0.0, bool transposeA = false]) {
     if (transposeA) {
       return dice().mult(y, z, alpha, beta, false);
     }
@@ -539,9 +537,9 @@ abstract class DoubleMatrix extends AbstractMatrix {
   /// `C[i,j] = alpha*Sum(A[i,k] * B[k,j]) + beta*C[i,j], k=0..n-1`.
   ///
   /// Matrix shapes: `A(m x n), B(n x p), C(m x p)`.
-  DoubleMatrix multiply(DoubleMatrix B,
-      [DoubleMatrix C = null, double alpha = 1.0, double beta = 0.0,
-      bool transposeA = false, bool transposeB = false]) {
+  DoubleMatrix multiply(DoubleMatrix B, [DoubleMatrix C = null,
+      double alpha = 1.0, double beta = 0.0, bool transposeA = false,
+      bool transposeB = false]) {
     if (transposeA) {
       return dice().multiply(B, C, alpha, beta, false, transposeB);
     }

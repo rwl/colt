@@ -455,8 +455,7 @@ abstract class DoubleVector extends AbstractVector {
   /// Returns the dot product of two vectors x and y, which is
   /// `Sum(x[i]*y[i])`. Operates on cells at indexes
   /// `from .. Min(size(), y.size(), from+length)-1`.
-  double dot(DoubleVector y,
-      [int from = 0, int length = null]) {
+  double dot(DoubleVector y, [int from = 0, int length = null]) {
     if (length == null) {
       length = size;
     }

@@ -69,8 +69,7 @@ double density(DoubleMatrix A) => A.cardinality / A.size.toDouble();
 /// given value. The result is `true` if and only if
 /// `A != null` and `! (Math.abs(value - A[i]) > tolerance())`
 /// holds for all coordinates.
-bool allVector(DoubleVector A, double value,
-    [double epsilon = EPSILON]) {
+bool allVector(DoubleVector A, double value, [double epsilon = EPSILON]) {
   if (A == null) {
     return false;
   }
@@ -93,8 +92,7 @@ bool allVector(DoubleVector A, double value,
 /// `true` if and only if both arguments are `!= null`, have
 /// the same size and `! (Math.abs(A[i] - B[i]) > tolerance())`
 /// holds for all indexes.
-bool equalsVector(DoubleVector A, DoubleVector B,
-    [double epsilon = EPSILON]) {
+bool equalsVector(DoubleVector A, DoubleVector B, [double epsilon = EPSILON]) {
   if (identical(A, B)) {
     return true;
   }
@@ -124,8 +122,7 @@ bool equalsVector(DoubleVector A, DoubleVector B,
 /// given value. The result is `true` if and only if `A != null` and
 /// `! (Math.abs(value - A[row,col]) > tolerance())` holds for all
 /// coordinates.
-bool allMatrix(DoubleMatrix A, double value,
-    [double epsilon = EPSILON]) {
+bool allMatrix(DoubleMatrix A, double value, [double epsilon = EPSILON]) {
   if (A == null) {
     return false;
   }
@@ -152,8 +149,7 @@ bool allMatrix(DoubleMatrix A, double value,
 /// the same number of columns and rows and
 /// `! (Math.abs(A[row,col] - B[row,col]) > tolerance())` holds
 /// for all coordinates.
-bool equalsMatrix(DoubleMatrix A, DoubleMatrix B,
-    [double epsilon = EPSILON]) {
+bool equalsMatrix(DoubleMatrix A, DoubleMatrix B, [double epsilon = EPSILON]) {
   if (identical(A, B)) {
     return true;
   }

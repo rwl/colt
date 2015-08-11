@@ -109,7 +109,6 @@ part of cern.colt.matrix.int;
 //  }
 //}
 
-
 class DelegateIntVector extends IntVector {
   IntMatrix _content;
 

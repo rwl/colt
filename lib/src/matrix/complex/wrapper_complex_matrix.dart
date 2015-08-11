@@ -67,9 +67,11 @@ class WrapperComplexMatrix extends ComplexMatrix {
       for (int i = 0; i < dlength; i++) {
         var x = new Complex(elements[2 * i], elements[2 * i + 1]);
         var value = new Complex(otherElements[2 * i], otherElements[2 * i + 1]);
-        var diff = new Complex((value.real - x.real).abs(), (value.imaginary - x.imaginary).abs());
+        var diff = new Complex(
+            (value.real - x.real).abs(), (value.imaginary - x.imaginary).abs());
         if (((diff.real != diff.real) || (diff.imaginary != diff.imaginary)) &&
-                ((((value.real != value.real) || (value.imaginary != value.imaginary)) &&
+                ((((value.real != value.real) ||
+                        (value.imaginary != value.imaginary)) &&
                     ((x.real != x.real) || (x.imaginary != x.imaginary)))) ||
             (isEqual(value, x, epsilon))) {
           diff = Complex.ZERO;
@@ -119,8 +121,7 @@ class WrapperComplexMatrix extends ComplexMatrix {
     return view;
   }
 
-  ComplexMatrix part(
-      int row, int column, int height, int width) {
+  ComplexMatrix part(int row, int column, int height, int width) {
     checkBox(this, row, column, height, width);
     var view = new PartWrapperComplexMatrix(this, row, column);
     setRows(view, height);
@@ -253,8 +254,7 @@ class ColumnFlipWrapperComplexMatrix extends WrapperComplexMatrix {
 }
 
 class DiceWrapperComplexMatrix extends WrapperComplexMatrix {
-  DiceWrapperComplexMatrix(ComplexMatrix newContent)
-      : super._wrap(newContent);
+  DiceWrapperComplexMatrix(ComplexMatrix newContent) : super._wrap(newContent);
 
   Complex get(int row, int column) {
     return _content.get(column, row);
@@ -289,8 +289,7 @@ class PartWrapperComplexMatrix extends WrapperComplexMatrix {
   final int _row;
   final int _column;
 
-  PartWrapperComplexMatrix(
-      ComplexMatrix newContent, int row, int column)
+  PartWrapperComplexMatrix(ComplexMatrix newContent, int row, int column)
       : super._wrap(newContent),
         _row = row,
         _column = column;
@@ -325,8 +324,7 @@ class PartWrapperComplexMatrix extends WrapperComplexMatrix {
 }
 
 class RowWrapperComplexMatrix extends WrapperComplexMatrix {
-  RowWrapperComplexMatrix(ComplexMatrix newContent)
-      : super._wrap(newContent);
+  RowWrapperComplexMatrix(ComplexMatrix newContent) : super._wrap(newContent);
 
   Complex get(int row, int column) {
     return _content.get(rows - 1 - row, column);

@@ -144,8 +144,7 @@ IntIntFunction chain3(IntFunction g, IntIntFunction h) {
 }
 
 /// Constructs the function `f( g(a), h(b) )`.
-IntIntFunction chain4(
-    IntIntFunction f, IntFunction g, IntFunction h) {
+IntIntFunction chain4(IntIntFunction f, IntFunction g, IntFunction h) {
   return (int a, int b) => f(g(a), h(b));
 }
 

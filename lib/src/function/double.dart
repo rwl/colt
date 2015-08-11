@@ -404,23 +404,23 @@ DoubleDoubleFunction swapArgs(DoubleDoubleFunction fn) {
 /// reasons publicly accessible. Intended to be passed to
 /// `matrix.apply(function)` methods.
 class DoubleMult {
-    /// Public read/write access to avoid frequent object construction.
-    double multiplicator;
+  /// Public read/write access to avoid frequent object construction.
+  double multiplicator;
 
-    DoubleMult(this.multiplicator);
+  DoubleMult(this.multiplicator);
 
-    /// Returns the result of the function evaluation.
-    double call(double a) => a * multiplicator;
+  /// Returns the result of the function evaluation.
+  double call(double a) => a * multiplicator;
 
-    /// `a / constant`.
-    factory DoubleMult.div(double constant) {
-        return new DoubleMult.mult(1 / constant);
-    }
+  /// `a / constant`.
+  factory DoubleMult.div(double constant) {
+    return new DoubleMult.mult(1 / constant);
+  }
 
-    /// `a * constant`.
-    factory DoubleMult.mult(double constant) {
-        return new DoubleMult(constant);
-    }
+  /// `a * constant`.
+  factory DoubleMult.mult(double constant) {
+    return new DoubleMult(constant);
+  }
 }
 
 /// Only for performance tuning of compute intensive linear algebraic
@@ -433,33 +433,33 @@ class DoubleMult {
 /// performance reasons publicly accessible. Intended to be passed to
 /// `matrix.assign(otherMatrix,function)` methods.
 class DoublePlusMultFirst {
-    /// Public read/write access to avoid frequent object construction.
-    double multiplicator;
+  /// Public read/write access to avoid frequent object construction.
+  double multiplicator;
 
-    DoublePlusMultFirst(this.multiplicator);
+  DoublePlusMultFirst(this.multiplicator);
 
-    /// Returns the result of the function evaluation.
-    double call(double a, double b) => a * multiplicator + b;
+  /// Returns the result of the function evaluation.
+  double call(double a, double b) => a * multiplicator + b;
 
-    /// `a - b/constant`.
-    factory DoublePlusMultFirst.minusDiv(double constant) {
-        return new DoublePlusMultFirst(-1 / constant);
-    }
+  /// `a - b/constant`.
+  factory DoublePlusMultFirst.minusDiv(double constant) {
+    return new DoublePlusMultFirst(-1 / constant);
+  }
 
-    /// `a - b*constant`.
-    factory DoublePlusMultFirst.minusMult(double constant) {
-        return new DoublePlusMultFirst(-constant);
-    }
+  /// `a - b*constant`.
+  factory DoublePlusMultFirst.minusMult(double constant) {
+    return new DoublePlusMultFirst(-constant);
+  }
 
-    /// `a + b/constant`.
-    factory DoublePlusMultFirst.plusDiv(double constant) {
-        return new DoublePlusMultFirst(1 / constant);
-    }
+  /// `a + b/constant`.
+  factory DoublePlusMultFirst.plusDiv(double constant) {
+    return new DoublePlusMultFirst(1 / constant);
+  }
 
-    /// `a + b*constant`.
-    factory DoublePlusMultFirst.plusMult(double constant) {
-        return new DoublePlusMultFirst(constant);
-    }
+  /// `a + b*constant`.
+  factory DoublePlusMultFirst.plusMult(double constant) {
+    return new DoublePlusMultFirst(constant);
+  }
 }
 
 /// Only for performance tuning of compute intensive linear algebraic
@@ -472,31 +472,31 @@ class DoublePlusMultFirst {
 /// performance reasons publicly accessible. Intended to be passed to
 /// `matrix.assign(otherMatrix,function)` methods.
 class DoublePlusMultSecond {
-    /// Public read/write access to avoid frequent object construction.
-    double multiplicator;
+  /// Public read/write access to avoid frequent object construction.
+  double multiplicator;
 
-    DoublePlusMultSecond(this.multiplicator);
+  DoublePlusMultSecond(this.multiplicator);
 
-    /// Returns the result of the function evaluation.
-    double call(double a, double b) => a + b * multiplicator;
+  /// Returns the result of the function evaluation.
+  double call(double a, double b) => a + b * multiplicator;
 
-    /// `a - b/constant`.
-    factory DoublePlusMultSecond.minusDiv(double constant) {
-        return new DoublePlusMultSecond(-1 / constant);
-    }
+  /// `a - b/constant`.
+  factory DoublePlusMultSecond.minusDiv(double constant) {
+    return new DoublePlusMultSecond(-1 / constant);
+  }
 
-    /// `a - b*constant`.
-    factory DoublePlusMultSecond.minusMult(double constant) {
-        return new DoublePlusMultSecond(-constant);
-    }
+  /// `a - b*constant`.
+  factory DoublePlusMultSecond.minusMult(double constant) {
+    return new DoublePlusMultSecond(-constant);
+  }
 
-    /// `a + b/constant`.
-    factory DoublePlusMultSecond.plusDiv(double constant) {
-        return new DoublePlusMultSecond(1 / constant);
-    }
+  /// `a + b/constant`.
+  factory DoublePlusMultSecond.plusDiv(double constant) {
+    return new DoublePlusMultSecond(1 / constant);
+  }
 
-    /// `a + b*constant`.
-    factory DoublePlusMultSecond.plusMult(double constant) {
-        return new DoublePlusMultSecond(constant);
-    }
+  /// `a + b*constant`.
+  factory DoublePlusMultSecond.plusMult(double constant) {
+    return new DoublePlusMultSecond(constant);
+  }
 }

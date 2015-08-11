@@ -181,8 +181,7 @@ class DenseComplexMatrix extends ComplexMatrix {
     }
   }
 
-  void assign(ComplexMatrix y,
-      cfunc.ComplexComplexComplexFunction fn) {
+  void assign(ComplexMatrix y, cfunc.ComplexComplexComplexFunction fn) {
     // overriden for performance only
     if (y is! DenseComplexMatrix) {
       super.assign(y, fn);
@@ -410,8 +409,8 @@ class DenseComplexMatrix extends ComplexMatrix {
     return Im;
   }
 
-  void nonzero(List<int> rowList, List<int> columnList,
-      List<Complex> valueList) {
+  void nonzero(
+      List<int> rowList, List<int> columnList, List<Complex> valueList) {
     rowList.clear();
     columnList.clear();
     valueList.clear();
@@ -474,9 +473,8 @@ class DenseComplexMatrix extends ComplexMatrix {
     _elements[idx + 1] = value.imaginary;
   }
 
-  ComplexVector mult(ComplexVector y,
-      [ComplexVector z = null, Complex alpha = null,
-      Complex beta = null, bool transposeA = false]) {
+  ComplexVector mult(ComplexVector y, [ComplexVector z = null,
+      Complex alpha = null, Complex beta = null, bool transposeA = false]) {
     if (alpha == null) {
       alpha = Complex.ONE;
     }
@@ -530,19 +528,22 @@ class DenseComplexMatrix extends ComplexMatrix {
       }
       var reZ = elemsZ[idxZeroZ];
       var imZ = elemsZ[idxZeroZ + 1];
-      elemsZ[idxZeroZ] =
-          reS * alpha.real - imS * alpha.imaginary + reZ * beta.real - imZ * beta.imaginary;
-      elemsZ[idxZeroZ + 1] =
-          imS * alpha.real + reS * alpha.imaginary + imZ * beta.real + reZ * beta.imaginary;
+      elemsZ[idxZeroZ] = reS * alpha.real -
+          imS * alpha.imaginary +
+          reZ * beta.real -
+          imZ * beta.imaginary;
+      elemsZ[idxZeroZ + 1] = imS * alpha.real +
+          reS * alpha.imaginary +
+          imZ * beta.real +
+          reZ * beta.imaginary;
       idxZero += rowStride;
       idxZeroZ += strideZ;
     }
     return zz;
   }
 
-  ComplexMatrix multiply(ComplexMatrix B,
-      [ComplexMatrix C = null, Complex alpha = null,
-      Complex beta = null, bool transposeA = false,
+  ComplexMatrix multiply(ComplexMatrix B, [ComplexMatrix C = null,
+      Complex alpha = null, Complex beta = null, bool transposeA = false,
       bool transposeB = false]) {
     if (alpha == null) {
       alpha = Complex.ONE;
@@ -681,10 +682,14 @@ class DenseComplexMatrix extends ComplexMatrix {
           }
           var reC = CElems[iC];
           var imC = CElems[iC + 1];
-          CElems[iC] =
-              alpha.real * reS - alpha.imaginary * imS + beta.real * reC - beta.imaginary * imC;
-          CElems[iC + 1] =
-              alpha.imaginary * reS + alpha.real * imS + beta.imaginary * reC + beta.real * imC;
+          CElems[iC] = alpha.real * reS -
+              alpha.imaginary * imS +
+              beta.real * reC -
+              beta.imaginary * imC;
+          CElems[iC + 1] = alpha.imaginary * reS +
+              alpha.real * imS +
+              beta.imaginary * reC +
+              beta.real * imC;
           iA += rA;
           iC += rC;
         }

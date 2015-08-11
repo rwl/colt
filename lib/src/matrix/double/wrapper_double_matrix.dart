@@ -132,8 +132,7 @@ class WrapperDoubleMatrix extends DoubleMatrix {
     return view;
   }
 
-  DoubleMatrix part(
-      int row, int column, int height, int width) {
+  DoubleMatrix part(int row, int column, int height, int width) {
     checkBox(this, row, column, height, width);
     var view = new PartWrapperDoubleMatrix(this, row, column);
     setRows(view, height);
@@ -236,8 +235,7 @@ class ColumnFlipWrapperDoubleMatrix extends WrapperDoubleMatrix {
 }
 
 class DiceWrapperDoubleMatrix extends WrapperDoubleMatrix {
-  DiceWrapperDoubleMatrix(DoubleMatrix newContent)
-      : super._wrap(newContent);
+  DiceWrapperDoubleMatrix(DoubleMatrix newContent) : super._wrap(newContent);
 
   double get(int row, int column) => _content.get(column, row);
 
@@ -258,8 +256,7 @@ class PartWrapperDoubleMatrix extends WrapperDoubleMatrix {
   final int _row;
   final int _column;
 
-  PartWrapperDoubleMatrix(
-      DoubleMatrix newContent, this._row, this._column)
+  PartWrapperDoubleMatrix(DoubleMatrix newContent, this._row, this._column)
       : super._wrap(newContent);
 
   double get(int i, int j) => _content.get(_row + i, _column + j);
@@ -278,8 +275,7 @@ class PartWrapperDoubleMatrix extends WrapperDoubleMatrix {
 }
 
 class RowFlipWrapperDoubleMatrix extends WrapperDoubleMatrix {
-  RowFlipWrapperDoubleMatrix(DoubleMatrix newContent)
-      : super._wrap(newContent);
+  RowFlipWrapperDoubleMatrix(DoubleMatrix newContent) : super._wrap(newContent);
 
   double get(int row, int column) => _content.get(rows - 1 - row, column);
 
@@ -300,8 +296,7 @@ class SelectionWrapperDoubleMatrix extends WrapperDoubleMatrix {
   final Int32List _cix;
   final Int32List _rix;
 
-  SelectionWrapperDoubleMatrix(
-      DoubleMatrix newContent, this._cix, this._rix)
+  SelectionWrapperDoubleMatrix(DoubleMatrix newContent, this._cix, this._rix)
       : super._wrap(newContent);
 
   double get(int i, int j) => _content.get(_rix[i], _cix[j]);

@@ -28,17 +28,22 @@ class SparseIntMatrix extends IntMatrix {
   /// Constructs a matrix with a given number of rows and columns. All
   /// entries are initially `0`.
   factory SparseIntMatrix(int rows, int columns) {
-    return new SparseIntMatrix._internal(rows, columns, new Map<int, int>(), 0, 0, null, 1);
+    return new SparseIntMatrix._internal(
+        rows, columns, new Map<int, int>(), 0, 0, null, 1);
   }
 
   /// Constructs a matrix with a copy of the given indexes and a single value.
-  factory SparseIntMatrix.withValue(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, int value) {
-    return new SparseIntMatrix(rows, columns).._insert(rowIndexes, columnIndexes, value);
+  factory SparseIntMatrix.withValue(int rows, int columns, Int32List rowIndexes,
+      Int32List columnIndexes, int value) {
+    return new SparseIntMatrix(rows, columns)
+      .._insert(rowIndexes, columnIndexes, value);
   }
 
   /// Constructs a matrix with a copy of the given indexes and values.
-  factory SparseIntMatrix.withValues(int rows, int columns, Int32List rowIndexes, Int32List columnIndexes, Int32List values) {
-    return new SparseIntMatrix(rows, columns).._insertValues(rowIndexes, columnIndexes, values);
+  factory SparseIntMatrix.withValues(int rows, int columns,
+      Int32List rowIndexes, Int32List columnIndexes, Int32List values) {
+    return new SparseIntMatrix(rows, columns)
+      .._insertValues(rowIndexes, columnIndexes, values);
   }
 
   /**
@@ -65,8 +70,10 @@ class SparseIntMatrix extends IntMatrix {
    *             `rows<0 || columns<0 || (double)columns*rows > Integer.MAX_VALUE`
    *             or flip's are illegal.
    */
-  SparseIntMatrix._internal(int rows, int columns, Map<int, int> elements, int rowZero, int columnZero, int rowStride, int columnStride)
-      : super._(rows, columns, rowZero, columnZero, rowStride, columnStride, false) {
+  SparseIntMatrix._internal(int rows, int columns, Map<int, int> elements,
+      int rowZero, int columnZero, int rowStride, int columnStride)
+      : super._(
+          rows, columns, rowZero, columnZero, rowStride, columnStride, false) {
     _elements = elements;
   }
 
@@ -95,7 +102,8 @@ class SparseIntMatrix extends IntMatrix {
     }
     checkShape(this, other);
 
-    if (!isView && !other.isView) { // quickest
+    if (!isView && !other.isView) {
+      // quickest
       _elements.addAll(other._elements);
       return;
     }
@@ -110,7 +118,8 @@ class SparseIntMatrix extends IntMatrix {
 
     checkShape(this, y);
 
-    if (fn is ifunc.IntPlusMultSecond) { // x[i] = x[i] + alpha*y[i]
+    if (fn is ifunc.IntPlusMultSecond) {
+      // x[i] = x[i] + alpha*y[i]
       int alpha = fn.multiplicator;
       if (alpha == 0) {
         return; // nothing to do
@@ -119,7 +128,8 @@ class SparseIntMatrix extends IntMatrix {
         set(i, j, get(i, j) + alpha * value);
         return value;
       });
-    } else if (fn == ifunc.mult) { // x[i] = x[i] * y[i]
+    } else if (fn == ifunc.mult) {
+      // x[i] = x[i] * y[i]
       this._elements.forEach((int key, int value) {
         int i = key ~/ columns;
         int j = key % columns;
@@ -129,7 +139,8 @@ class SparseIntMatrix extends IntMatrix {
         }
         return true;
       });
-    } else if (fn == ifunc.div) { // x[i] = x[i] / y[i]
+    } else if (fn == ifunc.div) {
+      // x[i] = x[i] / y[i]
       this._elements.forEach((int key, int value) {
         int i = key ~/ columns;
         int j = key % columns;
@@ -155,7 +166,7 @@ class SparseIntMatrix extends IntMatrix {
 
   /// Returns a new matrix that has the same elements as this matrix, but is
   /// in a column-compressed form.
-  SparseCCIntMatrix columnCompressed([bool sortRowIndexes=false]) {
+  SparseCCIntMatrix columnCompressed([bool sortRowIndexes = false]) {
     var nnz = cardinality;
     var keys = _elements.keys;
     var values = _elements.values;
@@ -167,12 +178,16 @@ class SparseIntMatrix extends IntMatrix {
       rowIndexes[k] = key ~/ columns;
       columnIndexes[k] = key % columns;
     }
-    return new SparseCCIntMatrix.withValues(rows, columns, rowIndexes, columnIndexes, values, removeDuplicates: false, removeZeroes: false, sortRowIndexes: sortRowIndexes);
+    return new SparseCCIntMatrix.withValues(
+        rows, columns, rowIndexes, columnIndexes, values,
+        removeDuplicates: false,
+        removeZeroes: false,
+        sortRowIndexes: sortRowIndexes);
   }
 
   /// Returns a new matrix that has the same elements as this matrix, but is
   /// in a row-compressed form.
-  SparseRCIntMatrix rowCompressed([bool sortColumnIndexes=false]) {
+  SparseRCIntMatrix rowCompressed([bool sortColumnIndexes = false]) {
     var nnz = cardinality;
     var keys = _elements.keys;
     var values = _elements.values;
@@ -183,7 +198,11 @@ class SparseIntMatrix extends IntMatrix {
       rowIndexes[k] = key ~/ columns;
       columnIndexes[k] = key % columns;
     }
-    return new SparseRCIntMatrix.withValues(rows, columns, rowIndexes, columnIndexes, values, removeDuplicates: false, removeZeroes: false, sortColumnIndexes: sortColumnIndexes);
+    return new SparseRCIntMatrix.withValues(
+        rows, columns, rowIndexes, columnIndexes, values,
+        removeDuplicates: false,
+        removeZeroes: false,
+        sortColumnIndexes: sortColumnIndexes);
   }
 
   Object get elements => _elements;
@@ -240,14 +259,14 @@ class SparseIntMatrix extends IntMatrix {
         int elem = get(r, c);
         if (elem != 0) {
           buf
-              ..write('(')
-              ..write(r)
-              ..write(',')
-              ..write(c)
-              ..write(')')
-              ..write('\t')
-              ..write(elem)
-              ..write('\n');
+            ..write('(')
+            ..write(r)
+            ..write(',')
+            ..write(c)
+            ..write(')')
+            ..write('\t')
+            ..write(elem)
+            ..write('\n');
         }
       }
     }
@@ -266,7 +285,8 @@ class SparseIntMatrix extends IntMatrix {
     return v;
   }
 
-  IntVector mult(IntVector y, [IntVector z = null, int alpha = 1, int beta = null, bool transposeA = false]) {
+  IntVector mult(IntVector y, [IntVector z = null, int alpha = 1,
+      int beta = null, bool transposeA = false]) {
     if (beta == null) {
       beta = z == null ? 1 : 0;
     }
@@ -287,7 +307,12 @@ class SparseIntMatrix extends IntMatrix {
     }
 
     if (columnsA != y.size || rowsA > z.size) {
-      throw new ArgumentError("Incompatible args: " + ((transposeA ? dice() : this).toStringShort()) + ", " + y.toStringShort() + ", " + z.toStringShort());
+      throw new ArgumentError("Incompatible args: " +
+          ((transposeA ? dice() : this).toStringShort()) +
+          ", " +
+          y.toStringShort() +
+          ", " +
+          z.toStringShort());
     }
 
     if (!ignore) {
@@ -316,14 +341,16 @@ class SparseIntMatrix extends IntMatrix {
         i = j;
         j = tmp;
       }
-      elementsZ[zeroZ + strideZ * i] += alpha * value * elementsY[zeroY + strideY * j];
+      elementsZ[zeroZ + strideZ * i] +=
+          alpha * value * elementsY[zeroY + strideY * j];
       return true;
     });
 
     return z;
   }
 
-  IntMatrix multiply(IntMatrix B, [IntMatrix C = null, int alpha = 1, int beta = null, bool transposeA = false, bool transposeB = false]) {
+  IntMatrix multiply(IntMatrix B, [IntMatrix C = null, int alpha = 1,
+      int beta = null, bool transposeA = false, bool transposeB = false]) {
     if (beta == null) {
       beta = C == null ? 1 : 0;
     }
@@ -346,12 +373,21 @@ class SparseIntMatrix extends IntMatrix {
     }
 
     if (B.rows != columnsA) {
-      throw new ArgumentError("Matrix2D inner dimensions must agree:" + toStringShort() + ", " + (transposeB ? B.dice() : B).toStringShort());
+      throw new ArgumentError("Matrix2D inner dimensions must agree:" +
+          toStringShort() +
+          ", " +
+          (transposeB ? B.dice() : B).toStringShort());
     }
     if (C.rows != rowsA || C.columns != p) {
-      throw new ArgumentError("Incompatibel result matrix: " + toStringShort() + ", " + (transposeB ? B.dice() : B).toStringShort() + ", " + C.toStringShort());
+      throw new ArgumentError("Incompatibel result matrix: " +
+          toStringShort() +
+          ", " +
+          (transposeB ? B.dice() : B).toStringShort() +
+          ", " +
+          C.toStringShort());
     }
-    if (this == C || B == C) throw new ArgumentError("Matrices must not be identical");
+    if (this == C ||
+        B == C) throw new ArgumentError("Matrices must not be identical");
 
     if (!ignore) {
       C.apply(ifunc.multiply(beta));
@@ -359,11 +395,11 @@ class SparseIntMatrix extends IntMatrix {
 
     // cache views
     var Brows = new List<IntVector>(columnsA);
-    for (int i = columnsA; --i >= 0; ) {
+    for (int i = columnsA; --i >= 0;) {
       Brows[i] = B.row(i);
     }
     var Crows = new List<IntVector>(rowsA);
-    for (int i = rowsA; --i >= 0; ) {
+    for (int i = rowsA; --i >= 0;) {
       Crows[i] = C.row(i);
     }
 
@@ -393,7 +429,8 @@ class SparseIntMatrix extends IntMatrix {
         throw new RangeError("row: $row, column: $column");
       }
       if (value != 0) {
-        int index = rowZero + row * rowStride + columnZero + column * columnStride;
+        int index =
+            rowZero + row * rowStride + columnZero + column * columnStride;
         int elem = _elements[index];
         if (elem == 0) {
           _elements[index] = value;
@@ -409,7 +446,8 @@ class SparseIntMatrix extends IntMatrix {
     }
   }
 
-  void _insertValues(Int32List rowIndexes, Int32List columnIndexes, Int32List values) {
+  void _insertValues(
+      Int32List rowIndexes, Int32List columnIndexes, Int32List values) {
     int size = rowIndexes.length;
     for (int i = 0; i < size; i++) {
       int value = values[i];
@@ -419,7 +457,8 @@ class SparseIntMatrix extends IntMatrix {
         throw new RangeError("row: $row, column: $column");
       }
       if (value != 0) {
-        int index = rowZero + row * rowStride + columnZero + column * columnStride;
+        int index =
+            rowZero + row * rowStride + columnZero + column * columnStride;
         int elem = _elements[index];
         if (elem == 0) {
           _elements[index] = value;
@@ -453,9 +492,9 @@ class SparseIntMatrix extends IntMatrix {
   }
 
   Object clone() {
-    return new SparseIntMatrix._internal(rows, columns, _elements, rowZero, columnZero, rowStride, columnStride);
+    return new SparseIntMatrix._internal(
+        rows, columns, _elements, rowZero, columnZero, rowStride, columnStride);
   }
-
 }
 
 /// Selection view on sparse 2-d matrices holding [int] elements.
@@ -477,12 +516,19 @@ class SelectedSparseIntMatrix extends IntMatrix {
 
   int _offset;
 
-  factory SelectedSparseIntMatrix(Map<int, int> elements, Int32List rowOffsets, Int32List columnOffsets, int offset) {
-    return new SelectedSparseIntMatrix._internal(rowOffsets.length, columnOffsets.length, elements, 0, 0, 1, 1, rowOffsets, columnOffsets, offset);
+  factory SelectedSparseIntMatrix(Map<int, int> elements, Int32List rowOffsets,
+      Int32List columnOffsets, int offset) {
+    return new SelectedSparseIntMatrix._internal(rowOffsets.length,
+        columnOffsets.length, elements, 0, 0, 1, 1, rowOffsets, columnOffsets,
+        offset);
   }
 
-  SelectedSparseIntMatrix._internal(int rows, int columns, Map<int, int> elements, int rowZero, int columnZero, int rowStride, int columnStride, Int32List rowOffsets, Int32List columnOffsets, int offset)
-      : super._(rows, columns, rowZero, columnZero, rowStride, columnStride, false) {
+  SelectedSparseIntMatrix._internal(int rows, int columns,
+      Map<int, int> elements, int rowZero, int columnZero, int rowStride,
+      int columnStride, Int32List rowOffsets, Int32List columnOffsets,
+      int offset)
+      : super._(
+          rows, columns, rowZero, columnZero, rowStride, columnStride, false) {
     _elements = elements;
     _rowOffsets = rowOffsets;
     _columnOffsets = columnOffsets;
@@ -495,11 +541,15 @@ class SelectedSparseIntMatrix extends IntMatrix {
   }
 
   int get(int row, int column) {
-    return _elements[_offset + _rowOffsets[rowZero + row * rowStride] + _columnOffsets[columnZero + column * columnStride]];
+    return _elements[_offset +
+        _rowOffsets[rowZero + row * rowStride] +
+        _columnOffsets[columnZero + column * columnStride]];
   }
 
   int index(int row, int column) {
-    return _offset + _rowOffsets[rowZero + row * rowStride] + _columnOffsets[columnZero + column * columnStride];
+    return _offset +
+        _rowOffsets[rowZero + row * rowStride] +
+        _columnOffsets[columnZero + column * columnStride];
   }
 
   IntMatrix like2D(int rows, int columns) {
@@ -509,7 +559,9 @@ class SelectedSparseIntMatrix extends IntMatrix {
   IntVector like1D(int size) => new SparseIntVector(size);
 
   void set(int row, int column, int value) {
-    int index = _offset + _rowOffsets[rowZero + row * rowStride] + _columnOffsets[columnZero + column * columnStride];
+    int index = _offset +
+        _rowOffsets[rowZero + row * rowStride] +
+        _columnOffsets[columnZero + column * columnStride];
 
     if (value == 0) {
       _elements.remove(index);
@@ -525,7 +577,8 @@ class SelectedSparseIntMatrix extends IntMatrix {
     int viewStride = rowStride;
     Int32List viewOffsets = _rowOffsets;
     int viewOffset = _offset + columnOffset(columnRank(column));
-    return new SelectedSparseIntVector._internal(viewSize, _elements, viewZero, viewStride, viewOffsets, viewOffset);
+    return new SelectedSparseIntVector._internal(
+        viewSize, _elements, viewZero, viewStride, viewOffsets, viewOffset);
   }
 
   IntVector row(int row) {
@@ -535,7 +588,8 @@ class SelectedSparseIntMatrix extends IntMatrix {
     int viewStride = columnStride;
     Int32List viewOffsets = _columnOffsets;
     int viewOffset = _offset + rowOffset(rowRank(row));
-    return new SelectedSparseIntVector._internal(viewSize, _elements, viewZero, viewStride, viewOffsets, viewOffset);
+    return new SelectedSparseIntVector._internal(
+        viewSize, _elements, viewZero, viewStride, viewOffsets, viewOffset);
   }
 
   int columnOffset(int absRank) => _columnOffsets[absRank];
@@ -567,10 +621,13 @@ class SelectedSparseIntMatrix extends IntMatrix {
   }
 
   IntMatrix _viewSelectionLike(Int32List rowOffsets, Int32List columnOffsets) {
-    return new SelectedSparseIntMatrix(this._elements, rowOffsets, columnOffsets, this._offset);
+    return new SelectedSparseIntMatrix(
+        this._elements, rowOffsets, columnOffsets, this._offset);
   }
 
   Object clone() {
-    return new SelectedSparseIntMatrix._internal(rows, columns, _elements, rowZero, columnZero, rowStride, columnStride, _rowOffsets, _columnOffsets, _offset);
+    return new SelectedSparseIntMatrix._internal(rows, columns, _elements,
+        rowZero, columnZero, rowStride, columnStride, _rowOffsets,
+        _columnOffsets, _offset);
   }
 }

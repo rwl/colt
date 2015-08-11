@@ -38,15 +38,13 @@ class DoubleFormatter extends AbstractFormatter {
   }
 
   /// Converts a given cell to a String; no alignment considered.
-  String _formDoubleVector(
-      DoubleVector matrix, int index, Former formatter) {
+  String _formDoubleVector(DoubleVector matrix, int index, Former formatter) {
     return formatter.formDouble(matrix.get(index));
   }
 
   /// Converts a given cell to a String; no alignment considered.
   String _form(AbstractVector matrix, int index, Former formatter) {
-    return this._formDoubleVector(
-        matrix as DoubleVector, index, formatter);
+    return this._formDoubleVector(matrix as DoubleVector, index, formatter);
   }
 
   /// Returns a string representations of all cells; no alignment considered.
