@@ -4,7 +4,7 @@ const int DINDEX = 3;
 
 testDiagonalDoubleMatrix(bool view) {
   group("DiagonalDoubleMatrix (${view ? 'view' : 'raw'})", () {
-    DiagonalDoubleMatrix A, B, Bt;
+    DoubleMatrix A, B, Bt;
     int dlength;
 
     setUp(() {
@@ -12,10 +12,10 @@ testDiagonalDoubleMatrix(bool view) {
         A = new DiagonalDoubleMatrix(NROWS, NCOLUMNS, DINDEX);
         B = new DiagonalDoubleMatrix(NROWS, NCOLUMNS, DINDEX);
         Bt = new DiagonalDoubleMatrix(NCOLUMNS, NROWS, -DINDEX);
-        dlength = A.diagonalLength;
+        dlength = (A as DiagonalDoubleMatrix).diagonalLength;
       } else {
         A = new DiagonalDoubleMatrix(NCOLUMNS, NROWS, -DINDEX);
-        dlength = A.diagonalLength;
+        dlength = (A as DiagonalDoubleMatrix).diagonalLength;
         A = A.dice();
         B = new DiagonalDoubleMatrix(NCOLUMNS, NROWS, -DINDEX).dice();
         Bt = new DiagonalDoubleMatrix(NROWS, NCOLUMNS, DINDEX).dice();

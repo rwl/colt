@@ -44,7 +44,7 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
     }
     var rowIndexes = new Int32List(nzmax);
     var values = new Float64List(nzmax);
-    var columnPointers = new Int32List(rows + 1);
+    var columnPointers = new Int32List(columns + 1);
     return new SparseCCDoubleMatrix._internal(
         rows, columns, rowIndexes, columnPointers, values);
   }
@@ -130,6 +130,7 @@ class SparseCCDoubleMatrix extends WrapperDoubleMatrix {
     if (sortRowIndexes) {
       m.sortRowIndexes();
     }
+    return m;
   }
 
   static SparseCCDoubleMatrix create(int rows, int columns) {

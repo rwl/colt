@@ -415,7 +415,7 @@ abstract class DoubleVector extends AbstractVector {
   /// at [index].
   DoubleVector part(int index, int width) {
     var v = _view();
-    vPart(this, index, width);
+    vPart(v, index, width);
     return v;
   }
 
@@ -448,7 +448,7 @@ abstract class DoubleVector extends AbstractVector {
   /// every i-th cell.
   DoubleVector strides(int stride) {
     var v = _view();
-    vStride(this, stride);
+    vStride(v, stride);
     return v;
   }
 

@@ -30,19 +30,19 @@ doubleMatrixTests() {
   testDenseDoubleMatrix('raw', DenseDoubleMatrix.create);
   testDenseDoubleMatrix('view', _dice(DenseDoubleMatrix.create));
 
-//  testDiagonalDoubleMatrix(true);
-//  testDiagonalDoubleMatrix(false);
+  testDiagonalDoubleMatrix(true);
+  testDiagonalDoubleMatrix(false);
 
   testDoubleMatrix('sparse', SparseDoubleMatrix.create);
   testDoubleMatrix('sparse view', _dice(SparseDoubleMatrix.create));
-//  testSparseDoubleMatrix();
-//  testSparseDoubleMatrix();
+  testSparseDoubleMatrix();
+  testSparseDoubleMatrix();
 
   testDoubleMatrix('sparse rc', SparseRCDoubleMatrix.create);
   testDoubleMatrix('sparse rc view', _dice(SparseRCDoubleMatrix.create));
 
-//  testDoubleMatrix('sparse cc', SparseCCDoubleMatrix.create);
-//  testDoubleMatrix('sparse cc view', _view(SparseCCDoubleMatrix.create));
+  testDoubleMatrix('sparse cc', SparseCCDoubleMatrix.create);
+  testDoubleMatrix('sparse cc view', _dice(SparseCCDoubleMatrix.create));
 }
 
 _flip(make) => (sz) => make(sz).flip();

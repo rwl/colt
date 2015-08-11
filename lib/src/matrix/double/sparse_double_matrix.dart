@@ -143,15 +143,16 @@ class SparseDoubleMatrix extends DoubleMatrix {
   /// a column-compressed form.
   SparseCCDoubleMatrix columnCompressed([bool sortRowIndexes = false]) {
     int nnz = cardinality;
-    var keys = _elements.keys;
-    var values = _elements.values;
+    var keys = _elements.keys.toList();
     var rowIndexes = new Int32List(nnz);
     var columnIndexes = new Int32List(nnz);
+    var values = new Float64List(nnz);
 
     for (int k = 0; k < nnz; k++) {
       var key = keys[k];
       rowIndexes[k] = key ~/ columns;
       columnIndexes[k] = key % columns;
+      values[k] = _elements[key];
     }
     return new SparseCCDoubleMatrix.withValues(
         rows, columns, rowIndexes, columnIndexes, values,
@@ -164,14 +165,15 @@ class SparseDoubleMatrix extends DoubleMatrix {
   /// in a row-compressed form.
   SparseRCDoubleMatrix rowCompressed([bool sortColumnIndexes = false]) {
     int nnz = cardinality;
-    var keys = _elements.keys;
-    var values = _elements.values;
+    var keys = _elements.keys.toList();
     var rowIndexes = new Int32List(nnz);
     var columnIndexes = new Int32List(nnz);
+    var values = new Float64List(nnz);
     for (int k = 0; k < nnz; k++) {
       int key = keys[k];
       rowIndexes[k] = key ~/ columns;
       columnIndexes[k] = key % columns;
+      values[k] = _elements[key];
     }
     return new SparseRCDoubleMatrix.withValues(
         rows, columns, rowIndexes, columnIndexes, values,
@@ -408,7 +410,7 @@ class SparseDoubleMatrix extends DoubleMatrix {
         int index =
             rowZero + row * rowStride + columnZero + column * columnStride;
         double elem = _elements[index];
-        if (elem == 0) {
+        if (elem == 0 || elem == null) {
           _elements[index] = value;
         } else {
           double sum = elem + value;
