@@ -1,5 +1,3 @@
-
-
 void main(int size) {
 //  //cern.jet.math.tdouble.DoubleFunctions F = cern.jet.math.tdouble.DoubleFunctions.functions;
 //  print("\n\n");

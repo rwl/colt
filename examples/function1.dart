@@ -1,4 +1,3 @@
-
 void main() {
 //  //DoubleFunctions F = cern.jet.math.tdouble.DoubleFunctions.functions;
 //  double a = 0.5;
