@@ -1,4 +1,4 @@
-library cern.colt;
+library cern.colt.matrix;
 
 export 'src/matrix/double/matrix.dart'
     show
