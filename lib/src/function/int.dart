@@ -6,9 +6,6 @@ import '../math.dart' show MAX_INT;
 typedef int IntFunction(int argument);
 typedef int IntIntFunction(int x, int y);
 typedef int IntIntIntFunction(int first, int second, int third);
-//typedef bool IntIntIntProcedure(int first, int second, int third);
-//typedef bool IntIntProcedure(int first, int second);
-//typedef bool IntProcedure(int element);
 
 /// Unary functions
 
@@ -134,18 +131,13 @@ IntFunction bindArg2(IntIntFunction function, int c) {
 }
 
 /// Constructs the function `g( h(a) )`.
-IntFunction chain2(IntFunction g, IntFunction h) {
+IntFunction chain(IntFunction g, IntFunction h) {
   return (int a) => g(h(a));
 }
 
 /// Constructs the function `g( h(a,b) )`.
-IntIntFunction chain3(IntFunction g, IntIntFunction h) {
+IntIntFunction chainBinary(IntFunction g, IntIntFunction h) {
   return (int a, int b) => g(h(a, b));
-}
-
-/// Constructs the function `f( g(a), h(b) )`.
-IntIntFunction chain4(IntIntFunction f, IntFunction g, IntFunction h) {
-  return (int a, int b) => f(g(a), h(b));
 }
 
 /// Constructs a function that returns `a < b ? -1 : a > b ? 1 : 0`.
@@ -170,30 +162,6 @@ IntFunction divide(int b) {
 IntFunction equalTo(int b) {
   return (int a) => a == b ? 1 : 0;
 }
-
-/// Constructs a function that returns `from<=a && a<=to`. `a`
-/// is a variable, `from` and `to` are fixed.
-//IntProcedure isBetween(int from, int to) {
-//  return (int a) => from <= a && a <= to;
-//}
-
-/// Constructs a function that returns `a == b`. `a` is a
-/// variable, `b` is fixed.
-//IntProcedure isEqualTo(int b) {
-//  return (int a) => a == b;
-//}
-
-/// Constructs a function that returns `a > b`. `a` is a
-/// variable, `b` is fixed.
-//IntProcedure isGreaterThan(int b) {
-//  return (int a) => a > b;
-//}
-
-/// Constructs a function that returns `a < b`. `a` is a
-/// variable, `b` is fixed.
-//IntProcedure isLessThan(int b) {
-//  return (int a) => a < b;
-//}
 
 /// Constructs a function that returns `Math.max(a,b)`. `a` is
 /// a variable, `b` is fixed.

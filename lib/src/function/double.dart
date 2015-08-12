@@ -3,10 +3,6 @@ library cern.colt.function.double;
 import 'dart:math' as Math;
 
 typedef double DoubleFunction(double x);
-typedef double Double5Function(
-    double a, double b, double c, double d, double e);
-typedef double Double9Function(double a00, double a01, double a02, double a10,
-    double a11, double a12, double a20, double a21, double a22);
 typedef double DoubleDoubleFunction(double x, double y);
 typedef double IntDoubleFunction(int first, double second);
 typedef double IntIntDoubleFunction(int first, int second, double third);
@@ -206,19 +202,13 @@ DoubleFunction bindArg2(DoubleDoubleFunction fn, double c) {
   return (double v) => fn(v, c);
 }
 
-/// Constructs the function `f( g(a), h(b) )`.
-DoubleDoubleFunction chainFGH(
-    DoubleDoubleFunction f, DoubleFunction g, DoubleFunction h) {
-  return (double a, double b) => f(g(a), h(b));
-}
-
 /// Constructs the function `g( h(a,b) )`.
-DoubleDoubleFunction chain(DoubleFunction g, DoubleDoubleFunction h) {
+DoubleDoubleFunction chainBinary(DoubleFunction g, DoubleDoubleFunction h) {
   return (double a, double b) => g(h(a, b));
 }
 
 /// Constructs the function `g( h(a) )`.
-DoubleFunction chainGH(DoubleFunction g, DoubleFunction h) {
+DoubleFunction chain(DoubleFunction g, DoubleFunction h) {
   return (double a) => g(h(a));
 }
 
@@ -258,36 +248,8 @@ DoubleFunction greaterThan(double b) {
 /// Constructs a function that returns `Math.IEEEremainder(a,b)`.
 /// `a` is a variable, `b` is fixed.
 /*DoubleFunction IEEEremainderOf(double b) {
-    return (double a) {
-            return Math.IEEEremainder(a, b);
-    };
+    return (double a) => Math.IEEEremainder(a, b);
 }*/
-
-/// Constructs a function that returns `from<=a && a<=to`. `a`
-/// is a variable, `from` and `to` are fixed.
-//DoubleProcedure isBetween(double from, double to) {
-//    return (double a) => from <= a && a <= to;
-//}
-
-/// Constructs a function that returns `a == b`. `a` is a
-/// variable, `b` is fixed.
-//DoubleProcedure isEqualTo(double b) {
-//    return (double a) => a == b;
-//}
-
-/// Constructs a function that returns `a > b`. `a` is a
-/// variable, `b` is fixed.
-//DoubleProcedure isGreaterThan(double b) {
-//    return (double a) => a > b;
-//}
-
-/**
- * Constructs a function that returns `a < b`. `a` is a
- * variable, `b` is fixed.
- */
-//DoubleProcedure isLessThan(double b) {
-//    return (double a) => a < b;
-//}
 
 /// Constructs a function that returns `a < b ? 1 : 0`. `a` is
 /// a variable, `b` is fixed.

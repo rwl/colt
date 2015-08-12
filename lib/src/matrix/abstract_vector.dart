@@ -15,14 +15,10 @@ part of cern.colt.matrix;
 abstract class AbstractVector {
   bool _isNoView = true;
 
-  /// The number of cells this matrix (view) has.
   int _size;
 
-  /// The index of the first element.
   int _zero;
 
-  /// The number of indexes between any two elements, i.e.
-  ///     index(i+1) - index(i).
   int _stride;
 
   /// Returns whether the receiver is a view or not.
@@ -59,19 +55,11 @@ abstract class AbstractVector {
   int get size => _size;
 
   /// Throws an [UnsupportedError].
-//  void set size(_) {
-//    throw new UnsupportedError('vectors are fixed length');
-//  }
 
-  /// Returns the stride of the given [dimension] (axis, rank).
-//  int stride([int dimension = 0]) {
-//    if (dimension != 0) {
-//      throw new ArgumentError("invalid dimension: $dimension used to access" + toStringShort());
-//    }
-//    return _stride;
-//  }
+  /// The number of indexes between any two elements.
   int get stride => _stride;
 
+  /// The index of the first element.
   int get zero => _zero;
 
   /// Returns a string representation of the receiver's shape.
