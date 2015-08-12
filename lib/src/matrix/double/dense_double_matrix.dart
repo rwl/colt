@@ -110,7 +110,7 @@ class DenseDoubleMatrix extends DoubleMatrix {
     }
   }
 
-  void setAll(Float64List values) {
+  void setValues(Float64List values) {
     if (values.length != size) {
       throw new ArgumentError(
           "Must have same length: length=${values.length} rows()*columns()=${rows * columns}");

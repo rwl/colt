@@ -18,7 +18,7 @@ class SparseComplexVector extends ComplexVector {
   /// Constructs a matrix with a copy of the given [values]. The [values] are
   /// copied.
   factory SparseComplexVector.fromList(Float64List values) {
-    return new SparseComplexVector(values.length)..setAll(values);
+    return new SparseComplexVector(values.length)..setValues(values);
   }
 
   /// Constructs a matrix with a given number of cells.

@@ -31,12 +31,12 @@ testIntVector(String kind, IntVector make(int size)) {
       }
     });
 
-    test('setAll', () {
+    test('setValues', () {
       var expected = new Int32List(A.size);
       for (int i = 0; i < A.size; i++) {
         expected[i] = random.nextInt(MAX_INT);
       }
-      A.setAll(expected);
+      A.setValues(expected);
       for (int i = 0; i < A.size; i++) {
         expect(expected[i], A.get(i));
       }

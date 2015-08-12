@@ -12,7 +12,7 @@ part of cern.colt.matrix.double;
 
 /// Abstract base class for 1-d matrices (aka vectors) holding
 /// [double] elements.
-abstract class DoubleVector extends AbstractVector {
+abstract class DoubleVector extends AbstractVector<double> {
   DoubleVector._(int size, [int zero = 0, int stride = 1, bool isNoView = true])
       : super(size, zero, stride, isNoView);
 
@@ -68,7 +68,7 @@ abstract class DoubleVector extends AbstractVector {
 
   /// Sets all cells to the state specified by [values]. [values]
   /// is required to have the same number of cells as the receiver.
-  void setAll(Float64List values) {
+  void setValues(Float64List values) {
     if (values.length != size) {
       throw new ArgumentError(
           "Must have same number of cells: length=${values.length} size()=${size}");
@@ -380,7 +380,8 @@ abstract class DoubleVector extends AbstractVector {
   void set(int index, double value);
 
   /// Constructs and returns a 1-dimensional array containing the cell values.
-  Float64List toList() {
+  /// The [growable] argument is ignored.
+  Float64List toList({bool growable: true}) {
     Float64List result;
     result = new Float64List(size);
     fillList(result);

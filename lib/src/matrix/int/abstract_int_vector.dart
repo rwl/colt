@@ -12,7 +12,7 @@ part of cern.colt.matrix.int;
 
 /// Abstract base class for 1-d matrices (aka vectors) holding [int]
 /// elements.
-abstract class IntVector extends AbstractVector /*with ListMixin<int>*/ {
+abstract class IntVector extends AbstractVector<int> {
   IntVector._(int size, [int zero = 0, int stride = 1, bool isNoView = true])
       : super(size, zero, stride, isNoView);
 
@@ -66,7 +66,7 @@ abstract class IntVector extends AbstractVector /*with ListMixin<int>*/ {
 
   /// Sets all cells to the state specified by [values]. [values]
   /// is required to have the same number of cells as the receiver.
-  void setAll(Int32List values) {
+  void setValues(Int32List values) {
     if (values.length != size) {
       throw new ArgumentError(
           "Must have same number of cells: length=${values.length} size()=$size");
@@ -396,7 +396,8 @@ abstract class IntVector extends AbstractVector /*with ListMixin<int>*/ {
   void set(int index, int value);
 
   /// Constructs and returns a 1-dimensional array containing the cell values.
-  Int32List toList() {
+  /// The [growable] argument is ignored.
+  Int32List toList({bool growable: true}) {
     var result = new Int32List(size);
     fillList(result);
     return result;

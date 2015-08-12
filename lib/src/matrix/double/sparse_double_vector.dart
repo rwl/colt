@@ -28,7 +28,7 @@ class SparseDoubleVector extends DoubleVector {
 
   /// Constructs a matrix with a copy of the given values.
   factory SparseDoubleVector.fromList(Float64List values) {
-    return new SparseDoubleVector(values.length)..setAll(values);
+    return new SparseDoubleVector(values.length)..setValues(values);
   }
 
   /// Constructs a matrix with a given number of parameters. All entries are

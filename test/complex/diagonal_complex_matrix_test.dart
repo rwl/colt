@@ -49,12 +49,12 @@ testDiagonalComplexMatrix(bool view) {
       }
     });
 
-    test('setAll', () {
+    test('setValues', () {
       Float64List expected = new Float64List(2 * DLENGTH);
       for (int i = 0; i < 2 * DLENGTH; i++) {
         expected[i] = random.nextDouble();
       }
-      A.setAll(expected);
+      A.setValues(expected);
       if (DINDEX >= 0) {
         for (int r = 0; r < DLENGTH; r++) {
           expect(expected[2 * r], closeTo(A.get(r, r + DINDEX).real, TOL));

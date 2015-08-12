@@ -2,7 +2,6 @@ library cern.colt.matrix.complex;
 
 import 'dart:math' as Math;
 import 'dart:typed_data';
-//import 'dart:collection' show ListMixin;
 import 'package:intl/intl.dart' show NumberFormat;
 import 'package:complex/complex.dart';
 

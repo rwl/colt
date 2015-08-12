@@ -179,12 +179,12 @@ ComplexMatrix csparse(int rows, int columns, List<int> rowIndexes,
 ComplexMatrix cspdiag(ComplexVector a) {
   int n = a.size;
   var ix = range(n);
-  return csparse(n, n, ix, ix, a.toList(), removeDuplicates: true);
+  return csparse(n, n, ix, ix, a.toFloatList(), removeDuplicates: true);
 }
 
 SparseComplexVector csparray(int size, Int32List indexes, Float64List values) {
   var v = new SparseComplexVector(size);
-  v.select(indexes).setAll(values);
+  v.select(indexes).setValues(values);
   return v;
 }
 

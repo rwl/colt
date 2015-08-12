@@ -100,7 +100,7 @@ class DiagonalDoubleMatrix extends WrapperDoubleMatrix {
     }
   }
 
-  void setAll(Float64List values) {
+  void setValues(Float64List values) {
     if (values.length != _dlength) {
       throw new ArgumentError(
           "Must have same length: length=${values.length} dlength=$_dlength");

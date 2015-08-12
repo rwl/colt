@@ -50,12 +50,12 @@ testDiagonalDoubleMatrix(bool view) {
       }
     });
 
-    test('setAll', () {
+    test('setValues', () {
       Float64List expected = new Float64List(dlength);
       for (int i = 0; i < dlength; i++) {
         expected[i] = _r.nextDouble();
       }
-      A.setAll(expected);
+      A.setValues(expected);
       if (DINDEX >= 0) {
         for (int r = 0; r < dlength; r++) {
           expect(expected[r], closeTo(A.get(r, r + DINDEX), TOL));

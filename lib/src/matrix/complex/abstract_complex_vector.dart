@@ -12,8 +12,7 @@ part of cern.colt.matrix.complex;
 
 /// Abstract base class for 1-d matrices (aka vectors) holding [Complex]
 /// elements.
-abstract class ComplexVector extends AbstractVector {
-  //with ListMixin<double> {
+abstract class ComplexVector extends AbstractVector<Complex> {
   ComplexVector._(int size,
       [int zero = 0, int stride = 1, bool isNoView = true])
       : super(size, zero, stride, isNoView);
@@ -90,7 +89,7 @@ abstract class ComplexVector extends AbstractVector {
   /// to have the same number of cells as the receiver. Complex data is
   /// represented by 2 double values in sequence: the real and imaginary
   /// parts, i.e. input array must be of size `2*size`.
-  void setAll(Float64List values) {
+  void setValues(Float64List values) {
     if (values.length != 2 * size) {
       throw new ArgumentError(
           "The length of values[] must be equal to 2*size()=$size");
@@ -244,8 +243,9 @@ abstract class ComplexVector extends AbstractVector {
   /// Sets the matrix cell at coordinate [index] to the specified value.
   void set(int index, Complex value);
 
-  /// Constructs and returns a 1-dimensional array containing the cell values.
-  Float64List toList() {
+  /// Constructs and returns a 1-dimensional array containing interleaved
+  /// real and imaginary values.
+  Float64List toFloatList() {
     var values = new Float64List(2 * size);
     fillList(values);
     return values;

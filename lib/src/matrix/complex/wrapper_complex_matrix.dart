@@ -22,7 +22,7 @@ class WrapperComplexMatrix extends ComplexMatrix {
     _content = newContent;
   }
 
-  void setAll(Float64List values) {
+  void setValues(Float64List values) {
     if (_content is DiagonalComplexMatrix) {
       int dlength = (_content as DiagonalComplexMatrix)._dlength;
       Float64List elems = (_content as DiagonalComplexMatrix)._elements;
@@ -36,7 +36,7 @@ class WrapperComplexMatrix extends ComplexMatrix {
       }
       return;
     } else {
-      super.setAll(values);
+      super.setValues(values);
       return;
     }
   }

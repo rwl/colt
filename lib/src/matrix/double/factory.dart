@@ -20,8 +20,13 @@ DoubleVector append(DoubleVector A, DoubleVector B, VectorFn make) {
 
 /// Constructs a matrix with cells having ascending values.
 DoubleVector ascending(int size, VectorFn make) {
-  return descending(size, make)
-    ..apply(func.chainGH(func.neg, func.subtract(size)));
+  DoubleVector matrix = make(size);
+  double v = 0.0;
+  for (int i = 0; i < size; i++) {
+    matrix.set(i, v);
+    v += 1;
+  }
+  return matrix;
 }
 
 /// Constructs a matrix with cells having descending values.
@@ -246,8 +251,15 @@ DoubleMatrix appendRows(DoubleMatrix A, DoubleMatrix B, MatrixFn make) {
 ///     0 1 2
 ///     3 4 5
 DoubleMatrix ascendingMatrix(int rows, int columns, MatrixFn make) {
-  return descendingMatrix(rows, columns, make)
-    ..apply(func.chainGH(func.neg, func.subtract(columns * rows)));
+  DoubleMatrix matrix = make(rows, columns);
+  double v = 0.0;
+  for (int row = 0; row < rows; row++) {
+    for (int column = 0; column < columns; column++) {
+      matrix.set(row, column, v);
+      v += 1;
+    }
+  }
+  return matrix;
 }
 
 /// Constructs a block matrix made from the given parts. The inverse to

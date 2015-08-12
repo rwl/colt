@@ -25,7 +25,7 @@ class DenseComplexVector extends ComplexVector {
   /// real and imaginary parts, the size of new matrix will be equal to
   /// `values.length / 2`.
   factory DenseComplexVector.fromList(Float64List values) {
-    return new DenseComplexVector(values.length ~/ 2)..setAll(values);
+    return new DenseComplexVector(values.length ~/ 2)..setValues(values);
   }
 
   /// Constructs a complex matrix with the same size as [realPart] matrix
@@ -306,7 +306,7 @@ class DenseComplexVector extends ComplexVector {
     }
   }
 
-  void setAll(Float64List values) {
+  void setValues(Float64List values) {
     if (!isView) {
       if (values.length != 2 * size) {
         throw new ArgumentError(
@@ -314,7 +314,7 @@ class DenseComplexVector extends ComplexVector {
       }
       _elements.setAll(0, values);
     } else {
-      super.setAll(values);
+      super.setValues(values);
     }
   }
 

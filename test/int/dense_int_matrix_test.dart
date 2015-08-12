@@ -6,12 +6,12 @@ testDenseIntMatrix(String kind, IntMatrix make(int rows, int columns)) {
     setUp(() {
       A = make(NROWS, NCOLUMNS);
     });
-    test('setAll', () {
+    test('setValues', () {
       var expected = new Int32List(A.size);
       for (int i = 0; i < A.size; i++) {
         expected[i] = random.nextInt(MAX_INT);
       }
-      A.setAll(expected);
+      A.setValues(expected);
       int idx = 0;
       for (int r = 0; r < A.rows; r++) {
         for (int c = 0; c < A.columns; c++) {

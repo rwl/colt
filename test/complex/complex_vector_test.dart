@@ -59,12 +59,12 @@ testComplexVector(String kind, ComplexVector make(int size)) {
       }
     });
 
-    test('setAll', () {
+    test('setValues', () {
       var expected = new Float64List(2 * A.size);
       for (int i = 0; i < 2 * A.size; i++) {
         expected[i] = random.nextDouble();
       }
-      A.setAll(expected);
+      A.setValues(expected);
       for (int i = 0; i < A.size; i++) {
         var elem = A.get(i);
         expect(expected[2 * i], closeTo(elem.real, TOL));
@@ -153,8 +153,8 @@ testComplexVector(String kind, ComplexVector make(int size)) {
       }
     });
 
-    test('toList', () {
-      Float64List array = A.toList();
+    test('toFloatList', () {
+      Float64List array = A.toFloatList();
       for (int i = 0; i < A.size; i++) {
         var elem = A.get(i);
         expect(elem.real, closeTo(array[2 * i], TOL));

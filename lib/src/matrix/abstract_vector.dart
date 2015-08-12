@@ -12,7 +12,7 @@ part of cern.colt.matrix;
 
 /// Abstract base class for 1-d matrices (aka vectors) holding objects or
 /// primitive data types such as [int], [double], etc.
-abstract class AbstractVector {
+abstract class AbstractVector<E> extends ListBase<E> {
   bool _isNoView = true;
 
   int _size;
@@ -66,6 +66,14 @@ abstract class AbstractVector {
   String toStringShort() {
     return AbstractFormatter.shapeVector(this);
   }
+
+  /// Throws an [UnsupportedError].
+  void set length(int _) {
+    throw new UnsupportedError('fixed size');
+  }
+
+  /// Synonym for [size] ([List] API).
+  int get length => size;
 }
 
 /// Sanity check for operations requiring an index to be within bounds.

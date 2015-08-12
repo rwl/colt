@@ -105,7 +105,7 @@ abstract class ComplexMatrix extends AbstractMatrix {
   /// `re = values[row*rowStride+column*columnStride];`
   /// `im = values[row*rowStride+column*columnStride+1]`
   /// and have exactly the same number of rows and columns as the receiver.
-  void setAll(Float64List values) {
+  void setValues(Float64List values) {
     if (values.length != rows * 2 * columns) {
       throw new ArgumentError(
           "Must have same length: length=${values.length} rows()*2*columns()=${rows * 2 * columns}");

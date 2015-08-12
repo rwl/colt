@@ -2,7 +2,6 @@ library cern.colt.matrix.int;
 
 import 'dart:math' as Math;
 import 'dart:typed_data';
-//import 'dart:collection' show ListMixin;
 
 import '../matrix.dart'
     show

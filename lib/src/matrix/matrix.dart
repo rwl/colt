@@ -1,5 +1,7 @@
 library cern.colt.matrix;
 
+import 'dart:collection' show ListBase;
+
 import '../math.dart';
 import 'formatter.dart';
 

@@ -36,7 +36,7 @@ class WrapperIntMatrix extends IntMatrix {
     return;
   }*/
 
-  void setAll(Int32List values) {
+  void setValues(Int32List values) {
     if (_content is DiagonalIntMatrix) {
       int dlength = (_content as DiagonalIntMatrix)._dlength;
       Int32List elems = (_content as DiagonalIntMatrix)._elements;
@@ -49,7 +49,7 @@ class WrapperIntMatrix extends IntMatrix {
       }
       return;
     } else {
-      super.setAll(values);
+      super.setValues(values);
       return;
     }
   }

@@ -93,7 +93,7 @@ class DiagonalIntMatrix extends WrapperIntMatrix {
     return;
   }
 
-  void setAll(Int32List values) {
+  void setValues(Int32List values) {
     if (values.length != _dlength) {
       throw new ArgumentError(
           "Must have same length: length=${values.length} dlength=$_dlength");

@@ -104,7 +104,7 @@ class DiagonalComplexMatrix extends WrapperComplexMatrix {
     }
   }
 
-  void setAll(Float64List values) {
+  void setValues(Float64List values) {
     if (values.length != 2 * _dlength) {
       throw new ArgumentError(
           "Must have same length: length=${values.length} 2*dlength=${2 * _dlength}");

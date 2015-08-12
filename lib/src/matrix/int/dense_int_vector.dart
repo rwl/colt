@@ -18,7 +18,7 @@ class DenseIntVector extends IntVector {
 
   /// Constructs a matrix with a copy of the given [values].
   factory DenseIntVector.fromList(Int32List values) {
-    return new DenseIntVector(values.length)..setAll(values);
+    return new DenseIntVector(values.length)..setValues(values);
   }
 
   /// Constructs a matrix with a given number of cells. All entries are
@@ -105,7 +105,7 @@ class DenseIntVector extends IntVector {
     }
   }
 
-  void setAll(Int32List values) {
+  void setValues(Int32List values) {
     if (values.length != size) {
       throw new ArgumentError(
           "Must have same number of cells: length=${values.length} size()=$size");
@@ -488,7 +488,7 @@ class DenseIntVector extends IntVector {
 
   DenseDoubleVector toDouble() {
     var l = new List<double>.generate(size, (int i) => get(i).toDouble());
-    return new DenseDoubleVector(size)..setAll(new Float64List.fromList(l));
+    return new DenseDoubleVector(size)..setValues(new Float64List.fromList(l));
   }
 }
 

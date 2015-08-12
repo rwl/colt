@@ -30,8 +30,12 @@ IntVector append(IntVector A, IntVector B, VectorFn make) {
 
 /// Constructs a matrix with cells having ascending values.
 IntVector ascending(int size, VectorFn make) {
-  return descending(size, make)
-    ..apply(ifunc.chain2(ifunc.neg, ifunc.subtract(size)));
+  IntVector matrix = make(size);
+  int v = 0;
+  for (int i = 0; i < size; i++) {
+    matrix.set(i, v++);
+  }
+  return matrix;
 }
 
 /// Constructs a matrix with cells having descending values.
@@ -192,8 +196,14 @@ IntMatrix appendRow(IntMatrix A, IntVector b, MatrixFn make) {
 ///     0 1 2
 ///     3 4 5
 IntMatrix ascendingMatrix(int rows, int columns, MatrixFn make) {
-  return descendingMatrix(rows, columns, make)
-    ..apply(ifunc.chain2(ifunc.neg, ifunc.subtract(columns * rows)));
+  IntMatrix matrix = make(rows, columns);
+  int v = 0;
+  for (int row = 0; row < rows; row++) {
+    for (int column = 0; column < columns; column++) {
+      matrix.set(row, column, v++);
+    }
+  }
+  return matrix;
 }
 
 /// Checks whether the given array is rectangular, that is, whether all rows

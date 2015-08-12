@@ -29,7 +29,7 @@ class WrapperDoubleMatrix extends DoubleMatrix {
     _content = newContent;
   }
 
-  void setAll(Float64List values) {
+  void setValues(Float64List values) {
     if (_content is DiagonalDoubleMatrix) {
       int dlength = (_content as DiagonalDoubleMatrix)._dlength;
       Float64List elems = (_content as DiagonalDoubleMatrix)._elements;
@@ -43,7 +43,7 @@ class WrapperDoubleMatrix extends DoubleMatrix {
       }
       return;
     } else {
-      super.setAll(values);
+      super.setValues(values);
     }
   }
 

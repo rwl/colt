@@ -27,7 +27,7 @@ class SparseIntVector extends IntVector {
 
   /// Constructs a matrix with a copy of the given values.
   factory SparseIntVector.fromList(Int32List values) {
-    return new SparseIntVector(values.length)..setAll(values);
+    return new SparseIntVector(values.length)..setValues(values);
   }
 
   /// Constructs a matrix with a given number of cells. All entries are

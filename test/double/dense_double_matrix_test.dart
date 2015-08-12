@@ -7,12 +7,12 @@ testDenseDoubleMatrix(String kind, DoubleMatrix make(int rows, int columns)) {
       A = make(NROWS, NCOLUMNS);
     });
 
-    test('setAll', () {
+    test('setValues', () {
       var expected = new Float64List(A.size);
       for (int i = 0; i < A.size; i++) {
         expected[i] = _r.nextDouble();
       }
-      A.setAll(expected);
+      A.setValues(expected);
       int idx = 0;
       for (int r = 0; r < A.rows; r++) {
         for (int c = 0; c < A.columns; c++) {

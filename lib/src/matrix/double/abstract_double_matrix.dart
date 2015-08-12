@@ -90,7 +90,7 @@ abstract class DoubleMatrix extends AbstractMatrix {
   /// Sets all cells to the state specified by [values]. [values] is required
   /// to have the form `values[row*column]` and elements have to be stored in
   /// a row-wise order.
-  void setAll(Float64List values) {
+  void setValues(Float64List values) {
     if (values.length != rows * columns) {
       throw new ArgumentError(
           "Must have same length: length=${values.length}rows()*columns()=${rows * columns}");

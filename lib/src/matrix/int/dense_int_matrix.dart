@@ -107,7 +107,7 @@ class DenseIntMatrix extends IntMatrix {
     }
   }
 
-  void setAll(Int32List values) {
+  void setValues(Int32List values) {
     if (values.length != size) {
       throw new ArgumentError("Must have same length: length=${values.length} "
           "rows()*columns()=${rows * columns}");

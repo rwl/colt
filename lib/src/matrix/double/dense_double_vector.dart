@@ -18,7 +18,7 @@ class DenseDoubleVector extends DoubleVector {
 
   /// Constructs a matrix with a copy of the given values.
   factory DenseDoubleVector.fromList(Float64List values) {
-    return new DenseDoubleVector(values.length)..setAll(values);
+    return new DenseDoubleVector(values.length)..setValues(values);
   }
 
   /// Constructs a matrix with a given number of cells. All entries are
@@ -91,7 +91,7 @@ class DenseDoubleVector extends DoubleVector {
     }
   }
 
-  void setAll(Float64List values) {
+  void setValues(Float64List values) {
     if (values.length != size) {
       throw new ArgumentError(
           "Must have same number of cells: length=${values.length} size()=${size}");

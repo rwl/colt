@@ -35,12 +35,12 @@ testDoubleVector(String kind, DoubleVector make(int size)) {
       }
     });
 
-    test('setAll', () {
+    test('setValues', () {
       Float64List expected = new Float64List(A.size);
       for (int i = 0; i < A.size; i++) {
         expected[i] = _r.nextDouble();
       }
-      A.setAll(expected);
+      A.setValues(expected);
       for (int i = 0; i < A.size; i++) {
         expect(expected[i], closeTo(A.get(i), TOL));
       }
