@@ -8,3 +8,5 @@ colt.iml
 
 .project
 /.settings/
+
+.travis.yml.save
