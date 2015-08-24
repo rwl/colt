@@ -1,4 +1,4 @@
-library cern.colt.matrix.function.complex;
+library cern.colt.matrix.function.complex.internal;
 
 import 'dart:math' as Math;
 import 'package:complex/complex.dart';

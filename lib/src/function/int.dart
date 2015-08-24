@@ -1,4 +1,4 @@
-library cern.colt.function.int;
+library cern.colt.function.int.internal;
 
 import 'dart:math' as math;
 import '../math.dart' show MAX_INT;

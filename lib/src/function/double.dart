@@ -1,4 +1,4 @@
-library cern.colt.function.double;
+library cern.colt.function.double.internal;
 
 import 'dart:math' as Math;
 

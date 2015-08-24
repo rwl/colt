@@ -8,7 +8,7 @@
 //
 // CERN makes no representations about the suitability of this software for
 // any purpose. It is provided "as is" without expressed or implied warranty.
-part of cern.colt.matrix;
+part of cern.colt.matrix.internal;
 
 /// Abstract base class for 2-d matrices holding objects or primitive data
 /// types such as [int], [double], etc.

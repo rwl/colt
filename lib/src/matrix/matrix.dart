@@ -1,4 +1,4 @@
-library cern.colt.matrix;
+library cern.colt.matrix.internal;
 
 import 'dart:collection' show ListBase;
 
