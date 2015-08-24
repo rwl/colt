@@ -38,6 +38,11 @@ main() {
 }
 ```
 
+## Related projects
+
+- [Complex](https://pub.dartlang.org/packages/complex)
+- [SuperLU](https://pub.dartlang.org/packages/superlu)
+
 [Dart]: https://www.dartlang.org/
 [ParallelColt]: https://sites.google.com/site/piotrwendykier/software/parallelcolt
 [Colt]: http://dst.lbl.gov/ACSSoftware/colt/
